@@ -1,30 +1,96 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:mobile_kalimasada/app/modules/ortu_home/controllers/ortu_home_controller.dart';
+import 'package:mobile_kalimasada/app/modules/ortu_home/views/ortu_home_view.dart';
+import 'package:mobile_kalimasada/app/modules/santri_home/controllers/santri_home_controller.dart';
+import 'package:mobile_kalimasada/app/modules/santri_home/views/santri_home_view.dart';
+import 'package:mobile_kalimasada/app/modules/ustadz_home/controllers/ustadz_home_controller.dart';
+import 'package:mobile_kalimasada/app/modules/ustadz_home/views/ustadz_home_view.dart';
 
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
-  const HomeView({super.key});
+  final santriHomeC = Get.put(SantriHomeController());
+  final ustadzHomeC = Get.put(UstadzHomeController());
+  final ortuHomeC = Get.put(OrtuHomeController());
+
+  HomeView({super.key});
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('HomeView'), centerTitle: true),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Obx(() => Text('User ID : ${controller.userId}')),
-            Obx(() => Text('Role : ${controller.role}')),
-            Obx(() => Text('Token : ${controller.token}')),
+    Widget body() {
+      if (controller.role.value == 'santri') {
+        switch (controller.currentIndex.value) {
+          case 0:
+            return const SantriHomeView();
+          case 1:
+            return const SantriHomeView();
+          case 2:
+            return const SantriHomeView();
+          default:
+            return const SantriHomeView();
+        }
+      } else if (controller.role.value == 'ustadz') {
+        switch (controller.currentIndex.value) {
+          case 0:
+            return const UstadzHomeView();
+          case 1:
+            return const UstadzHomeView();
+          case 2:
+            return const UstadzHomeView();
+          default:
+            return const UstadzHomeView();
+        }
+      } else if (controller.role.value == 'ortu') {
+        switch (controller.currentIndex.value) {
+          case 0:
+            return const OrtuHomeView();
+          case 1:
+            return const OrtuHomeView();
+          case 2:
+            return const OrtuHomeView();
+          default:
+            return const OrtuHomeView();
+        }
+      } else {
+        return Center(child: Text('Role tidak ditemukan'));
+      }
+    }
 
-            ElevatedButton(
-              onPressed: () {
-                controller.logout();
-              },
-              child: Text('Logout'),
-            ),
-          ],
+    return Scaffold(
+      body: Obx(() => body()),
+      bottomNavigationBar: Obx(
+        () => Theme(
+          data: Theme.of(context).copyWith(
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+          ),
+          child: BottomNavigationBar(
+            backgroundColor: Colors.white,
+            selectedItemColor: Colors.purple,
+            selectedFontSize: 12,
+            currentIndex: controller.currentIndex.value,
+            onTap: (index) {
+              controller.currentIndex.value = index;
+            },
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home, color: Colors.grey),
+                activeIcon: Icon(Icons.home, color: Colors.purple),
+                label: 'Beranda',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.history, color: Colors.grey),
+                activeIcon: Icon(Icons.history, color: Colors.purple),
+                label: 'Riwayat',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person, color: Colors.grey),
+                activeIcon: Icon(Icons.person, color: Colors.purple),
+                label: 'Profil',
+              ),
+            ],
+          ),
         ),
       ),
     );
