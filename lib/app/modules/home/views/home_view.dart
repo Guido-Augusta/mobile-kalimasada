@@ -67,7 +67,7 @@ class HomeView extends GetView<HomeController> {
           ),
           child: BottomNavigationBar(
             backgroundColor: Colors.white,
-            selectedItemColor: Colors.purple,
+            selectedItemColor: Colors.deepPurpleAccent,
             selectedFontSize: 12,
             currentIndex: controller.currentIndex.value,
             onTap: (index) {
@@ -76,17 +76,17 @@ class HomeView extends GetView<HomeController> {
             items: [
               BottomNavigationBarItem(
                 icon: Icon(Icons.home, color: Colors.grey),
-                activeIcon: Icon(Icons.home, color: Colors.purple),
+                activeIcon: Icon(Icons.home, color: Colors.deepPurpleAccent),
                 label: 'Beranda',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.history, color: Colors.grey),
-                activeIcon: Icon(Icons.history, color: Colors.purple),
+                activeIcon: Icon(Icons.history, color: Colors.deepPurpleAccent),
                 label: 'Riwayat',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person, color: Colors.grey),
-                activeIcon: Icon(Icons.person, color: Colors.purple),
+                activeIcon: Icon(Icons.person, color: Colors.deepPurpleAccent),
                 label: 'Profil',
               ),
             ],
