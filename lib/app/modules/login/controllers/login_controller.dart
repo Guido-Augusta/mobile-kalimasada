@@ -58,6 +58,7 @@ class LoginController extends GetxController {
           await prefs.setString('token', data['token'].toString());
           await prefs.setString('role', data['user']['role'].toString());
           await prefs.setString('userId', data['user']['id'].toString());
+          await prefs.setString('roleId', data['user']['roleId'].toString());
           Get.snackbar('Success', 'Login berhasil');
           // Navigate to home or another page
           Get.offAllNamed('/home');

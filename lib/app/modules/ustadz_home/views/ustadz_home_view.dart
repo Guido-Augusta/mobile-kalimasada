@@ -23,10 +23,12 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
               children: [
                 Row(
                   children: [
-                    CircleAvatar(
-                      radius: 35,
-                      backgroundImage: NetworkImage(
-                        'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg',
+                    Obx(
+                      () => CircleAvatar(
+                        radius: 35,
+                        backgroundImage: NetworkImage(
+                          controller.fotoProfil.value,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -40,14 +42,45 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                             color: Colors.grey[700],
                           ),
                         ),
-                        Text(
-                          'Ustadz',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                        Obx(
+                          () => Text(
+                            'Ustadz ${controller.name.value}',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
+                    ),
+                    const Spacer(),
+                    InkWell(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Text('Logout'),
+                              content: Text('Apakah anda yakin ingin logout?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Get.back();
+                                  },
+                                  child: Text('Tidak'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    controller.logout();
+                                  },
+                                  child: Text('Ya'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: Icon(Icons.logout_rounded, color: Colors.red),
                     ),
                   ],
                 ),
