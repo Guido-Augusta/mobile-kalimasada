@@ -1,5 +1,5 @@
-class Santri {
-  Santri({
+class DaftarSantri {
+  DaftarSantri({
     required this.id,
     required this.userId,
     required this.ortuId,
@@ -33,8 +33,8 @@ class Santri {
   final User? user;
   final OrangTua? orangTua;
 
-  factory Santri.fromJson(Map<String, dynamic> json) {
-    return Santri(
+  factory DaftarSantri.fromJson(Map<String, dynamic> json) {
+    return DaftarSantri(
       id: json["id"],
       userId: json["userId"],
       ortuId: json["ortuId"],

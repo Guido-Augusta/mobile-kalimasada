@@ -32,28 +32,32 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Assalamualaikum',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                        Obx(
-                          () => Text(
-                            'Ustadz ${controller.name.value}',
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Assalamualaikum',
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.grey[700],
                             ),
                           ),
-                        ),
-                      ],
+                          Obx(
+                            () => Text(
+                              'Ustadz ${controller.name.value}',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const Spacer(),
+                    const SizedBox(width: 30),
                     InkWell(
                       onTap: () {
                         showDialog(
@@ -87,7 +91,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                 const SizedBox(height: 30),
                 InkWell(
                   onTap: () {
-                    // Get.toNamed('/daftar_santri');
+                    Get.toNamed('/daftar-santri');
                   },
                   child: Container(
                     width: double.infinity,
@@ -145,7 +149,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                 const SizedBox(height: 20),
                 InkWell(
                   onTap: () {
-                    // Get.toNamed('/daftar_ortu');
+                    // Get.toNamed('/daftar-ortu');
                   },
                   child: Container(
                     width: double.infinity,

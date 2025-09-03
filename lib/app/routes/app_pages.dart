@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/daftar_santri/bindings/daftar_santri_binding.dart';
+import '../modules/daftar_santri/views/daftar_santri_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -46,6 +48,11 @@ class AppPages {
       name: _Paths.ORTU_HOME,
       page: () => const OrtuHomeView(),
       binding: OrtuHomeBinding(),
+    ),
+    GetPage(
+      name: _Paths.DAFTAR_SANTRI,
+      page: () => const DaftarSantriView(),
+      binding: DaftarSantriBinding(),
     ),
   ];
 }
