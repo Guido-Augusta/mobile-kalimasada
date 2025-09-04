@@ -131,113 +131,136 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                       Get.dialog(
                         barrierDismissible: false,
                         AlertDialog(
-                          title: const Text(
-                            'Tambah Hafalan',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.deepPurpleAccent,
+                          insetPadding: EdgeInsets.zero,
+                          title: Center(
+                            child: const Text(
+                              'Tambah Hafalan',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepPurpleAccent,
+                              ),
                             ),
                           ),
-                          content: SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                // Surah Dropdown
-                                const Text(
-                                  'Surah',
-                                  style: TextStyle(fontWeight: FontWeight.w500),
-                                ),
-                                const SizedBox(height: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.grey[300]!,
+                          content: SizedBox(
+                            width: MediaQuery.of(Get.context!).size.width - 80,
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // Surah Dropdown
+                                  const Text(
+                                    'Surah',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton<String>(
-                                      isExpanded: true,
-                                      hint: Obx(
-                                        () => Text(
-                                          controller.selectedSurah.value.isEmpty
-                                              ? 'Pilih Surah'
-                                              : controller.selectedSurah.value,
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                        isExpanded: true,
+                                        hint: Obx(
+                                          () => Text(
+                                            controller
+                                                    .selectedSurah
+                                                    .value
+                                                    .isEmpty
+                                                ? 'Pilih Surah'
+                                                : controller
+                                                      .selectedSurah
+                                                      .value,
+                                          ),
+                                        ),
+                                        items:
+                                            <String>[
+                                              'Al-Fatihah',
+                                              'Al-Baqarah',
+                                              'Ali-Imran',
+                                              // Add more surahs as needed
+                                            ].map<DropdownMenuItem<String>>((
+                                              String value,
+                                            ) {
+                                              return DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Text(value),
+                                              );
+                                            }).toList(),
+                                        onChanged: (String? newValue) {
+                                          controller.selectedSurah.value =
+                                              newValue!;
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Ayat Mulai',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Ayat Akhir',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // Ayat Input
+                                  const Text(
+                                    'Ayat',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  TextField(
+                                    decoration: InputDecoration(
+                                      hintText: 'Contoh: 1-5',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey[300]!,
                                         ),
                                       ),
-                                      items:
-                                          <String>[
-                                            'Al-Fatihah',
-                                            'Al-Baqarah',
-                                            'Ali-Imran',
-                                            // Add more surahs as needed
-                                          ].map<DropdownMenuItem<String>>((
-                                            String value,
-                                          ) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(value),
-                                            );
-                                          }).toList(),
-                                      onChanged: (String? newValue) {
-                                        controller.selectedSurah.value =
-                                            newValue!;
-                                      },
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 12,
+                                          ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(height: 16),
-
-                                // Juz Input
-                                const Text(
-                                  'Juz',
-                                  style: TextStyle(fontWeight: FontWeight.w500),
-                                ),
-                                const SizedBox(height: 8),
-                                TextField(
-                                  decoration: InputDecoration(
-                                    hintText: 'Masukkan Juz',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey[300]!,
-                                      ),
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 12,
-                                    ),
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                ),
-                                const SizedBox(height: 16),
-
-                                // Ayat Input
-                                const Text(
-                                  'Ayat',
-                                  style: TextStyle(fontWeight: FontWeight.w500),
-                                ),
-                                const SizedBox(height: 8),
-                                TextField(
-                                  decoration: InputDecoration(
-                                    hintText: 'Contoh: 1-5',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey[300]!,
-                                      ),
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 12,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                           actions: [
