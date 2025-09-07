@@ -9,7 +9,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFf1f5f9),
+      backgroundColor: Color(0xFFF8FAFF),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Padding(

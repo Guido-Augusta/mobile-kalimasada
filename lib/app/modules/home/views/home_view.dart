@@ -7,12 +7,15 @@ import 'package:mobile_kalimasada/app/modules/santri_home/controllers/santri_hom
 import 'package:mobile_kalimasada/app/modules/santri_home/views/santri_home_view.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz_home/controllers/ustadz_home_controller.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz_home/views/ustadz_home_view.dart';
+import 'package:mobile_kalimasada/app/modules/ustadz_profile/controllers/ustadz_profile_controller.dart';
+import 'package:mobile_kalimasada/app/modules/ustadz_profile/views/ustadz_profile_view.dart';
 
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
   final santriHomeC = Get.put(SantriHomeController());
   final ustadzHomeC = Get.put(UstadzHomeController());
+  final ustadzProfileC = Get.put(UstadzProfileController());
   final ortuHomeC = Get.put(OrtuHomeController());
 
   HomeView({super.key});
@@ -35,9 +38,7 @@ class HomeView extends GetView<HomeController> {
           case 0:
             return const UstadzHomeView();
           case 1:
-            return const UstadzHomeView();
-          case 2:
-            return const UstadzHomeView();
+            return const UstadzProfileView();
           default:
             return const UstadzHomeView();
         }
@@ -73,23 +74,51 @@ class HomeView extends GetView<HomeController> {
             onTap: (index) {
               controller.currentIndex.value = index;
             },
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home, color: Colors.grey),
-                activeIcon: Icon(Icons.home, color: Colors.deepPurpleAccent),
-                label: 'Beranda',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.history, color: Colors.grey),
-                activeIcon: Icon(Icons.history, color: Colors.deepPurpleAccent),
-                label: 'Riwayat',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person, color: Colors.grey),
-                activeIcon: Icon(Icons.person, color: Colors.deepPurpleAccent),
-                label: 'Profil',
-              ),
-            ],
+            items: controller.role.value == 'ustadz'
+                ? [
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.home, color: Colors.grey),
+                      activeIcon: Icon(
+                        Icons.home,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      label: 'Beranda',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.person, color: Colors.grey),
+                      activeIcon: Icon(
+                        Icons.person,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      label: 'Profil',
+                    ),
+                  ]
+                : [
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.home, color: Colors.grey),
+                      activeIcon: Icon(
+                        Icons.home,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      label: 'Beranda',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.history, color: Colors.grey),
+                      activeIcon: Icon(
+                        Icons.history,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      label: 'Riwayat',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.person, color: Colors.grey),
+                      activeIcon: Icon(
+                        Icons.person,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      label: 'Profil',
+                    ),
+                  ],
           ),
         ),
       ),

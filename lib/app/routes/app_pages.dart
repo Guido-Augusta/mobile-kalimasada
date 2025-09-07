@@ -14,6 +14,8 @@ import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
 import '../modules/ustadz_home/bindings/ustadz_home_binding.dart';
 import '../modules/ustadz_home/views/ustadz_home_view.dart';
+import '../modules/ustadz_profile/bindings/ustadz_profile_binding.dart';
+import '../modules/ustadz_profile/views/ustadz_profile_view.dart';
 
 part 'app_routes.dart';
 
@@ -53,6 +55,11 @@ class AppPages {
       name: _Paths.DAFTAR_SANTRI,
       page: () => const DaftarSantriView(),
       binding: DaftarSantriBinding(),
+    ),
+    GetPage(
+      name: _Paths.USTADZ_PROFILE,
+      page: () => const UstadzProfileView(),
+      binding: UstadzProfileBinding(),
     ),
   ];
 }
