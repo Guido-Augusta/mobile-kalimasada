@@ -570,8 +570,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                 child: CircleAvatar(
                   radius: 30,
                   backgroundImage: NetworkImage(
-                    santri.fotoProfil ??
-                        'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg',
+                    controller.getImageUrl(santri.fotoProfil!),
                   ),
                   onBackgroundImageError: (exception, stackTrace) {
                     // Handle image loading error
@@ -595,7 +594,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      santri.tahapHafalan?.replaceAll('_', ' ') ?? 'Belum ada',
+                      controller.getTahapanSantri(santri.tahapHafalan!),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: TextStyle(color: Colors.grey[600], fontSize: 13),

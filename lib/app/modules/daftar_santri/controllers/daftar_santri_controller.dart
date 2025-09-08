@@ -346,4 +346,21 @@ class DaftarSantriController extends GetxController {
     statusSetoran.value = '';
     catatanController.clear();
   }
+
+  String getImageUrl(String imageUrl) {
+    String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
+    return newImageUrl;
+  }
+
+  String getTahapanSantri(String tahapan) {
+    if (tahapan == 'Tahap1_Juz30') {
+      return 'Tahap 1 - Juz 30';
+    } else if (tahapan == 'Tahap2_SuratPilihan') {
+      return 'Tahap 2 - Surat Pilihan';
+    } else if (tahapan == 'Tahap3_Juz1_29') {
+      return 'Tahap 3 - Juz 1-29';
+    } else {
+      return 'Belum ada tahapan';
+    }
+  }
 }
