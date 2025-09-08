@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import '../modules/daftar_santri/bindings/daftar_santri_binding.dart';
 import '../modules/daftar_santri/views/daftar_santri_view.dart';
+import '../modules/daftar_surah/bindings/daftar_surah_binding.dart';
+import '../modules/daftar_surah/views/daftar_surah_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -60,6 +62,11 @@ class AppPages {
       name: _Paths.USTADZ_PROFILE,
       page: () => const UstadzProfileView(),
       binding: UstadzProfileBinding(),
+    ),
+    GetPage(
+      name: _Paths.DAFTAR_SURAH,
+      page: () => const DaftarSurahView(),
+      binding: DaftarSurahBinding(),
     ),
   ];
 }

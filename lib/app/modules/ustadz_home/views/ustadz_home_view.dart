@@ -213,7 +213,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          // Get.toNamed('/alquran');
+                          Get.toNamed('/daftar-surah');
                         },
                         child: Container(
                           height: 120,

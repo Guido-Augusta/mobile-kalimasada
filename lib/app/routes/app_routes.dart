@@ -11,6 +11,7 @@ abstract class Routes {
   static const ORTU_HOME = _Paths.ORTU_HOME;
   static const DAFTAR_SANTRI = _Paths.DAFTAR_SANTRI;
   static const USTADZ_PROFILE = _Paths.USTADZ_PROFILE;
+  static const DAFTAR_SURAH = _Paths.DAFTAR_SURAH;
 }
 
 abstract class _Paths {
@@ -23,4 +24,5 @@ abstract class _Paths {
   static const ORTU_HOME = '/ortu-home';
   static const DAFTAR_SANTRI = '/daftar-santri';
   static const USTADZ_PROFILE = '/ustadz-profile';
+  static const DAFTAR_SURAH = '/daftar-surah';
 }
