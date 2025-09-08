@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:mobile_kalimasada/app/modules/ortu_home/controllers/ortu_home_controller.dart';
-import 'package:mobile_kalimasada/app/modules/ortu_home/views/ortu_home_view.dart';
-import 'package:mobile_kalimasada/app/modules/santri_home/controllers/santri_home_controller.dart';
-import 'package:mobile_kalimasada/app/modules/santri_home/views/santri_home_view.dart';
-import 'package:mobile_kalimasada/app/modules/ustadz_home/controllers/ustadz_home_controller.dart';
-import 'package:mobile_kalimasada/app/modules/ustadz_home/views/ustadz_home_view.dart';
-import 'package:mobile_kalimasada/app/modules/ustadz_profile/controllers/ustadz_profile_controller.dart';
-import 'package:mobile_kalimasada/app/modules/ustadz_profile/views/ustadz_profile_view.dart';
+import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/controllers/ortu_home_controller.dart';
+import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/views/ortu_home_view.dart';
+import 'package:mobile_kalimasada/app/modules/santri/santri_home/controllers/santri_home_controller.dart';
+import 'package:mobile_kalimasada/app/modules/santri/santri_home/views/santri_home_view.dart';
+import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_home/controllers/ustadz_home_controller.dart';
+import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_home/views/ustadz_home_view.dart';
+import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_profile/controllers/ustadz_profile_controller.dart';
+import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_profile/views/ustadz_profile_view.dart';
 
 import '../controllers/home_controller.dart';
 
