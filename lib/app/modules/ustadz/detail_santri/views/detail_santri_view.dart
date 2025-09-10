@@ -284,7 +284,10 @@ class DetailSantriView extends GetView<DetailSantriController> {
                 ),
               ),
               onPressed: () {
-                // Navigate to add hafalan page
+                Get.toNamed(
+                  '/progres-hafalan',
+                  arguments: {'santriId': controller.santriId},
+                );
               },
             ),
           ),

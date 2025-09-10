@@ -29,12 +29,9 @@ class SantriHomeController extends GetxController {
 
   void getProfile() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId') ?? '';
-    final token = prefs.getString('token') ?? '';
-    final role = prefs.getString('role') ?? '';
-    this.token.value = token;
-    this.role.value = role;
-    this.userId.value = userId;
+    userId.value = prefs.getString('userId') ?? '';
+    token.value = prefs.getString('token') ?? '';
+    role.value = prefs.getString('role') ?? '';
   }
 
   void logout() async {
@@ -42,9 +39,7 @@ class SantriHomeController extends GetxController {
 
     try {
       final response = await post(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/auth/logout/${prefs.getString('userId')}',
-        ),
+        Uri.parse('http://10.0.2.2:5000/api/auth/logout/${userId.value}'),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);

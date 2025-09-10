@@ -77,6 +77,9 @@ flutter:
           weight: 600
         - asset: assets/fonts/Poppins-Bold.ttf
           weight: 700
+    - family: Amiri
+      fonts:
+        - asset: assets/fonts/AmiriQuran-Regular.ttf
 
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
