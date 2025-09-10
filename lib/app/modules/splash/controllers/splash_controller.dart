@@ -27,8 +27,15 @@ class SplashController extends GetxController {
     isLoading.value = true;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+    final role = prefs.getString('role');
     if (token != null) {
-      Get.offAllNamed('/home');
+      if (role == 'santri') {
+        Get.offAllNamed('/santri-main');
+      } else if (role == 'ustadz') {
+        Get.offAllNamed('/ustadz-main');
+      } else if (role == 'ortu') {
+        Get.offAllNamed('/ortu-main');
+      }
     } else {
       Get.offAllNamed('/login');
     }

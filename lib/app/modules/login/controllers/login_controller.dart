@@ -61,7 +61,15 @@ class LoginController extends GetxController {
           await prefs.setString('roleId', data['user']['roleId'].toString());
           Get.snackbar('Success', 'Login berhasil');
           // Navigate to home or another page
-          Get.offAllNamed('/home');
+          if (data['user']['role'] == 'santri') {
+            Get.offAllNamed('/santri-home');
+          } else if (data['user']['role'] == 'ustadz') {
+            Get.offAllNamed('/ustadz-home');
+          } else if (data['user']['role'] == 'ortu') {
+            Get.offAllNamed('/ortu-home');
+          } else {
+            Get.offAllNamed('/home');
+          }
         } else {
           Get.snackbar('Error', data['message'] ?? 'Login gagal');
         }
