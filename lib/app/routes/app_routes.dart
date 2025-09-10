@@ -12,6 +12,7 @@ abstract class Routes {
   static const DAFTAR_SANTRI = _Paths.DAFTAR_SANTRI;
   static const USTADZ_PROFILE = _Paths.USTADZ_PROFILE;
   static const DAFTAR_SURAH = _Paths.DAFTAR_SURAH;
+  static const DETAIL_SANTRI = _Paths.DETAIL_SANTRI;
 }
 
 abstract class _Paths {
@@ -25,4 +26,5 @@ abstract class _Paths {
   static const DAFTAR_SANTRI = '/daftar-santri';
   static const USTADZ_PROFILE = '/ustadz-profile';
   static const DAFTAR_SURAH = '/daftar-surah';
+  static const DETAIL_SANTRI = '/detail-santri';
 }
