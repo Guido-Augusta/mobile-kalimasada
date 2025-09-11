@@ -268,7 +268,10 @@ class DetailSantriView extends GetView<DetailSantriController> {
                 ),
               ),
               onPressed: () {
-                // Navigate to history page
+                Get.toNamed(
+                  '/riwayat-hafalan',
+                  arguments: {'santriId': controller.santriId},
+                );
               },
             ),
           ),

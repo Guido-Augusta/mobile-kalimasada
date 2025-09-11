@@ -12,7 +12,7 @@ class DaftarSantriController extends GetxController {
   var santriList = <DaftarSantri>[].obs;
   var searchQuery = ''.obs;
 
-  final int _perPage = 8;
+  final int _perPage = 10;
   var currentPage = 1;
   var hasMore = true;
   var isLoadingMore = false;

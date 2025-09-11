@@ -8,12 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class DetailSantriController extends GetxController {
   var isLoading = false.obs;
   var santriDetail = Rxn<DaftarSantri>();
-  late String santriId;
+  var santriId = Get.arguments;
 
   @override
   void onInit() {
     super.onInit();
-    santriId = Get.arguments.toString();
     getSantriDetail(santriId);
   }
 

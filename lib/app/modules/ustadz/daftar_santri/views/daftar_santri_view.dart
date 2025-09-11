@@ -119,7 +119,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
       shadowColor: Colors.grey[50],
       child: InkWell(
         onTap: () {
-          Get.toNamed('/detail-santri', arguments: santri.id);
+          Get.toNamed('/detail-santri', arguments: santri.id.toString());
         },
         onLongPress: () {
           Get.dialog(
