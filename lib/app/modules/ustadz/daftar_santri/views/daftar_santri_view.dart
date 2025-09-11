@@ -15,7 +15,11 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
       appBar: AppBar(
         title: const Text(
           'Daftar Santri',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 20,
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.deepPurpleAccent,

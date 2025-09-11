@@ -17,6 +17,7 @@ abstract class Routes {
   static const USTADZ_MAIN = _Paths.USTADZ_MAIN;
   static const SANTRI_MAIN = _Paths.SANTRI_MAIN;
   static const ORTU_MAIN = _Paths.ORTU_MAIN;
+  static const SETORAN = _Paths.SETORAN;
 }
 
 abstract class _Paths {
@@ -35,4 +36,5 @@ abstract class _Paths {
   static const USTADZ_MAIN = '/ustadz-main';
   static const SANTRI_MAIN = '/santri-main';
   static const ORTU_MAIN = '/ortu-main';
+  static const SETORAN = '/setoran';
 }

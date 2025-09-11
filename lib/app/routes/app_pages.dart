@@ -5,16 +5,18 @@ import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
+import '../modules/main/ortu_main/bindings/ortu_main_binding.dart';
+import '../modules/main/ortu_main/views/ortu_main_view.dart';
 import '../modules/main/santri_main/bindings/santri_main_binding.dart';
 import '../modules/main/santri_main/views/santri_main_view.dart';
 import '../modules/main/ustadz_main/bindings/ustadz_main_binding.dart';
 import '../modules/main/ustadz_main/views/ustadz_main_view.dart';
 import '../modules/ortu/ortu_home/bindings/ortu_home_binding.dart';
 import '../modules/ortu/ortu_home/views/ortu_home_view.dart';
-import '../modules/main/ortu_main/bindings/ortu_main_binding.dart';
-import '../modules/main/ortu_main/views/ortu_main_view.dart';
 import '../modules/santri/santri_home/bindings/santri_home_binding.dart';
 import '../modules/santri/santri_home/views/santri_home_view.dart';
+import '../modules/ustadz/setoran/bindings/setoran_binding.dart';
+import '../modules/ustadz/setoran/views/setoran_view.dart';
 import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
 import '../modules/ustadz/daftar_santri/bindings/daftar_santri_binding.dart';
@@ -112,6 +114,11 @@ class AppPages {
       page: () => OrtuMainView(),
       binding: OrtuMainBinding(),
       middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.SETORAN,
+      page: () => const SetoranView(),
+      binding: SetoranBinding(),
     ),
   ];
 }

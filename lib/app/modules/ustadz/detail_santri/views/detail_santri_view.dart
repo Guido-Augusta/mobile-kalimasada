@@ -13,7 +13,11 @@ class DetailSantriView extends GetView<DetailSantriController> {
       appBar: AppBar(
         title: const Text(
           'Detail Santri',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.deepPurpleAccent,
