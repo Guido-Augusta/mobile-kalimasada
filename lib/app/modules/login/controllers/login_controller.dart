@@ -62,11 +62,11 @@ class LoginController extends GetxController {
           Get.snackbar('Success', 'Login berhasil');
           // Navigate to home or another page
           if (data['user']['role'] == 'santri') {
-            Get.offAllNamed('/santri-home');
+            Get.offAllNamed('/santri-main');
           } else if (data['user']['role'] == 'ustadz') {
-            Get.offAllNamed('/ustadz-home');
+            Get.offAllNamed('/ustadz-main');
           } else if (data['user']['role'] == 'ortu') {
-            Get.offAllNamed('/ortu-home');
+            Get.offAllNamed('/ortu-main');
           } else {
             Get.offAllNamed('/home');
           }

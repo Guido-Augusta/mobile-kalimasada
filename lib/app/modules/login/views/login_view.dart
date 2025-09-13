@@ -27,11 +27,13 @@ class LoginView extends GetView<LoginController> {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: Colors.blue[600],
+                        color: Colors.deepPurpleAccent,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.blue.withValues(alpha: 0.3),
+                            color: Colors.deepPurpleAccent.withValues(
+                              alpha: 0.3,
+                            ),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -208,14 +210,16 @@ class LoginView extends GetView<LoginController> {
                                   controller.callLoginApi();
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue[600],
+                            backgroundColor: Colors.deepPurpleAccent,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             elevation: 2,
-                            shadowColor: Colors.blue.withOpacity(0.3),
+                            shadowColor: Colors.deepPurpleAccent.withValues(
+                              alpha: 0.3,
+                            ),
                           ),
                           child: controller.isLoading.value
                               ? const SizedBox(

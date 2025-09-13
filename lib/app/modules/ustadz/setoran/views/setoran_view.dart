@@ -381,7 +381,7 @@ class SetoranView extends GetView<SetoranController> {
             _showCatatanDialog(Get.context!);
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepPurple[600],
+            backgroundColor: Colors.deepPurpleAccent,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
@@ -608,7 +608,7 @@ class SetoranView extends GetView<SetoranController> {
                         Get.back();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple[600],
+                        backgroundColor: Colors.deepPurpleAccent,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(

@@ -556,6 +556,10 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     onTap: () {
                       // Handle delete action
                       Get.back();
+                      Get.toNamed(
+                        '/riwayat-hafalan',
+                        arguments: {'santriId': santri.id.toString()},
+                      );
                     },
                   ),
                 ],

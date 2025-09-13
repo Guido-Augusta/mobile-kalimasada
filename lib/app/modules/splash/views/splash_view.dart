@@ -21,7 +21,7 @@ class SplashView extends GetView<SplashController> {
                       child: Text(
                         'KALIMASADA APP',
                         style: TextStyle(
-                          color: Colors.blue[600],
+                          color: Colors.deepPurpleAccent,
                           fontSize: 35,
                           fontWeight: FontWeight.bold,
                         ),

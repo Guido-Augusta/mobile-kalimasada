@@ -274,7 +274,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurpleAccent,
+                    backgroundColor: Colors.orangeAccent,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     padding: EdgeInsets.zero,
@@ -319,11 +319,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
               ),
               Text(
                 '$currentAyat / $totalAyat',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurpleAccent[700],
-                ),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
             ],
           ),
