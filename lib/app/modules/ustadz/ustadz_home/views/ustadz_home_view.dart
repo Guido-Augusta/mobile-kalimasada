@@ -77,10 +77,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
               backgroundColor: Colors.grey[200],
               backgroundImage: NetworkImage(controller.fotoProfil.value),
               onBackgroundImageError: (_, _) {},
-              child:
-                  controller.fotoProfil.value.isEmpty ||
-                      controller.fotoProfil.value ==
-                          'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+              child: controller.fotoProfil.value.isEmpty
                   ? Icon(Icons.person, size: 28, color: Colors.deepPurpleAccent)
                   : null,
             ),
@@ -230,16 +227,20 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      'Dashboard Ustadz',
-                      style: GoogleFonts.poppins(
-                        fontSize: 24,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        height: 1.2,
+                    Obx(
+                      () => Text(
+                        'Dashboard ${controller.ustadz.value?.jenisKelamin == 'L' ? 'Ustadz' : 'Ustadzah'}',
+                        style: GoogleFonts.poppins(
+                          fontSize: controller.ustadz.value?.jenisKelamin == 'L'
+                              ? 22
+                              : 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          height: 1.2,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
                     ),
                     const SizedBox(height: 16),
                     Container(

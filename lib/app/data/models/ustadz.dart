@@ -1,3 +1,5 @@
+// GET http://localhost:5000/api/ustadz/:ustadzId
+
 class Ustadz {
   Ustadz({
     required this.id,
@@ -7,9 +9,8 @@ class Ustadz {
     required this.alamat,
     required this.jenisKelamin,
     required this.fotoProfil,
-    required this.tingkatan,
+    required this.waliKelasTahap,
     required this.user,
-    required this.santri,
   });
 
   final int? id;
@@ -19,9 +20,8 @@ class Ustadz {
   final String? alamat;
   final String? jenisKelamin;
   final String? fotoProfil;
-  final String? tingkatan;
+  final String? waliKelasTahap;
   final User? user;
-  final List<Santri> santri;
 
   factory Ustadz.fromJson(Map<String, dynamic> json) {
     return Ustadz(
@@ -32,11 +32,8 @@ class Ustadz {
       alamat: json["alamat"],
       jenisKelamin: json["jenisKelamin"],
       fotoProfil: json["fotoProfil"],
-      tingkatan: json["tingkatan"],
+      waliKelasTahap: json["waliKelasTahap"],
       user: json["user"] == null ? null : User.fromJson(json["user"]),
-      santri: json["santri"] == null
-          ? []
-          : List<Santri>.from(json["santri"]!.map((x) => Santri.fromJson(x))),
     );
   }
 
@@ -48,32 +45,13 @@ class Ustadz {
     "alamat": alamat,
     "jenisKelamin": jenisKelamin,
     "fotoProfil": fotoProfil,
-    "tingkatan": tingkatan,
+    "waliKelasTahap": waliKelasTahap,
     "user": user?.toJson(),
-    "santri": santri.map((x) => x.toJson()).toList(),
   };
 
   @override
   String toString() {
-    return "$id, $userId, $nama, $nomorHp, $alamat, $jenisKelamin, $fotoProfil, $tingkatan, $user, $santri, ";
-  }
-}
-
-class Santri {
-  Santri({required this.id, required this.nama});
-
-  final int? id;
-  final String? nama;
-
-  factory Santri.fromJson(Map<String, dynamic> json) {
-    return Santri(id: json["id"], nama: json["nama"]);
-  }
-
-  Map<String, dynamic> toJson() => {"id": id, "nama": nama};
-
-  @override
-  String toString() {
-    return "$id, $nama, ";
+    return "$id, $userId, $nama, $nomorHp, $alamat, $jenisKelamin, $fotoProfil, $waliKelasTahap, $user, ";
   }
 }
 
