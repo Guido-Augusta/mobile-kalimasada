@@ -9,8 +9,9 @@ import 'dart:convert';
 
 class DaftarSantriController extends GetxController {
   final isLoading = false.obs;
-  var santriList = <DaftarSantri>[].obs;
+  var santriList = <Datum>[].obs;
   var searchQuery = ''.obs;
+  var tahapHafalan = 'level1'.obs;
 
   final int _perPage = 10;
   var currentPage = 1;
@@ -55,7 +56,7 @@ class DaftarSantriController extends GetxController {
       if (token != null) {
         final response = await http.get(
           Uri.parse(
-            'http://10.0.2.2:5000/api/santri?page=$currentPage&limit=$_perPage&search=${searchQuery.value}',
+            'http://10.0.2.2:5000/api/santri?page=$currentPage&limit=$_perPage&tahapHafalan=${tahapHafalan.value}&search=${searchQuery.value}',
           ),
           headers: {
             'Content-Type': 'application/json',
@@ -66,8 +67,8 @@ class DaftarSantriController extends GetxController {
 
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
-          final newItems = List<DaftarSantri>.from(
-            data['data'].map((x) => DaftarSantri.fromJson(x)),
+          final newItems = List<Datum>.from(
+            data['data'].map((x) => Datum.fromJson(x)),
           );
 
           if (newItems.length < _perPage) {
@@ -98,7 +99,7 @@ class DaftarSantriController extends GetxController {
       if (token != null) {
         final response = await http.get(
           Uri.parse(
-            'http://10.0.2.2:5000/api/santri?page=$currentPage&limit=$_perPage&search=${searchQuery.value}',
+            'http://10.0.2.2:5000/api/santri?page=$currentPage&limit=$_perPage&tahapHafalan=${tahapHafalan.value}&search=${searchQuery.value}',
           ),
           headers: {
             'Content-Type': 'application/json',
@@ -109,8 +110,8 @@ class DaftarSantriController extends GetxController {
 
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
-          final items = List<DaftarSantri>.from(
-            data['data'].map((x) => DaftarSantri.fromJson(x)),
+          final items = List<Datum>.from(
+            data['data'].map((x) => Datum.fromJson(x)),
           );
 
           if (items.length < _perPage) {
@@ -353,14 +354,26 @@ class DaftarSantriController extends GetxController {
   }
 
   String getTahapanSantri(String tahapan) {
-    if (tahapan == 'Tahap1_Juz30') {
-      return 'Tahap 1 - Juz 30';
-    } else if (tahapan == 'Tahap2_SuratPilihan') {
-      return 'Tahap 2 - Surat Pilihan';
-    } else if (tahapan == 'Tahap3_Juz1_29') {
-      return 'Tahap 3 - Juz 1-29';
+    if (tahapan == 'Level1') {
+      return 'Level 1';
+    } else if (tahapan == 'Level2') {
+      return 'Level 2';
+    } else if (tahapan == 'Level3') {
+      return 'Level 3';
     } else {
       return 'Belum ada tahapan';
+    }
+  }
+
+  String getTahapanFilter(String tahapan) {
+    if (tahapan == 'level1') {
+      return 'level 1';
+    } else if (tahapan == 'level2') {
+      return 'level 2';
+    } else if (tahapan == 'level3') {
+      return 'level 3';
+    } else {
+      return 'Tidak ada tahapan';
     }
   }
 }

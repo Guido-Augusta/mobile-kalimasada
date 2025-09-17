@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailSantriController extends GetxController {
   var isLoading = false.obs;
-  var santriDetail = Rxn<DaftarSantri>();
+  var santriDetail = Rxn<Datum>();
   var santriId = Get.arguments;
 
   @override
@@ -43,7 +43,7 @@ class DetailSantriController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final santri = DaftarSantri.fromJson(data['data']);
+        final santri = Datum.fromJson(data['data']);
         santriDetail.value = santri;
         print('Santri detail loaded: ${santri.nama}');
       } else {

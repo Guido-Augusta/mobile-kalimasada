@@ -71,7 +71,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${santri.tingkatan ?? 'Tingkat'} • ${santri.tahapHafalan ?? 'Tahap 0'}',
+                      santri.tahapHafalan ?? 'Data Level Tidak Tersedia',
                       style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
                   ],
@@ -152,7 +152,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                 children: [
                   _buildInfoRow(
                     'Nama',
-                    santri.orangTua?.nama ?? 'Tidak ada data',
+                    santri.orangTua.first.nama ?? 'Tidak ada data',
                   ),
                 ],
               ),
