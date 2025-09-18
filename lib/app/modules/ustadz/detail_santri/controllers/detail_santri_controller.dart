@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart';
+import 'package:mobile_kalimasada/app/data/models/santri.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailSantriController extends GetxController {
   var isLoading = false.obs;
-  var santriDetail = Rxn<Datum>();
+  var santriDetail = Rxn<Santri>();
   var santriId = Get.arguments;
 
   @override
@@ -19,6 +19,17 @@ class DetailSantriController extends GetxController {
   String getImageUrl(String imageUrl) {
     String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
     return newImageUrl;
+  }
+
+  String getOrangTuaByTipe(List<OrangTua> orangTua, String tipe) {
+    try {
+      final orangTuaByTipe = orangTua.firstWhere(
+        (element) => element.tipe == tipe,
+      );
+      return orangTuaByTipe.nama ?? '-';
+    } catch (e) {
+      return '-';
+    }
   }
 
   Future<void> getSantriDetail(String id) async {
@@ -43,7 +54,7 @@ class DetailSantriController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final santri = Datum.fromJson(data['data']);
+        final santri = Santri.fromJson(data['data']);
         santriDetail.value = santri;
         print('Santri detail loaded: ${santri.nama}');
       } else {

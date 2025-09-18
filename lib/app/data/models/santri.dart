@@ -1,18 +1,18 @@
+// GET http://localhost:5000/api/santri/santriId
+
 class Santri {
   Santri({
     required this.id,
     required this.userId,
-    required this.ortuId,
     required this.nama,
     required this.nomorHp,
     required this.alamat,
     required this.jenisKelamin,
     required this.tanggalLahir,
     required this.fotoProfil,
-    required this.tingkatan,
     required this.tahapHafalan,
-    required this.totalPoin,
     required this.peringkat,
+    required this.totalPoin,
     required this.createdAt,
     required this.poinUpdatedAt,
     required this.user,
@@ -21,87 +21,84 @@ class Santri {
 
   final int? id;
   final int? userId;
-  final int? ortuId;
   final String? nama;
   final String? nomorHp;
   final String? alamat;
   final String? jenisKelamin;
   final DateTime? tanggalLahir;
   final String? fotoProfil;
-  final String? tingkatan;
   final String? tahapHafalan;
-  final int? totalPoin;
   final int? peringkat;
+  final int? totalPoin;
   final DateTime? createdAt;
   final DateTime? poinUpdatedAt;
   final User? user;
-  final OrangTua? orangTua;
+  final List<OrangTua> orangTua;
 
   factory Santri.fromJson(Map<String, dynamic> json) {
     return Santri(
       id: json["id"],
       userId: json["userId"],
-      ortuId: json["ortuId"],
       nama: json["nama"],
       nomorHp: json["nomorHp"],
       alamat: json["alamat"],
       jenisKelamin: json["jenisKelamin"],
       tanggalLahir: DateTime.tryParse(json["tanggalLahir"] ?? ""),
       fotoProfil: json["fotoProfil"],
-      tingkatan: json["tingkatan"],
       tahapHafalan: json["tahapHafalan"],
-      totalPoin: json["totalPoin"],
       peringkat: json["peringkat"],
+      totalPoin: json["totalPoin"],
       createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
       poinUpdatedAt: DateTime.tryParse(json["poinUpdatedAt"] ?? ""),
       user: json["user"] == null ? null : User.fromJson(json["user"]),
       orangTua: json["orangTua"] == null
-          ? null
-          : OrangTua.fromJson(json["orangTua"]),
+          ? []
+          : List<OrangTua>.from(
+              json["orangTua"]!.map((x) => OrangTua.fromJson(x)),
+            ),
     );
   }
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "userId": userId,
-    "ortuId": ortuId,
     "nama": nama,
     "nomorHp": nomorHp,
     "alamat": alamat,
     "jenisKelamin": jenisKelamin,
     "tanggalLahir": tanggalLahir?.toIso8601String(),
     "fotoProfil": fotoProfil,
-    "tingkatan": tingkatan,
     "tahapHafalan": tahapHafalan,
-    "totalPoin": totalPoin,
     "peringkat": peringkat,
+    "totalPoin": totalPoin,
     "createdAt": createdAt?.toIso8601String(),
     "poinUpdatedAt": poinUpdatedAt?.toIso8601String(),
     "user": user?.toJson(),
-    "orangTua": orangTua?.toJson(),
+    "orangTua": orangTua.map((x) => x.toJson()).toList(),
   };
 
   @override
   String toString() {
-    return "$id, $userId, $ortuId, $nama, $nomorHp, $alamat, $jenisKelamin, $tanggalLahir, $fotoProfil, $tingkatan, $tahapHafalan, $totalPoin, $peringkat, $createdAt, $poinUpdatedAt, $user, $orangTua, ";
+    return "$id, $userId, $nama, $nomorHp, $alamat, $jenisKelamin, $tanggalLahir, $fotoProfil, $tahapHafalan, $peringkat, $totalPoin, $createdAt, $poinUpdatedAt, $user, $orangTua, ";
   }
 }
 
 class OrangTua {
-  OrangTua({required this.id, required this.nama});
+  OrangTua({required this.id, required this.nama, required this.tipe});
 
   final int? id;
   final String? nama;
+  final String? tipe;
 
   factory OrangTua.fromJson(Map<String, dynamic> json) {
-    return OrangTua(id: json["id"], nama: json["nama"]);
+    return OrangTua(id: json["id"], nama: json["nama"], tipe: json["tipe"]);
   }
 
-  Map<String, dynamic> toJson() => {"id": id, "nama": nama};
+  Map<String, dynamic> toJson() => {"id": id, "nama": nama, "tipe": tipe};
 
   @override
   String toString() {
-    return "$id, $nama, ";
+    return "$id, $nama, $tipe, ";
   }
 }
 
