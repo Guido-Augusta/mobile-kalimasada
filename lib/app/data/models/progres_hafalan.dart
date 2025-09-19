@@ -1,8 +1,10 @@
+// GET http://localhost:5000/api/hafalan/:idSantri/surah
+
 class ProgresHafalan {
   ProgresHafalan({required this.santri, required this.data});
 
   final Santri? santri;
-  final List<Datum> data;
+  List<Datum> data;
 
   factory ProgresHafalan.fromJson(Map<String, dynamic> json) {
     return ProgresHafalan(
@@ -71,41 +73,85 @@ class Santri {
   Santri({
     required this.id,
     required this.nama,
-    required this.ortuId,
     required this.tahapHafalan,
-    required this.tingkatan,
     required this.totalPoin,
+    required this.orangTua,
   });
 
   final int? id;
   final String? nama;
-  final int? ortuId;
   final String? tahapHafalan;
-  final String? tingkatan;
   final int? totalPoin;
+  final List<OrangTua> orangTua;
 
   factory Santri.fromJson(Map<String, dynamic> json) {
     return Santri(
       id: json["id"],
       nama: json["nama"],
-      ortuId: json["ortuId"],
       tahapHafalan: json["tahapHafalan"],
-      tingkatan: json["tingkatan"],
       totalPoin: json["totalPoin"],
+      orangTua: json["orangTua"] == null
+          ? []
+          : List<OrangTua>.from(
+              json["orangTua"]!.map((x) => OrangTua.fromJson(x)),
+            ),
     );
   }
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "nama": nama,
-    "ortuId": ortuId,
     "tahapHafalan": tahapHafalan,
-    "tingkatan": tingkatan,
     "totalPoin": totalPoin,
+    "orangTua": orangTua.map((x) => x.toJson()).toList(),
   };
 
   @override
   String toString() {
-    return "$id, $nama, $ortuId, $tahapHafalan, $tingkatan, $totalPoin, ";
+    return "$id, $nama, $tahapHafalan, $totalPoin, $orangTua, ";
+  }
+}
+
+class OrangTua {
+  OrangTua({required this.id, required this.nama, required this.user});
+
+  final int? id;
+  final String? nama;
+  final User? user;
+
+  factory OrangTua.fromJson(Map<String, dynamic> json) {
+    return OrangTua(
+      id: json["id"],
+      nama: json["nama"],
+      user: json["user"] == null ? null : User.fromJson(json["user"]),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "nama": nama,
+    "user": user?.toJson(),
+  };
+
+  @override
+  String toString() {
+    return "$id, $nama, $user, ";
+  }
+}
+
+class User {
+  User({required this.email});
+
+  final String? email;
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(email: json["email"]);
+  }
+
+  Map<String, dynamic> toJson() => {"email": email};
+
+  @override
+  String toString() {
+    return "$email, ";
   }
 }
