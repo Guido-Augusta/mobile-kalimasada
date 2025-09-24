@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:mobile_kalimasada/app/data/models/ayat_hafalan.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart';
 import 'package:mobile_kalimasada/app/data/models/surah.dart';
+import 'package:searchfield/searchfield.dart';
 import '../controllers/daftar_santri_controller.dart';
 
 class DaftarSantriView extends GetView<DaftarSantriController> {
@@ -471,7 +472,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        _showMurajaahDialog(santri);
+                        _showMurajaah2Dialog(santri);
                       },
                       icon: const Icon(
                         Icons.menu_book_rounded,
@@ -578,329 +579,903 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
     controller.statusSetoran.value = 'TambahHafalan';
     Get.dialog(
       barrierDismissible: false,
-      AlertDialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-        title: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Tambah Hafalan',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurpleAccent,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              santri.nama!,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        content: SizedBox(
-          width: MediaQuery.of(Get.context!).size.width - 80,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Surah Dropdown
-                Obx(() {
-                  if (controller.isLoadingSurah.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  return DropdownButtonFormField<Surah>(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+      Dialog(
+        backgroundColor: Colors.white,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(Get.context!).size.height * 0.7,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.deepPurple, Colors.deepPurpleAccent],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Tambah Hafalan',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 18,
                       ),
                     ),
-                    hint: const Text('Pilih Surah'),
-                    value: controller.selectedSurah.value,
-                    items: controller.surahList.map((Surah surah) {
-                      return DropdownMenuItem<Surah>(
-                        value: surah,
-                        child: Text(
-                          '${surah.nomor}. ${surah.namaLatin} - ${surah.totalAyat} ayat',
+                    const SizedBox(height: 8),
+                    Text(
+                      santri.nama!,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.3),
+                          width: 1,
                         ),
-                      );
-                    }).toList(),
-                    onChanged: (Surah? newValue) {
-                      final santriId = santri.id.toString();
-                      controller.onSurahSelected(
-                        newValue,
-                        santriId,
-                        controller.statusSetoran.value,
-                      );
-                    },
-                    isExpanded: true,
-                  );
-                }),
-                Obx(() {
-                  if (controller.isLoadingAyat.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  return Column(
-                    children: [
-                      const SizedBox(height: 16),
-                      Row(
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Expanded(
-                            child: _BuildAyatHafalanDropdown(
-                              title: 'Mulai',
-                              value: controller.selectedAyatMulai.value,
-                              ayatList: controller.ayatList,
-                              otherSelectedAyat:
-                                  controller.selectedAyatAkhir.value,
-                              onChanged: (AyatHafalan? ayat) {
-                                controller.selectedAyatMulai.value = ayat;
-                              },
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: _getTahapColor(santri.tahapHafalan),
+                              shape: BoxShape.circle,
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _BuildAyatHafalanDropdown(
-                              title: 'Selesai',
-                              value: controller.selectedAyatAkhir.value,
-                              ayatList: controller.ayatList,
-                              otherSelectedAyat:
-                                  controller.selectedAyatMulai.value,
-                              isStartAyat: false,
-                              onChanged: (ayat) {
-                                controller.selectedAyatAkhir.value = ayat;
-                              },
+                          const SizedBox(width: 8),
+                          Text(
+                            _getTahapLabel(santri.tahapHafalan),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Surah Search
+                      Obx(() {
+                        if (controller.isLoadingSurah.value) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.deepPurpleAccent,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Pilih Surah',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: SearchField(
+                                suggestions: controller.surahList.map((
+                                  Surah surah,
+                                ) {
+                                  return SearchFieldListItem<Surah>(
+                                    surah.namaLatin!,
+                                    value: surah.namaLatin,
+                                    item: surah,
+                                    key: ValueKey(surah.id),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 32,
+                                          height: 32,
+                                          decoration: BoxDecoration(
+                                            color: Colors.deepPurple.withValues(
+                                              alpha: 0.1,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              '${surah.nomor}',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.deepPurple,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          surah.namaLatin!,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          '${surah.totalAyat!} Ayat',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                                selectedValue:
+                                    controller.selectedSurahHafalan.value,
+                                onSuggestionTap: (SearchFieldListItem x) {
+                                  controller.selectedSurahHafalan.value =
+                                      x as SearchFieldListItem<Surah>;
+                                  controller.onSurahSelected(
+                                    x.item,
+                                    santri.id.toString(),
+                                    'TambahHafalan',
+                                  );
+                                },
+                                suggestionState: Suggestion.expand,
+                                textInputAction: TextInputAction.next,
+                                suggestionsDecoration: SuggestionDecoration(
+                                  color: Colors.white,
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(12),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                searchInputDecoration: SearchInputDecoration(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                  hintText: 'Cari surah...',
+                                  hintStyle: TextStyle(color: Colors.grey[500]),
+                                  prefixIcon: const Icon(
+                                    Icons.search,
+                                    color: Colors.deepPurpleAccent,
+                                  ),
+                                  suffixIcon: Obx(() {
+                                    if (controller.selectedSurahHafalan.value !=
+                                        null) {
+                                      return IconButton(
+                                        icon: const Icon(
+                                          Icons.clear,
+                                          color: Colors.grey,
+                                        ),
+                                        onPressed: () {
+                                          controller
+                                                  .selectedSurahHafalan
+                                                  .value =
+                                              null;
+                                          controller.ayatList.clear();
+                                        },
+                                      );
+                                    }
+                                    return const SizedBox.shrink();
+                                  }),
+                                  border: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+
+                      const SizedBox(height: 20),
+
+                      // Jumlah Ayat
+                      Obx(() {
+                        if (controller.isLoadingAyat.value) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.deepPurpleAccent,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Jumlah Ayat',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: TextField(
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  hintText: 'Masukkan jumlah ayat',
+                                  hintStyle: TextStyle(color: Colors.grey[500]),
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                  prefixIcon: const Icon(
+                                    Icons.format_list_numbered,
+                                    color: Colors.deepPurpleAccent,
+                                  ),
+                                ),
+                                controller:
+                                    controller.inputJumlahAyatController,
+                                onChanged: (value) {
+                                  controller.inputJumlahAyatController.text =
+                                      value;
+                                },
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+
+                      const SizedBox(height: 20),
+
+                      // Catatan
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Catatan',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey[300]!),
+                            ),
+                            child: TextField(
+                              controller: controller.catatanController,
+                              maxLines: 5,
+                              minLines: 3,
+                              decoration: InputDecoration(
+                                hintText: 'Keterangan hafalan (opsional)',
+                                hintStyle: TextStyle(color: Colors.grey[500]),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                prefixIcon: const Padding(
+                                  padding: EdgeInsets.only(bottom: 40),
+                                  child: Icon(
+                                    Icons.note_alt_outlined,
+                                    color: Colors.deepPurpleAccent,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ],
-                  );
-                }),
-                const SizedBox(height: 16),
-                // Catatan Input
-                const Text(
-                  'Catatan',
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  expands: false,
-                  maxLines: 5,
-                  controller: controller.catatanController,
-                  decoration: InputDecoration(
-                    hintText: 'Keterangan hafalan',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              // Actions
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          controller.selectedSurahHafalan.value = null;
+                          controller.inputJumlahAyatController.text = '';
+                          controller.ayatList.clear();
+                          controller.statusSetoran.value = '';
+                          controller.catatanController.clear();
+                          Get.back();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(color: Colors.grey[400]!),
+                          ),
+                        ),
+                        child: const Text(
+                          'Batal',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Obx(
+                        () => ElevatedButton(
+                          onPressed: () {
+                            controller.saveHafalan(santri.id.toString());
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurpleAccent,
+                            padding: controller.isSaveLoading.value
+                                ? EdgeInsets.symmetric(vertical: 4)
+                                : EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Obx(
+                            () => controller.isSaveLoading.value
+                                ? Transform.scale(
+                                    scale: 0.5,
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    'Simpan',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              controller.selectedSurah.value = null;
-              controller.selectedAyatMulai.value = null;
-              controller.selectedAyatAkhir.value = null;
-              controller.ayatList.clear();
-              controller.statusSetoran.value = '';
-              controller.catatanController.clear();
-              Get.back();
-            },
-            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              controller.saveHafalan(santri.id.toString());
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurpleAccent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text('Simpan', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
 
-  // Method to show murajaah dialog
-  void _showMurajaahDialog(Datum santri) {
+  // Method to show hafalan dialog
+  void _showMurajaah2Dialog(Datum santri) {
     controller.statusSetoran.value = 'Murajaah';
     Get.dialog(
       barrierDismissible: false,
-      AlertDialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-        title: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Murajaah',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurpleAccent,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              santri.nama!,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        content: SizedBox(
-          width: MediaQuery.of(Get.context!).size.width - 80,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Surah Dropdown
-                Obx(() {
-                  if (controller.isLoadingSurah.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  return DropdownButtonFormField<Surah>(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+      Dialog(
+        backgroundColor: Colors.white,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(Get.context!).size.height * 0.7,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.deepPurple, Colors.deepPurpleAccent],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Murajaah',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 18,
                       ),
                     ),
-                    hint: const Text('Pilih Surah'),
-                    value: controller.selectedSurah.value,
-                    items: controller.surahList.map((Surah surah) {
-                      return DropdownMenuItem<Surah>(
-                        value: surah,
-                        child: Text(
-                          '${surah.nomor}. ${surah.namaLatin} - ${surah.totalAyat} ayat',
+                    const SizedBox(height: 8),
+                    Text(
+                      santri.nama!,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.3),
+                          width: 1,
                         ),
-                      );
-                    }).toList(),
-                    onChanged: (Surah? newValue) {
-                      final santriId = santri.id.toString();
-                      controller.onSurahSelected(
-                        newValue,
-                        santriId,
-                        controller.statusSetoran.value,
-                      );
-                    },
-                    isExpanded: true,
-                  );
-                }),
-                Obx(() {
-                  if (controller.isLoadingAyat.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  return Column(
-                    children: [
-                      const SizedBox(height: 16),
-                      Row(
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Expanded(
-                            child: _BuildAyatHafalanDropdown(
-                              title: 'Mulai',
-                              value: controller.selectedAyatMulai.value,
-                              ayatList: controller.ayatList,
-                              otherSelectedAyat:
-                                  controller.selectedAyatAkhir.value,
-                              onChanged: (AyatHafalan? ayat) {
-                                controller.selectedAyatMulai.value = ayat;
-                              },
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: _getTahapColor(santri.tahapHafalan),
+                              shape: BoxShape.circle,
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _BuildAyatHafalanDropdown(
-                              title: 'Selesai',
-                              value: controller.selectedAyatAkhir.value,
-                              ayatList: controller.ayatList,
-                              otherSelectedAyat:
-                                  controller.selectedAyatMulai.value,
-                              isStartAyat: false,
-                              onChanged: (ayat) {
-                                controller.selectedAyatAkhir.value = ayat;
-                              },
+                          const SizedBox(width: 8),
+                          Text(
+                            _getTahapLabel(santri.tahapHafalan),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Surah Search
+                      Obx(() {
+                        if (controller.isLoadingSurah.value) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.deepPurpleAccent,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Pilih Surah',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: SearchField(
+                                suggestions: controller.surahList.map((
+                                  Surah surah,
+                                ) {
+                                  return SearchFieldListItem<Surah>(
+                                    surah.namaLatin!,
+                                    value: surah.namaLatin,
+                                    item: surah,
+                                    key: ValueKey(surah.id),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 32,
+                                          height: 32,
+                                          decoration: BoxDecoration(
+                                            color: Colors.deepPurple.withValues(
+                                              alpha: 0.1,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              '${surah.nomor}',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.deepPurple,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          surah.namaLatin!,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          '${surah.totalAyat!} Ayat',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                                selectedValue:
+                                    controller.selectedSurahMurajaah.value,
+                                onSuggestionTap: (SearchFieldListItem x) {
+                                  controller.selectedSurahMurajaah.value =
+                                      x as SearchFieldListItem<Surah>;
+                                  controller.onSurahSelected(
+                                    x.item,
+                                    santri.id.toString(),
+                                    'Murajaah',
+                                  );
+                                },
+                                suggestionState: Suggestion.expand,
+                                textInputAction: TextInputAction.next,
+                                suggestionsDecoration: SuggestionDecoration(
+                                  color: Colors.white,
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(12),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                searchInputDecoration: SearchInputDecoration(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                  hintText: 'Cari surah...',
+                                  hintStyle: TextStyle(color: Colors.grey[500]),
+                                  prefixIcon: const Icon(
+                                    Icons.search,
+                                    color: Colors.deepPurpleAccent,
+                                  ),
+                                  suffixIcon: Obx(() {
+                                    if (controller
+                                            .selectedSurahMurajaah
+                                            .value !=
+                                        null) {
+                                      return IconButton(
+                                        icon: const Icon(
+                                          Icons.clear,
+                                          color: Colors.grey,
+                                        ),
+                                        onPressed: () {
+                                          controller
+                                                  .selectedSurahMurajaah
+                                                  .value =
+                                              null;
+                                          controller.selectedAyatMulai.value =
+                                              null;
+                                          controller.selectedAyatAkhir.value =
+                                              null;
+                                          controller.ayatList.clear();
+                                        },
+                                      );
+                                    }
+                                    return const SizedBox.shrink();
+                                  }),
+                                  border: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+
+                      const SizedBox(height: 20),
+
+                      // Ayat Dropdown
+                      Obx(() {
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: _BuildAyatHafalanDropdown(
+                                title: 'Mulai',
+                                value: controller.selectedAyatMulai.value,
+                                ayatList: controller.ayatList,
+                                otherSelectedAyat:
+                                    controller.selectedAyatAkhir.value,
+                                onChanged: (AyatHafalan? ayat) {
+                                  controller.selectedAyatMulai.value = ayat;
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _BuildAyatHafalanDropdown(
+                                title: 'Selesai',
+                                value: controller.selectedAyatAkhir.value,
+                                ayatList: controller.ayatList,
+                                otherSelectedAyat:
+                                    controller.selectedAyatMulai.value,
+                                isStartAyat: false,
+                                onChanged: (ayat) {
+                                  controller.selectedAyatAkhir.value = ayat;
+                                },
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+
+                      const SizedBox(height: 20),
+
+                      // Catatan
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Catatan',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          TextField(
+                            controller: controller.catatanController,
+                            maxLines: 5,
+                            minLines: 3,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.grey[50],
+                              hintText: 'Keterangan hafalan (opsional)',
+                              hintStyle: TextStyle(color: Colors.grey[500]),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.deepPurpleAccent,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.only(bottom: 40),
+                                child: Icon(
+                                  Icons.note_alt_outlined,
+                                  color: Colors.deepPurpleAccent,
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ],
-                  );
-                }),
-                const SizedBox(height: 16),
-                // Catatan Input
-                const Text(
-                  'Catatan',
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  expands: false,
-                  maxLines: 5,
-                  controller: controller.catatanController,
-                  decoration: InputDecoration(
-                    hintText: 'Keterangan murajaah',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              // Actions
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          controller.selectedSurahMurajaah.value = null;
+                          controller.selectedAyatMulai.value = null;
+                          controller.selectedAyatAkhir.value = null;
+                          controller.ayatList.clear();
+                          controller.statusSetoran.value = '';
+                          controller.catatanController.clear();
+                          Get.back();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(color: Colors.grey[400]!),
+                          ),
+                        ),
+                        child: const Text(
+                          'Batal',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Obx(
+                        () => ElevatedButton(
+                          onPressed: () {
+                            controller.saveMurajaah(santri.id.toString());
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurpleAccent,
+                            padding: controller.isSaveLoading.value
+                                ? EdgeInsets.symmetric(vertical: 4)
+                                : EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Obx(
+                            () => controller.isSaveLoading.value
+                                ? Transform.scale(
+                                    scale: 0.5,
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    'Simpan',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              controller.selectedSurah.value = null;
-              controller.selectedAyatMulai.value = null;
-              controller.selectedAyatAkhir.value = null;
-              controller.ayatList.clear();
-              controller.statusSetoran.value = '';
-              controller.catatanController.clear();
-              Get.back();
-            },
-            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              controller.saveHafalan(santri.id.toString());
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurpleAccent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text('Simpan', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
@@ -960,44 +1535,63 @@ class _BuildAyatHafalanDropdown extends StatelessWidget {
       children: [
         Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
         const SizedBox(height: 8),
-        DropdownButtonFormField<AyatHafalan>(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
-            ),
-          ),
-          value: value,
-          hint: Text('Pilih Ayat $title'),
-          isExpanded: true,
-          items: ayatList.map((ayat) {
-            final isDisabled =
-                (ayat.checked == true ||
-                (isStartAyat &&
-                    otherSelectedAyat != null &&
-                    ayat.nomorAyat! > otherSelectedAyat!.nomorAyat!) ||
-                (!isStartAyat &&
-                    otherSelectedAyat != null &&
-                    ayat.nomorAyat! < otherSelectedAyat!.nomorAyat!));
-
-            return DropdownMenuItem<AyatHafalan>(
-              value: ayat,
-              enabled: !isDisabled,
-              child: Text(
-                'Ayat ${ayat.nomorAyat}${ayat.checked == true ? ' (Sudah Dihafal)' : ''}',
-                style: TextStyle(
-                  color: isDisabled ? Colors.grey : null,
-                  fontStyle: ayat.checked == true ? FontStyle.italic : null,
-                ),
+        Obx(
+          () => DropdownButtonFormField<AyatHafalan>(
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey[50],
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
               ),
-            );
-          }).toList(),
-          onChanged: (AyatHafalan? newValue) {
-            if (newValue != null) {
-              onChanged(newValue);
-            }
-          },
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.deepPurple),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+            ),
+            dropdownColor: Colors.white,
+            value: value,
+            hint: Text(
+              'Pilih Ayat $title',
+              style: TextStyle(color: Colors.grey[500]),
+            ),
+            isExpanded: true,
+            items: ayatList.map((ayat) {
+              final isDisabled =
+                  (ayat.checked == true ||
+                  (isStartAyat &&
+                      otherSelectedAyat != null &&
+                      ayat.nomorAyat! > otherSelectedAyat!.nomorAyat!) ||
+                  (!isStartAyat &&
+                      otherSelectedAyat != null &&
+                      ayat.nomorAyat! < otherSelectedAyat!.nomorAyat!));
+
+              return DropdownMenuItem<AyatHafalan>(
+                value: ayat,
+                enabled: !isDisabled,
+                child: Text(
+                  'Ayat ${ayat.nomorAyat}${ayat.checked == true ? ' (Sudah Dihafal)' : ''}',
+                  style: TextStyle(
+                    color: isDisabled ? Colors.grey : null,
+                    fontStyle: ayat.checked == true ? FontStyle.italic : null,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: (AyatHafalan? newValue) {
+              if (newValue != null) {
+                onChanged(newValue);
+              }
+            },
+          ),
         ),
       ],
     );
