@@ -89,26 +89,15 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              riwayat.santri!.nama ?? 'Nama Santri',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Tingkatan: ${riwayat.santri!.tingkatan ?? '-'}',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          riwayat.santri!.nama ?? 'Nama Santri',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -124,7 +113,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                       const SizedBox(width: 12),
                       _buildInfoCard(
                         'Tahap',
-                        riwayat.santri!.tahapHafalan ?? '-',
+                        getTahapanLabel(riwayat.santri!.tahapHafalan ?? '-'),
                         Icons.timeline,
                       ),
                     ],
@@ -379,6 +368,19 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         return Colors.green[400]!;
       default:
         return Colors.grey[400]!;
+    }
+  }
+
+  String getTahapanLabel(String tahapan) {
+    switch (tahapan.toLowerCase()) {
+      case 'level1':
+        return 'Level 1';
+      case 'level2':
+        return 'Level 2';
+      case 'level3':
+        return 'Level 3';
+      default:
+        return '-';
     }
   }
 
