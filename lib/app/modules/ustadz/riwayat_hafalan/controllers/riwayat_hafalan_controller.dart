@@ -151,7 +151,12 @@ class RiwayatHafalanController extends GetxController {
     getRiwayatHafalan(santriId);
   }
 
-  void deleteRiwayatHafalan(int id) async {
+  void deleteRiwayatHafalan(
+    int santriId,
+    int surahId,
+    String tanggal,
+    String status,
+  ) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
@@ -162,12 +167,18 @@ class RiwayatHafalanController extends GetxController {
 
     try {
       final response = await http.delete(
-        Uri.parse('http://10.0.2.2:5000/api/hafalan/$id'),
+        Uri.parse('http://10.0.2.2:5000/api/hafalan/riwayat'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'x-platform': 'mobile',
         },
+        body: jsonEncode({
+          'santriId': santriId,
+          'surahId': surahId,
+          'tanggal': tanggal,
+          'status': status,
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -176,7 +187,7 @@ class RiwayatHafalanController extends GetxController {
       } else {
         Get.snackbar(
           'Error',
-          'Failed to delete riwayat hafalan: ${response.statusCode}',
+          'Gagal menghapus riwayat hafalan: ${response.statusCode}',
         );
       }
     } catch (e) {
