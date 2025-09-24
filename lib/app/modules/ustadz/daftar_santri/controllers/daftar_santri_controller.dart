@@ -354,6 +354,7 @@ class DaftarSantriController extends GetxController {
   }
 
   void saveMurajaah(String santriId) async {
+    isSaveLoading.value = true;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final ustadzId = prefs.getString('roleId');
@@ -370,7 +371,6 @@ class DaftarSantriController extends GetxController {
     print(statusSetoran.value);
     print(catatanController.text);
     try {
-      isLoadingAyat.value = true;
       final response = await http.post(
         Uri.parse('http://10.0.2.2:5000/api/hafalan'),
         headers: {
@@ -398,7 +398,7 @@ class DaftarSantriController extends GetxController {
       print(e);
       Get.snackbar('Error', 'Terjadi kesalahan saat menambahkan hafalan');
     } finally {
-      isLoadingAyat.value = false;
+      isSaveLoading.value = false;
     }
 
     selectedAyatMulai.value = null;
