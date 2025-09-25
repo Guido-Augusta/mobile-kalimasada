@@ -18,39 +18,36 @@ class DetailSantriView extends GetView<DetailSantriController> {
       body: Obx(() {
         // Loading
         if (controller.isLoading.value) {
-          return Scaffold(
-            backgroundColor: const Color(0xFFF8FAFC),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6B46C1).withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Color(0xFF6B46C1),
-                        ),
-                        strokeWidth: 3,
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6B46C1).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFF6B46C1),
                       ),
+                      strokeWidth: 3,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Memuat data santri...',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: const Color(0xFF6B46C1),
-                      fontWeight: FontWeight.w500,
-                    ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Memuat data santri...',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: const Color(0xFF6B46C1),
+                    fontWeight: FontWeight.w500,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         }
@@ -58,36 +55,33 @@ class DetailSantriView extends GetView<DetailSantriController> {
         final santri = controller.santriDetail.value;
         // Data kosong
         if (santri == null) {
-          return Scaffold(
-            backgroundColor: const Color(0xFFF8FAFC),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.person_off,
-                      size: 40,
-                      color: Colors.grey,
-                    ),
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Data santri tidak ditemukan',
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: const Icon(
+                    Icons.person_off,
+                    size: 40,
+                    color: Colors.grey,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Data santri tidak ditemukan',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           );
         }
@@ -115,11 +109,14 @@ class DetailSantriView extends GetView<DetailSantriController> {
               elevation: 0,
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [Color(0xFF6B46C1), Color(0xFF9333EA)],
+                      colors: [
+                        Colors.deepPurpleAccent,
+                        Colors.deepPurple[700]!,
+                      ],
                     ),
                   ),
                   child: SafeArea(
@@ -213,13 +210,29 @@ class DetailSantriView extends GetView<DetailSantriController> {
                                         ),
                                       ),
                                     ),
-                                    child: Text(
-                                      getTahapLabel(santri.tahapHafalan),
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          width: 8,
+                                          height: 8,
+                                          decoration: BoxDecoration(
+                                            color: _getTahapColor(
+                                              santri.tahapHafalan!,
+                                            ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          getTahapLabel(santri.tahapHafalan),
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 12,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
 
@@ -298,6 +311,11 @@ class DetailSantriView extends GetView<DetailSantriController> {
                   // Parents Information
                   _buildParentsInfoSection(santri),
 
+                  const SizedBox(height: 24),
+
+                  // Wali Kelas Information
+                  _buildWaliKelasSection(santri),
+
                   const SizedBox(height: 50), // Space for bottom buttons
                 ]),
               ),
@@ -307,6 +325,19 @@ class DetailSantriView extends GetView<DetailSantriController> {
       }),
       bottomNavigationBar: _buildBottomButtons(),
     );
+  }
+
+  Color _getTahapColor(String tahap) {
+    switch (tahap.toLowerCase()) {
+      case 'level1':
+        return Colors.green;
+      case 'level2':
+        return Colors.orange;
+      case 'level3':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 
   // Helper method to get label based on tahap hafalan
@@ -346,12 +377,12 @@ class DetailSantriView extends GetView<DetailSantriController> {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF6B46C1).withValues(alpha: 0.1),
+                    color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.star,
-                    color: Color(0xFF6B46C1),
+                    color: Colors.deepPurpleAccent,
                     size: 24,
                   ),
                 ),
@@ -361,7 +392,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                   style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF6B46C1),
+                    color: Colors.deepPurpleAccent,
                   ),
                 ),
                 Text(
@@ -399,12 +430,12 @@ class DetailSantriView extends GetView<DetailSantriController> {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF9333EA).withValues(alpha: 0.1),
+                    color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.trending_up,
-                    color: Color(0xFF9333EA),
+                    color: Colors.deepPurpleAccent,
                     size: 24,
                   ),
                 ),
@@ -414,7 +445,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                   style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF9333EA),
+                    color: Colors.deepPurpleAccent,
                   ),
                 ),
                 Text(
@@ -455,7 +486,6 @@ class DetailSantriView extends GetView<DetailSantriController> {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1F2937),
             ),
           ),
 
@@ -555,6 +585,46 @@ class DetailSantriView extends GetView<DetailSantriController> {
     );
   }
 
+  Widget _buildWaliKelasSection(Santri santri) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Informasi Wali Kelas',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF1F2937),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Wali Kelas
+          _buildInfoTile(
+            icon: Icons.school,
+            label: 'Wali Kelas Santri',
+            value: santri.waliKelas.first.nama!,
+            telepon: santri.waliKelas.first.nomorHp,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInfoTile({
     required IconData icon,
     required String label,
@@ -573,10 +643,10 @@ class DetailSantriView extends GetView<DetailSantriController> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF6B46C1).withValues(alpha: 0.1),
+              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: const Color(0xFF6B46C1), size: 20),
+            child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
           ),
 
           const SizedBox(width: 12),
@@ -598,7 +668,6 @@ class DetailSantriView extends GetView<DetailSantriController> {
                   value,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
-                    color: const Color(0xFF1F2937),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -642,16 +711,16 @@ class DetailSantriView extends GetView<DetailSantriController> {
                   icon: const Icon(
                     Icons.phone,
                     size: 18,
-                    color: Color(0xFF6B46C1),
+                    color: Colors.deepPurpleAccent,
                   ),
                   onPressed: () {
                     final phoneUrl = "tel:$telepon";
                     launchUrl(Uri.parse(phoneUrl));
                   },
                   style: IconButton.styleFrom(
-                    backgroundColor: const Color(
-                      0xFF6B46C1,
-                    ).withValues(alpha: 0.1),
+                    backgroundColor: Colors.deepPurpleAccent.withValues(
+                      alpha: 0.1,
+                    ),
                     shape: const CircleBorder(),
                   ),
                 ),

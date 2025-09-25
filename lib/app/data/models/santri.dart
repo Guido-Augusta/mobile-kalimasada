@@ -17,6 +17,7 @@ class Santri {
     required this.poinUpdatedAt,
     required this.user,
     required this.orangTua,
+    required this.waliKelas,
   });
 
   final int? id;
@@ -34,6 +35,7 @@ class Santri {
   final DateTime? poinUpdatedAt;
   final User? user;
   final List<OrangTua> orangTua;
+  final List<WaliKelas> waliKelas;
 
   factory Santri.fromJson(Map<String, dynamic> json) {
     return Santri(
@@ -56,6 +58,11 @@ class Santri {
           : List<OrangTua>.from(
               json["orangTua"]!.map((x) => OrangTua.fromJson(x)),
             ),
+      waliKelas: json["waliKelas"] == null
+          ? []
+          : List<WaliKelas>.from(
+              json["waliKelas"]!.map((x) => WaliKelas.fromJson(x)),
+            ),
     );
   }
 
@@ -75,11 +82,12 @@ class Santri {
     "poinUpdatedAt": poinUpdatedAt?.toIso8601String(),
     "user": user?.toJson(),
     "orangTua": orangTua.map((x) => x.toJson()).toList(),
+    "waliKelas": waliKelas.map((x) => x.toJson()).toList(),
   };
 
   @override
   String toString() {
-    return "$id, $userId, $nama, $nomorHp, $alamat, $jenisKelamin, $tanggalLahir, $fotoProfil, $tahapHafalan, $peringkat, $totalPoin, $createdAt, $poinUpdatedAt, $user, $orangTua, ";
+    return "$id, $userId, $nama, $nomorHp, $alamat, $jenisKelamin, $tanggalLahir, $fotoProfil, $tahapHafalan, $peringkat, $totalPoin, $createdAt, $poinUpdatedAt, $user, $orangTua, $waliKelas, ";
   }
 }
 
@@ -142,5 +150,40 @@ class User {
   @override
   String toString() {
     return "$id, $email, $password, $role, $createdAt, $updatedAt, ";
+  }
+}
+
+class WaliKelas {
+  WaliKelas({
+    required this.id,
+    required this.nama,
+    required this.nomorHp,
+    required this.waliKelasTahap,
+  });
+
+  final int? id;
+  final String? nama;
+  final String? nomorHp;
+  final String? waliKelasTahap;
+
+  factory WaliKelas.fromJson(Map<String, dynamic> json) {
+    return WaliKelas(
+      id: json["id"],
+      nama: json["nama"],
+      nomorHp: json["nomorHp"],
+      waliKelasTahap: json["waliKelasTahap"],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "nama": nama,
+    "nomorHp": nomorHp,
+    "waliKelasTahap": waliKelasTahap,
+  };
+
+  @override
+  String toString() {
+    return "$id, $nama, $nomorHp, $waliKelasTahap, ";
   }
 }
