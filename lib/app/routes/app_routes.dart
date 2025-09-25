@@ -19,6 +19,7 @@ abstract class Routes {
   static const ORTU_MAIN = _Paths.ORTU_MAIN;
   static const SETORAN = _Paths.SETORAN;
   static const RIWAYAT_HAFALAN = _Paths.RIWAYAT_HAFALAN;
+  static const DETAIL_RIWAYAT_HAFALAN = _Paths.DETAIL_RIWAYAT_HAFALAN;
 }
 
 abstract class _Paths {
@@ -39,4 +40,5 @@ abstract class _Paths {
   static const ORTU_MAIN = '/ortu-main';
   static const SETORAN = '/setoran';
   static const RIWAYAT_HAFALAN = '/riwayat-hafalan';
+  static const DETAIL_RIWAYAT_HAFALAN = '/detail-riwayat-hafalan';
 }

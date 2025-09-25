@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_kalimasada/app/data/models/riwayat_hafalan.dart';
 import '../controllers/riwayat_hafalan_controller.dart';
@@ -24,12 +25,6 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         backgroundColor: Colors.deepPurpleAccent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-            onPressed: controller.refreshRiwayatHafalan,
-          ),
-        ],
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.allRiwayatData.isEmpty) {
@@ -279,11 +274,14 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            // TODO: Implement lihat detail
-            Get.snackbar(
-              'Info',
-              'Fitur lihat detail akan segera hadir',
-              snackPosition: SnackPosition.BOTTOM,
+            Get.toNamed(
+              '/detail-riwayat-hafalan',
+              arguments: {
+                'santriId': riwayatHafalan.santri?.id,
+                'surahId': datum.surahId,
+                'tanggalRiwayat': datum.tanggal,
+                'status': datum.status,
+              },
             );
           },
           child: Padding(
@@ -300,8 +298,8 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                         children: [
                           Text(
                             datum.namaSurah ?? '-',
-                            style: const TextStyle(
-                              fontSize: 20,
+                            style: GoogleFonts.amiri(
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF6B46C1),
                             ),
