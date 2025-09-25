@@ -8,6 +8,7 @@ class Surah {
     required this.tempatTurun,
     required this.arti,
     required this.deskripsi,
+    required this.audio,
   });
 
   final int? id;
@@ -18,6 +19,7 @@ class Surah {
   final String? tempatTurun;
   final String? arti;
   final String? deskripsi;
+  final String? audio;
 
   factory Surah.fromJson(Map<String, dynamic> json) {
     return Surah(
@@ -29,6 +31,7 @@ class Surah {
       tempatTurun: json["tempatTurun"],
       arti: json["arti"],
       deskripsi: json["deskripsi"],
+      audio: json["audio"],
     );
   }
 
@@ -41,10 +44,11 @@ class Surah {
     "tempatTurun": tempatTurun,
     "arti": arti,
     "deskripsi": deskripsi,
+    "audio": audio,
   };
 
   @override
   String toString() {
-    return "$id, $nomor, $nama, $namaLatin, $totalAyat, $tempatTurun, $arti, $deskripsi, ";
+    return "$id, $nomor, $nama, $namaLatin, $totalAyat, $tempatTurun, $arti, $deskripsi, $audio, ";
   }
 }

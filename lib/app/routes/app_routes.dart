@@ -11,7 +11,7 @@ abstract class Routes {
   static const ORTU_HOME = _Paths.ORTU_HOME;
   static const DAFTAR_SANTRI = _Paths.DAFTAR_SANTRI;
   static const USTADZ_PROFILE = _Paths.USTADZ_PROFILE;
-  static const DAFTAR_SURAH = _Paths.DAFTAR_SURAH;
+  static const ALQURAN = _Paths.ALQURAN;
   static const DETAIL_SANTRI = _Paths.DETAIL_SANTRI;
   static const PROGRES_HAFALAN = _Paths.PROGRES_HAFALAN;
   static const USTADZ_MAIN = _Paths.USTADZ_MAIN;
@@ -32,7 +32,7 @@ abstract class _Paths {
   static const ORTU_HOME = '/ortu-home';
   static const DAFTAR_SANTRI = '/daftar-santri';
   static const USTADZ_PROFILE = '/ustadz-profile';
-  static const DAFTAR_SURAH = '/daftar-surah';
+  static const ALQURAN = '/alquran';
   static const DETAIL_SANTRI = '/detail-santri';
   static const PROGRES_HAFALAN = '/progres-hafalan';
   static const USTADZ_MAIN = '/ustadz-main';

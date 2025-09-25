@@ -21,8 +21,8 @@ import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
 import '../modules/ustadz/daftar_santri/bindings/daftar_santri_binding.dart';
 import '../modules/ustadz/daftar_santri/views/daftar_santri_view.dart';
-import '../modules/ustadz/daftar_surah/bindings/daftar_surah_binding.dart';
-import '../modules/ustadz/daftar_surah/views/daftar_surah_view.dart';
+import '../modules/ustadz/alquran/bindings/alquran_binding.dart';
+import '../modules/ustadz/alquran/views/alquran_view.dart';
 import '../modules/ustadz/detail_santri/bindings/detail_santri_binding.dart';
 import '../modules/ustadz/detail_santri/views/detail_santri_view.dart';
 import '../modules/ustadz/progres_hafalan/bindings/progres_hafalan_binding.dart';
@@ -84,9 +84,9 @@ class AppPages {
       middlewares: [AuthMiddleware()],
     ),
     GetPage(
-      name: _Paths.DAFTAR_SURAH,
-      page: () => const DaftarSurahView(),
-      binding: DaftarSurahBinding(),
+      name: _Paths.ALQURAN,
+      page: () => const AlquranView(),
+      binding: AlquranBinding(),
       middlewares: [AuthMiddleware()],
     ),
     GetPage(

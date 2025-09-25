@@ -693,7 +693,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
             Expanded(
               child: InkWell(
                 onTap: () {
-                  Get.toNamed('/daftar-surah');
+                  Get.toNamed('/alquran');
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
