@@ -20,6 +20,7 @@ abstract class Routes {
   static const SETORAN = _Paths.SETORAN;
   static const RIWAYAT_HAFALAN = _Paths.RIWAYAT_HAFALAN;
   static const DETAIL_RIWAYAT_HAFALAN = _Paths.DETAIL_RIWAYAT_HAFALAN;
+  static const PERINGKAT = _Paths.PERINGKAT;
 }
 
 abstract class _Paths {
@@ -41,4 +42,5 @@ abstract class _Paths {
   static const SETORAN = '/setoran';
   static const RIWAYAT_HAFALAN = '/riwayat-hafalan';
   static const DETAIL_RIWAYAT_HAFALAN = '/detail-riwayat-hafalan';
+  static const PERINGKAT = '/peringkat';
 }

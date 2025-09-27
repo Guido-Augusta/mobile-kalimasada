@@ -750,7 +750,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
             Expanded(
               child: InkWell(
                 onTap: () {
-                  // Get.toNamed('/peringkat_santri');
+                  Get.toNamed('/peringkat');
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
