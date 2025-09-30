@@ -55,7 +55,7 @@ class UstadzHomeController extends GetxController {
     return newImageUrl;
   }
 
-  void getUstadz() async {
+  Future<void> getUstadz() async {
     isLoading.value = true;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -86,7 +86,7 @@ class UstadzHomeController extends GetxController {
     }
   }
 
-  void logout() async {
+  Future<void> logout() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final userId = prefs.getString('userId');
@@ -106,6 +106,7 @@ class UstadzHomeController extends GetxController {
         await prefs.remove('role');
         await prefs.remove('userId');
         await prefs.remove('roleId');
+        Get.offAllNamed('/login');
         Get.snackbar('Success', 'Logout berhasil');
       } else {
         Get.snackbar('Error', data['message'] ?? 'Logout gagal');
@@ -113,6 +114,5 @@ class UstadzHomeController extends GetxController {
     } catch (e) {
       Get.snackbar('Error', 'An error occurred: $e');
     }
-    Get.offAllNamed('/login');
   }
 }

@@ -1,16 +1,30 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:path/path.dart' as path;
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/models/ustadz.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_home/controllers/ustadz_home_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
 
 class UstadzProfileController extends GetxController {
   final isLoading = true.obs;
+  final isSaveLoading = false.obs;
+  final isUploadingImage = false.obs;
   var ustadzData = Rxn<Ustadz>();
   var fotoProfil =
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
           .obs;
+
+  var namaC = TextEditingController();
+  var noHpC = TextEditingController();
+  var alamatC = TextEditingController();
+  var jenisKelaminC = TextEditingController();
+  var imagePicker = ImagePicker();
 
   @override
   void onInit() {
@@ -38,6 +52,10 @@ class UstadzProfileController extends GetxController {
         final ustadz = Ustadz.fromJson(data['data']);
         ustadzData.value = ustadz;
         fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+        namaC.text = ustadz.nama!;
+        noHpC.text = ustadz.nomorHp!;
+        alamatC.text = ustadz.alamat!;
+        jenisKelaminC.text = ustadz.jenisKelamin!;
       } else {
         Get.snackbar('Error', 'Gagal memuat data profil');
       }
@@ -48,13 +66,187 @@ class UstadzProfileController extends GetxController {
     }
   }
 
+  Future<void> updateProfileData(
+    String? nama,
+    String? noHp,
+    String? alamat,
+    String? jenisKelamin,
+  ) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final roleId = prefs.getString('roleId');
+    try {
+      isLoading.value = true;
+
+      final response = await http.put(
+        Uri.parse('http://10.0.2.2:5000/api/ustadz/$roleId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'x-platform': 'mobile',
+        },
+        body: jsonEncode({
+          'nama': nama ?? ustadzData.value?.nama,
+          'nomorHp': noHp ?? ustadzData.value?.nomorHp,
+          'alamat': alamat ?? ustadzData.value?.alamat,
+          'jenisKelamin': jenisKelamin ?? ustadzData.value?.jenisKelamin,
+        }),
+      );
+      if (response.statusCode == 200) {
+        fetchUstadzData();
+        if (Get.isRegistered<UstadzHomeController>()) {
+          Get.find<UstadzHomeController>().getUstadz();
+        }
+        print(response.body);
+        Get.back();
+        Get.snackbar('Success', 'Profil berhasil diperbarui');
+      } else {
+        Get.snackbar('Error', 'Gagal memuat data profil');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal memuat data profil');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> pickImage(ImageSource source) async {
+    try {
+      final XFile? pickedImage = await imagePicker.pickImage(
+        source: source,
+        imageQuality: 70,
+        maxWidth: 800,
+        maxHeight: 800,
+      );
+
+      if (pickedImage != null) {
+        isUploadingImage.value = true;
+        await uploadImage(pickedImage.path);
+        print(pickedImage.path);
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal memilih gambar: $e');
+    }
+  }
+
+  Future<void> uploadImage(String imagePath) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final roleId = prefs.getString('roleId');
+
+    print('DEBUG: Starting upload');
+    print('DEBUG: Token: $token');
+    print('DEBUG: Role ID: $roleId');
+    print('DEBUG: Image path: $imagePath');
+
+    try {
+      final request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('http://10.0.2.2:5000/api/ustadz/$roleId'),
+      );
+
+      request.headers['Authorization'] = 'Bearer $token';
+      request.headers['x-platform'] = 'mobile';
+
+      // Read file and create multipart with proper content type
+      final file = File(imagePath);
+      final bytes = await file.readAsBytes();
+      final fileName = path.basename(imagePath);
+      final extension = path.extension(imagePath).toLowerCase();
+
+      // Ensure proper file extension
+      String finalFileName = fileName;
+      if (extension != '.jpg' && extension != '.jpeg' && extension != '.png') {
+        finalFileName = '${path.basenameWithoutExtension(imagePath)}.jpg';
+      }
+
+      // Determine content type
+      String contentType;
+      if (extension == '.png') {
+        contentType = 'image/png';
+      } else {
+        contentType = 'image/jpeg';
+      }
+
+      final multipartFile = http.MultipartFile.fromBytes(
+        'fotoProfil',
+        bytes,
+        filename: finalFileName,
+        contentType: MediaType.parse(contentType),
+      );
+
+      request.files.add(multipartFile);
+
+      print('DEBUG: Request prepared, sending...');
+      print('DEBUG: File name: $finalFileName');
+      print('DEBUG: Content type: $contentType');
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      print('DEBUG: Response status: ${response.statusCode}');
+      print('DEBUG: Response body: $responseBody');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(responseBody);
+        if (data['data']['fotoProfil'] != null) {
+          fotoProfil.value = getImageUrl(data['data']['fotoProfil']);
+        }
+
+        if (Get.isRegistered<UstadzHomeController>()) {
+          Get.find<UstadzHomeController>().getUstadz();
+        }
+
+        Get.back();
+        Get.snackbar('Success', 'Foto profil berhasil diperbarui');
+      } else {
+        print('DEBUG: Upload failed with status: ${response.statusCode}');
+        print('DEBUG: Upload failed with body: $responseBody');
+        Get.snackbar(
+          'Error',
+          'Gagal mengupload foto profil (Status: ${response.statusCode})',
+        );
+      }
+    } catch (e) {
+      print('DEBUG: Upload error: $e');
+      Get.snackbar('Error', 'Gagal mengupload foto profil: $e');
+    } finally {
+      isUploadingImage.value = false;
+    }
+  }
+
+  Future<void> logout() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final userId = prefs.getString('userId');
+    try {
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      var data = jsonDecode(response.body);
+      print(response.statusCode);
+      print(data);
+      if (response.statusCode == 200) {
+        await prefs.remove('token');
+        await prefs.remove('role');
+        await prefs.remove('userId');
+        await prefs.remove('roleId');
+        Get.offAllNamed('/login');
+        Get.snackbar('Success', 'Logout berhasil');
+      } else {
+        Get.snackbar('Error', data['message'] ?? 'Logout gagal');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'An error occurred: $e');
+    }
+  }
+
   String getImageUrl(String imageUrl) {
     String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
     return newImageUrl;
-  }
-
-  void navigateToEditProfile() {
-    // TODO: Implement navigation to edit profile
-    Get.snackbar('Info', 'Edit profile akan segera tersedia');
   }
 }
