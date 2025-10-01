@@ -365,7 +365,7 @@ class PeringkatView extends GetView<PeringkatController> {
               borderRadius: BorderRadius.circular(8),
               child: item.fotoProfil != null && item.fotoProfil!.isNotEmpty
                   ? CachedNetworkImage(
-                      imageUrl: item.fotoProfil!,
+                      imageUrl: controller.getImageUrl(item.fotoProfil!),
                       width: 48,
                       height: 48,
                       fit: BoxFit.cover,

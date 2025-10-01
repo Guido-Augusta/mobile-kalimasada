@@ -31,6 +31,11 @@ class PeringkatController extends GetxController {
     peringkat.clear();
   }
 
+  String getImageUrl(String imageUrl) {
+    String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
+    return newImageUrl;
+  }
+
   Future<void> getPeringkat() async {
     // http://10.0.2.2:5000/api/santri/peringkat?page=1&limit=10&search=guido&tahapHafalan=level1
 
