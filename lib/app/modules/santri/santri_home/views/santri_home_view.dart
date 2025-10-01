@@ -72,10 +72,11 @@ class SantriHomeView extends GetView<SantriHomeController> {
               radius: 28,
               backgroundColor: Colors.grey[200],
               backgroundImage: CachedNetworkImageProvider(
-                controller.fotoProfil.value,
+                controller.getImageUrl(controller.fotoProfil.value),
               ),
               onBackgroundImageError: (_, _) {
-                controller.fotoProfil.value = '';
+                controller.fotoProfil.value =
+                    'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg';
               },
               child:
                   controller.fotoProfil.value.isEmpty ||
