@@ -17,8 +17,6 @@ class SantriMainView extends GetView<SantriMainController> {
           return const SantriHomeView();
         case 1:
           return const SantriHomeView();
-        case 2:
-          return const SantriHomeView();
         default:
           return const SantriHomeView();
       }
@@ -45,11 +43,6 @@ class SantriMainView extends GetView<SantriMainController> {
                 icon: Icon(Icons.home, color: Colors.grey),
                 activeIcon: Icon(Icons.home, color: Colors.deepPurpleAccent),
                 label: 'Beranda',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.history, color: Colors.grey),
-                activeIcon: Icon(Icons.history, color: Colors.deepPurpleAccent),
-                label: 'Riwayat',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person, color: Colors.grey),

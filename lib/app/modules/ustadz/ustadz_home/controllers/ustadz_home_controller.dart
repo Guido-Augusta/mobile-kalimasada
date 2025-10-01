@@ -88,15 +88,11 @@ class UstadzHomeController extends GetxController {
 
   Future<void> logout() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
     final userId = prefs.getString('userId');
     try {
       final response = await post(
         Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
       print(response.statusCode);

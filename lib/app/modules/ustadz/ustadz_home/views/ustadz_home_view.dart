@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
@@ -12,39 +13,34 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFF),
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            controller.getUstadz();
-          },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight:
-                    MediaQuery.of(context).size.height -
-                    MediaQuery.of(context).padding.top,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight:
+                  MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.top,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 20,
+                left: 20,
+                right: 20,
+                bottom: 30,
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  top: 20,
-                  left: 20,
-                  right: 20,
-                  bottom: 30,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(context),
-                    const SizedBox(height: 30),
-                    _buildWelcomeCard(context),
-                    const SizedBox(height: 25),
-                    _buildFeatureCards(context),
-                    const SizedBox(height: 25),
-                    _buildIslamicQuoteSlider(context),
-                    const SizedBox(height: 25),
-                    _buildIslamicDecoration(context),
-                  ],
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context),
+                  const SizedBox(height: 30),
+                  _buildWelcomeCard(context),
+                  const SizedBox(height: 25),
+                  _buildFeatureCards(context),
+                  const SizedBox(height: 25),
+                  _buildIslamicQuoteSlider(context),
+                  const SizedBox(height: 25),
+                  _buildIslamicDecoration(context),
+                ],
               ),
             ),
           ),
@@ -75,9 +71,15 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
             child: CircleAvatar(
               radius: 28,
               backgroundColor: Colors.grey[200],
-              backgroundImage: NetworkImage(controller.fotoProfil.value),
-              onBackgroundImageError: (_, _) {},
-              child: controller.fotoProfil.value.isEmpty
+              backgroundImage: CachedNetworkImageProvider(
+                controller.fotoProfil.value,
+              ),
+              onBackgroundImageError: (_, _) {
+                controller.fotoProfil.value = '';
+              },
+              child:
+                  controller.fotoProfil.value.isEmpty ||
+                      controller.fotoProfil.value == ''
                   ? Icon(Icons.person, size: 28, color: Colors.deepPurpleAccent)
                   : null,
             ),
