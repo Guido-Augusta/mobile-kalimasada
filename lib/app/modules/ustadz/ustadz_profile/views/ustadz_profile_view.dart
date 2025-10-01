@@ -63,7 +63,9 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                                 () => CircleAvatar(
                                   radius: 50,
                                   backgroundImage: CachedNetworkImageProvider(
-                                    controller.fotoProfil.value,
+                                    controller.getImageUrl(
+                                      controller.fotoProfil.value,
+                                    ),
                                   ),
                                   onBackgroundImageError: (exception, stackTrace) {
                                     // Handle image loading error

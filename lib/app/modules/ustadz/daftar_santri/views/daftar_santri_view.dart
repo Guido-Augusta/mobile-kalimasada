@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_kalimasada/app/data/models/ayat_hafalan.dart';
@@ -294,20 +295,26 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     ),
                     child: ClipOval(
                       child:
-                          santri.fotoProfil != null &&
-                              santri.fotoProfil!.isNotEmpty
-                          ? Image.network(
-                              santri.fotoProfil!,
+                          santri.fotoProfil != null ||
+                              santri.fotoProfil!.isNotEmpty ||
+                              santri.fotoProfil! != ''
+                          ? CachedNetworkImage(
+                              imageUrl: controller.getImageUrl(
+                                santri.fotoProfil!,
+                              ),
                               fit: BoxFit.cover,
                               width: 60,
                               height: 60,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(
-                                  Icons.person,
-                                  size: 30,
-                                  color: Colors.grey[400],
-                                );
-                              },
+                              placeholder: (context, url) => Icon(
+                                Icons.person,
+                                size: 30,
+                                color: Colors.grey[400],
+                              ),
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.person,
+                                size: 30,
+                                color: Colors.grey[400],
+                              ),
                             )
                           : Icon(
                               Icons.person,
