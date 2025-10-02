@@ -617,8 +617,12 @@ class DetailSantriView extends GetView<DetailSantriController> {
           _buildInfoTile(
             icon: Icons.school,
             label: 'Wali Kelas Santri',
-            value: santri.waliKelas.first.nama!,
-            telepon: santri.waliKelas.first.nomorHp,
+            value: santri.waliKelas.isNotEmpty
+                ? santri.waliKelas.first.nama!
+                : '-',
+            telepon: santri.waliKelas.isNotEmpty
+                ? santri.waliKelas.first.nomorHp
+                : '',
           ),
         ],
       ),

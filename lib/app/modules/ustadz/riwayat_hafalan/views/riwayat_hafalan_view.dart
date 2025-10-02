@@ -358,23 +358,24 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                     ),
                     const Spacer(),
                     // Small delete button
-                    InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: () =>
-                          _showDeleteConfirmation(datum, riwayatHafalan),
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.red[50],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.delete_outline_rounded,
-                          size: 18,
-                          color: Colors.red[400],
+                    if (controller.userRole == 'ustadz')
+                      InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () =>
+                            _showDeleteConfirmation(datum, riwayatHafalan),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.red[50],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.delete_outline_rounded,
+                            size: 18,
+                            color: Colors.red[400],
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ],

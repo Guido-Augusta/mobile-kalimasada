@@ -7,6 +7,7 @@ import 'package:mobile_kalimasada/app/data/models/riwayat_hafalan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RiwayatHafalanController extends GetxController {
+  String? userRole;
   final santriId = Get.arguments['santriId'];
   var isLoading = false.obs;
   var isLoadingMore = false.obs;
@@ -20,8 +21,10 @@ class RiwayatHafalanController extends GetxController {
   final ScrollController scrollController = ScrollController();
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userRole = prefs.getString('role');
     getRiwayatHafalan(santriId);
     _setupScrollController();
   }
@@ -35,11 +38,6 @@ class RiwayatHafalanController extends GetxController {
         }
       }
     });
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
   }
 
   @override
@@ -78,7 +76,6 @@ class RiwayatHafalanController extends GetxController {
 
         // Check if there are more pages
         hasMore.value = riwayat.data.length >= _perPage;
-        print('Riwayat hafalan loaded: ${riwayat.data.length} entries');
       } else {
         Get.snackbar(
           'Error',
