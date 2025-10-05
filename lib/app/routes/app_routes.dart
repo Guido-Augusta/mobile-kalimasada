@@ -21,6 +21,7 @@ abstract class Routes {
   static const RIWAYAT_HAFALAN = _Paths.RIWAYAT_HAFALAN;
   static const DETAIL_RIWAYAT_HAFALAN = _Paths.DETAIL_RIWAYAT_HAFALAN;
   static const PERINGKAT = _Paths.PERINGKAT;
+  static const SANTRI_PROFILE = _Paths.SANTRI_PROFILE;
 }
 
 abstract class _Paths {
@@ -43,4 +44,5 @@ abstract class _Paths {
   static const RIWAYAT_HAFALAN = '/riwayat-hafalan';
   static const DETAIL_RIWAYAT_HAFALAN = '/detail-riwayat-hafalan';
   static const PERINGKAT = '/peringkat';
+  static const SANTRI_PROFILE = '/santri-profile';
 }

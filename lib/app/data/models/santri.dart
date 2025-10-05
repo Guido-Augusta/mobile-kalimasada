@@ -26,7 +26,7 @@ class Santri {
   final String? nomorHp;
   final String? alamat;
   final String? jenisKelamin;
-  final DateTime? tanggalLahir;
+  DateTime? tanggalLahir;
   final String? fotoProfil;
   final String? tahapHafalan;
   final int? peringkat;
