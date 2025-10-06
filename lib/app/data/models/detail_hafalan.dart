@@ -1,3 +1,5 @@
+// GET http://10.0.2.2:5000/api/hafalan/:santriId/surah/:surahId?mode=tambah
+
 class DetailHafalan {
   DetailHafalan({
     required this.surah,
@@ -42,6 +44,7 @@ class Ayat {
     required this.arab,
     required this.latin,
     required this.terjemah,
+    required this.juz,
     required this.checked,
   });
 
@@ -50,6 +53,7 @@ class Ayat {
   final String? arab;
   final String? latin;
   final String? terjemah;
+  final int? juz;
   final bool? checked;
 
   factory Ayat.fromJson(Map<String, dynamic> json) {
@@ -59,6 +63,7 @@ class Ayat {
       arab: json["arab"],
       latin: json["latin"],
       terjemah: json["terjemah"],
+      juz: json["juz"],
       checked: json["checked"],
     );
   }
@@ -69,12 +74,13 @@ class Ayat {
     "arab": arab,
     "latin": latin,
     "terjemah": terjemah,
+    "juz": juz,
     "checked": checked,
   };
 
   @override
   String toString() {
-    return "$id, $nomorAyat, $arab, $latin, $terjemah, $checked, ";
+    return "$id, $nomorAyat, $arab, $latin, $terjemah, $juz, $checked, ";
   }
 }
 
@@ -85,6 +91,7 @@ class Surah {
     required this.namaLatin,
     required this.totalAyat,
     required this.nomor,
+    required this.audio,
   });
 
   final int? id;
@@ -92,6 +99,7 @@ class Surah {
   final String? namaLatin;
   final int? totalAyat;
   final int? nomor;
+  final String? audio;
 
   factory Surah.fromJson(Map<String, dynamic> json) {
     return Surah(
@@ -100,6 +108,7 @@ class Surah {
       namaLatin: json["namaLatin"],
       totalAyat: json["totalAyat"],
       nomor: json["nomor"],
+      audio: json["audio"],
     );
   }
 
@@ -109,10 +118,11 @@ class Surah {
     "namaLatin": namaLatin,
     "totalAyat": totalAyat,
     "nomor": nomor,
+    "audio": audio,
   };
 
   @override
   String toString() {
-    return "$id, $nama, $namaLatin, $totalAyat, $nomor, ";
+    return "$id, $nama, $namaLatin, $totalAyat, $nomor, $audio, ";
   }
 }

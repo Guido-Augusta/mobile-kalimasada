@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 
 import '../middleware/auth_middleware.dart';
+import '../modules/santri/detail-progres/bindings/detail_progres_binding.dart';
+import '../modules/santri/detail-progres/views/detail_progres_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -147,6 +149,11 @@ class AppPages {
       name: _Paths.SANTRI_PROFILE,
       page: () => const SantriProfileView(),
       binding: SantriProfileBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAIL_PROGRES,
+      page: () => const DetailProgresView(),
+      binding: DetailProgresBinding(),
     ),
   ];
 }
