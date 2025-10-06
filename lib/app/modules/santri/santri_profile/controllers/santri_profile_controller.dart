@@ -75,7 +75,6 @@ class SantriProfileController extends GetxController {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      print(token);
 
       if (token == null) {
         Get.snackbar('Error', 'No authentication token found');
