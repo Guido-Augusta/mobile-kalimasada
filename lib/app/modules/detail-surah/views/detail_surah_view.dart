@@ -6,10 +6,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart' as rx;
 
-import '../controllers/detail_progres_controller.dart';
+import '../controllers/detail_surah_controller.dart';
 
-class DetailProgresView extends GetView<DetailProgresController> {
-  const DetailProgresView({super.key});
+class DetailSurahView extends GetView<DetailSurahController> {
+  const DetailSurahView({super.key});
 
   Stream<PositionData> get positionDataStream =>
       rx.Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
@@ -29,16 +29,16 @@ class DetailProgresView extends GetView<DetailProgresController> {
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: const Color(0xFFF8FAFC),
-        surfaceTintColor: Colors.transparent,
-        title: Text('Detail Progres'),
+        title: Text('Detail Surah'),
         centerTitle: true,
+        surfaceTintColor: Colors.transparent,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (controller.detailProgres.value == null) {
+        if (controller.detailSurah.value == null) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -93,7 +93,7 @@ class DetailProgresView extends GetView<DetailProgresController> {
                 child: Column(
                   children: [
                     Text(
-                      controller.surahInfo.value?.namaLatin ?? '',
+                      controller.detailSurah.value?.namaLatin ?? '',
                       style: GoogleFonts.poppins(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -104,7 +104,7 @@ class DetailProgresView extends GetView<DetailProgresController> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      controller.surahInfo.value?.arti ?? '',
+                      controller.detailSurah.value?.arti ?? '',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -123,7 +123,7 @@ class DetailProgresView extends GetView<DetailProgresController> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${controller.surahInfo.value?.tempatTurun?.toUpperCase()} • ${controller.surahInfo.value?.jumlahAyat} AYAT',
+                      '${controller.detailSurah.value?.tempatTurun?.toUpperCase()} • ${controller.detailSurah.value?.jumlahAyat} AYAT',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -233,7 +233,7 @@ class DetailProgresView extends GetView<DetailProgresController> {
               ),
             ),
             // Ayat List
-            if (controller.detailProgres.value?.ayat.isEmpty ?? true)
+            if (controller.detailSurah.value?.ayat.isEmpty ?? true)
               SliverFillRemaining(
                 child: Center(
                   child: Column(
@@ -267,7 +267,7 @@ class DetailProgresView extends GetView<DetailProgresController> {
             else
               SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
-                  final ayat = controller.detailProgres.value?.ayat[index];
+                  final ayat = controller.detailSurah.value?.ayat[index];
                   return Container(
                     margin: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -279,69 +279,43 @@ class DetailProgresView extends GetView<DetailProgresController> {
                       shadowColor: Colors.black.withValues(alpha: 0.05),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(
-                          color: ayat?.checked == true
-                              ? Colors.green[300]!
-                              : Colors.grey[200]!,
-                          width: ayat?.checked == true ? 1.5 : 1,
-                        ),
+                        side: BorderSide(color: Colors.grey[200]!, width: 1),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                // Ayat Number
-                                Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    color: Colors.deepPurpleAccent.withValues(
-                                      alpha: 0.1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '${ayat?.nomorAyat}',
-                                      style: TextStyle(
-                                        color: Colors.deepPurpleAccent[700],
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Colors.deepPurpleAccent.withValues(
+                                  alpha: 0.1,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '${ayat?.nomor}',
+                                  style: TextStyle(
+                                    color: Colors.deepPurpleAccent[700],
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-
-                                // Status Checked Ayat
-                                if (ayat?.checked == true)
-                                  Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green[300],
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: const Icon(
-                                      Icons.check,
-                                      size: 16,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                              ],
+                              ),
                             ),
                             const SizedBox(height: 12),
 
                             // Arabic Text
-                            if (ayat?.arab != null && ayat!.arab!.isNotEmpty)
+                            if (ayat?.ar != null && ayat!.ar!.isNotEmpty)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 12),
                                 child: Align(
                                   alignment: Alignment.centerRight,
                                   child: Text(
-                                    ayat.arab!,
+                                    ayat.ar!,
                                     style: GoogleFonts.amiri(
                                       fontSize: 24,
                                       height: 2.5,
@@ -352,11 +326,11 @@ class DetailProgresView extends GetView<DetailProgresController> {
                               ),
 
                             // Latin Text
-                            if (ayat?.latin != null && ayat!.latin!.isNotEmpty)
+                            if (ayat?.tr != null && ayat!.tr!.isNotEmpty)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 8),
                                 child: Text(
-                                  ayat.latin!,
+                                  ayat.tr!,
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey[700],
@@ -367,8 +341,7 @@ class DetailProgresView extends GetView<DetailProgresController> {
                               ),
 
                             // Translation
-                            if (ayat?.terjemah != null &&
-                                ayat!.terjemah!.isNotEmpty)
+                            if (ayat?.idn != null && ayat!.idn!.isNotEmpty)
                               Padding(
                                 padding: const EdgeInsets.only(top: 8),
                                 child: Container(
@@ -380,7 +353,7 @@ class DetailProgresView extends GetView<DetailProgresController> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    ayat.terjemah!,
+                                    ayat.idn!,
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: Colors.grey[600],
@@ -394,7 +367,7 @@ class DetailProgresView extends GetView<DetailProgresController> {
                       ),
                     ),
                   );
-                }, childCount: controller.detailProgres.value?.ayat.length),
+                }, childCount: controller.detailSurah.value?.ayat.length),
               ),
             const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],

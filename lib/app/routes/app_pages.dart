@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 
 import '../middleware/auth_middleware.dart';
-import '../modules/santri/detail-progres/bindings/detail_progres_binding.dart';
-import '../modules/santri/detail-progres/views/detail_progres_view.dart';
+import '../modules/detail-surah/bindings/detail_surah_binding.dart';
+import '../modules/detail-surah/views/detail_surah_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -15,6 +15,8 @@ import '../modules/main/ustadz_main/bindings/ustadz_main_binding.dart';
 import '../modules/main/ustadz_main/views/ustadz_main_view.dart';
 import '../modules/ortu/ortu_home/bindings/ortu_home_binding.dart';
 import '../modules/ortu/ortu_home/views/ortu_home_view.dart';
+import '../modules/santri/detail-progres/bindings/detail_progres_binding.dart';
+import '../modules/santri/detail-progres/views/detail_progres_view.dart';
 import '../modules/santri/santri_home/bindings/santri_home_binding.dart';
 import '../modules/santri/santri_home/views/santri_home_view.dart';
 import '../modules/santri/santri_profile/bindings/santri_profile_binding.dart';
@@ -154,6 +156,11 @@ class AppPages {
       name: _Paths.DETAIL_PROGRES,
       page: () => const DetailProgresView(),
       binding: DetailProgresBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAIL_SURAH,
+      page: () => const DetailSurahView(),
+      binding: DetailSurahBinding(),
     ),
   ];
 }

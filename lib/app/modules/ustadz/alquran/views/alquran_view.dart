@@ -9,7 +9,7 @@ class AlquranView extends GetView<AlquranController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.deepPurpleAccent,
@@ -98,7 +98,9 @@ class AlquranView extends GetView<AlquranController> {
                         ],
                       ),
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          Get.toNamed('/detail-surah', arguments: surah.id);
+                        },
                         highlightColor: Colors.transparent,
                         splashColor: Colors.transparent,
                         child: Padding(
