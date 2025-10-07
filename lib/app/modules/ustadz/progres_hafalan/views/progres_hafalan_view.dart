@@ -27,62 +27,92 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
           controller.progresHafalan.value = [];
           await controller.getProgresHafalan(controller.santriId);
         },
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Student Info Card
-              buildSantriInfoCard(),
-              const SizedBox(height: 24),
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text(
+                    'Memuat data...',
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                ],
+              ),
+            );
+          }
 
-              // Progress Header
-              buildProgressHeader(),
-              const SizedBox(height: 16),
+          return CustomScrollView(
+            slivers: [
+              // Student Info Card
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                  child: buildSantriInfoCard(),
+                ),
+              ),
 
               // Search Bar
-              buildSearchBar(),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                  child: buildSearchBar(),
+                ),
+              ),
 
-              const SizedBox(height: 24),
+              // Progress Header
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+                  child: buildProgressHeader(),
+                ),
+              ),
 
               // Surah Progress List
-              Obx(() {
-                if (controller.isLoading.value) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 50),
-                        const CircularProgressIndicator(),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Memuat data...',
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
+              if (controller.progresHafalan.isEmpty)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      'Tidak ada progres hafalan',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
                     ),
-                  );
-                } else if (controller.progresHafalan.isEmpty) {
-                  return const Center(child: Text('Tidak ada progres hafalan'));
-                }
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: controller.searchQuery.value.isEmpty
-                      ? controller.progresHafalan.length
-                      : controller.filteredSurahList.length,
-                  itemBuilder: (context, index) {
-                    final surah = controller.searchQuery.value.isEmpty
-                        ? controller.progresHafalan[index]
-                        : controller.filteredSurahList[index];
-                    return _buildSurahProgressCard(surah, index);
-                  },
-                );
-              }),
+                  ),
+                )
+              else if (controller.searchQuery.value.isNotEmpty &&
+                  controller.filteredSurahList.isEmpty)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      'Tidak ada hasil pencarian',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                    ),
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final surah = controller.searchQuery.value.isEmpty
+                            ? controller.progresHafalan[index]
+                            : controller.filteredSurahList[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _buildSurahProgressCard(surah, index),
+                        );
+                      },
+                      childCount: controller.searchQuery.value.isEmpty
+                          ? controller.progresHafalan.length
+                          : controller.filteredSurahList.length,
+                    ),
+                  ),
+                ),
             ],
-          ),
-        ),
+          );
+        }),
       ),
     );
   }
@@ -311,7 +341,11 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       children: [
         Text(
           'Progres Hafalan',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.deepPurple[800],
+          ),
         ),
         Obx(
           () => controller.searchQuery.value.isNotEmpty
@@ -334,7 +368,8 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
 
     return InkWell(
       onTap: () {
-        if (controller.userRole.value == 'santri') {
+        if (controller.userRole.value == 'santri' ||
+            controller.userRole.value == 'ortu') {
           Get.toNamed(
             '/detail-progres',
             arguments: {
@@ -409,7 +444,8 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
 
                   const SizedBox(width: 12),
 
-                  if (controller.userRole.value == 'santri')
+                  if (controller.userRole.value == 'santri' ||
+                      controller.userRole.value == 'ortu')
                     Text(
                       surah.nama ?? '-',
                       overflow: TextOverflow.ellipsis,
