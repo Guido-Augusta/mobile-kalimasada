@@ -2,16 +2,24 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:http/http.dart';
-import 'package:mobile_kalimasada/app/data/models/santri.dart';
+import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
+import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
 import 'package:shared_preferences/shared_preferences.dart';
+
+enum ChartType { hafalanBaru, murajaah }
 
 class SantriHomeController extends GetxController {
   var isLoading = false.obs;
+  var isLoadingChart = false.obs;
   var fotoProfil =
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
           .obs;
 
-  final santri = Rxn<Santri>();
+  var santri = Rxn<s.Santri>();
+  var chart = Rxn<c.Chart>();
+  var range = '1w'.obs;
+
+  var selectedChartType = ChartType.hafalanBaru.obs;
 
   var currentIndex = 0.obs;
   var islamicQuotes = [
@@ -48,6 +56,12 @@ class SantriHomeController extends GetxController {
   void onInit() {
     super.onInit();
     getSantri();
+    getChart();
+  }
+
+  void updateRange(String newRange) {
+    range.value = newRange;
+    getChart();
   }
 
   String getImageUrl(String imageUrl) {
@@ -73,7 +87,7 @@ class SantriHomeController extends GetxController {
       print(response.statusCode);
       print(data);
       if (response.statusCode == 200) {
-        santri.value = Santri.fromJson(data['data']);
+        santri.value = s.Santri.fromJson(data['data']);
         fotoProfil.value = getImageUrl(santri.value!.fotoProfil!);
       } else {
         Get.snackbar('Error', data['message'] ?? 'Gagal mendapatkan data');
@@ -83,6 +97,40 @@ class SantriHomeController extends GetxController {
       Get.snackbar('Error', 'An error occurred: $e');
     }
     isLoading.value = false;
+  }
+
+  void getChart() async {
+    isLoadingChart.value = true;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final roleId = prefs.getString('roleId');
+    try {
+      final response = await get(
+        Uri.parse(
+          'http://10.0.2.2:5000/api/chart?range=$range&santriId=$roleId',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'x-platform': 'mobile',
+        },
+      );
+      var data = jsonDecode(response.body);
+      print(response.statusCode);
+      print(data);
+      if (response.statusCode == 200) {
+        chart.value = c.Chart.fromJson(data);
+      } else {
+        Get.snackbar(
+          'Error',
+          data['message'] ?? 'Gagal mendapatkan data chart',
+        );
+      }
+    } catch (e) {
+      print(e);
+      Get.snackbar('Error', 'An error occurred: $e');
+    }
+    isLoadingChart.value = false;
   }
 
   Future<void> logout() async {
