@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_kalimasada/app/modules/santri/santri_home/views/santri_home_view.dart';
 import 'package:mobile_kalimasada/app/modules/santri/santri_home/controllers/santri_home_controller.dart';
+import 'package:mobile_kalimasada/app/modules/santri/santri_profile/controllers/santri_profile_controller.dart';
+import 'package:mobile_kalimasada/app/modules/santri/santri_profile/views/santri_profile_view.dart';
 
 import '../controllers/santri_main_controller.dart';
 
 class SantriMainView extends GetView<SantriMainController> {
   final santriHomeC = Get.put(SantriHomeController());
+  final santriProfileC = Get.put(SantriProfileController());
   SantriMainView({super.key});
   @override
   Widget build(BuildContext context) {
@@ -16,7 +19,7 @@ class SantriMainView extends GetView<SantriMainController> {
         case 0:
           return const SantriHomeView();
         case 1:
-          return const SantriHomeView();
+          return const SantriProfileView();
         default:
           return const SantriHomeView();
       }

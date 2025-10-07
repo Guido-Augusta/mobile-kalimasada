@@ -14,15 +14,18 @@ class ProgresHafalanController extends GetxController {
   var searchQuery = ''.obs;
   var filteredSurahList = <Datum>[].obs;
   var searchController = TextEditingController();
+  var userRole = ''.obs;
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    userRole.value = prefs.getString('role') ?? '';
     santriId = Get.arguments['santriId'];
     getProgresHafalan(santriId);
   }
 
-  void getProgresHafalan(String santriId) async {
+  Future<void> getProgresHafalan(String santriId) async {
     isLoading.value = true;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -71,27 +74,14 @@ class ProgresHafalanController extends GetxController {
     filteredSurahList.value = filteredList;
   }
 
-  String getLabelTingkatan(String tingkatan) {
-    switch (tingkatan) {
-      case 'Level1':
-        return 'Level 1';
-      case 'Level2':
-        return 'Level 2';
-      case 'Level3':
-        return 'Level 3';
-      default:
-        return '-';
-    }
-  }
-
   String getLabelTahapan(String tahapan) {
     switch (tahapan) {
       case 'Level1':
-        return 'Juz 30';
+        return 'Level 1 - Juz 30';
       case 'Level2':
-        return 'Surah Pilihan';
+        return 'Level 2 - Surah Pilihan';
       case 'Level3':
-        return 'Juz 1-29';
+        return 'Level 3 - Juz 1-29';
       default:
         return '-';
     }

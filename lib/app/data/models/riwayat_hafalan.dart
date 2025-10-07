@@ -41,6 +41,7 @@ class Datum {
     required this.namaSurah,
     required this.namaSurahLatin,
     required this.jumlahAyat,
+    required this.totalPoin,
   });
 
   final DateTime? tanggal;
@@ -49,6 +50,7 @@ class Datum {
   final String? namaSurah;
   final String? namaSurahLatin;
   final int? jumlahAyat;
+  final int? totalPoin;
 
   factory Datum.fromJson(Map<String, dynamic> json) {
     return Datum(
@@ -58,6 +60,7 @@ class Datum {
       namaSurah: json["namaSurah"],
       namaSurahLatin: json["namaSurahLatin"],
       jumlahAyat: json["jumlahAyat"],
+      totalPoin: json["totalPoin"],
     );
   }
 
@@ -69,11 +72,12 @@ class Datum {
     "namaSurah": namaSurah,
     "namaSurahLatin": namaSurahLatin,
     "jumlahAyat": jumlahAyat,
+    "totalPoin": totalPoin,
   };
 
   @override
   String toString() {
-    return "$tanggal, $status, $surahId, $namaSurah, $namaSurahLatin, $jumlahAyat, ";
+    return "$tanggal, $status, $surahId, $namaSurah, $namaSurahLatin, $jumlahAyat, $totalPoin, ";
   }
 }
 

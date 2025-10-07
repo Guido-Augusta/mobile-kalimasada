@@ -27,13 +27,13 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Obx(() {
-        if (controller.isLoading.value && controller.allRiwayatData.isEmpty) {
-          return const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B46C1)),
-            ),
-          );
-        }
+        // if (controller.isLoading.value && controller.allRiwayatData.isEmpty) {
+        //   return const Center(
+        //     child: CircularProgressIndicator(
+        //       valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B46C1)),
+        //     ),
+        //   );
+        // }
 
         final riwayat = controller.riwayatHafalan.value;
         if (riwayat == null || riwayat.santri == null) {
@@ -119,9 +119,9 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                       Row(
                         children: [
                           _buildInfoCard(
-                            'Total Setoran',
-                            '${controller.riwayatHafalan.value?.pagination?.totalData ?? 0}',
-                            Icons.book_rounded,
+                            'Total Poin',
+                            '${controller.riwayatHafalan.value?.santri?.totalPoin ?? 0}',
+                            Icons.star_rounded,
                           ),
                           const SizedBox(width: 12),
                           _buildInfoCard(
@@ -141,6 +141,62 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                         ],
                       ),
                     ],
+                  ),
+                ),
+              ),
+
+              // Filter Tambah Hafalan dan Murajaah
+              SliverToBoxAdapter(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey[200]!),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withValues(alpha: 0.1),
+                        spreadRadius: 1,
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      _buildFilterButton(
+                        'Tambah Hafalan',
+                        controller.filterType.value == 'TambahHafalan',
+                        onTap: () => controller.updateFilter('TambahHafalan'),
+                      ),
+                      const SizedBox(width: 12),
+                      _buildFilterButton(
+                        'Murajaah',
+                        controller.filterType.value == 'Murajaah',
+                        onTap: () => controller.updateFilter('Murajaah'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Total setoran info
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '${controller.riwayatHafalan.value?.pagination?.totalData ?? 0} Setoran',
+                      style: const TextStyle(fontSize: 14),
+                    ),
                   ),
                 ),
               ),
@@ -356,28 +412,67 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                       Icons.format_list_numbered_rounded,
                       '${datum.jumlahAyat ?? 0} ayat',
                     ),
+                    if (controller.filterType.value == 'TambahHafalan')
+                      const SizedBox(width: 24),
+                    if (controller.filterType.value == 'TambahHafalan')
+                      _buildDetailItem(
+                        Icons.star_rounded,
+                        '${datum.totalPoin ?? 0} poin',
+                      ),
                     const Spacer(),
                     // Small delete button
-                    InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: () =>
-                          _showDeleteConfirmation(datum, riwayatHafalan),
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.red[50],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.delete_outline_rounded,
-                          size: 18,
-                          color: Colors.red[400],
+                    if (controller.userRole == 'ustadz')
+                      InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () =>
+                            _showDeleteConfirmation(datum, riwayatHafalan),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.red[50],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.delete_outline_rounded,
+                            size: 18,
+                            color: Colors.red[400],
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterButton(String text, bool isActive, {VoidCallback? onTap}) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          decoration: BoxDecoration(
+            color: isActive
+                ? (controller.filterType.value == 'TambahHafalan'
+                      ? Color(0xFF10B981)
+                      : Colors.orangeAccent)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isActive ? Colors.transparent : Colors.grey[300]!,
+            ),
+          ),
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              color: isActive ? Colors.white : Colors.grey[700],
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              fontSize: 14,
             ),
           ),
         ),
@@ -405,7 +500,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
   Color _getStatusColor(String? status) {
     switch (status?.toLowerCase()) {
       case 'murajaah':
-        return const Color(0xFFFB923C);
+        return Colors.orangeAccent;
       case 'tambahhafalan':
         return const Color(0xFF10B981);
       default:
@@ -418,7 +513,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
       case 'murajaah':
         return 'Murajaah';
       case 'tambahhafalan':
-        return 'Hafalan Baru';
+        return 'Tambah Hafalan';
       default:
         return status ?? '-';
     }

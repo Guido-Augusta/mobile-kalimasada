@@ -7,9 +7,11 @@ import 'package:mobile_kalimasada/app/data/models/riwayat_hafalan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RiwayatHafalanController extends GetxController {
+  String? userRole;
   final santriId = Get.arguments['santriId'];
   var isLoading = false.obs;
   var isLoadingMore = false.obs;
+  var filterType = 'TambahHafalan'.obs; // TambahHafalan or Murajaah
   var riwayatHafalan = Rxn<RiwayatHafalan>();
   var allRiwayatData = <Datum>[].obs;
 
@@ -20,8 +22,10 @@ class RiwayatHafalanController extends GetxController {
   final ScrollController scrollController = ScrollController();
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userRole = prefs.getString('role');
     getRiwayatHafalan(santriId);
     _setupScrollController();
   }
@@ -35,11 +39,6 @@ class RiwayatHafalanController extends GetxController {
         }
       }
     });
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
   }
 
   @override
@@ -61,7 +60,7 @@ class RiwayatHafalanController extends GetxController {
     try {
       final response = await http.get(
         Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/riwayat/$id?page=$currentPage&limit=$_perPage',
+          'http://10.0.2.2:5000/api/hafalan/riwayat/$id?page=$currentPage&limit=$_perPage&status=${filterType.value}',
         ),
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +77,6 @@ class RiwayatHafalanController extends GetxController {
 
         // Check if there are more pages
         hasMore.value = riwayat.data.length >= _perPage;
-        print('Riwayat hafalan loaded: ${riwayat.data.length} entries');
       } else {
         Get.snackbar(
           'Error',
@@ -111,7 +109,7 @@ class RiwayatHafalanController extends GetxController {
     try {
       final response = await http.get(
         Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/riwayat/$santriId?page=$currentPage&limit=$_perPage',
+          'http://10.0.2.2:5000/api/hafalan/riwayat/$santriId?page=$currentPage&limit=$_perPage&status=${filterType.value}',
         ),
         headers: {
           'Content-Type': 'application/json',
@@ -149,6 +147,13 @@ class RiwayatHafalanController extends GetxController {
     hasMore.value = true;
     allRiwayatData.clear();
     getRiwayatHafalan(santriId);
+  }
+
+  void updateFilter(String type) {
+    if (filterType.value.toLowerCase() != type.toLowerCase()) {
+      filterType.value = type;
+    }
+    refreshRiwayatHafalan();
   }
 
   void deleteRiwayatHafalan(

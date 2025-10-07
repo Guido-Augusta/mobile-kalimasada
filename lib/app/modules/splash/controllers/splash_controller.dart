@@ -2,8 +2,6 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashController extends GetxController {
-  //TODO: Implement SplashController
-
   final isLoading = false.obs;
   @override
   void onInit() {
@@ -13,22 +11,13 @@ class SplashController extends GetxController {
     });
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
   void checkLoginStatus() async {
     isLoading.value = true;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final role = prefs.getString('role');
     if (token != null) {
+      print(token);
       if (role == 'santri') {
         Get.offAllNamed('/santri-main');
       } else if (role == 'ustadz') {

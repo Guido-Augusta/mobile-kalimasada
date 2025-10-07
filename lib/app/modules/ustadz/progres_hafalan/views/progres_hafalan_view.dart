@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart';
 import '../controllers/progres_hafalan_controller.dart';
 
@@ -9,7 +10,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF8FAFF),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.deepPurpleAccent,
@@ -19,71 +20,68 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              controller.isLoading.value = true;
-              controller.progresHafalan.value = [];
-              controller.getProgresHafalan(controller.santriId);
-            },
-          ),
-        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Student Info Card
-            buildSantriInfoCard(),
-            const SizedBox(height: 24),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          controller.isLoading.value = true;
+          controller.progresHafalan.value = [];
+          await controller.getProgresHafalan(controller.santriId);
+        },
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Student Info Card
+              buildSantriInfoCard(),
+              const SizedBox(height: 24),
 
-            // Progress Header
-            buildProgressHeader(),
-            const SizedBox(height: 16),
+              // Progress Header
+              buildProgressHeader(),
+              const SizedBox(height: 16),
 
-            // Search Bar
-            buildSearchBar(),
+              // Search Bar
+              buildSearchBar(),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            // Surah Progress List
-            Obx(() {
-              if (controller.isLoading.value) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 50),
-                      const CircularProgressIndicator(),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Memuat data...',
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
-                      ),
-                    ],
-                  ),
+              // Surah Progress List
+              Obx(() {
+                if (controller.isLoading.value) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 50),
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Memuat data...',
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (controller.progresHafalan.isEmpty) {
+                  return const Center(child: Text('Tidak ada progres hafalan'));
+                }
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: controller.searchQuery.value.isEmpty
+                      ? controller.progresHafalan.length
+                      : controller.filteredSurahList.length,
+                  itemBuilder: (context, index) {
+                    final surah = controller.searchQuery.value.isEmpty
+                        ? controller.progresHafalan[index]
+                        : controller.filteredSurahList[index];
+                    return _buildSurahProgressCard(surah, index);
+                  },
                 );
-              } else if (controller.progresHafalan.isEmpty) {
-                return const Center(child: Text('Tidak ada progres hafalan'));
-              }
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: controller.searchQuery.value.isEmpty
-                    ? controller.progresHafalan.length
-                    : controller.filteredSurahList.length,
-                itemBuilder: (context, index) {
-                  final surah = controller.searchQuery.value.isEmpty
-                      ? controller.progresHafalan[index]
-                      : controller.filteredSurahList[index];
-                  return _buildSurahProgressCard(surah, index);
-                },
-              );
-            }),
-          ],
+              }),
+            ],
+          ),
         ),
       ),
     );
@@ -176,6 +174,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
             Row(
               children: [
                 Expanded(
+                  flex: 3,
                   child: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -207,7 +206,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                             color: Colors.white,
                           ),
                           textAlign: TextAlign.center,
-                          maxLines: 2,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -216,6 +215,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
+                  flex: 2,
                   child: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -229,7 +229,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                     child: Column(
                       children: [
                         Text(
-                          'Tingkatan',
+                          'Total Poin',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.white.withValues(alpha: 0.8),
@@ -238,9 +238,8 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          controller.getLabelTingkatan(
-                            controller.santriData.value?.tahapHafalan ?? '-',
-                          ),
+                          controller.santriData.value?.totalPoin.toString() ??
+                              '0',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -335,13 +334,23 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
 
     return InkWell(
       onTap: () {
-        Get.toNamed(
-          '/setoran',
-          arguments: {
-            'santriId': controller.santriData.value?.id,
-            'surahId': surah.id,
-          },
-        );
+        if (controller.userRole.value == 'santri') {
+          Get.toNamed(
+            '/detail-progres',
+            arguments: {
+              'santriId': controller.santriData.value?.id,
+              'surahId': surah.id,
+            },
+          );
+        } else if (controller.userRole.value == 'ustadz') {
+          Get.toNamed(
+            '/setoran',
+            arguments: {
+              'santriId': controller.santriData.value?.id,
+              'surahId': surah.id,
+            },
+          );
+        }
       },
       highlightColor: Colors.transparent,
       splashColor: Colors.transparent,
@@ -400,41 +409,55 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
 
                   const SizedBox(width: 12),
 
+                  if (controller.userRole.value == 'santri')
+                    Text(
+                      surah.nama ?? '-',
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: GoogleFonts.amiri(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+
                   // Quick Action Button
-                  ElevatedButton(
-                    onPressed: () {
-                      // Button Murajaah
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orangeAccent,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  if (controller.userRole.value == 'ustadz')
+                    ElevatedButton(
+                      onPressed: () {
+                        // Button Murajaah
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orangeAccent,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
+                      child: const Icon(Icons.menu_book_rounded, size: 20),
                     ),
-                    child: const Icon(Icons.menu_book_rounded, size: 20),
-                  ),
                   const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Button Tambah Hafalan
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  if (controller.userRole.value == 'ustadz')
+                    ElevatedButton(
+                      onPressed: () {
+                        // Button Tambah Hafalan
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.add_circle_outline_rounded,
+                        size: 20,
                       ),
                     ),
-                    child: const Icon(
-                      Icons.add_circle_outline_rounded,
-                      size: 20,
-                    ),
-                  ),
                 ],
               ),
             ),

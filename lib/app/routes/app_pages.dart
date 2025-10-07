@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 
 import '../middleware/auth_middleware.dart';
+import '../modules/detail-surah/bindings/detail_surah_binding.dart';
+import '../modules/detail-surah/views/detail_surah_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -13,10 +15,12 @@ import '../modules/main/ustadz_main/bindings/ustadz_main_binding.dart';
 import '../modules/main/ustadz_main/views/ustadz_main_view.dart';
 import '../modules/ortu/ortu_home/bindings/ortu_home_binding.dart';
 import '../modules/ortu/ortu_home/views/ortu_home_view.dart';
-import '../modules/ustadz/peringkat/bindings/peringkat_binding.dart';
-import '../modules/ustadz/peringkat/views/peringkat_view.dart';
+import '../modules/santri/detail-progres/bindings/detail_progres_binding.dart';
+import '../modules/santri/detail-progres/views/detail_progres_view.dart';
 import '../modules/santri/santri_home/bindings/santri_home_binding.dart';
 import '../modules/santri/santri_home/views/santri_home_view.dart';
+import '../modules/santri/santri_profile/bindings/santri_profile_binding.dart';
+import '../modules/santri/santri_profile/views/santri_profile_view.dart';
 import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
 import '../modules/ustadz/alquran/bindings/alquran_binding.dart';
@@ -27,6 +31,8 @@ import '../modules/ustadz/detail_riwayat_hafalan/bindings/detail_riwayat_hafalan
 import '../modules/ustadz/detail_riwayat_hafalan/views/detail_riwayat_hafalan_view.dart';
 import '../modules/ustadz/detail_santri/bindings/detail_santri_binding.dart';
 import '../modules/ustadz/detail_santri/views/detail_santri_view.dart';
+import '../modules/ustadz/peringkat/bindings/peringkat_binding.dart';
+import '../modules/ustadz/peringkat/views/peringkat_view.dart';
 import '../modules/ustadz/progres_hafalan/bindings/progres_hafalan_binding.dart';
 import '../modules/ustadz/progres_hafalan/views/progres_hafalan_view.dart';
 import '../modules/ustadz/riwayat_hafalan/bindings/riwayat_hafalan_binding.dart';
@@ -140,6 +146,21 @@ class AppPages {
       name: _Paths.PERINGKAT,
       page: () => const PeringkatView(),
       binding: PeringkatBinding(),
+    ),
+    GetPage(
+      name: _Paths.SANTRI_PROFILE,
+      page: () => const SantriProfileView(),
+      binding: SantriProfileBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAIL_PROGRES,
+      page: () => const DetailProgresView(),
+      binding: DetailProgresBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAIL_SURAH,
+      page: () => const DetailSurahView(),
+      binding: DetailSurahBinding(),
     ),
   ];
 }
