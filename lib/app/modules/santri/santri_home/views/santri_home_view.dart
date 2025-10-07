@@ -832,7 +832,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+          padding: const EdgeInsets.only(left: 10, right: 4),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(8),
