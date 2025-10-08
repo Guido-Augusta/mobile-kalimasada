@@ -5,14 +5,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:mobile_kalimasada/app/data/models/santri.dart';
+import 'package:mobile_kalimasada/app/data/models/ortu.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../controllers/santri_profile_controller.dart';
+import '../controllers/ortu_profile_controller.dart';
 
-class SantriProfileView extends GetView<SantriProfileController> {
-  const SantriProfileView({super.key});
+class OrtuProfileView extends GetView<OrtuProfileController> {
+  const OrtuProfileView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,9 +53,9 @@ class SantriProfileView extends GetView<SantriProfileController> {
           );
         }
 
-        final santri = controller.santriDetail.value;
+        final ortu = controller.ortuDetail.value;
         // Data kosong
-        if (santri == null) {
+        if (ortu == null) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -76,7 +75,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Data santri tidak ditemukan',
+                  'Data ortu tidak ditemukan',
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     color: Colors.grey[600],
@@ -94,7 +93,9 @@ class SantriProfileView extends GetView<SantriProfileController> {
             SliverAppBar(
               centerTitle: true,
               title: Text(
-                'Profil Santri',
+                controller.userRole == 'ortu'
+                    ? 'Profil Orang Tua'
+                    : 'Profil Wali',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -270,7 +271,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
 
                               // Name
                               Text(
-                                santri.nama ?? 'Nama tidak tersedia',
+                                ortu.nama ?? 'Nama tidak tersedia',
                                 style: GoogleFonts.poppins(
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
@@ -281,98 +282,34 @@ class SantriProfileView extends GetView<SantriProfileController> {
                               const SizedBox(height: 8),
 
                               // Badges Row
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Tahap Badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.3,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Container(
-                                          width: 8,
-                                          height: 8,
-                                          decoration: BoxDecoration(
-                                            color: _getTahapColor(
-                                              santri.tahapHafalan!,
-                                            ),
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          getTahapLabel(santri.tahapHafalan),
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.3),
                                   ),
-
-                                  const SizedBox(width: 8),
-
-                                  // Gender Badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.3,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          santri.jenisKelamin?.toLowerCase() ==
-                                                  'l'
-                                              ? Icons.male
-                                              : Icons.female,
-                                          size: 14,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        ortu.user?.email ??
+                                            'Email tidak tersedia',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 12,
                                           color: Colors.white,
                                         ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          santri.jenisKelamin?.toLowerCase() ==
-                                                  'l'
-                                              ? 'Laki-laki'
-                                              : 'Perempuan',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -389,24 +326,11 @@ class SantriProfileView extends GetView<SantriProfileController> {
               padding: const EdgeInsets.all(16),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  // Stats Cards
-                  _buildStatsCards(santri),
-
-                  const SizedBox(height: 24),
-
+                  // Action Cards
+                  _buildActionSection(ortu),
+                  const SizedBox(height: 16),
                   // Personal Information
-                  _buildPersonalInfoSection(santri),
-
-                  const SizedBox(height: 24),
-
-                  // Parents Information
-                  _buildParentsInfoSection(santri),
-
-                  const SizedBox(height: 24),
-
-                  // Wali Kelas Information
-                  _buildWaliKelasSection(santri),
-
+                  _buildPersonalInfoSection(ortu),
                   const SizedBox(height: 50), // Space for bottom buttons
                 ]),
               ),
@@ -472,46 +396,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
     );
   }
 
-  // Format the date to display in the text field
-  String formatDate(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-  }
-
   void _showEditProfileDialog() {
-    // Initialize the date controller with the current date of birth
-    controller.tanggalLahirC = TextEditingController(
-      text: formatDate(controller.santriDetail.value!.tanggalLahir!),
-    );
-
-    // Function to show date picker
-    Future<void> selectDate(BuildContext context) async {
-      final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: controller.santriDetail.value!.tanggalLahir!,
-        firstDate: DateTime(1900),
-        lastDate: DateTime.now(),
-        builder: (BuildContext context, Widget? child) {
-          return Theme(
-            data: ThemeData.light().copyWith(
-              colorScheme: const ColorScheme.light(
-                primary: Colors.deepPurple,
-                onPrimary: Colors.white,
-                surface: Colors.white,
-                onSurface: Colors.black,
-              ),
-            ),
-            child: child!,
-          );
-        },
-      );
-
-      if (picked != null &&
-          picked != controller.santriDetail.value!.tanggalLahir) {
-        // controller.santriDetail.value!.tanggalLahir = picked;
-        controller.tanggalLahirC.text = formatDate(picked);
-      }
-    }
-
     Get.dialog(
       barrierDismissible: false,
       Dialog(
@@ -520,7 +405,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(Get.context!).size.height * 0.7,
+            maxHeight: MediaQuery.of(Get.context!).size.height * 0.65,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -636,104 +521,9 @@ class SantriProfileView extends GetView<SantriProfileController> {
                           ),
                         ),
                       ),
-                      // Inside the form's Column, add this after the alamat field
+
                       const SizedBox(height: 16),
-                      Text(
-                        'Tanggal Lahir',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () => selectDate(Get.context!),
-                        child: AbsorbPointer(
-                          child: TextFormField(
-                            controller: controller.tanggalLahirC,
-                            decoration: InputDecoration(
-                              hintText: 'Pilih Tanggal Lahir',
-                              hintStyle: TextStyle(color: Colors.grey[500]),
-                              prefixIcon: Icon(
-                                Icons.calendar_today,
-                                color: Colors.deepPurple,
-                                size: 20,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
-                                ),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Jenis Kelamin',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        value: controller.jenisKelaminC.text,
-                        decoration: InputDecoration(
-                          fillColor: Colors.grey[50],
-                          filled: true,
-                          hintText: 'Pilih Jenis Kelamin',
-                          hintStyle: TextStyle(color: Colors.grey[500]),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
-                          ),
-                        ),
-                        dropdownColor: Colors.white,
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'P',
-                            child: Text('Perempuan'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'L',
-                            child: Text('Laki-laki'),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          controller.jenisKelaminC.text = value!;
-                        },
-                      ),
-                      const SizedBox(height: 16),
+
                       Text(
                         'Alamat',
                         style: TextStyle(
@@ -811,26 +601,16 @@ class SantriProfileView extends GetView<SantriProfileController> {
                         onPressed: () {
                           if (controller.namaC.text.isEmpty ||
                               controller.noHpC.text.isEmpty ||
-                              controller.alamatC.text.isEmpty ||
-                              controller.jenisKelaminC.text.isEmpty) {
+                              controller.alamatC.text.isEmpty) {
                             Get.snackbar('Error', 'Semua field harus diisi');
                             return;
                           }
                           if (controller.namaC.text ==
-                                  controller.santriDetail.value?.nama &&
+                                  controller.ortuDetail.value?.nama &&
                               controller.noHpC.text ==
-                                  controller.santriDetail.value?.nomorHp &&
+                                  controller.ortuDetail.value?.nomorHp &&
                               controller.alamatC.text ==
-                                  controller.santriDetail.value?.alamat &&
-                              controller.jenisKelaminC.text ==
-                                  controller.santriDetail.value?.jenisKelamin &&
-                              controller.tanggalLahirC.text ==
-                                  formatDate(
-                                    controller
-                                        .santriDetail
-                                        .value!
-                                        .tanggalLahir!,
-                                  )) {
+                                  controller.ortuDetail.value?.alamat) {
                             Get.snackbar('Error', 'Tidak ada perubahan data');
                             return;
                           }
@@ -838,8 +618,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
                             controller.namaC.text,
                             controller.noHpC.text,
                             controller.alamatC.text,
-                            controller.jenisKelaminC.text,
-                            controller.tanggalLahirC.text,
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -880,34 +658,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
     );
   }
 
-  Color _getTahapColor(String tahap) {
-    switch (tahap.toLowerCase()) {
-      case 'level1':
-        return Colors.green;
-      case 'level2':
-        return Colors.orange;
-      case 'level3':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  // Helper method to get label based on tahap hafalan
-  String getTahapLabel(String? tahap) {
-    switch (tahap?.toLowerCase()) {
-      case 'level1':
-        return 'Level 1';
-      case 'level2':
-        return 'Level 2';
-      case 'level3':
-        return 'Level 3';
-      default:
-        return 'Tahap ?';
-    }
-  }
-
-  Widget _buildStatsCards(Santri santri) {
+  Widget _buildActionSection(Ortu ortu) {
     return Row(
       children: [
         Expanded(
@@ -934,14 +685,14 @@ class SantriProfileView extends GetView<SantriProfileController> {
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
-                    Icons.star,
+                    Icons.people_alt_rounded,
                     color: Colors.deepPurpleAccent,
                     size: 24,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '${santri.totalPoin ?? 0}',
+                  '${ortu.santri.length}',
                   style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -949,7 +700,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                   ),
                 ),
                 Text(
-                  'Total Poin',
+                  'Total Santri',
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     color: Colors.grey[600],
@@ -986,13 +737,11 @@ class SantriProfileView extends GetView<SantriProfileController> {
                   child: ElevatedButton(
                     onPressed: () {
                       controller.namaC.text =
-                          controller.santriDetail.value!.nama!;
+                          controller.ortuDetail.value!.nama!;
                       controller.noHpC.text =
-                          controller.santriDetail.value!.nomorHp!;
+                          controller.ortuDetail.value!.nomorHp!;
                       controller.alamatC.text =
-                          controller.santriDetail.value!.alamat!;
-                      controller.jenisKelaminC.text =
-                          controller.santriDetail.value!.jenisKelamin!;
+                          controller.ortuDetail.value!.alamat!;
                       _showEditProfileDialog();
                     },
                     style: ElevatedButton.styleFrom(
@@ -1054,7 +803,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
     );
   }
 
-  Widget _buildPersonalInfoSection(Santri santri) {
+  Widget _buildPersonalInfoSection(Ortu ortu) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1082,31 +831,10 @@ class SantriProfileView extends GetView<SantriProfileController> {
           const SizedBox(height: 16),
 
           _buildInfoTile(
-            icon: Icons.email,
-            label: 'Email',
-            value: santri.user?.email ?? 'Tidak ada data',
-          ),
-
-          const SizedBox(height: 12),
-
-          _buildInfoTile(
-            icon: Icons.cake,
-            label: 'Tanggal Lahir',
-            value: santri.tanggalLahir != null
-                ? DateFormat(
-                    'dd MMMM yyyy',
-                    'id_ID',
-                  ).format(santri.tanggalLahir!)
-                : 'Tidak ada data',
-          ),
-
-          const SizedBox(height: 12),
-
-          _buildInfoTile(
             icon: Icons.phone,
             label: 'No. Telepon',
-            value: santri.nomorHp ?? 'Tidak ada data',
-            telepon: santri.nomorHp,
+            value: ortu.nomorHp ?? 'Tidak ada data',
+            telepon: ortu.nomorHp,
           ),
 
           const SizedBox(height: 12),
@@ -1114,137 +842,27 @@ class SantriProfileView extends GetView<SantriProfileController> {
           _buildInfoTile(
             icon: Icons.location_on,
             label: 'Alamat',
-            value: santri.alamat ?? 'Tidak ada data',
+            value: ortu.alamat ?? 'Tidak ada data',
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildParentsInfoSection(Santri santri) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (santri.orangTua.any(
-            (element) => element.tipe == 'Ayah' || element.tipe == 'Ibu',
-          ))
-            Text(
-              'Informasi Orang Tua',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1F2937),
-              ),
-            ),
-
-          if (santri.orangTua.any((element) => element.tipe == 'Wali'))
-            Text(
-              'Informasi Wali',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1F2937),
-              ),
-            ),
-
-          if (santri.orangTua.any(
-            (element) =>
-                element.tipe == 'Wali' &&
-                (element.tipe == 'Ayah' || element.tipe == 'Ibu'),
-          ))
-            Text(
-              'Informasi Orang Tua/Wali',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1F2937),
-              ),
-            ),
-
-          if (santri.orangTua.any((element) => element.tipe == 'Ayah'))
-            const SizedBox(height: 16),
-
-          if (santri.orangTua.any((element) => element.tipe == 'Ayah'))
-            _buildInfoTile(
-              icon: Icons.person,
-              label: 'Ayah',
-              value: controller.getOrangTuaByTipe(santri.orangTua, 'Ayah'),
-            ),
-
-          if (santri.orangTua.any((element) => element.tipe == 'Ibu'))
-            const SizedBox(height: 12),
-
-          if (santri.orangTua.any((element) => element.tipe == 'Ibu'))
-            _buildInfoTile(
-              icon: Icons.person,
-              label: 'Ibu',
-              value: controller.getOrangTuaByTipe(santri.orangTua, 'Ibu'),
-            ),
 
           const SizedBox(height: 12),
 
-          if (santri.orangTua.any((element) => element.tipe == 'Wali'))
-            _buildInfoTile(
-              icon: Icons.person,
-              label: 'Wali',
-              value: controller.getOrangTuaByTipe(santri.orangTua, 'Wali'),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWaliKelasSection(Santri santri) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Informasi Wali Kelas',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF1F2937),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Wali Kelas
           _buildInfoTile(
-            icon: Icons.school,
-            label: 'Wali Kelas Santri',
-            value: santri.waliKelas.isNotEmpty
-                ? santri.waliKelas.first.nama!
-                : '-',
-            telepon: santri.waliKelas.isNotEmpty
-                ? santri.waliKelas.first.nomorHp
-                : '',
+            icon: ortu.jenisKelamin?.toLowerCase() == 'l'
+                ? Icons.male
+                : Icons.female,
+            label: 'Jenis Kelamin',
+            value: ortu.jenisKelamin?.toLowerCase() == 'l'
+                ? 'Laki-laki'
+                : 'Perempuan',
+          ),
+
+          const SizedBox(height: 12),
+
+          _buildInfoTile(
+            icon: Icons.person,
+            label: 'Peran',
+            value: ortu.tipe ?? 'Tidak ada data',
           ),
         ],
       ),
@@ -1301,7 +919,9 @@ class SantriProfileView extends GetView<SantriProfileController> {
             ),
           ),
 
-          if (telepon != null && telepon.isNotEmpty)
+          if (telepon != null &&
+              telepon.isNotEmpty &&
+              controller.userRole != 'ortu')
             Row(
               children: [
                 const SizedBox(width: 8),

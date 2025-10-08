@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/views/ortu_home_view.dart';
 import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/controllers/ortu_home_controller.dart';
+import 'package:mobile_kalimasada/app/modules/ortu/ortu_profile/controllers/ortu_profile_controller.dart';
+import 'package:mobile_kalimasada/app/modules/ortu/ortu_profile/views/ortu_profile_view.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz/alquran/controllers/alquran_controller.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz/alquran/views/alquran_view.dart';
 
@@ -11,6 +13,7 @@ import '../controllers/ortu_main_controller.dart';
 class OrtuMainView extends GetView<OrtuMainController> {
   final ortuHomeC = Get.put(OrtuHomeController());
   final alquranC = Get.put(AlquranController());
+  final ortuProfileC = Get.put(OrtuProfileController());
   OrtuMainView({super.key});
   @override
   Widget build(BuildContext context) {
@@ -21,7 +24,7 @@ class OrtuMainView extends GetView<OrtuMainController> {
         case 1:
           return const AlquranView();
         case 2:
-          return const OrtuHomeView();
+          return const OrtuProfileView();
         default:
           return const OrtuHomeView();
       }
