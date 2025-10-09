@@ -1007,22 +1007,20 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                             ),
                             elevation: 0,
                           ),
-                          child: Obx(
-                            () => controller.isSaveLoading.value
-                                ? Transform.scale(
-                                    scale: 0.5,
-                                    child: const CircularProgressIndicator(
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text(
-                                    'Simpan',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                          child: controller.isSaveLoading.value
+                              ? Transform.scale(
+                                  scale: 0.5,
+                                  child: const CircularProgressIndicator(
+                                    color: Colors.white,
                                   ),
-                          ),
+                                )
+                              : Text(
+                                  'Simpan',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
