@@ -634,6 +634,18 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                       ),
                     ),
                     const SizedBox(height: 10),
+
+                    // Tanggal Hari ini
+                    Text(
+                      '${_getHariIni()}, ${_formatTanggal(DateTime.now())}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.white70,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -1087,6 +1099,19 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                       ),
                     ),
                     const SizedBox(height: 10),
+
+                    // Tanggal Hari ini
+                    Text(
+                      '${_getHariIni()}, ${_formatTanggal(DateTime.now())}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.white70,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    const SizedBox(height: 10),
+
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -1513,6 +1538,48 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
         ],
       ),
     );
+  }
+
+  // Method untuk mendapatkan nama hari dalam bahasa Indonesia
+  String _getHariIni() {
+    final now = DateTime.now();
+    switch (now.weekday) {
+      case 1:
+        return 'Senin';
+      case 2:
+        return 'Selasa';
+      case 3:
+        return 'Rabu';
+      case 4:
+        return 'Kamis';
+      case 5:
+        return 'Jumat';
+      case 6:
+        return 'Sabtu';
+      case 7:
+        return 'Minggu';
+      default:
+        return '';
+    }
+  }
+
+  // Method untuk memformat tanggal dalam format Indonesia (contoh: 10 Oktober 2023)
+  String _formatTanggal(DateTime date) {
+    final months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 }
 
