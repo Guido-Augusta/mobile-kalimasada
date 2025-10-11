@@ -25,6 +25,7 @@ abstract class Routes {
   static const DETAIL_PROGRES = _Paths.DETAIL_PROGRES;
   static const DETAIL_SURAH = _Paths.DETAIL_SURAH;
   static const ORTU_PROFILE = _Paths.ORTU_PROFILE;
+  static const CHANGE_PASSWORD = _Paths.CHANGE_PASSWORD;
 }
 
 abstract class _Paths {
@@ -51,4 +52,5 @@ abstract class _Paths {
   static const DETAIL_PROGRES = '/detail-progres';
   static const DETAIL_SURAH = '/detail-surah';
   static const ORTU_PROFILE = '/ortu-profile';
+  static const CHANGE_PASSWORD = '/change-password';
 }

@@ -772,7 +772,9 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.toNamed('/change-password');
+                    },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF6B46C1),
                       side: const BorderSide(color: Color(0xFF6B46C1)),
