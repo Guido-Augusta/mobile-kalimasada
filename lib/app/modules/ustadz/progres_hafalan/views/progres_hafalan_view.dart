@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart';
 import '../controllers/progres_hafalan_controller.dart';
 
@@ -442,58 +441,47 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                     ),
                   ),
 
-                  const SizedBox(width: 12),
-
-                  if (controller.userRole.value == 'santri' ||
-                      controller.userRole.value == 'ortu')
-                    Text(
-                      surah.nama ?? '-',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: GoogleFonts.amiri(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-
-                  // Quick Action Button
-                  if (controller.userRole.value == 'ustadz')
-                    ElevatedButton(
-                      onPressed: () {
-                        // Button Murajaah
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orangeAccent,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Icon(Icons.menu_book_rounded, size: 20),
-                    ),
                   const SizedBox(width: 8),
-                  if (controller.userRole.value == 'ustadz')
-                    ElevatedButton(
-                      onPressed: () {
-                        // Button Tambah Hafalan
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.add_circle_outline_rounded,
-                        size: 20,
+
+                  // Label progres surah
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: currentAyat == 0
+                          ? Colors.red[50]
+                          : currentAyat >= totalAyat
+                          ? Colors.green[50]
+                          : Colors.orange[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: currentAyat == 0
+                            ? Colors.red[100]!
+                            : currentAyat >= totalAyat
+                            ? Colors.green[100]!
+                            : Colors.orange[100]!,
+                        width: 1,
                       ),
                     ),
+                    child: Text(
+                      currentAyat == 0
+                          ? 'Belum Mulai'
+                          : currentAyat >= totalAyat
+                          ? 'Hafal'
+                          : 'Proses',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: currentAyat == 0
+                            ? Colors.red[700]
+                            : currentAyat >= totalAyat
+                            ? Colors.green[700]
+                            : Colors.orange[700],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
