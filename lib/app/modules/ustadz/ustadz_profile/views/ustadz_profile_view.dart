@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile_kalimasada/app/data/models/ustadz.dart';
 import '../controllers/ustadz_profile_controller.dart';
 
 class UstadzProfileView extends GetView<UstadzProfileController> {
@@ -11,341 +12,524 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Header with profile
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.deepPurple[700]!, Colors.deepPurpleAccent],
-                ),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 24),
-                child: Column(
-                  children: [
-                    Text(
-                      'Profil Saya',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: Obx(() {
+        // Loading
+        if (controller.isLoading.value) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6B46C1).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFF6B46C1),
                       ),
+                      strokeWidth: 3,
                     ),
-                    const SizedBox(width: 40),
-                    const SizedBox(height: 10),
-                    Stack(
-                      children: [
-                        Material(
-                          shape: const CircleBorder(),
-                          child: InkWell(
-                            onTap: () {
-                              _showEditPhotoProfileBottomSheet();
-                            },
-                            customBorder: const CircleBorder(),
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white,
-                              ),
-                              child: Obx(
-                                () => CircleAvatar(
-                                  radius: 50,
-                                  backgroundImage: CachedNetworkImageProvider(
-                                    controller.getImageUrl(
-                                      controller.fotoProfil.value,
-                                    ),
-                                  ),
-                                  onBackgroundImageError: (exception, stackTrace) {
-                                    // Handle image loading error
-                                    controller.fotoProfil.value =
-                                        'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg';
-                                  },
-                                  child: Obx(
-                                    () =>
-                                        controller.fotoProfil.value.isEmpty ||
-                                            controller.fotoProfil.value == ''
-                                        ? Icon(
-                                            Icons.person,
-                                            size: 50,
-                                            color: Colors.deepPurple,
-                                          )
-                                        : SizedBox.shrink(),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Material(
-                            shape: const CircleBorder(),
-                            child: InkWell(
-                              onTap: () {
-                                _showEditPhotoProfileBottomSheet();
-                              },
-                              customBorder: const CircleBorder(),
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.deepPurpleAccent,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Obx(
-                      () => Text(
-                        controller.ustadzData.value?.nama ?? '',
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Obx(
-                      () => controller.ustadzData.value?.waliKelasTahap != null
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.star_border_purple500_rounded,
-                                        color: Colors.deepPurpleAccent,
-                                        size: 20,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        _getTahapLabel(
-                                          controller
-                                                  .ustadzData
-                                                  .value
-                                                  ?.waliKelasTahap ??
-                                              '',
-                                        ),
-                                        style: GoogleFonts.poppins(
-                                          color: Colors.deepPurpleAccent,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            )
-                          : const SizedBox.shrink(),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 16),
+                Text(
+                  'Memuat data santri...',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: const Color(0xFF6B46C1),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
+          );
+        }
 
-            // Profile Content
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // Info Cards
-                  Obx(
-                    () => Column(
-                      children: [
-                        _buildInfoCard(
-                          Icons.email_outlined,
-                          'Email',
-                          controller.ustadzData.value?.user?.email ?? '',
-                          1,
+        final ustadz = controller.ustadzData.value;
+        // Data kosong
+        if (ustadz == null) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.person_off,
+                    size: 40,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Data ustadz tidak ditemukan',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return CustomScrollView(
+          slivers: [
+            // Custom App Bar with Gradient Background
+            SliverAppBar(
+              centerTitle: true,
+              title: Text(
+                ustadz.jenisKelamin?.toLowerCase() == 'l'
+                    ? 'Profil Ustadz'
+                    : 'Profil Ustazah',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.logout_rounded,
+                    color: Colors.redAccent,
+                  ),
+                  onPressed: () => showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        _buildInfoCard(
-                          Icons.phone_outlined,
-                          'Nomor HP',
-                          controller.ustadzData.value?.nomorHp ?? '',
-                          1,
+                        title: Text(
+                          'Logout',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        _buildInfoCard(
-                          Icons.person_outline,
-                          'Jenis Kelamin',
-                          controller.ustadzData.value?.jenisKelamin == 'L'
-                              ? 'Laki-laki'
-                              : 'Perempuan',
-                          1,
+                        content: Text(
+                          'Apakah anda yakin ingin logout?',
+                          style: GoogleFonts.poppins(),
                         ),
-                        controller.ustadzData.value?.waliKelasTahap != null
-                            ? _buildInfoCard(
-                                Icons.star_border_purple500_rounded,
-                                'Wali Kelas Tahap',
-                                _getTahapLabel(
-                                  controller.ustadzData.value?.waliKelasTahap ??
-                                      '',
-                                ),
-                                1,
-                              )
-                            : const SizedBox.shrink(),
-                        _buildInfoCard(
-                          Icons.location_on_outlined,
-                          'Alamat',
-                          controller.ustadzData.value?.alamat ??
-                              'Alamat tidak ditemukan',
-                          5,
-                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            child: Text(
+                              'Tidak',
+                              style: GoogleFonts.poppins(
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              controller.logout();
+                            },
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 8,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'Ya',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+              expandedHeight: 280,
+              pinned: false,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.deepPurpleAccent,
+                        Colors.deepPurple[700]!,
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 24),
-
-                  // Action Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            controller.namaC.text =
-                                controller.ustadzData.value!.nama!;
-                            controller.noHpC.text =
-                                controller.ustadzData.value!.nomorHp!;
-                            controller.alamatC.text =
-                                controller.ustadzData.value!.alamat!;
-                            controller.jenisKelaminC.text =
-                                controller.ustadzData.value!.jenisKelamin!;
-                            _showEditProfileDialog();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orangeAccent,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          icon: const Icon(Icons.edit, size: 20),
-                          label: Text(
-                            'Edit Profil',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            Get.dialog(
-                              AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                title: Text(
-                                  'Logout',
-                                  style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                content: Text(
-                                  'Apakah anda yakin ingin logout?',
-                                  style: GoogleFonts.poppins(),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Get.back();
-                                    },
-                                    child: Text(
-                                      'Tidak',
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.grey[600],
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        // Profile Section
+                        const SizedBox(height: 40),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Profile Picture with Border and Shadow
+                              Stack(
+                                children: [
+                                  Container(
+                                    width: 120,
+                                    height: 120,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 4,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          blurRadius: 20,
+                                          offset: const Offset(0, 8),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl: controller.getImageUrl(
+                                          controller.fotoProfil.value,
+                                        ),
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) =>
+                                            Container(
+                                              color: Colors.grey[300],
+                                              child: const Icon(
+                                                Icons.person,
+                                                size: 40,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                        errorWidget: (context, url, error) =>
+                                            Container(
+                                              color: Colors.grey[300],
+                                              child: const Icon(
+                                                Icons.person,
+                                                size: 40,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
                                       ),
                                     ),
                                   ),
-                                  TextButton(
-                                    onPressed: () {
-                                      controller.logout();
-                                    },
-                                    style: TextButton.styleFrom(
-                                      backgroundColor: Colors.red,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                        vertical: 8,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Ya',
-                                      style: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.w500,
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Material(
+                                      shape: const CircleBorder(),
+                                      child: InkWell(
+                                        onTap: () {
+                                          _showEditPhotoProfileBottomSheet();
+                                        },
+                                        customBorder: const CircleBorder(),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.white,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.camera_alt,
+                                            color: Colors.deepPurpleAccent,
+                                            size: 20,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.red,
-                            side: const BorderSide(color: Colors.red),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          icon: const Icon(Icons.logout, size: 20),
-                          label: Text(
-                            'Logout',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w500,
-                            ),
+
+                              const SizedBox(height: 16),
+
+                              // Name
+                              Text(
+                                ustadz.nama ?? 'Nama tidak tersedia',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+
+                              const SizedBox(height: 8),
+
+                              // Badges Row
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        ustadz.user?.email ??
+                                            'Email tidak tersedia',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ],
+                ),
+              ),
+            ),
+
+            // Main Content
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  // Personal Information
+                  _buildPersonalInfoSection(ustadz),
+                  const SizedBox(height: 16),
+                  // Action Cards
+                  _buildActionSection(ustadz),
+                  const SizedBox(height: 50), // Space for bottom buttons
+                ]),
               ),
             ),
           ],
-        ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildActionSection(Ustadz ustadz) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Change Password Button
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () {
+                Get.toNamed('/change-password');
+              },
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFF6B46C1),
+                side: const BorderSide(color: Color(0xFF6B46C1)),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                'Ubah Password',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Edit Profile Button
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                controller.namaC.text = controller.ustadzData.value!.nama!;
+                controller.noHpC.text = controller.ustadzData.value!.nomorHp!;
+                controller.alamatC.text = controller.ustadzData.value!.alamat!;
+                controller.jenisKelaminC.text =
+                    controller.ustadzData.value!.jenisKelamin!;
+                _showEditProfileDialog();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orangeAccent,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                'Edit Profil',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPersonalInfoSection(Ustadz ustadz) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Informasi Pribadi',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          _buildInfoTile(
+            icon: Icons.phone,
+            label: 'No. Telepon',
+            value: ustadz.nomorHp ?? 'Tidak ada data',
+            telepon: ustadz.nomorHp,
+          ),
+
+          const SizedBox(height: 12),
+
+          _buildInfoTile(
+            icon: ustadz.jenisKelamin?.toLowerCase() == 'l'
+                ? Icons.male
+                : Icons.female,
+            label: 'Jenis Kelamin',
+            value: ustadz.jenisKelamin?.toLowerCase() == 'l'
+                ? 'Laki-laki'
+                : 'Perempuan',
+          ),
+
+          if (ustadz.waliKelasTahap != null) const SizedBox(height: 12),
+
+          if (ustadz.waliKelasTahap != null)
+            _buildInfoTile(
+              icon: Icons.person,
+              label: 'Wali Kelas Tahap',
+              value: _getTahapLabel(ustadz.waliKelasTahap ?? ''),
+            ),
+
+          const SizedBox(height: 12),
+
+          _buildInfoTile(
+            icon: Icons.location_on,
+            label: 'Alamat',
+            value: ustadz.alamat ?? 'Tidak ada data',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoTile({
+    required IconData icon,
+    required String label,
+    required String value,
+    String? telepon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
+          ),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -710,69 +894,6 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(
-    IconData icon,
-    String title,
-    String value,
-    int maxline,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                  maxLines: maxline,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
