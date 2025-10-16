@@ -1108,7 +1108,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
             icon: Icons.phone,
             label: 'No. Telepon',
             value: santri.nomorHp ?? 'Tidak ada data',
-            telepon: santri.nomorHp,
           ),
 
           const SizedBox(height: 12),
