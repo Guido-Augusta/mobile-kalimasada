@@ -1092,7 +1092,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
           const SizedBox(height: 12),
 
           _buildInfoTile(
-            icon: Icons.cake,
+            icon: Icons.calendar_today_rounded,
             label: 'Tanggal Lahir',
             value: santri.tanggalLahir != null
                 ? DateFormat(
