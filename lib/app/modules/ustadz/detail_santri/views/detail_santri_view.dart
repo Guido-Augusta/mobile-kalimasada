@@ -19,6 +19,26 @@ class DetailSantriView extends GetView<DetailSantriController> {
       backgroundColor: const Color(0xFFF8FAFC),
       body: Obx(() {
         final santri = controller.santriDetail.value;
+
+        if (controller.isLoading.value) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text(
+                  'Loading...',
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
         // Data kosong
         if (santri == null) {
           return Center(
@@ -103,7 +123,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // Profile Picture with Border and Shadow
+                              // Profile Picture with Border
                               Container(
                                 width: 120,
                                 height: 120,
@@ -160,13 +180,17 @@ class DetailSantriView extends GetView<DetailSantriController> {
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
 
                               const SizedBox(height: 8),
 
-                              // Badges Row
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                              // Badges Wrap
+                              Wrap(
+                                direction: Axis.horizontal,
+                                alignment: WrapAlignment.center,
+                                runAlignment: WrapAlignment.center,
                                 children: [
                                   // Tahap Badge
                                   Container(
@@ -211,90 +235,96 @@ class DetailSantriView extends GetView<DetailSantriController> {
                                     ),
                                   ),
 
-                                  const SizedBox(width: 8),
+                                  if (controller.userRole == 'ustadz')
+                                    const SizedBox(width: 8),
 
                                   // Gender Badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.2,
+                                  if (controller.userRole == 'ustadz')
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 6,
                                       ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
+                                      decoration: BoxDecoration(
                                         color: Colors.white.withValues(
-                                          alpha: 0.3,
+                                          alpha: 0.2,
                                         ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          santri.jenisKelamin?.toLowerCase() ==
-                                                  'l'
-                                              ? Icons.male
-                                              : Icons.female,
-                                          size: 14,
-                                          color: Colors.white,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          santri.jenisKelamin?.toLowerCase() ==
-                                                  'l'
-                                              ? 'Laki-laki'
-                                              : 'Perempuan',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.3,
                                           ),
                                         ),
-                                      ],
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            santri.jenisKelamin
+                                                        ?.toLowerCase() ==
+                                                    'l'
+                                                ? Icons.male
+                                                : Icons.female,
+                                            size: 14,
+                                            color: Colors.white,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            santri.jenisKelamin
+                                                        ?.toLowerCase() ==
+                                                    'l'
+                                                ? 'Laki-laki'
+                                                : 'Perempuan',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 12,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
 
                                   // Point Badge
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.2,
+                                  if (controller.userRole == 'ortu')
+                                    const SizedBox(width: 8),
+                                  if (controller.userRole == 'ortu')
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 6,
                                       ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
+                                      decoration: BoxDecoration(
                                         color: Colors.white.withValues(
-                                          alpha: 0.3,
+                                          alpha: 0.2,
                                         ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.star_border_rounded,
-                                          size: 14,
-                                          color: Colors.white,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          '${santri.totalPoin} Poin',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.3,
                                           ),
                                         ),
-                                      ],
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.star_border_rounded,
+                                            size: 14,
+                                            color: Colors.white,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '${santri.totalPoin} Poin',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 12,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
                             ],
@@ -569,13 +599,13 @@ class DetailSantriView extends GetView<DetailSantriController> {
   String getTahapLabel(String? tahap) {
     switch (tahap?.toLowerCase()) {
       case 'level1':
-        return 'Level 1';
+        return 'Level 1 - Juz 30';
       case 'level2':
-        return 'Level 2';
+        return 'Level 2 - Surah Pilihan';
       case 'level3':
-        return 'Level 3';
+        return 'Level 3 - Juz 1-29';
       default:
-        return 'Tahap ?';
+        return 'Belum ada tahap';
     }
   }
 
@@ -722,10 +752,23 @@ class DetailSantriView extends GetView<DetailSantriController> {
             value: santri.user?.email ?? 'Tidak ada data',
           ),
 
+          if (controller.userRole == 'ortu') const SizedBox(height: 12),
+
+          if (controller.userRole == 'ortu')
+            _buildInfoTile(
+              icon: santri.jenisKelamin?.toLowerCase() == 'l'
+                  ? Icons.male
+                  : Icons.female,
+              label: 'Jenis Kelamin',
+              value: santri.jenisKelamin?.toLowerCase() == 'l'
+                  ? 'Laki-laki'
+                  : 'Perempuan',
+            ),
+
           const SizedBox(height: 12),
 
           _buildInfoTile(
-            icon: Icons.cake,
+            icon: Icons.calendar_today_rounded,
             label: 'Tanggal Lahir',
             value: santri.tanggalLahir != null
                 ? DateFormat(

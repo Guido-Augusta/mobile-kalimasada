@@ -897,13 +897,13 @@ class SantriProfileView extends GetView<SantriProfileController> {
   String getTahapLabel(String? tahap) {
     switch (tahap?.toLowerCase()) {
       case 'level1':
-        return 'Level 1';
+        return 'Level 1 - Juz 30';
       case 'level2':
-        return 'Level 2';
+        return 'Level 2 - Surah Pilihan';
       case 'level3':
-        return 'Level 3';
+        return 'Level 3 - Juz 1-29';
       default:
-        return 'Tahap ?';
+        return 'Belum ada tahap';
     }
   }
 

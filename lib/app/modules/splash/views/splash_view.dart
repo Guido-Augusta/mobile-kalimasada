@@ -18,13 +18,26 @@ class SplashView extends GetView<SplashController> {
                 child: Stack(
                   children: [
                     Center(
-                      child: Text(
-                        'KALIMASADA APP',
-                        style: TextStyle(
-                          color: Colors.deepPurpleAccent,
-                          fontSize: 35,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'KALIMASADA',
+                            style: TextStyle(
+                              color: Colors.deepPurpleAccent,
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Tahfidz App',
+                            style: TextStyle(
+                              color: Colors.orangeAccent,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Align(
