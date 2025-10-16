@@ -595,7 +595,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                               );
                             },
                             icon: const Icon(
-                              Icons.lightbulb,
+                              Icons.book_rounded,
                               size: 18,
                               color: Colors.white,
                             ),

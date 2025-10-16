@@ -93,7 +93,9 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
             SliverAppBar(
               centerTitle: true,
               title: Text(
-                controller.userRole == 'ortu'
+                controller.ortuDetail.value?.tipe?.toLowerCase() == 'ayah' ||
+                        controller.ortuDetail.value?.tipe?.toLowerCase() ==
+                            'ibu'
                     ? 'Profil Orang Tua'
                     : 'Profil Wali',
                 style: TextStyle(
