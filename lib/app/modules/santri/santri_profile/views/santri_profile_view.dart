@@ -1084,6 +1084,14 @@ class SantriProfileView extends GetView<SantriProfileController> {
           const SizedBox(height: 16),
 
           _buildInfoTile(
+            icon: Icons.credit_card,
+            label: 'No. Induk',
+            value: santri.noInduk ?? '-',
+          ),
+
+          const SizedBox(height: 12),
+
+          _buildInfoTile(
             icon: Icons.email,
             label: 'Email',
             value: santri.user?.email ?? 'Tidak ada data',
