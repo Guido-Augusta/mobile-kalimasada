@@ -10,7 +10,7 @@ class LoginView extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color(0xFFF8FAFF),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -40,7 +40,7 @@ class LoginView extends GetView<LoginController> {
                         ],
                       ),
                       child: const Icon(
-                        Icons.lock_outline,
+                        Icons.mosque,
                         color: Colors.white,
                         size: 40,
                       ),
@@ -198,8 +198,24 @@ class LoginView extends GetView<LoginController> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 16),
 
-                      const SizedBox(height: 32),
+                      // Forgot Password
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: InkWell(
+                          onTap: () {},
+                          child: const Text(
+                            'Lupa Password?',
+                            style: TextStyle(
+                              color: Colors.deepPurpleAccent,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
 
                       // Login Button
                       Obx(

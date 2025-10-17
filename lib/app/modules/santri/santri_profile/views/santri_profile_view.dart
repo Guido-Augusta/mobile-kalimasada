@@ -94,7 +94,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
             SliverAppBar(
               centerTitle: true,
               title: Text(
-                'Detail Santri',
+                'Profil Santri',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -897,13 +897,13 @@ class SantriProfileView extends GetView<SantriProfileController> {
   String getTahapLabel(String? tahap) {
     switch (tahap?.toLowerCase()) {
       case 'level1':
-        return 'Level 1';
+        return 'Level 1 - Juz 30';
       case 'level2':
-        return 'Level 2';
+        return 'Level 2 - Surah Pilihan';
       case 'level3':
-        return 'Level 3';
+        return 'Level 3 - Juz 1-29';
       default:
-        return 'Tahap ?';
+        return 'Belum ada tahap';
     }
   }
 
@@ -1023,7 +1023,9 @@ class SantriProfileView extends GetView<SantriProfileController> {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.toNamed('/change-password');
+                    },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF6B46C1),
                       side: const BorderSide(color: Color(0xFF6B46C1)),
@@ -1082,22 +1084,30 @@ class SantriProfileView extends GetView<SantriProfileController> {
           const SizedBox(height: 16),
 
           _buildInfoTile(
-            icon: Icons.email,
-            label: 'Email',
-            value: santri.user?.email ?? 'Tidak ada data',
+            icon: Icons.credit_card,
+            label: 'No. Induk',
+            value: santri.noInduk ?? '-',
           ),
 
           const SizedBox(height: 12),
 
           _buildInfoTile(
-            icon: Icons.cake,
+            icon: Icons.email,
+            label: 'Email',
+            value: santri.user?.email ?? '-',
+          ),
+
+          const SizedBox(height: 12),
+
+          _buildInfoTile(
+            icon: Icons.calendar_today_rounded,
             label: 'Tanggal Lahir',
             value: santri.tanggalLahir != null
                 ? DateFormat(
                     'dd MMMM yyyy',
                     'id_ID',
                   ).format(santri.tanggalLahir!)
-                : 'Tidak ada data',
+                : '-',
           ),
 
           const SizedBox(height: 12),
@@ -1105,8 +1115,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
           _buildInfoTile(
             icon: Icons.phone,
             label: 'No. Telepon',
-            value: santri.nomorHp ?? 'Tidak ada data',
-            telepon: santri.nomorHp,
+            value: santri.nomorHp ?? '-',
           ),
 
           const SizedBox(height: 12),
@@ -1114,7 +1123,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
           _buildInfoTile(
             icon: Icons.location_on,
             label: 'Alamat',
-            value: santri.alamat ?? 'Tidak ada data',
+            value: santri.alamat ?? '-',
           ),
         ],
       ),

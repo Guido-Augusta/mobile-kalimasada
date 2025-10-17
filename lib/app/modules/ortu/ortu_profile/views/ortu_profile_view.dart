@@ -1,14 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mobile_kalimasada/app/data/models/ustadz.dart';
-import '../controllers/ustadz_profile_controller.dart';
+import 'package:mobile_kalimasada/app/data/models/ortu.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class UstadzProfileView extends GetView<UstadzProfileController> {
-  const UstadzProfileView({super.key});
+import '../controllers/ortu_profile_controller.dart';
 
+class OrtuProfileView extends GetView<OrtuProfileController> {
+  const OrtuProfileView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,9 +53,9 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
           );
         }
 
-        final ustadz = controller.ustadzData.value;
+        final ortu = controller.ortuDetail.value;
         // Data kosong
-        if (ustadz == null) {
+        if (ortu == null) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -72,7 +75,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Data ustadz tidak ditemukan',
+                  'Data ortu tidak ditemukan',
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     color: Colors.grey[600],
@@ -90,9 +93,11 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
             SliverAppBar(
               centerTitle: true,
               title: Text(
-                ustadz.jenisKelamin?.toLowerCase() == 'l'
-                    ? 'Profil Ustadz'
-                    : 'Profil Ustazah',
+                controller.ortuDetail.value?.tipe?.toLowerCase() == 'ayah' ||
+                        controller.ortuDetail.value?.tipe?.toLowerCase() ==
+                            'ibu'
+                    ? 'Profil Orang Tua'
+                    : 'Profil Wali',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -268,7 +273,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
 
                               // Name
                               Text(
-                                ustadz.nama ?? 'Nama tidak tersedia',
+                                ortu.nama ?? 'Nama tidak tersedia',
                                 style: GoogleFonts.poppins(
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
@@ -296,7 +301,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                                   children: [
                                     Flexible(
                                       child: Text(
-                                        ustadz.user?.email ??
+                                        ortu.user?.email ??
                                             'Email tidak tersedia',
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
@@ -323,11 +328,11 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
               padding: const EdgeInsets.all(16),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  // Personal Information
-                  _buildPersonalInfoSection(ustadz),
-                  const SizedBox(height: 16),
                   // Action Cards
-                  _buildActionSection(ustadz),
+                  _buildActionSection(ortu),
+                  const SizedBox(height: 16),
+                  // Personal Information
+                  _buildPersonalInfoSection(ortu),
                   const SizedBox(height: 50), // Space for bottom buttons
                 ]),
               ),
@@ -338,198 +343,57 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
     );
   }
 
-  Widget _buildActionSection(Ustadz ustadz) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+  void _showEditPhotoProfileBottomSheet() {
+    Get.bottomSheet(
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Change Password Button
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () {
-                Get.toNamed('/change-password');
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Foto Profil',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            ListTile(
+              minTileHeight: 40,
+              leading: Icon(Icons.camera_alt_outlined),
+              title: Text('Kamera'),
+              onTap: () {
+                controller.pickImage(ImageSource.camera);
+                Get.back();
               },
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF6B46C1),
-                side: const BorderSide(color: Color(0xFF6B46C1)),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Ubah Password',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          // Edit Profile Button
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                controller.namaC.text = controller.ustadzData.value!.nama!;
-                controller.noHpC.text = controller.ustadzData.value!.nomorHp!;
-                controller.alamatC.text = controller.ustadzData.value!.alamat!;
-                controller.jenisKelaminC.text =
-                    controller.ustadzData.value!.jenisKelamin!;
-                _showEditProfileDialog();
+            ListTile(
+              minTileHeight: 40,
+              leading: Icon(Icons.photo_outlined),
+              title: Text('Galeri'),
+              onTap: () {
+                controller.pickImage(ImageSource.gallery);
+                Get.back();
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orangeAccent,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Edit Profil',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPersonalInfoSection(Ustadz ustadz) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Informasi Pribadi',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          _buildInfoTile(
-            icon: Icons.phone,
-            label: 'No. Telepon',
-            value: ustadz.nomorHp ?? 'Tidak ada data',
-            telepon: ustadz.nomorHp,
-          ),
-
-          const SizedBox(height: 12),
-
-          _buildInfoTile(
-            icon: ustadz.jenisKelamin?.toLowerCase() == 'l'
-                ? Icons.male
-                : Icons.female,
-            label: 'Jenis Kelamin',
-            value: ustadz.jenisKelamin?.toLowerCase() == 'l'
-                ? 'Laki-laki'
-                : 'Perempuan',
-          ),
-
-          if (ustadz.waliKelasTahap != null) const SizedBox(height: 12),
-
-          if (ustadz.waliKelasTahap != null)
-            _buildInfoTile(
-              icon: Icons.person,
-              label: 'Wali Kelas Tahap',
-              value: _getTahapLabel(ustadz.waliKelasTahap ?? ''),
-            ),
-
-          const SizedBox(height: 12),
-
-          _buildInfoTile(
-            icon: Icons.location_on,
-            label: 'Alamat',
-            value: ustadz.alamat ?? 'Tidak ada data',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoTile({
-    required IconData icon,
-    required String label,
-    required String value,
-    String? telepon,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
-          ),
-
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -543,7 +407,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(Get.context!).size.height * 0.7,
+            maxHeight: MediaQuery.of(Get.context!).size.height * 0.65,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -659,52 +523,9 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 16),
-                      Text(
-                        'Jenis Kelamin',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        value: controller.jenisKelaminC.text,
-                        decoration: InputDecoration(
-                          fillColor: Colors.grey[50],
-                          filled: true,
-                          hintText: 'Pilih Jenis Kelamin',
-                          hintStyle: TextStyle(color: Colors.grey[500]),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
-                          ),
-                        ),
-                        dropdownColor: Colors.white,
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'P',
-                            child: Text('Perempuan'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'L',
-                            child: Text('Laki-laki'),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          controller.jenisKelaminC.text = value!;
-                        },
-                      ),
-                      const SizedBox(height: 16),
+
                       Text(
                         'Alamat',
                         style: TextStyle(
@@ -782,19 +603,16 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                         onPressed: () {
                           if (controller.namaC.text.isEmpty ||
                               controller.noHpC.text.isEmpty ||
-                              controller.alamatC.text.isEmpty ||
-                              controller.jenisKelaminC.text.isEmpty) {
+                              controller.alamatC.text.isEmpty) {
                             Get.snackbar('Error', 'Semua field harus diisi');
                             return;
                           }
                           if (controller.namaC.text ==
-                                  controller.ustadzData.value?.nama &&
+                                  controller.ortuDetail.value?.nama &&
                               controller.noHpC.text ==
-                                  controller.ustadzData.value?.nomorHp &&
+                                  controller.ortuDetail.value?.nomorHp &&
                               controller.alamatC.text ==
-                                  controller.ustadzData.value?.alamat &&
-                              controller.jenisKelaminC.text ==
-                                  controller.ustadzData.value?.jenisKelamin) {
+                                  controller.ortuDetail.value?.alamat) {
                             Get.snackbar('Error', 'Tidak ada perubahan data');
                             return;
                           }
@@ -802,7 +620,6 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                             controller.namaC.text,
                             controller.noHpC.text,
                             controller.alamatC.text,
-                            controller.jenisKelaminC.text,
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -843,71 +660,324 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
     );
   }
 
-  void _showEditPhotoProfileBottomSheet() {
-    Get.bottomSheet(
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
+  Widget _buildActionSection(Ortu ortu) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.people_alt_rounded,
+                    color: Colors.deepPurpleAccent,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '${ortu.santri.length}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                ),
+                Text(
+                  'Total Santri',
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(12),
-              ),
+
+        const SizedBox(width: 16),
+
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Foto Profil',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+            child: Column(
+              children: [
+                // Edit Profile Button
+                const SizedBox(height: 2),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      controller.namaC.text =
+                          controller.ortuDetail.value!.nama!;
+                      controller.noHpC.text =
+                          controller.ortuDetail.value!.nomorHp!;
+                      controller.alamatC.text =
+                          controller.ortuDetail.value!.alamat!;
+                      _showEditProfileDialog();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orangeAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 0,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Edit Profil',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Change Password Button
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Get.toNamed('/change-password');
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF6B46C1),
+                      side: const BorderSide(color: Color(0xFF6B46C1)),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 0,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Ubah Password',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 2),
+              ],
             ),
-            ListTile(
-              minTileHeight: 40,
-              leading: Icon(Icons.camera_alt_outlined),
-              title: Text('Kamera'),
-              onTap: () {
-                controller.pickImage(ImageSource.camera);
-                Get.back();
-              },
-            ),
-            ListTile(
-              minTileHeight: 40,
-              leading: Icon(Icons.photo_outlined),
-              title: Text('Galeri'),
-              onTap: () {
-                controller.pickImage(ImageSource.gallery);
-                Get.back();
-              },
-            ),
-          ],
+          ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildPersonalInfoSection(Ortu ortu) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Informasi Pribadi',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          _buildInfoTile(
+            icon: Icons.phone,
+            label: 'No. Telepon',
+            value: ortu.nomorHp ?? 'Tidak ada data',
+            telepon: ortu.nomorHp,
+          ),
+
+          const SizedBox(height: 12),
+
+          _buildInfoTile(
+            icon: Icons.location_on,
+            label: 'Alamat',
+            value: ortu.alamat ?? 'Tidak ada data',
+          ),
+
+          const SizedBox(height: 12),
+
+          _buildInfoTile(
+            icon: ortu.jenisKelamin?.toLowerCase() == 'l'
+                ? Icons.male
+                : Icons.female,
+            label: 'Jenis Kelamin',
+            value: ortu.jenisKelamin?.toLowerCase() == 'l'
+                ? 'Laki-laki'
+                : 'Perempuan',
+          ),
+
+          const SizedBox(height: 12),
+
+          _buildInfoTile(
+            icon: Icons.person,
+            label: 'Peran',
+            value: ortu.tipe ?? 'Tidak ada data',
+          ),
+        ],
       ),
     );
   }
 
-  String _getTahapLabel(String tahap) {
-    switch (tahap) {
-      case 'Level1':
-        return 'Level 1';
-      case 'Level2':
-        return 'Level 2';
-      case 'Level3':
-        return 'Level 3';
-      default:
-        return 'Tahap tidak ditemukan';
-    }
+  Widget _buildInfoTile({
+    required IconData icon,
+    required String label,
+    required String value,
+    String? telepon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
+          ),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          if (telepon != null &&
+              telepon.isNotEmpty &&
+              controller.userRole != 'ortu')
+            Row(
+              children: [
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: SvgPicture.asset(
+                    'assets/icons/whatsapp.svg',
+                    width: 20,
+                    colorFilter: const ColorFilter.mode(
+                      Color(0xFF25D366),
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  onPressed: () {
+                    String formattedNomor = telepon;
+                    if (telepon.startsWith('0')) {
+                      formattedNomor = '+62${telepon.substring(1)}';
+                    }
+
+                    final whatsappUrl = "https://wa.me/$formattedNomor";
+                    launchUrl(Uri.parse(whatsappUrl));
+                  },
+                  style: IconButton.styleFrom(
+                    backgroundColor: const Color(
+                      0xFF25D366,
+                    ).withValues(alpha: 0.1),
+                    shape: const CircleBorder(),
+                  ),
+                ),
+
+                const SizedBox(width: 4),
+
+                IconButton(
+                  icon: const Icon(
+                    Icons.phone,
+                    size: 18,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  onPressed: () {
+                    final phoneUrl = "tel:$telepon";
+                    launchUrl(Uri.parse(phoneUrl));
+                  },
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.deepPurpleAccent.withValues(
+                      alpha: 0.1,
+                    ),
+                    shape: const CircleBorder(),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
   }
 }
