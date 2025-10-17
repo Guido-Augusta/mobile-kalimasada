@@ -1094,7 +1094,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
           _buildInfoTile(
             icon: Icons.email,
             label: 'Email',
-            value: santri.user?.email ?? 'Tidak ada data',
+            value: santri.user?.email ?? '-',
           ),
 
           const SizedBox(height: 12),
@@ -1107,7 +1107,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                     'dd MMMM yyyy',
                     'id_ID',
                   ).format(santri.tanggalLahir!)
-                : 'Tidak ada data',
+                : '-',
           ),
 
           const SizedBox(height: 12),
@@ -1115,7 +1115,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
           _buildInfoTile(
             icon: Icons.phone,
             label: 'No. Telepon',
-            value: santri.nomorHp ?? 'Tidak ada data',
+            value: santri.nomorHp ?? '-',
           ),
 
           const SizedBox(height: 12),
@@ -1123,7 +1123,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
           _buildInfoTile(
             icon: Icons.location_on,
             label: 'Alamat',
-            value: santri.alamat ?? 'Tidak ada data',
+            value: santri.alamat ?? '-',
           ),
         ],
       ),
