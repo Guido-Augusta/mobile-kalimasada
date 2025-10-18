@@ -118,7 +118,9 @@ class LoginView extends GetView<LoginController> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide(
-                                  color: Colors.blue[600]!,
+                                  color: Colors.deepPurpleAccent.withValues(
+                                    alpha: 0.6,
+                                  ),
                                   width: 2,
                                 ),
                               ),
@@ -183,7 +185,9 @@ class LoginView extends GetView<LoginController> {
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide(
-                                    color: Colors.blue[600]!,
+                                    color: Colors.deepPurpleAccent.withValues(
+                                      alpha: 0.6,
+                                    ),
                                     width: 2,
                                   ),
                                 ),
@@ -204,7 +208,9 @@ class LoginView extends GetView<LoginController> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            Get.toNamed('/forgot-password');
+                          },
                           child: const Text(
                             'Lupa Password?',
                             style: TextStyle(
