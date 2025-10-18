@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
-import '../controllers/change_password_controller.dart';
+import '../controllers/forgot_password_controller.dart';
 
-class ChangePasswordView extends GetView<ChangePasswordController> {
-  const ChangePasswordView({super.key});
+class ForgotPasswordView extends GetView<ForgotPasswordController> {
+  const ForgotPasswordView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,52 +24,74 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                 const SizedBox(height: 60),
 
                 // Logo/Title Section
-                Column(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurpleAccent,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.deepPurpleAccent.withValues(
-                              alpha: 0.3,
+                Obx(() {
+                  return Column(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurpleAccent,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.deepPurpleAccent.withValues(
+                                alpha: 0.3,
+                              ),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
                             ),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.lock_outline,
+                          color: Colors.white,
+                          size: 40,
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.lock_outline,
-                        color: Colors.white,
-                        size: 40,
+                      const SizedBox(height: 24),
+                      Text(
+                        'Lupa Password',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'Ubah Password',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Obx(
-                      () => Text(
-                        controller.step.value == ChangePasswordStep.oldPassword
-                            ? 'Verifikasi Password Lama'
-                            : 'Verifikasi Password Baru',
+                      const SizedBox(height: 8),
+                      Text(
+                        textAlign: TextAlign.center,
+                        controller.step.value == ForgotPasswordStep.inputEmail
+                            ? 'Masukkan Email Anda'
+                            : controller.step.value ==
+                                  ForgotPasswordStep.tokenVerification
+                            ? 'Masukkan Token yang dikirim ke email Anda'
+                            : 'Masukkan Password Baru',
                         style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                       ),
-                    ),
-                  ],
-                ),
 
-                const SizedBox(height: 48),
+                      if (controller.step.value ==
+                              ForgotPasswordStep.tokenVerification ||
+                          controller.step.value ==
+                              ForgotPasswordStep.newPassword)
+                        Column(
+                          children: [
+                            const SizedBox(height: 24),
+                            // Time Counter
+                            Text(
+                              controller.formattedCountdown,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  );
+                }),
+
+                const SizedBox(height: 24),
 
                 // Login Form
                 Container(
@@ -95,8 +117,11 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                           children: [
                             Text(
                               controller.step.value ==
-                                      ChangePasswordStep.oldPassword
-                                  ? 'Password Lama'
+                                      ForgotPasswordStep.inputEmail
+                                  ? 'Email'
+                                  : controller.step.value ==
+                                        ForgotPasswordStep.tokenVerification
+                                  ? 'Token'
                                   : 'Password Baru',
                               style: TextStyle(
                                 fontSize: 14,
@@ -105,28 +130,59 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            // Old Password Field
+                            // Email Field
                             if (controller.step.value ==
-                                ChangePasswordStep.oldPassword)
+                                ForgotPasswordStep.inputEmail)
                               TextFormField(
-                                controller: controller.oldPasswordC,
-                                obscureText:
-                                    controller.isOldPasswordHidden.value,
+                                controller: controller.emailC,
+                                keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
-                                  hintText: 'Masukkan Password Lama',
+                                  hintText: 'Masukkan Email',
                                   prefixIcon: Icon(
                                     Icons.lock_outline,
                                     color: Colors.grey[500],
                                   ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      controller.isOldPasswordHidden.value
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
-                                      color: Colors.grey[500],
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
                                     ),
-                                    onPressed:
-                                        controller.toggleOldPasswordVisibility,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.deepPurpleAccent.withValues(
+                                        alpha: 0.6,
+                                      ),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey[50],
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 16,
+                                  ),
+                                ),
+                              ),
+
+                            // Token Verification Field
+                            if (controller.step.value ==
+                                ForgotPasswordStep.tokenVerification)
+                              TextFormField(
+                                controller: controller.tokenC,
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  hintText: 'Masukkan 6 Digit Token',
+                                  prefixIcon: Icon(
+                                    Icons.lock_outline,
+                                    color: Colors.grey[500],
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -160,9 +216,10 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
 
                             // New Password Field
                             if (controller.step.value ==
-                                ChangePasswordStep.newPassword)
+                                ForgotPasswordStep.newPassword)
                               TextFormField(
                                 controller: controller.newPasswordC,
+                                keyboardType: TextInputType.visiblePassword,
                                 obscureText:
                                     controller.isNewPasswordHidden.value,
                                 decoration: InputDecoration(
@@ -170,16 +227,6 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                                   prefixIcon: Icon(
                                     Icons.lock_outline,
                                     color: Colors.grey[500],
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      controller.isNewPasswordHidden.value
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
-                                      color: Colors.grey[500],
-                                    ),
-                                    onPressed:
-                                        controller.toggleNewPasswordVisibility,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -202,6 +249,16 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                                       width: 2,
                                     ),
                                   ),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      controller.isNewPasswordHidden.value
+                                          ? Icons.visibility_outlined
+                                          : Icons.visibility_off_outlined,
+                                      color: Colors.grey[500],
+                                    ),
+                                    onPressed:
+                                        controller.toggleNewPasswordVisibility,
+                                  ),
                                   filled: true,
                                   fillColor: Colors.grey[50],
                                   contentPadding: const EdgeInsets.symmetric(
@@ -219,20 +276,31 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                       // Submit Button
                       Obx(
                         () => ElevatedButton(
-                          onPressed: controller.isValidating.value
-                              ? null
-                              : () {
+                          onPressed:
+                              !controller.isValidating.value &&
+                                  controller.isButtonEnabled.value
+                              ? () {
                                   if (controller.step.value ==
-                                      ChangePasswordStep.oldPassword) {
-                                    if (controller.oldPasswordC.text.isEmpty) {
+                                      ForgotPasswordStep.inputEmail) {
+                                    if (controller.emailC.text.isEmpty) {
                                       Get.snackbar(
                                         'Peringatan',
-                                        'Password tidak boleh kosong',
+                                        'Email tidak boleh kosong',
                                       );
                                     } else {
-                                      controller.changePasswordStep1(
-                                        controller.oldPasswordC.text,
+                                      // TODO: implement inputEmailController
+                                      controller.sendToken();
+                                    }
+                                  } else if (controller.step.value ==
+                                      ForgotPasswordStep.tokenVerification) {
+                                    if (controller.tokenC.text.isEmpty) {
+                                      Get.snackbar(
+                                        'Peringatan',
+                                        'Token tidak boleh kosong',
                                       );
+                                    } else {
+                                      // TODO: implement tokenVerificationController
+                                      controller.tokenVerification();
                                     }
                                   } else {
                                     if (controller.newPasswordC.text.isEmpty) {
@@ -241,12 +309,12 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                                         'Password tidak boleh kosong',
                                       );
                                     } else {
-                                      controller.changePasswordStep2(
-                                        controller.newPasswordC.text,
-                                      );
+                                      // TODO: implement newPasswordController
+                                      controller.changePassword();
                                     }
                                   }
-                                },
+                                }
+                              : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.deepPurpleAccent,
                             foregroundColor: Colors.white,
@@ -270,8 +338,11 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                                 )
                               : Text(
                                   controller.step.value ==
-                                          ChangePasswordStep.oldPassword
-                                      ? 'Verifikasi'
+                                          ForgotPasswordStep.inputEmail
+                                      ? 'Kirim Token'
+                                      : controller.step.value ==
+                                            ForgotPasswordStep.tokenVerification
+                                      ? 'Verifikasi Token'
                                       : 'Ubah Password',
                                   style: TextStyle(
                                     fontSize: 16,
