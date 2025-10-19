@@ -85,14 +85,6 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Santri',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.8),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const SizedBox(height: 0),
-                                Text(
                                   riwayat.santri!.nama ?? 'Nama Santri',
                                   style: const TextStyle(
                                     color: Colors.white,
@@ -101,6 +93,13 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  riwayat.santri!.noInduk ?? '-',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.8),
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ],
                             ),
