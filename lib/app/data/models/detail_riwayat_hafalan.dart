@@ -23,6 +23,7 @@ class Data {
     required this.status,
     required this.ustadz,
     required this.catatan,
+    required this.totalPoin,
     required this.surah,
     required this.daftarAyat,
   });
@@ -31,6 +32,7 @@ class Data {
   final String? status;
   final Ustadz? ustadz;
   final String? catatan;
+  final int? totalPoin;
   final Surah? surah;
   final List<DaftarAyat> daftarAyat;
 
@@ -40,6 +42,7 @@ class Data {
       status: json["status"],
       ustadz: json["ustadz"] == null ? null : Ustadz.fromJson(json["ustadz"]),
       catatan: json["catatan"],
+      totalPoin: json["totalPoin"],
       surah: json["surah"] == null ? null : Surah.fromJson(json["surah"]),
       daftarAyat: json["daftarAyat"] == null
           ? []
@@ -55,13 +58,14 @@ class Data {
     "status": status,
     "ustadz": ustadz?.toJson(),
     "catatan": catatan,
+    "totalPoin": totalPoin,
     "surah": surah?.toJson(),
     "daftarAyat": daftarAyat.map((x) => x.toJson()).toList(),
   };
 
   @override
   String toString() {
-    return "$tanggal, $status, $ustadz, $catatan, $surah, $daftarAyat, ";
+    return "$tanggal, $status, $ustadz, $catatan, $totalPoin, $surah, $daftarAyat, ";
   }
 }
 
@@ -74,6 +78,7 @@ class DaftarAyat {
     required this.terjemah,
     required this.juz,
     required this.surah,
+    required this.poinDidapat,
   });
 
   final int? id;
@@ -83,6 +88,7 @@ class DaftarAyat {
   final String? terjemah;
   final int? juz;
   final Surah? surah;
+  final int? poinDidapat;
 
   factory DaftarAyat.fromJson(Map<String, dynamic> json) {
     return DaftarAyat(
@@ -93,6 +99,7 @@ class DaftarAyat {
       terjemah: json["terjemah"],
       juz: json["juz"],
       surah: json["surah"] == null ? null : Surah.fromJson(json["surah"]),
+      poinDidapat: json["poinDidapat"],
     );
   }
 
@@ -104,11 +111,12 @@ class DaftarAyat {
     "terjemah": terjemah,
     "juz": juz,
     "surah": surah?.toJson(),
+    "poinDidapat": poinDidapat,
   };
 
   @override
   String toString() {
-    return "$id, $nomorAyat, $arab, $latin, $terjemah, $juz, $surah, ";
+    return "$id, $nomorAyat, $arab, $latin, $terjemah, $juz, $surah, $poinDidapat, ";
   }
 }
 

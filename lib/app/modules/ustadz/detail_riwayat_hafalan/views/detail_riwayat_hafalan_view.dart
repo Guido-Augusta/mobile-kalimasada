@@ -168,14 +168,13 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
                       children: [
                         _buildInfoCard(
                           'Jumlah Ayat',
-                          '${detail.data?.daftarAyat.length} ayat',
-                          Icons.format_list_numbered_rounded,
+                          '${detail.data?.daftarAyat.length} Ayat',
                         ),
                         const SizedBox(width: 12),
                         _buildInfoCard(
                           'Status',
                           _getStatusText(detail.data?.status),
-                          _getStatusIcon(detail.data?.status),
+                          flex: 3,
                         ),
                       ],
                     ),
@@ -216,6 +215,12 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
                           Icons.person_rounded,
                           'Ustadz',
                           detail.data?.ustadz?.nama ?? '-',
+                        ),
+                        const SizedBox(height: 12),
+                        _buildDetailItem(
+                          Icons.star_rounded,
+                          'Total Poin',
+                          detail.data?.totalPoin.toString() ?? '-',
                         ),
                         const SizedBox(height: 16),
                         SizedBox(
@@ -304,33 +309,50 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
                       shadowColor: Colors.black.withValues(alpha: 0.05),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey[200]!, width: 1),
+                        side: BorderSide(color: Colors.green[200]!, width: 1.5),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Ayat Number
-                            Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: Colors.deepPurpleAccent.withValues(
-                                  alpha: 0.1,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '${ayat?.nomorAyat}',
-                                  style: TextStyle(
-                                    color: Colors.deepPurpleAccent[700],
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Ayat Number
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: Colors.deepPurpleAccent.withValues(
+                                      alpha: 0.1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '${ayat?.nomorAyat}',
+                                      style: TextStyle(
+                                        color: Colors.deepPurpleAccent[700],
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+                                Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green[300],
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: const Icon(
+                                    Icons.check,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 12),
 
@@ -405,8 +427,9 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
     );
   }
 
-  Widget _buildInfoCard(String title, String value, IconData icon) {
+  Widget _buildInfoCard(String title, String value, {int flex = 2}) {
     return Expanded(
+      flex: flex,
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -417,33 +440,29 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
             width: 1,
           ),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 18),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
               ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ],
         ),
@@ -503,23 +522,12 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
     }
   }
 
-  IconData _getStatusIcon(String? status) {
-    switch (status?.toLowerCase()) {
-      case 'murajaah':
-        return Icons.repeat_rounded;
-      case 'tambahhafalan':
-        return Icons.add_circle_rounded;
-      default:
-        return Icons.help_outline_rounded;
-    }
-  }
-
   String _getStatusText(String? status) {
     switch (status?.toLowerCase()) {
       case 'murajaah':
         return 'Murajaah';
       case 'tambahhafalan':
-        return 'Hafalan Baru';
+        return 'Tambah Hafalan';
       default:
         return status ?? '-';
     }
@@ -573,7 +581,7 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
               fillColor: Colors.grey[50],
               contentPadding: const EdgeInsets.all(16),
             ),
-            style: TextStyle(fontSize: 16, color: Colors.grey, height: 1.5),
+            style: TextStyle(fontSize: 16, height: 1.5),
           ),
         ),
         actions: [
