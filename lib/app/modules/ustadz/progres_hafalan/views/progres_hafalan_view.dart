@@ -367,24 +367,13 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
 
     return InkWell(
       onTap: () {
-        if (controller.userRole.value == 'santri' ||
-            controller.userRole.value == 'ortu') {
-          Get.toNamed(
-            '/detail-progres',
-            arguments: {
-              'santriId': controller.santriData.value?.id,
-              'surahId': surah.id,
-            },
-          );
-        } else if (controller.userRole.value == 'ustadz') {
-          Get.toNamed(
-            '/setoran',
-            arguments: {
-              'santriId': controller.santriData.value?.id,
-              'surahId': surah.id,
-            },
-          );
-        }
+        Get.toNamed(
+          '/detail-progres',
+          arguments: {
+            'santriId': controller.santriData.value?.id,
+            'surahId': surah.id,
+          },
+        );
       },
       highlightColor: Colors.transparent,
       splashColor: Colors.transparent,
