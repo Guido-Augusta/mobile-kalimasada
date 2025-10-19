@@ -27,14 +27,6 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Obx(() {
-        // if (controller.isLoading.value && controller.allRiwayatData.isEmpty) {
-        //   return const Center(
-        //     child: CircularProgressIndicator(
-        //       valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B46C1)),
-        //     ),
-        //   );
-        // }
-
         final riwayat = controller.riwayatHafalan.value;
         if (riwayat == null || riwayat.santri == null) {
           return const Center(child: Text('Data tidak ditemukan'));
@@ -121,7 +113,6 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                           _buildInfoCard(
                             'Total Poin',
                             '${controller.riwayatHafalan.value?.santri?.totalPoin ?? 0}',
-                            Icons.star_rounded,
                           ),
                           const SizedBox(width: 12),
                           _buildInfoCard(
@@ -134,9 +125,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                                       ?.tahapHafalan ??
                                   '-',
                             ),
-                            // Icons.circle, // level 1
-                            Icons.check_circle, // level 2
-                            // Icons.check_circle_outline, // level 3
+                            flex: 3,
                           ),
                         ],
                       ),
@@ -271,8 +260,9 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
     );
   }
 
-  Widget _buildInfoCard(String title, String value, IconData icon) {
+  Widget _buildInfoCard(String title, String value, {int flex = 2}) {
     return Expanded(
+      flex: flex,
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -283,32 +273,26 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
             width: 1,
           ),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 18),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
               ),
+            ),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -522,11 +506,11 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
   String getTahapanLabel(String tahapan) {
     switch (tahapan.toLowerCase()) {
       case 'level1':
-        return 'Level 1';
+        return 'Level 1 - Juz 30';
       case 'level2':
-        return 'Level 2';
+        return 'Level 2 - Surah Pilihan';
       case 'level3':
-        return 'Level 3';
+        return 'Level 3 - Juz 1-29';
       default:
         return '-';
     }
