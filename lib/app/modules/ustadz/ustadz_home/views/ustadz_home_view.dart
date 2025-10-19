@@ -696,7 +696,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
             Expanded(
               child: InkWell(
                 onTap: () {
-                  Get.toNamed('/alquran');
+                  // navigate to summary hafalan
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
@@ -721,14 +721,14 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: const Icon(
-                          Icons.menu_book_rounded,
+                          Icons.history,
                           color: Colors.deepPurple,
                           size: 32,
                         ),
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Al-Qur\'an',
+                        'Riwayat',
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           color: Colors.deepPurple[800],
@@ -737,7 +737,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Daftar Surah',
+                        'Hafalan Terakhir',
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           color: Colors.grey[600],
