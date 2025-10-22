@@ -696,7 +696,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
             Expanded(
               child: InkWell(
                 onTap: () {
-                  // navigate to summary hafalan
+                  Get.toNamed('/summary-hafalan');
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
