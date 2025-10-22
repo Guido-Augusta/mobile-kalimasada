@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:mobile_kalimasada/app/modules/ustadz/alquran/controllers/alquran_controller.dart';
+import 'package:mobile_kalimasada/app/modules/ustadz/alquran/views/alquran_view.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_home/views/ustadz_home_view.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_home/controllers/ustadz_home_controller.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_profile/views/ustadz_profile_view.dart';
@@ -11,6 +13,7 @@ import '../controllers/ustadz_main_controller.dart';
 class UstadzMainView extends GetView<UstadzMainController> {
   final ustadzHomeC = Get.put(UstadzHomeController());
   final ustadzProfileC = Get.put(UstadzProfileController());
+  final alquranC = Get.put(AlquranController());
   UstadzMainView({super.key});
   @override
   Widget build(BuildContext context) {
@@ -19,6 +22,8 @@ class UstadzMainView extends GetView<UstadzMainController> {
         case 0:
           return const UstadzHomeView();
         case 1:
+          return const AlquranView();
+        case 2:
           return const UstadzProfileView();
         default:
           return const UstadzHomeView();
@@ -46,6 +51,14 @@ class UstadzMainView extends GetView<UstadzMainController> {
                 icon: Icon(Icons.home, color: Colors.grey),
                 activeIcon: Icon(Icons.home, color: Colors.deepPurpleAccent),
                 label: 'Beranda',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.book, color: Colors.grey),
+                activeIcon: Icon(
+                  Icons.menu_book_rounded,
+                  color: Colors.deepPurpleAccent,
+                ),
+                label: 'Al-Qur\'an',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person, color: Colors.grey),

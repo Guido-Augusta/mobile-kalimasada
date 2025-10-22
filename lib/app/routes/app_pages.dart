@@ -29,6 +29,8 @@ import '../modules/santri/santri_profile/bindings/santri_profile_binding.dart';
 import '../modules/santri/santri_profile/views/santri_profile_view.dart';
 import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
+import '../modules/summary_hafalan/bindings/summary_hafalan_binding.dart';
+import '../modules/summary_hafalan/views/summary_hafalan_view.dart';
 import '../modules/ustadz/alquran/bindings/alquran_binding.dart';
 import '../modules/ustadz/alquran/views/alquran_view.dart';
 import '../modules/ustadz/daftar_santri/bindings/daftar_santri_binding.dart';
@@ -182,6 +184,11 @@ class AppPages {
       name: _Paths.FORGOT_PASSWORD,
       page: () => const ForgotPasswordView(),
       binding: ForgotPasswordBinding(),
+    ),
+    GetPage(
+      name: _Paths.SUMMARY_HAFALAN,
+      page: () => const SummaryHafalanView(),
+      binding: SummaryHafalanBinding(),
     ),
   ];
 }
