@@ -173,15 +173,20 @@ class DetailSantriView extends GetView<DetailSantriController> {
                               const SizedBox(height: 16),
 
                               // Name
-                              Text(
-                                santri.nama ?? 'Nama tidak tersedia',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                child: Text(
+                                  santri.nama ?? 'Nama tidak tersedia',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
 
                               const SizedBox(height: 8),
@@ -1459,18 +1464,18 @@ class DetailSantriView extends GetView<DetailSantriController> {
         children: [
           Expanded(
             child: OutlinedButton.icon(
-              icon: const Icon(Icons.history, color: Color(0xFF6B46C1)),
+              icon: const Icon(Icons.history, color: Colors.orange),
               label: Text(
                 'Riwayat',
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF6B46C1),
+                  color: Colors.orange,
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF6B46C1),
-                side: const BorderSide(color: Color(0xFF6B46C1)),
+                foregroundColor: Colors.orange,
+                side: const BorderSide(color: Colors.orange),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -1489,7 +1494,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
 
           Expanded(
             child: ElevatedButton.icon(
-              icon: const Icon(Icons.add_circle_outline, color: Colors.white),
+              icon: const Icon(Icons.book_rounded, color: Colors.white),
               label: Text(
                 'Hafalan',
                 style: GoogleFonts.poppins(
@@ -1499,7 +1504,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6B46C1),
+                backgroundColor: Colors.green.withValues(alpha: 0.8),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
