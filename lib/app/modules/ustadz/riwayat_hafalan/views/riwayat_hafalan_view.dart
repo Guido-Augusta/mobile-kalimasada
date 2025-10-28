@@ -35,6 +35,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         return RefreshIndicator(
           onRefresh: () async => controller.refreshRiwayatHafalan(),
           child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             controller: controller.scrollController,
             slivers: [
               // Santri Header Card as Sliver
