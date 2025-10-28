@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:get/get.dart';
+import 'package:toastification/toastification.dart';
 
 import 'app/routes/app_pages.dart';
 
@@ -17,11 +18,13 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
   runApp(
-    GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Application",
-      initialRoute: AppPages.INITIAL,
-      getPages: AppPages.routes,
+    ToastificationWrapper(
+      child: GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: "Application",
+        initialRoute: AppPages.INITIAL,
+        getPages: AppPages.routes,
+      ),
     ),
   );
 }

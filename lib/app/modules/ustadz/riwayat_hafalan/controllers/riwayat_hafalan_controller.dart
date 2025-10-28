@@ -1,10 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/models/riwayat_hafalan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toastification/toastification.dart';
 
 class RiwayatHafalanController extends GetxController {
   String? userRole;
@@ -18,6 +19,8 @@ class RiwayatHafalanController extends GetxController {
   final int _perPage = 10;
   var currentPage = 1;
   var hasMore = true.obs;
+
+  DateTime? _lastErrorShown;
 
   final ScrollController scrollController = ScrollController();
 
@@ -53,7 +56,35 @@ class RiwayatHafalanController extends GetxController {
     final token = prefs.getString('token');
 
     if (token == null) {
-      Get.snackbar('Error', 'No authentication token found');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Anda tidak terautentikasi',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 1500),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
+      Get.offAllNamed('/login');
       return;
     }
 
@@ -78,14 +109,61 @@ class RiwayatHafalanController extends GetxController {
         // Check if there are more pages
         hasMore.value = riwayat.data.length >= _perPage;
       } else {
-        Get.snackbar(
-          'Error',
-          'Failed to load riwayat hafalan: ${response.statusCode}',
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text('Gagal memuat data', style: TextStyle(color: Colors.white)),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
         );
       }
     } catch (e) {
-      print('Error in getRiwayatHafalan: $e');
-      Get.snackbar('Error', 'An error occurred: ${e.toString()}');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 1500),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -101,8 +179,35 @@ class RiwayatHafalanController extends GetxController {
     final token = prefs.getString('token');
 
     if (token == null) {
-      Get.snackbar('Error', 'No authentication token found');
-      isLoadingMore.value = false;
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Anda tidak terautentikasi',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 1500),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
+      Get.offAllNamed('/login');
       return;
     }
 
@@ -127,16 +232,70 @@ class RiwayatHafalanController extends GetxController {
 
         // Check if there are more pages
         hasMore.value = riwayat.data.length >= _perPage;
-        print('More riwayat hafalan loaded: ${riwayat.data.length} entries');
       } else {
-        Get.snackbar(
-          'Error',
-          'Failed to load more riwayat hafalan: ${response.statusCode}',
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Gagal memuat data\nPeriksa koneksi internet Anda',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
         );
       }
     } catch (e) {
-      print('Error in loadMoreRiwayatHafalan: $e');
-      Get.snackbar('Error', 'An error occurred: ${e.toString()}');
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Gagal memuat data\nPeriksa koneksi internet Anda',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
+      }
     } finally {
       isLoadingMore.value = false;
     }
@@ -166,7 +325,35 @@ class RiwayatHafalanController extends GetxController {
     final token = prefs.getString('token');
 
     if (token == null) {
-      Get.snackbar('Error', 'No authentication token found');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Anda tidak terautentikasi',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 1500),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
+      Get.offAllNamed('/login');
       return;
     }
 
@@ -187,17 +374,95 @@ class RiwayatHafalanController extends GetxController {
       );
 
       if (response.statusCode == 200) {
-        Get.snackbar('Success', 'Riwayat hafalan berhasil dihapus');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.check_circle_outline_rounded, color: Colors.green),
+              SizedBox(width: 10),
+              Text(
+                'Riwayat hafalan berhasil dihapus',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.check_circle_outline_rounded, color: Colors.green),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 2000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.success,
+          style: ToastificationStyle.simple,
+        );
+
         refreshRiwayatHafalan();
       } else {
-        Get.snackbar(
-          'Error',
-          'Gagal menghapus riwayat hafalan: ${response.statusCode}',
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Gagal menghapus riwayat hafalan: ${response.statusCode}',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
         );
       }
     } catch (e) {
-      print('Error in deleteRiwayatHafalan: $e');
-      Get.snackbar('Error', 'An error occurred: ${e.toString()}');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 1500),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
     }
   }
 }

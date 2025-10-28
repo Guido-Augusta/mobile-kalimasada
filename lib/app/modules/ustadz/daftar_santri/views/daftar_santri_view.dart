@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/ayat_hafalan.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart';
 import 'package:mobile_kalimasada/app/data/models/surah.dart';
@@ -27,6 +28,15 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
         backgroundColor: Colors.deepPurpleAccent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline_rounded),
+            onPressed: () {
+              // dialog informasi level
+              showLevelInfoDialog(context);
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -79,37 +89,26 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                   controller.santriList.isEmpty) {
                 return _buildEmptyState();
               }
-              return NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification scrollInfo) {
-                  if (!controller.isLoading.value &&
-                      !controller.isLoadingMore &&
-                      scrollInfo.metrics.pixels ==
-                          scrollInfo.metrics.maxScrollExtent &&
-                      controller.hasMore) {
-                    controller.loadMoreData();
-                  }
-                  return true;
+              return RefreshIndicator(
+                onRefresh: () async {
+                  controller.fetchData();
                 },
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    controller.fetchData();
-                  },
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
-                    ),
-                    itemCount:
-                        controller.santriList.length +
-                        (controller.hasMore ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index >= controller.santriList.length) {
-                        return _buildLoadMoreIndicator();
-                      }
-                      final santri = controller.santriList[index];
-                      return _buildSantriCard(santri);
-                    },
+                child: ListView.builder(
+                  controller: controller.scrollController,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
                   ),
+                  itemCount:
+                      controller.santriList.length +
+                      (controller.hasMore.value ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index >= controller.santriList.length) {
+                      return _buildLoadMoreIndicator();
+                    }
+                    final santri = controller.santriList[index];
+                    return _buildSantriCard(santri);
+                  },
                 ),
               );
             }),
@@ -476,10 +475,18 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
               // Action Buttons Section
               Row(
                 children: [
+                  // Murajaah Button
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        _showMurajaah2Dialog(santri);
+                      onPressed: () async {
+                        // Check if surah list is empty
+                        if (controller.surahList.isEmpty) {
+                          await controller.fetchSurahs();
+                          if (controller.surahList.isEmpty) {
+                            return;
+                          }
+                        }
+                        _showMurajaahDialog(santri);
                       },
                       icon: const Icon(
                         Icons.menu_book_rounded,
@@ -488,6 +495,47 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                       ),
                       label: const Text(
                         'Murajaah',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orangeAccent.withValues(
+                          alpha: 0.8,
+                        ),
+                        foregroundColor: Colors.white,
+                        elevation: 2,
+                        shadowColor: Colors.orangeAccent.withValues(alpha: 0.3),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Hafalan Button
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        // Check if surah list is empty
+                        if (controller.surahList.isEmpty) {
+                          await controller.fetchSurahs();
+                          if (controller.surahList.isEmpty) {
+                            return;
+                          }
+                        }
+                        showHafalanDialog(santri);
+                      },
+                      icon: const Icon(
+                        Icons.book,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        'Hafalan',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -506,44 +554,6 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  // Hafalan Button
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        _showHafalanDialog(santri);
-                      },
-                      icon: const Icon(
-                        Icons.lightbulb,
-                        size: 18,
-                        color: Colors.white,
-                      ),
-                      label: const Text(
-                        'Hafalan',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurpleAccent.withValues(
-                          alpha: 0.8,
-                        ),
-                        foregroundColor: Colors.white,
-                        elevation: 2,
-                        shadowColor: Colors.deepPurpleAccent.withValues(
-                          alpha: 0.3,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
-
-                  // Murajaah Button
                 ],
               ),
             ],
@@ -582,7 +592,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
   }
 
   // Method to show hafalan dialog
-  void _showHafalanDialog(Datum santri) {
+  void showHafalanDialog(Datum santri) {
     controller.statusSetoran.value = 'TambahHafalan';
     Get.dialog(
       barrierDismissible: false,
@@ -693,43 +703,47 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     horizontal: 24,
                     vertical: 20,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Surah Search
-                      Obx(() {
-                        if (controller.isLoadingSurah.value) {
-                          return const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(20),
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.deepPurpleAccent,
+                  child: Form(
+                    key: controller.formKeyHafalan,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Surah Search
+                        Obx(() {
+                          if (controller.isLoadingSurah.value) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.deepPurpleAccent,
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Pilih Surah',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                                color: Colors.black87,
+                            );
+                          }
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Pilih Surah',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey[50],
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey[300]!),
-                              ),
-                              child: SearchField(
+                              const SizedBox(height: 8),
+                              SearchField(
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Harap pilih surah';
+                                  }
+                                  return null;
+                                },
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
                                 suggestions: controller.surahList.map((
                                   Surah surah,
                                 ) {
@@ -834,43 +848,145 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                                   .selectedSurahHafalan
                                                   .value =
                                               null;
+                                          controller.detailHafalan.value = null;
+                                          controller.inputJumlahAyatController
+                                              .clear();
                                           controller.ayatList.clear();
                                         },
                                       );
                                     }
                                     return const SizedBox.shrink();
                                   }),
-                                  border: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
+                                  fillColor: Colors.grey[50],
+                                  filled: true,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.deepPurpleAccent,
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        );
-                      }),
-
-                      const SizedBox(height: 20),
-
-                      // Jumlah Ayat
-                      Obx(() {
-                        if (controller.isLoadingAyat.value) {
-                          return const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(20),
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.deepPurpleAccent,
-                                ),
-                              ),
-                            ),
+                            ],
                           );
-                        }
-                        return Column(
+                        }),
+
+                        const SizedBox(height: 20),
+
+                        // Jumlah Ayat
+                        Obx(() {
+                          if (controller.isLoadingAyat.value) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.deepPurpleAccent,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Jumlah Ayat',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              TextFormField(
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Harap masukkan jumlah ayat';
+                                  }
+                                  if (int.parse(value) <= 0) {
+                                    return 'Jumlah ayat harus lebih dari 0';
+                                  }
+                                  return null;
+                                },
+                                enabled: controller.detailHafalan.value != null,
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  hintText: 'Masukkan jumlah ayat',
+                                  hintStyle: TextStyle(color: Colors.grey[500]),
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                  fillColor: Colors.grey[50],
+                                  filled: true,
+                                  disabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.deepPurpleAccent,
+                                    ),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  prefixIcon: const Icon(
+                                    Icons.format_list_numbered,
+                                    color: Colors.deepPurpleAccent,
+                                  ),
+                                ),
+                                controller:
+                                    controller.inputJumlahAyatController,
+                                onChanged: (value) {
+                                  controller.inputJumlahAyatController.text =
+                                      value;
+                                },
+                              ),
+                            ],
+                          );
+                        }),
+
+                        const SizedBox(height: 20),
+
+                        // Catatan
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Jumlah Ayat',
+                              'Catatan',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
@@ -885,78 +1001,37 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                 border: Border.all(color: Colors.grey[300]!),
                               ),
                               child: TextField(
-                                keyboardType: TextInputType.number,
+                                controller: controller.catatanController,
+                                maxLines: 5,
+                                minLines: 3,
                                 decoration: InputDecoration(
-                                  hintText: 'Masukkan jumlah ayat',
+                                  hintText: 'Keterangan hafalan (opsional)',
                                   hintStyle: TextStyle(color: Colors.grey[500]),
                                   border: InputBorder.none,
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.deepPurpleAccent,
+                                    ),
+                                  ),
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                     vertical: 12,
                                   ),
-                                  prefixIcon: const Icon(
-                                    Icons.format_list_numbered,
-                                    color: Colors.deepPurpleAccent,
+                                  prefixIcon: const Padding(
+                                    padding: EdgeInsets.only(bottom: 40),
+                                    child: Icon(
+                                      Icons.note_alt_outlined,
+                                      color: Colors.deepPurpleAccent,
+                                    ),
                                   ),
                                 ),
-                                controller:
-                                    controller.inputJumlahAyatController,
-                                onChanged: (value) {
-                                  controller.inputJumlahAyatController.text =
-                                      value;
-                                },
                               ),
                             ),
                           ],
-                        );
-                      }),
-
-                      const SizedBox(height: 20),
-
-                      // Catatan
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Catatan',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey[300]!),
-                            ),
-                            child: TextField(
-                              controller: controller.catatanController,
-                              maxLines: 5,
-                              minLines: 3,
-                              decoration: InputDecoration(
-                                hintText: 'Keterangan hafalan (opsional)',
-                                hintStyle: TextStyle(color: Colors.grey[500]),
-                                border: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                                prefixIcon: const Padding(
-                                  padding: EdgeInsets.only(bottom: 40),
-                                  child: Icon(
-                                    Icons.note_alt_outlined,
-                                    color: Colors.deepPurpleAccent,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -1007,7 +1082,10 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                       child: Obx(
                         () => ElevatedButton(
                           onPressed: () {
-                            controller.saveHafalan(santri.id.toString());
+                            if (controller.formKeyHafalan.currentState!
+                                .validate()) {
+                              controller.saveHafalan(santri.id.toString());
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.deepPurpleAccent,
@@ -1047,7 +1125,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
   }
 
   // Method to show hafalan dialog
-  void _showMurajaah2Dialog(Datum santri) {
+  void _showMurajaahDialog(Datum santri) {
     controller.statusSetoran.value = 'Murajaah';
     Get.dialog(
       barrierDismissible: false,
@@ -1159,43 +1237,47 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     horizontal: 24,
                     vertical: 20,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Surah Search
-                      Obx(() {
-                        if (controller.isLoadingSurah.value) {
-                          return const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(20),
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.deepPurpleAccent,
+                  child: Form(
+                    key: controller.formKeyMurajaah,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Surah Search
+                        Obx(() {
+                          if (controller.isLoadingSurah.value) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.deepPurpleAccent,
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Pilih Surah',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                                color: Colors.black87,
+                            );
+                          }
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Pilih Surah',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey[50],
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey[300]!),
-                              ),
-                              child: SearchField(
+                              const SizedBox(height: 8),
+                              SearchField(
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Harap pilih surah';
+                                  }
+                                  return null;
+                                },
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
                                 suggestions: controller.surahList.map((
                                   Surah surah,
                                 ) {
@@ -1314,110 +1396,133 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                     }
                                     return const SizedBox.shrink();
                                   }),
-                                  border: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
+                                  fillColor: Colors.grey[50],
+                                  filled: true,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.deepPurpleAccent,
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        );
-                      }),
+                            ],
+                          );
+                        }),
 
-                      const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                      // Ayat Dropdown
-                      Obx(() {
-                        return Row(
+                        // Ayat Dropdown
+                        Obx(() {
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: _BuildAyatHafalanDropdown(
+                                  title: 'Mulai',
+                                  value: controller.selectedAyatMulai.value,
+                                  ayatList: controller.ayatList,
+                                  otherSelectedAyat:
+                                      controller.selectedAyatAkhir.value,
+                                  onChanged: (AyatHafalan? ayat) {
+                                    controller.selectedAyatMulai.value = ayat;
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _BuildAyatHafalanDropdown(
+                                  title: 'Selesai',
+                                  value: controller.selectedAyatAkhir.value,
+                                  ayatList: controller.ayatList,
+                                  otherSelectedAyat:
+                                      controller.selectedAyatMulai.value,
+                                  isStartAyat: false,
+                                  onChanged: (ayat) {
+                                    controller.selectedAyatAkhir.value = ayat;
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+
+                        const SizedBox(height: 20),
+
+                        // Catatan
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: _BuildAyatHafalanDropdown(
-                                title: 'Mulai',
-                                value: controller.selectedAyatMulai.value,
-                                ayatList: controller.ayatList,
-                                otherSelectedAyat:
-                                    controller.selectedAyatAkhir.value,
-                                onChanged: (AyatHafalan? ayat) {
-                                  controller.selectedAyatMulai.value = ayat;
-                                },
+                            const Text(
+                              'Catatan',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.black87,
                               ),
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: _BuildAyatHafalanDropdown(
-                                title: 'Selesai',
-                                value: controller.selectedAyatAkhir.value,
-                                ayatList: controller.ayatList,
-                                otherSelectedAyat:
-                                    controller.selectedAyatMulai.value,
-                                isStartAyat: false,
-                                onChanged: (ayat) {
-                                  controller.selectedAyatAkhir.value = ayat;
-                                },
+                            const SizedBox(height: 8),
+                            TextField(
+                              controller: controller.catatanController,
+                              maxLines: 5,
+                              minLines: 3,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.grey[50],
+                                hintText: 'Keterangan hafalan (opsional)',
+                                hintStyle: TextStyle(color: Colors.grey[500]),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.deepPurpleAccent,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                prefixIcon: const Padding(
+                                  padding: EdgeInsets.only(bottom: 40),
+                                  child: Icon(
+                                    Icons.note_alt_outlined,
+                                    color: Colors.deepPurpleAccent,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
-                        );
-                      }),
-
-                      const SizedBox(height: 20),
-
-                      // Catatan
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Catatan',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          TextField(
-                            controller: controller.catatanController,
-                            maxLines: 5,
-                            minLines: 3,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                              hintText: 'Keterangan hafalan (opsional)',
-                              hintStyle: TextStyle(color: Colors.grey[500]),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.deepPurpleAccent,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
-                                ),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              prefixIcon: const Padding(
-                                padding: EdgeInsets.only(bottom: 40),
-                                child: Icon(
-                                  Icons.note_alt_outlined,
-                                  color: Colors.deepPurpleAccent,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -1469,7 +1574,10 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                       child: Obx(
                         () => ElevatedButton(
                           onPressed: () {
-                            controller.saveMurajaah(santri.id.toString());
+                            if (controller.formKeyMurajaah.currentState!
+                                .validate()) {
+                              controller.saveMurajaah(santri.id.toString());
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.deepPurpleAccent,
@@ -1511,28 +1619,182 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
   }
 
   Widget _buildEmptyState() {
+    return RefreshIndicator(
+      onRefresh: () async {
+        controller.fetchData();
+      },
+      child: ListView(
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 100),
+              Icon(Icons.people_outline, size: 80, color: Colors.grey[400]),
+              const SizedBox(height: 16),
+              Text(
+                'Tidak ada data santri',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Obx(
+                () => Text(
+                  controller.searchQuery.value.isNotEmpty &&
+                          controller.santriList.isEmpty
+                      ? 'Santri tidak ditemukan di ${controller.getTahapanFilter(controller.tahapHafalan.value)}'
+                      : 'Data santri akan muncul di sini',
+                  style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadMoreIndicator() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.people_outline, size: 80, color: Colors.grey[400]),
-          const SizedBox(height: 16),
-          Text(
-            'Tidak ada data santri',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
           ),
-          const SizedBox(height: 8),
-          Obx(
-            () => Text(
-              controller.searchQuery.value.isNotEmpty &&
-                      controller.santriList.isEmpty
-                  ? 'Santri tidak ditemukan di ${controller.getTahapanFilter(controller.tahapHafalan.value)}'
-                  : 'Data santri akan muncul di sini',
-              style: TextStyle(color: Colors.grey[500], fontSize: 14),
+          const SizedBox(height: 16),
+          const Text(
+            'Memuat data...',
+            style: TextStyle(color: Colors.grey, fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showLevelInfoDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Informasi Level Hafalan',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF6B46C1),
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildLevelInfo(
+                context,
+                title: 'Level 1',
+                description: 'Juz 30',
+                color: const Color(0xFF10B981), // Green
+              ),
+              const SizedBox(height: 12),
+              _buildLevelInfo(
+                context,
+                title: 'Level 2',
+                description: 'Surah Pilihan',
+                color: const Color(0xFFF59E0B), // Amber
+              ),
+              const SizedBox(height: 12),
+              _buildLevelInfo(
+                context,
+                title: 'Level 3',
+                description: 'Juz 1-29',
+                color: const Color(0xFFEF4444), // Red
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6B46C1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Text(
+                    'Mengerti',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLevelInfo(
+    BuildContext context, {
+    required String title,
+    required String description,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            child: const Icon(Icons.check, color: Colors.white, size: 16),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -1609,6 +1871,13 @@ class _BuildAyatHafalanDropdown extends StatelessWidget {
         const SizedBox(height: 8),
         Obx(
           () => DropdownButtonFormField<AyatHafalan>(
+            validator: (value) {
+              if (value == null) {
+                return 'Harap pilih ayat';
+              }
+              return null;
+            },
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.grey[50],
@@ -1624,13 +1893,17 @@ class _BuildAyatHafalanDropdown extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: Colors.deepPurple),
               ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 8,
               ),
             ),
             dropdownColor: Colors.white,
-            value: value,
+            initialValue: value,
             hint: Text(
               'Pilih Ayat $title',
               style: TextStyle(color: Colors.grey[500]),
@@ -1668,33 +1941,4 @@ class _BuildAyatHafalanDropdown extends StatelessWidget {
       ],
     );
   }
-}
-
-Widget _buildLoadMoreIndicator() {
-  return Padding(
-    padding: const EdgeInsets.all(16.0),
-    child: Center(
-      child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
-      ),
-    ),
-  );
-}
-
-Widget _buildLoadingIndicator() {
-  return Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
-        ),
-        const SizedBox(height: 16),
-        const Text(
-          'Memuat data...',
-          style: TextStyle(color: Colors.grey, fontSize: 16),
-        ),
-      ],
-    ),
-  );
 }

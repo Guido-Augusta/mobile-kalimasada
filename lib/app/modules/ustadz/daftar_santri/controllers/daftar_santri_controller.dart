@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart';
-import 'package:mobile_kalimasada/app/data/models/surah.dart' as Surah;
+import 'package:mobile_kalimasada/app/data/models/surah.dart' as s;
 import 'package:mobile_kalimasada/app/data/models/ayat_hafalan.dart';
-import 'package:mobile_kalimasada/app/data/models/detail_hafalan.dart'
-    as DetailHafalan;
+import 'package:mobile_kalimasada/app/data/models/detail_hafalan.dart' as dh;
 import 'package:searchfield/searchfield.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:toastification/toastification.dart';
 
 class DaftarSantriController extends GetxController {
   final isLoading = false.obs;
@@ -19,14 +20,14 @@ class DaftarSantriController extends GetxController {
 
   final int _perPage = 10;
   var currentPage = 1;
-  var hasMore = true;
-  var isLoadingMore = false;
+  var hasMore = true.obs;
+  var isLoadingMore = false.obs;
 
   var isLoadingSurah = false.obs;
-  var surahList = <Surah.Surah>[].obs;
-  var selectedSurahHafalan = Rxn<SearchFieldListItem<Surah.Surah>>();
-  var selectedSurahMurajaah = Rxn<SearchFieldListItem<Surah.Surah>>();
-  var detailHafalan = Rx<DetailHafalan.DetailHafalan?>(null);
+  var surahList = <s.Surah>[].obs;
+  var selectedSurahHafalan = Rxn<SearchFieldListItem<s.Surah>>();
+  var selectedSurahMurajaah = Rxn<SearchFieldListItem<s.Surah>>();
+  var detailHafalan = Rx<dh.DetailHafalan?>(null);
 
   var isLoadingAyat = false.obs;
   var inputJumlahAyatController = TextEditingController();
@@ -38,102 +39,300 @@ class DaftarSantriController extends GetxController {
 
   var catatanController = TextEditingController();
 
+  final formKeyHafalan = GlobalKey<FormState>();
+  final formKeyMurajaah = GlobalKey<FormState>();
+
+  final scrollController = ScrollController();
+
+  DateTime? _lastErrorShown;
+
   @override
   void onInit() {
     super.onInit();
     fetchData();
-    fetchSurahs();
+    _setupScrollController();
+  }
+
+  @override
+  void onClose() {
+    scrollController.dispose();
+    super.onClose();
   }
 
   void _resetPagination() {
     currentPage = 1;
-    hasMore = true;
+    hasMore.value = true;
     santriList.clear();
   }
 
-  void loadMoreData() async {
-    if (isLoadingMore || !hasMore) return;
+  void _setupScrollController() {
+    scrollController.addListener(() {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
+        if (hasMore.value && !isLoadingMore.value) {
+          loadMoreData();
+        }
+      }
+    });
+  }
 
-    isLoadingMore = true;
-    currentPage++;
+  void loadMoreData() async {
+    if (isLoadingMore.value || !hasMore.value) return;
 
     try {
+      isLoadingMore.value = true;
+      currentPage++;
+
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      if (token != null) {
-        final response = await http.get(
-          Uri.parse(
-            'http://10.0.2.2:5000/api/santri?page=$currentPage&limit=$_perPage&tahapHafalan=${tahapHafalan.value}&search=${searchQuery.value}',
+
+      if (token == null) {
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Anda tidak terautentikasi',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
           ),
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-            'x-platform': 'mobile',
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          applyBlurEffect: true,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
           },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
+        Get.offAllNamed('/login');
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse(
+          'http://10.0.2.2:5000/api/santri?page=$currentPage&limit=$_perPage&tahapHafalan=${tahapHafalan.value}&search=${searchQuery.value}',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'x-platform': 'mobile',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final newItems = List<Datum>.from(
+          data['data'].map((x) => Datum.fromJson(x)),
         );
 
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final newItems = List<Datum>.from(
-            data['data'].map((x) => Datum.fromJson(x)),
-          );
-
-          if (newItems.length < _perPage) {
-            hasMore = false;
-          }
-
-          santriList.addAll(newItems);
-        } else {
-          currentPage--; // Revert page on error
-          Get.snackbar('Error', 'Gagal memuat data tambahan');
+        if (newItems.length < _perPage) {
+          hasMore.value = false;
         }
+
+        santriList.addAll(newItems);
+      } else {
+        currentPage--; // Revert page on error
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Gagal memuat data tambahan',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
     } catch (e) {
       currentPage--; // Revert page on error
-      Get.snackbar('Error', 'Terjadi kesalahan: ${e.toString()}');
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.start,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            direction: Axis.horizontal,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Gagal memuat data\nPeriksa koneksi internet Anda',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(seconds: 2),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
+      }
     } finally {
-      isLoadingMore = false;
+      isLoadingMore.value = false;
     }
   }
 
   void fetchData() async {
-    _resetPagination();
-    isLoading.value = true;
-
     try {
+      isLoading.value = true;
+      _resetPagination();
+
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      if (token != null) {
-        final response = await http.get(
-          Uri.parse(
-            'http://10.0.2.2:5000/api/santri?page=$currentPage&limit=$_perPage&tahapHafalan=${tahapHafalan.value}&search=${searchQuery.value}',
+
+      if (token == null) {
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Anda tidak terautentikasi',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
           ),
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-            'x-platform': 'mobile',
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
           },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
+        Get.offAllNamed('/login');
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse(
+          'http://10.0.2.2:5000/api/santri?page=$currentPage&limit=$_perPage&tahapHafalan=${tahapHafalan.value}&search=${searchQuery.value}',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'x-platform': 'mobile',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final items = List<Datum>.from(
+          data['data'].map((x) => Datum.fromJson(x)),
         );
 
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final items = List<Datum>.from(
-            data['data'].map((x) => Datum.fromJson(x)),
-          );
-
-          if (items.length < _perPage) {
-            hasMore = false;
-          }
-
-          santriList.value = items;
-        } else {
-          Get.snackbar('Error', 'Gagal mendapatkan data');
+        if (items.length < _perPage) {
+          hasMore.value = false;
         }
+
+        santriList.value = items;
       } else {
-        Get.offAllNamed('/login');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text('Gagal memuat data', style: TextStyle(color: Colors.white)),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan: ${e.toString()}');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 1500),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -151,13 +350,67 @@ class DaftarSantriController extends GetxController {
         final data = jsonDecode(response.body);
         final List<dynamic> surahsData = data['data'];
         surahList.value = surahsData
-            .map((json) => Surah.Surah.fromJson(json))
+            .map((json) => s.Surah.fromJson(json))
             .toList();
       } else {
-        Get.snackbar('Error', 'Failed to load surahs');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Gagal memuat data surah',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred while loading surahs');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 1500),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
     } finally {
       isLoadingSurah.value = false;
     }
@@ -189,17 +442,71 @@ class DaftarSantriController extends GetxController {
             .map((json) => AyatHafalan.fromJson(json))
             .toList();
       } else {
-        Get.snackbar('Error', 'Failed to load ayat');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Gagal memuat data ayat',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan saat memuat ayat');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 1500),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
     } finally {
       isLoadingAyat.value = false;
     }
   }
 
   void onSurahSelected(
-    Surah.Surah? newSurah,
+    s.Surah? newSurah,
     String santriId,
     String statusSetoran,
   ) {
@@ -214,16 +521,44 @@ class DaftarSantriController extends GetxController {
         // selectedSurahMurajaah.value = newSurah;
         fetchAyatMurajaahForSurah(santriId, newSurah.id.toString());
       } else {
-        Get.snackbar('Error', 'Invalid status setoran');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Invalid status setoran',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
     }
   }
 
   void getDetailTambahHafalan(String santriId, String surahId) async {
-    isLoading.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
     try {
+      isLoading.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
       final response = await http.get(
         Uri.parse(
           'http://10.0.2.2:5000/api/hafalan/$santriId/surah/$surahId?mode=tambah',
@@ -236,12 +571,63 @@ class DaftarSantriController extends GetxController {
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        detailHafalan.value = DetailHafalan.DetailHafalan.fromJson(data);
+        detailHafalan.value = dh.DetailHafalan.fromJson(data);
       } else {
-        Get.snackbar('Error', 'Terjadi kesalahan saat memuat ayat');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text('Gagal memuat ayat', style: TextStyle(color: Colors.white)),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan saat memuat ayat');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Terjadi kesalahan saat memuat ayat\nPeriksa koneksi internet Anda',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 1500),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -265,7 +651,7 @@ class DaftarSantriController extends GetxController {
       }
 
       // 2. Dapatkan daftar ayat yang belum dihafalkan (checked = false)
-      List<DetailHafalan.Ayat> uncheckedAyats = detailHafalan.value!.ayat
+      List<dh.Ayat> uncheckedAyats = detailHafalan.value!.ayat
           .where((ayat) => ayat.checked == false)
           .toList();
 
@@ -277,13 +663,40 @@ class DaftarSantriController extends GetxController {
       // 4. Ambil ayat-ayat berikutnya sesuai jumlah yang diinput
       int jumlahAyatDitambahkan = int.parse(inputJumlahAyatController.text);
       if (jumlahAyatDitambahkan <= 0) {
-        Get.snackbar('Error', 'Jumlah ayat harus lebih dari 0');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Jumlah ayat harus lebih dari 0',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 1500),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
         isSaveLoading.value = false;
         return;
       }
       if (jumlahAyatDitambahkan > 0) {
         // Cari ayat pertama yang belum dihafalkan setelah ayat terakhir yang dihafalkan
-        List<DetailHafalan.Ayat> ayatsToBeAdded = [];
+        List<dh.Ayat> ayatsToBeAdded = [];
         bool foundStartingPoint = false;
 
         for (var ayat in uncheckedAyats) {
@@ -332,13 +745,94 @@ class DaftarSantriController extends GetxController {
         final data = jsonDecode(response.body);
         print(data);
         Get.back();
-        Get.snackbar('Success', 'Hafalan berhasil ditambahkan');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.check_circle_outline_rounded, color: Colors.green),
+              SizedBox(width: 10),
+              Text(
+                'Hafalan berhasil ditambahkan',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.check_circle_outline_rounded, color: Colors.green),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 2000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.success,
+          style: ToastificationStyle.simple,
+        );
       } else {
-        Get.snackbar('Error', 'Gagal menambahkan hafalan');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Gagal menambahkan hafalan',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 2000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
     } catch (e) {
       print(e);
-      Get.snackbar('Error', 'Terjadi kesalahan saat menambahkan hafalan');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Terjadi kesalahan saat menambahkan hafalan\nPeriksa koneksi internet Anda',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 2000),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
     } finally {
       isSaveLoading.value = false;
     }
@@ -390,13 +884,94 @@ class DaftarSantriController extends GetxController {
         final data = jsonDecode(response.body);
         print(data);
         Get.back();
-        Get.snackbar('Success', 'Hafalan berhasil ditambahkan');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.check_circle_outline_rounded, color: Colors.green),
+              SizedBox(width: 10),
+              Text(
+                'Murajaah berhasil ditambahkan',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.check_circle_outline_rounded, color: Colors.green),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 2000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.success,
+          style: ToastificationStyle.simple,
+        );
       } else {
-        Get.snackbar('Error', 'Gagal menambahkan hafalan');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Gagal menambahkan hafalan',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 2000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
     } catch (e) {
       print(e);
-      Get.snackbar('Error', 'Terjadi kesalahan saat menambahkan hafalan');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Terjadi kesalahan saat menambahkan murajaah\nPeriksa koneksi internet Anda',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 2000),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
     } finally {
       isSaveLoading.value = false;
     }
