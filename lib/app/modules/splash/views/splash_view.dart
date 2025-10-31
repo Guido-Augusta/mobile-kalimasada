@@ -5,51 +5,49 @@ import 'package:get/get.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashView extends GetView<SplashController> {
-  const SplashView({super.key});
+  SplashView({super.key}) {
+    Get.find<SplashController>();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      body: Obx(
-        () => controller.isLoading.value
-            ? const Center(child: CircularProgressIndicator())
-            : Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'KALIMASADA',
-                            style: TextStyle(
-                              color: Colors.deepPurpleAccent,
-                              fontSize: 40,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            'Tahfidz App',
-                            style: TextStyle(
-                              color: Colors.orangeAccent,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+      body: Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: Stack(
+          children: [
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'KALIMASADA',
+                    style: TextStyle(
+                      color: Colors.deepPurpleAccent,
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Text(
-                        '© Universitas Amikom Yogyakarta',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
+                  ),
+                  Text(
+                    'Tahfidz App',
+                    style: TextStyle(
+                      color: Colors.orangeAccent,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                '© Universitas Amikom Yogyakarta',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -30,6 +30,7 @@ environment:
 dependencies:
   audio_video_progress_bar: ^2.0.3
   cached_network_image: ^3.3.1
+  connectivity_plus: ^7.0.0
   cupertino_icons: ^1.0.8
   fl_chart: ^1.1.1
   flutter:
@@ -41,6 +42,7 @@ dependencies:
   http: ^1.5.0
   http_parser: ^4.1.2
   image_picker: ^1.2.0
+  internet_connection_checker_plus: ^2.9.0
   intl: ^0.20.2
   just_audio: ^0.10.5
   path: ^1.9.1
