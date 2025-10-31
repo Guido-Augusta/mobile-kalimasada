@@ -272,12 +272,20 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                               const SizedBox(height: 16),
 
                               // Name
-                              Text(
-                                ortu.nama ?? 'Nama tidak tersedia',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                child: Text(
+                                  ortu.nama ?? 'Nama tidak tersedia',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
 
@@ -288,6 +296,9 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 6,
+                                ),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 16,
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withValues(alpha: 0.2),
