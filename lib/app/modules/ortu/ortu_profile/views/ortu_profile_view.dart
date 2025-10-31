@@ -41,7 +41,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Memuat data santri...',
+                  'Memuat data...',
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     color: const Color(0xFF6B46C1),
