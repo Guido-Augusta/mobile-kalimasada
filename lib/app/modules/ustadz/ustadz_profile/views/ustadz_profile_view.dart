@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/data/models/ustadz.dart';
+import 'package:toastification/toastification.dart';
 import '../controllers/ustadz_profile_controller.dart';
 
 class UstadzProfileView extends GetView<UstadzProfileController> {
@@ -267,12 +268,20 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                               const SizedBox(height: 16),
 
                               // Name
-                              Text(
-                                ustadz.nama ?? 'Nama tidak tersedia',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                child: Text(
+                                  ustadz.nama ?? 'Nama tidak tersedia',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
 
@@ -283,6 +292,9 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 6,
+                                ),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 16,
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withValues(alpha: 0.2),
@@ -670,7 +682,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
-                        value: controller.jenisKelaminC.text,
+                        initialValue: controller.jenisKelaminC.text,
                         decoration: InputDecoration(
                           fillColor: Colors.grey[50],
                           filled: true,
@@ -795,7 +807,45 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                                   controller.ustadzData.value?.alamat &&
                               controller.jenisKelaminC.text ==
                                   controller.ustadzData.value?.jenisKelamin) {
-                            Get.snackbar('Error', 'Tidak ada perubahan data');
+                            toastification.show(
+                              context: Get.context!,
+                              title: Wrap(
+                                alignment: WrapAlignment.center,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Icon(Icons.error, color: Colors.white),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Tidak ada perubahan data',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
+                              icon: Icon(Icons.error, color: Colors.white),
+                              showIcon: true,
+                              backgroundColor: Color(0xFF6B6B6B),
+                              borderSide: BorderSide.none,
+                              alignment: Alignment.bottomCenter,
+                              autoCloseDuration: const Duration(
+                                milliseconds: 2000,
+                              ),
+                              closeButton: ToastCloseButton(
+                                showType: CloseButtonShowType.none,
+                              ),
+                              animationBuilder:
+                                  (context, animation, alignment, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                              type: ToastificationType.error,
+                              style: ToastificationStyle.simple,
+                            );
                             return;
                           }
                           controller.updateProfileData(
