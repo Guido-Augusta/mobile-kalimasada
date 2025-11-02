@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
+import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/santri_profile_controller.dart';
@@ -533,199 +534,282 @@ class SantriProfileView extends GetView<SantriProfileController> {
                     horizontal: 24,
                     vertical: 20,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'Nama Lengkap',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.black87,
+                  child: Form(
+                    key: controller.formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Nama Lengkap',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: TextField(
+                        const SizedBox(height: 8),
+                        TextFormField(
                           style: TextStyle(color: Colors.black),
                           controller: controller.namaC,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Nama tidak boleh kosong';
+                            }
+                            return null;
+                          },
                           decoration: InputDecoration(
                             hintText: 'Masukkan Nama Lengkap',
                             hintStyle: TextStyle(color: Colors.grey[500]),
-                            border: InputBorder.none,
+                            fillColor: Colors.grey[50],
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.deepPurple),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 12,
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Nomor HP',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.black87,
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Text(
+                              'Nomor HP',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              '(Opsional)',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: TextField(
+                        const SizedBox(height: 8),
+                        TextFormField(
                           keyboardType: TextInputType.phone,
                           style: TextStyle(color: Colors.black),
                           controller: controller.noHpC,
+                          validator: (value) {
+                            if (value!.isNotEmpty && !value.isNumericOnly) {
+                              return 'Nomor HP harus berupa angka';
+                            }
+                            return null;
+                          },
                           decoration: InputDecoration(
                             hintText: 'Masukkan Nomor HP',
                             hintStyle: TextStyle(color: Colors.grey[500]),
-                            border: InputBorder.none,
+                            fillColor: Colors.grey[50],
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.deepPurple),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 12,
                             ),
                           ),
                         ),
-                      ),
-                      // Inside the form's Column, add this after the alamat field
-                      const SizedBox(height: 16),
-                      Text(
-                        'Tanggal Lahir',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.black87,
+                        // Inside the form's Column, add this after the alamat field
+                        const SizedBox(height: 16),
+                        Text(
+                          'Tanggal Lahir',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () => selectDate(Get.context!),
-                        child: AbsorbPointer(
-                          child: TextFormField(
-                            controller: controller.tanggalLahirC,
-                            decoration: InputDecoration(
-                              hintText: 'Pilih Tanggal Lahir',
-                              hintStyle: TextStyle(color: Colors.grey[500]),
-                              prefixIcon: Icon(
-                                Icons.calendar_today,
-                                color: Colors.deepPurple,
-                                size: 20,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
+                        const SizedBox(height: 8),
+                        GestureDetector(
+                          onTap: () => selectDate(Get.context!),
+                          child: AbsorbPointer(
+                            child: TextFormField(
+                              controller: controller.tanggalLahirC,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Tanggal lahir tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Pilih Tanggal Lahir',
+                                hintStyle: TextStyle(color: Colors.grey[500]),
+                                prefixIcon: Icon(
+                                  Icons.calendar_today,
+                                  color: Colors.deepPurple,
+                                  size: 20,
                                 ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                  ),
                                 ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                  ),
                                 ),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.deepPurple,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[50],
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Jenis Kelamin',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        initialValue: controller.jenisKelaminC.text,
-                        decoration: InputDecoration(
-                          fillColor: Colors.grey[50],
-                          filled: true,
-                          hintText: 'Pilih Jenis Kelamin',
-                          hintStyle: TextStyle(color: Colors.grey[500]),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Jenis Kelamin',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.black87,
                           ),
                         ),
-                        dropdownColor: Colors.white,
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'P',
-                            child: Text('Perempuan'),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          initialValue: controller.jenisKelaminC.text,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Jenis kelamin tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            fillColor: Colors.grey[50],
+                            filled: true,
+                            hintText: 'Pilih Jenis Kelamin',
+                            hintStyle: TextStyle(color: Colors.grey[500]),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.deepPurple),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                          DropdownMenuItem(
-                            value: 'L',
-                            child: Text('Laki-laki'),
+                          dropdownColor: Colors.white,
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'P',
+                              child: Text('Perempuan'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'L',
+                              child: Text('Laki-laki'),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            controller.jenisKelaminC.text = value!;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Alamat',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.black87,
                           ),
-                        ],
-                        onChanged: (value) {
-                          controller.jenisKelaminC.text = value!;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Alamat',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.black87,
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: TextField(
+                        const SizedBox(height: 8),
+                        TextFormField(
                           maxLines: 5,
                           minLines: 3,
                           controller: controller.alamatC,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Alamat tidak boleh kosong';
+                            }
+                            return null;
+                          },
                           decoration: InputDecoration(
                             hintText: 'Masukkan Alamat',
                             hintStyle: TextStyle(color: Colors.grey[500]),
-                            border: InputBorder.none,
+                            fillColor: Colors.grey[50],
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.deepPurple),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 12,
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -770,38 +854,75 @@ class SantriProfileView extends GetView<SantriProfileController> {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          if (controller.namaC.text.isEmpty ||
-                              controller.noHpC.text.isEmpty ||
-                              controller.alamatC.text.isEmpty ||
-                              controller.jenisKelaminC.text.isEmpty) {
-                            Get.snackbar('Error', 'Semua field harus diisi');
-                            return;
-                          }
-                          if (controller.namaC.text ==
-                                  controller.santriDetail.value?.nama &&
-                              controller.noHpC.text ==
-                                  controller.santriDetail.value?.nomorHp &&
-                              controller.alamatC.text ==
-                                  controller.santriDetail.value?.alamat &&
-                              controller.jenisKelaminC.text ==
-                                  controller.santriDetail.value?.jenisKelamin &&
-                              controller.tanggalLahirC.text ==
-                                  formatDate(
+                          if (controller.formKey.currentState!.validate()) {
+                            if (controller.namaC.text ==
+                                    controller.santriDetail.value?.nama &&
+                                controller.noHpC.text ==
+                                    controller.santriDetail.value?.nomorHp &&
+                                controller.alamatC.text ==
+                                    controller.santriDetail.value?.alamat &&
+                                controller.jenisKelaminC.text ==
                                     controller
                                         .santriDetail
-                                        .value!
-                                        .tanggalLahir!,
-                                  )) {
-                            Get.snackbar('Error', 'Tidak ada perubahan data');
-                            return;
+                                        .value
+                                        ?.jenisKelamin &&
+                                controller.tanggalLahirC.text ==
+                                    formatDate(
+                                      controller
+                                          .santriDetail
+                                          .value!
+                                          .tanggalLahir!,
+                                    )) {
+                              toastification.show(
+                                context: Get.context!,
+                                title: Wrap(
+                                  alignment: WrapAlignment.center,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Icon(Icons.error, color: Colors.white),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Tidak ada perubahan data',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 10,
+                                ),
+                                icon: Icon(Icons.error, color: Colors.white),
+                                showIcon: true,
+                                backgroundColor: Color(0xFF6B6B6B),
+                                borderSide: BorderSide.none,
+                                alignment: Alignment.bottomCenter,
+                                autoCloseDuration: const Duration(
+                                  milliseconds: 2000,
+                                ),
+                                closeButton: ToastCloseButton(
+                                  showType: CloseButtonShowType.none,
+                                ),
+                                animationBuilder:
+                                    (context, animation, alignment, child) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                                type: ToastificationType.error,
+                                style: ToastificationStyle.simple,
+                              );
+
+                              return;
+                            }
+                            controller.updateProfileData(
+                              controller.namaC.text,
+                              controller.noHpC.text,
+                              controller.alamatC.text,
+                              controller.jenisKelaminC.text,
+                              controller.tanggalLahirC.text,
+                            );
                           }
-                          controller.updateProfileData(
-                            controller.namaC.text,
-                            controller.noHpC.text,
-                            controller.alamatC.text,
-                            controller.jenisKelaminC.text,
-                            controller.tanggalLahirC.text,
-                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.deepPurpleAccent,
@@ -1080,7 +1201,9 @@ class SantriProfileView extends GetView<SantriProfileController> {
           _buildInfoTile(
             icon: Icons.phone,
             label: 'No. Telepon',
-            value: santri.nomorHp ?? '-',
+            value: santri.nomorHp!.isEmpty || santri.nomorHp == null
+                ? '-'
+                : santri.nomorHp!,
           ),
 
           const SizedBox(height: 12),

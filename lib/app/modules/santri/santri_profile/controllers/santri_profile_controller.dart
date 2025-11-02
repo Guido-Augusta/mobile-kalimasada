@@ -13,6 +13,8 @@ import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SantriProfileController extends GetxController {
+  final formKey = GlobalKey<FormState>();
+
   var isLoading = false.obs;
   var isSaveLoading = false.obs;
   var santriDetail = Rxn<Santri>();
