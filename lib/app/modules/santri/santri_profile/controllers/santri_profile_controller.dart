@@ -62,7 +62,7 @@ class SantriProfileController extends GetxController {
   String getOrangTuaByTipe(List<OrangTua> orangTua, String tipe) {
     try {
       final orangTuaByTipe = orangTua.firstWhere(
-        (element) => element.tipe == tipe,
+        (element) => element.tipe?.toLowerCase() == tipe,
       );
       return orangTuaByTipe.nama ?? '-';
     } catch (e) {
