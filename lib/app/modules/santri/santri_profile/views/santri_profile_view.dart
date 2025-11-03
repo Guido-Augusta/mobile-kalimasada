@@ -528,6 +528,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                         TextFormField(
                           style: TextStyle(color: Colors.black),
                           controller: controller.namaC,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Nama tidak boleh kosong';
@@ -587,6 +588,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                           keyboardType: TextInputType.phone,
                           style: TextStyle(color: Colors.black),
                           controller: controller.noHpC,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (value) {
                             if (value!.isNotEmpty && !value.isNumericOnly) {
                               return 'Nomor HP harus berupa angka';
@@ -636,6 +638,8 @@ class SantriProfileView extends GetView<SantriProfileController> {
                           child: AbsorbPointer(
                             child: TextFormField(
                               controller: controller.tanggalLahirC,
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Tanggal lahir tidak boleh kosong';
@@ -694,6 +698,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
                           initialValue: controller.jenisKelaminC.text,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Jenis kelamin tidak boleh kosong';
@@ -751,6 +756,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                           maxLines: 5,
                           minLines: 3,
                           controller: controller.alamatC,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Alamat tidak boleh kosong';
