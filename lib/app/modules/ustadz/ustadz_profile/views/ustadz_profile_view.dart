@@ -15,42 +15,6 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: Obx(() {
-        // Loading
-        if (controller.isLoading.value) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6B46C1).withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Color(0xFF6B46C1),
-                      ),
-                      strokeWidth: 3,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Memuat data...',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: const Color(0xFF6B46C1),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-
         final ustadz = controller.ustadzData.value;
         // Data kosong
         if (ustadz == null) {
@@ -85,267 +49,274 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
           );
         }
 
-        return CustomScrollView(
-          slivers: [
-            // Custom App Bar with Gradient Background
-            SliverAppBar(
-              centerTitle: true,
-              title: Text(
-                ustadz.jenisKelamin?.toLowerCase() == 'l'
-                    ? 'Profil Ustadz'
-                    : 'Profil Ustazah',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              actions: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.logout_rounded,
-                    color: Colors.redAccent,
-                  ),
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        title: Text(
-                          'Logout',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        content: Text(
-                          'Apakah anda yakin ingin logout?',
-                          style: GoogleFonts.poppins(),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Get.back();
-                            },
-                            child: Text(
-                              'Tidak',
-                              style: GoogleFonts.poppins(
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              controller.logout();
-                            },
-                            style: TextButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 8,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              'Ya',
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
+        return RefreshIndicator(
+          onRefresh: () async {
+            controller.fetchUstadzData();
+          },
+          child: CustomScrollView(
+            slivers: [
+              // Custom App Bar with Gradient Background
+              SliverAppBar(
+                centerTitle: true,
+                title: Text(
+                  ustadz.jenisKelamin?.toLowerCase() == 'l'
+                      ? 'Profil Ustadz'
+                      : 'Profil Ustazah',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-              ],
-              expandedHeight: 280,
-              pinned: false,
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.deepPurpleAccent,
-                        Colors.deepPurple[700]!,
-                      ],
+                actions: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.logout_rounded,
+                      color: Colors.redAccent,
+                    ),
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          title: Text(
+                            'Logout',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          content: Text(
+                            'Apakah anda yakin ingin logout?',
+                            style: GoogleFonts.poppins(),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Get.back();
+                              },
+                              child: Text(
+                                'Tidak',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                controller.logout();
+                              },
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 8,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Text(
+                                'Ya',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
-                  child: SafeArea(
-                    child: Column(
-                      children: [
-                        // Profile Section
-                        const SizedBox(height: 40),
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // Profile Picture with Border and Shadow
-                              Stack(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    height: 120,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 4,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(
-                                            alpha: 0.2,
-                                          ),
-                                          blurRadius: 20,
-                                          offset: const Offset(0, 8),
-                                        ),
-                                      ],
-                                    ),
-                                    child: ClipOval(
-                                      child: CachedNetworkImage(
-                                        imageUrl: controller.getImageUrl(
-                                          controller.fotoProfil.value,
-                                        ),
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) =>
-                                            Container(
-                                              color: Colors.grey[300],
-                                              child: const Icon(
-                                                Icons.person,
-                                                size: 40,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                        errorWidget: (context, url, error) =>
-                                            Container(
-                                              color: Colors.grey[300],
-                                              child: const Icon(
-                                                Icons.person,
-                                                size: 40,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Material(
-                                      shape: const CircleBorder(),
-                                      child: InkWell(
-                                        onTap: () {
-                                          _showEditPhotoProfileBottomSheet();
-                                        },
-                                        customBorder: const CircleBorder(),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(6),
-                                          decoration: const BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Icon(
-                                            Icons.camera_alt,
-                                            color: Colors.deepPurpleAccent,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 16),
-
-                              // Name
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                child: Text(
-                                  ustadz.nama ?? 'Nama tidak tersedia',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-
-                              const SizedBox(height: 8),
-
-                              // Badges Row
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.3),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
+                ],
+                expandedHeight: 280,
+                pinned: false,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.deepPurpleAccent,
+                          Colors.deepPurple[700]!,
+                        ],
+                      ),
+                    ),
+                    child: SafeArea(
+                      child: Column(
+                        children: [
+                          // Profile Section
+                          const SizedBox(height: 40),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Profile Picture with Border and Shadow
+                                Stack(
                                   children: [
-                                    Flexible(
-                                      child: Text(
-                                        ustadz.user?.email ??
-                                            'Email tidak tersedia',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 12,
+                                    Container(
+                                      width: 120,
+                                      height: 120,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
                                           color: Colors.white,
+                                          width: 4,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(
+                                              alpha: 0.2,
+                                            ),
+                                            blurRadius: 20,
+                                            offset: const Offset(0, 8),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipOval(
+                                        child: CachedNetworkImage(
+                                          imageUrl: controller.getImageUrl(
+                                            controller.fotoProfil.value,
+                                          ),
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) =>
+                                              Container(
+                                                color: Colors.grey[300],
+                                                child: const Icon(
+                                                  Icons.person,
+                                                  size: 40,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                          errorWidget: (context, url, error) =>
+                                              Container(
+                                                color: Colors.grey[300],
+                                                child: const Icon(
+                                                  Icons.person,
+                                                  size: 40,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Material(
+                                        shape: const CircleBorder(),
+                                        child: InkWell(
+                                          onTap: () {
+                                            _showEditPhotoProfileBottomSheet();
+                                          },
+                                          customBorder: const CircleBorder(),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(6),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.camera_alt,
+                                              color: Colors.deepPurpleAccent,
+                                              size: 20,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
+
+                                const SizedBox(height: 16),
+
+                                // Name
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  child: Text(
+                                    ustadz.nama ?? 'Nama tidak tersedia',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 8),
+
+                                // Badges Row
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          ustadz.user?.email ??
+                                              'Email tidak tersedia',
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
 
-            // Main Content
-            SliverPadding(
-              padding: const EdgeInsets.all(16),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  // Personal Information
-                  _buildPersonalInfoSection(ustadz),
-                  const SizedBox(height: 16),
-                  // Action Cards
-                  _buildActionSection(ustadz),
-                  const SizedBox(height: 50), // Space for bottom buttons
-                ]),
+              // Main Content
+              SliverPadding(
+                padding: const EdgeInsets.all(16),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    // Personal Information
+                    _buildPersonalInfoSection(ustadz),
+                    const SizedBox(height: 16),
+                    // Action Cards
+                    _buildActionSection(ustadz),
+                    const SizedBox(height: 50), // Space for bottom buttons
+                  ]),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       }),
     );

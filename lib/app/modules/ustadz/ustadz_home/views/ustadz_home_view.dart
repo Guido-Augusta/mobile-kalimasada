@@ -14,7 +14,9 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
       backgroundColor: const Color(0xFFF8FAFF),
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: () => controller.getUstadz(),
+          onRefresh: () async {
+            controller.getUstadz();
+          },
           child: ListView(
             padding: const EdgeInsets.only(
               top: 20,

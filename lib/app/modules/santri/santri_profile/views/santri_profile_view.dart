@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
-import 'package:mobile_kalimasada/app/modules/santri/santri_home/controllers/santri_home_controller.dart';
 import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -57,9 +56,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
         return RefreshIndicator(
           onRefresh: () async {
             controller.getSantriDetail(controller.santriId!);
-            if (Get.isRegistered<SantriHomeController>()) {
-              Get.find<SantriHomeController>().getSantri();
-            }
           },
           child: CustomScrollView(
             slivers: [

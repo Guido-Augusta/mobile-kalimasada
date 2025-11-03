@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart';
-import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/controllers/ortu_home_controller.dart';
 import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -57,9 +56,6 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
         return RefreshIndicator(
           onRefresh: () async {
             controller.getOrtuDetail(controller.ortuId!);
-            if (Get.isRegistered<OrtuHomeController>()) {
-              Get.find<OrtuHomeController>().getOrtu();
-            }
           },
           child: CustomScrollView(
             slivers: [
