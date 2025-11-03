@@ -90,127 +90,146 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                     children: [
                       // Password Field
                       Obx(
-                        () => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              controller.step.value ==
-                                      ChangePasswordStep.oldPassword
-                                  ? 'Password Lama'
-                                  : 'Password Baru',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            // Old Password Field
-                            if (controller.step.value ==
-                                ChangePasswordStep.oldPassword)
-                              TextFormField(
-                                controller: controller.oldPasswordC,
-                                obscureText:
-                                    controller.isOldPasswordHidden.value,
-                                decoration: InputDecoration(
-                                  hintText: 'Masukkan Password Lama',
-                                  prefixIcon: Icon(
-                                    Icons.lock_outline,
-                                    color: Colors.grey[500],
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      controller.isOldPasswordHidden.value
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
-                                      color: Colors.grey[500],
-                                    ),
-                                    onPressed:
-                                        controller.toggleOldPasswordVisibility,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.deepPurpleAccent.withValues(
-                                        alpha: 0.6,
-                                      ),
-                                      width: 2,
-                                    ),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey[50],
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 16,
-                                  ),
+                        () => Form(
+                          key: controller.formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                controller.step.value ==
+                                        ChangePasswordStep.oldPassword
+                                    ? 'Password Lama'
+                                    : 'Password Baru',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[700],
                                 ),
                               ),
+                              const SizedBox(height: 8),
+                              // Old Password Field
+                              if (controller.step.value ==
+                                  ChangePasswordStep.oldPassword)
+                                TextFormField(
+                                  controller: controller.oldPasswordC,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Password lama tidak boleh kosong';
+                                    }
+                                    if (value.length < 8) {
+                                      return 'Password minimal 8 karakter';
+                                    }
+                                    return null;
+                                  },
+                                  obscureText:
+                                      controller.isOldPasswordHidden.value,
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan Password Lama',
+                                    prefixIcon: Icon(
+                                      Icons.lock_outline,
+                                      color: Colors.grey[500],
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        controller.isOldPasswordHidden.value
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
+                                        color: Colors.grey[500],
+                                      ),
+                                      onPressed: controller
+                                          .toggleOldPasswordVisibility,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.deepPurpleAccent
+                                            .withValues(alpha: 0.6),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[50],
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                ),
 
-                            // New Password Field
-                            if (controller.step.value ==
-                                ChangePasswordStep.newPassword)
-                              TextFormField(
-                                controller: controller.newPasswordC,
-                                obscureText:
-                                    controller.isNewPasswordHidden.value,
-                                decoration: InputDecoration(
-                                  hintText: 'Masukkan Password Baru',
-                                  prefixIcon: Icon(
-                                    Icons.lock_outline,
-                                    color: Colors.grey[500],
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      controller.isNewPasswordHidden.value
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
+                              // New Password Field
+                              if (controller.step.value ==
+                                  ChangePasswordStep.newPassword)
+                                TextFormField(
+                                  controller: controller.newPasswordC,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Password baru tidak boleh kosong';
+                                    }
+                                    if (value.length < 8) {
+                                      return 'Password minimal 8 karakter';
+                                    }
+                                    return null;
+                                  },
+                                  obscureText:
+                                      controller.isNewPasswordHidden.value,
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan Password Baru',
+                                    prefixIcon: Icon(
+                                      Icons.lock_outline,
                                       color: Colors.grey[500],
                                     ),
-                                    onPressed:
-                                        controller.toggleNewPasswordVisibility,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.deepPurpleAccent.withValues(
-                                        alpha: 0.6,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        controller.isNewPasswordHidden.value
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
+                                        color: Colors.grey[500],
                                       ),
-                                      width: 2,
+                                      onPressed: controller
+                                          .toggleNewPasswordVisibility,
                                     ),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey[50],
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 16,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.deepPurpleAccent
+                                            .withValues(alpha: 0.6),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[50],
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 16,
+                                    ),
                                   ),
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
 
@@ -224,23 +243,15 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                               : () {
                                   if (controller.step.value ==
                                       ChangePasswordStep.oldPassword) {
-                                    if (controller.oldPasswordC.text.isEmpty) {
-                                      Get.snackbar(
-                                        'Peringatan',
-                                        'Password tidak boleh kosong',
-                                      );
-                                    } else {
+                                    if (controller.formKey.currentState!
+                                        .validate()) {
                                       controller.changePasswordStep1(
                                         controller.oldPasswordC.text,
                                       );
                                     }
                                   } else {
-                                    if (controller.newPasswordC.text.isEmpty) {
-                                      Get.snackbar(
-                                        'Peringatan',
-                                        'Password tidak boleh kosong',
-                                      );
-                                    } else {
+                                    if (controller.formKey.currentState!
+                                        .validate()) {
                                       controller.changePasswordStep2(
                                         controller.newPasswordC.text,
                                       );

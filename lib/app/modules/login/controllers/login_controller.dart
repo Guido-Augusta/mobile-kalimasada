@@ -87,6 +87,35 @@ class LoginController extends GetxController {
         } else {
           Get.offAllNamed('/home');
         }
+      } else if (response.statusCode == 401 || response.statusCode == 404) {
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Email atau password salah',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 2000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       } else {
         toastification.show(
           context: Get.context!,
@@ -124,7 +153,7 @@ class LoginController extends GetxController {
             Icon(Icons.error, color: Colors.white),
             SizedBox(width: 10),
             Text(
-              'Terjadi kesalahan saat menambahkan hafalan\nPeriksa koneksi internet Anda',
+              'Terjadi kesalahan\nPeriksa koneksi internet Anda',
               style: TextStyle(color: Colors.white),
             ),
           ],

@@ -5,10 +5,13 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toastification/toastification.dart';
 
 enum ChangePasswordStep { oldPassword, newPassword }
 
 class ChangePasswordController extends GetxController {
+  final formKey = GlobalKey<FormState>();
+
   var isLoading = false.obs;
   var isValidating = false.obs;
 
@@ -37,8 +40,39 @@ class ChangePasswordController extends GetxController {
       final token = prefs.getString('token');
 
       if (token == null) {
-        Get.snackbar('Error', 'No authentication token found');
-        return;
+        prefs.remove('token');
+        prefs.remove('role');
+        prefs.remove('userId');
+        prefs.remove('roleId');
+        Get.offAllNamed('/login');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Token tidak ditemukan\nSilakan login kembali',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 3000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
 
       final response = await http.post(
@@ -52,15 +86,94 @@ class ChangePasswordController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
+      print(data);
       if (response.statusCode == 200) {
         step.value = ChangePasswordStep.newPassword;
         oldPasswordVar.value = oldPassword;
-        Get.snackbar('Success', 'Password lama berhasil diverifikasi');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.check_circle_outline_rounded, color: Colors.green),
+              SizedBox(width: 10),
+              Text(
+                'Password lama berhasil diverifikasi',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.check_circle_outline_rounded, color: Colors.green),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 2000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.success,
+          style: ToastificationStyle.simple,
+        );
       } else {
-        Get.snackbar('Error', data['error'] ?? 'Gagal diverifikasi');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text('Verifikasi gagal', style: TextStyle(color: Colors.white)),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 2000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 2000),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
     } finally {
       isValidating.value = false;
     }
@@ -73,8 +186,39 @@ class ChangePasswordController extends GetxController {
       final token = prefs.getString('token');
 
       if (token == null) {
-        Get.snackbar('Error', 'No authentication token found');
-        return;
+        prefs.remove('token');
+        prefs.remove('role');
+        prefs.remove('userId');
+        prefs.remove('roleId');
+        Get.offAllNamed('/login');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Token tidak ditemukan\nSilakan login kembali',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 3000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
 
       final response = await http.post(
@@ -91,14 +235,97 @@ class ChangePasswordController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
+      print(data);
       if (response.statusCode == 200) {
-        Get.snackbar('Success', 'Password berhasil diubah');
+        logout();
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.check_circle_outline_rounded, color: Colors.green),
+              SizedBox(width: 10),
+              Text(
+                'Password berhasil diubah',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.check_circle_outline_rounded, color: Colors.green),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 2000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.success,
+          style: ToastificationStyle.simple,
+        );
         showSuccessDialog();
       } else {
-        Get.snackbar('Error', data['error'] ?? 'Gagal mengubah password');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Gagal mengubah password',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 2000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 2000),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
     } finally {
       isValidating.value = false;
     }
@@ -113,18 +340,68 @@ class ChangePasswordController extends GetxController {
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
+      print(data);
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');
         await prefs.remove('userId');
         await prefs.remove('roleId');
-        Get.offAllNamed('/login');
-        Get.snackbar('Success', 'Silahkan login kembali');
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Logout gagal');
+        toastification.show(
+          context: Get.context!,
+          title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 10),
+              Text('Gagal logout', style: TextStyle(color: Colors.white)),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          icon: Icon(Icons.error, color: Colors.white),
+          showIcon: true,
+          backgroundColor: Color(0xFF6B6B6B),
+          borderSide: BorderSide.none,
+          alignment: Alignment.bottomCenter,
+          autoCloseDuration: const Duration(milliseconds: 2000),
+          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+          animationBuilder: (context, animation, alignment, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          type: ToastificationType.error,
+          style: ToastificationStyle.simple,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      toastification.show(
+        context: Get.context!,
+        title: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        icon: Icon(Icons.error, color: Colors.white),
+        showIcon: true,
+        backgroundColor: Color(0xFF6B6B6B),
+        borderSide: BorderSide.none,
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(milliseconds: 2000),
+        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
+        animationBuilder: (context, animation, alignment, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        type: ToastificationType.error,
+        style: ToastificationStyle.simple,
+      );
     }
   }
 
@@ -172,7 +449,52 @@ class ChangePasswordController extends GetxController {
                         height: 48,
                         child: ElevatedButton(
                           onPressed: () {
-                            logout();
+                            Get.offAllNamed('/login');
+                            toastification.show(
+                              context: Get.context!,
+                              title: Wrap(
+                                alignment: WrapAlignment.center,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.check_circle_outline_rounded,
+                                    color: Colors.green,
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Silahkan login kembali',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
+                              icon: Icon(
+                                Icons.check_circle_outline_rounded,
+                                color: Colors.green,
+                              ),
+                              showIcon: true,
+                              backgroundColor: Color(0xFF6B6B6B),
+                              borderSide: BorderSide.none,
+                              alignment: Alignment.bottomCenter,
+                              autoCloseDuration: const Duration(
+                                milliseconds: 2000,
+                              ),
+                              closeButton: ToastCloseButton(
+                                showType: CloseButtonShowType.none,
+                              ),
+                              animationBuilder:
+                                  (context, animation, alignment, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                              type: ToastificationType.success,
+                              style: ToastificationStyle.simple,
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF6B46C1),
