@@ -104,7 +104,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
                 () => Text(
                   controller.santri.value?.nama ?? '',
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
+                  maxLines: 1,
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -115,6 +115,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
             ],
           ),
         ),
+        const SizedBox(width: 4),
         Container(
           decoration: BoxDecoration(
             color: Colors.red.withValues(alpha: 0.1),

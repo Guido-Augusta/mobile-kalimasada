@@ -96,7 +96,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                 () => Text(
                   controller.ortu.value?.nama ?? '',
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
+                  maxLines: 1,
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -107,6 +107,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
             ],
           ),
         ),
+        const SizedBox(width: 4),
         Container(
           decoration: BoxDecoration(
             color: Colors.red.withValues(alpha: 0.1),

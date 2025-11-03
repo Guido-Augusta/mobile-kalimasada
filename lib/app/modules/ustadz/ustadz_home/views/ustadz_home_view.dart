@@ -98,7 +98,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                 () => Text(
                   controller.ustadz.value?.nama ?? '',
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
+                  maxLines: 1,
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -109,6 +109,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
             ],
           ),
         ),
+        const SizedBox(width: 4),
         Container(
           decoration: BoxDecoration(
             color: Colors.red.withValues(alpha: 0.1),
