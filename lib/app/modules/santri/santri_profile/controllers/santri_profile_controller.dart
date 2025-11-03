@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
 import 'package:mobile_kalimasada/app/modules/santri/santri_home/controllers/santri_home_controller.dart';
 import 'package:path/path.dart' as path;
@@ -38,11 +37,6 @@ class SantriProfileController extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     santriId = prefs.getString('roleId');
 
-    if (santriDetail.value?.tanggalLahir != null) {
-      tanggalLahirC.text = DateFormat(
-        'yyyy-MM-dd',
-      ).format(santriDetail.value!.tanggalLahir!);
-    }
     getSantriDetail(santriId!);
   }
 
