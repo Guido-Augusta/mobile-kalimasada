@@ -425,7 +425,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Pastikan data yang Anda benar',
+                      'Pastikan data Anda benar',
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 16,
@@ -497,25 +497,13 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Text(
-                              'Nomor HP',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              '(Opsional)',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          'Nomor HP',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         TextFormField(
@@ -524,7 +512,10 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                           controller: controller.noHpC,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (value) {
-                            if (value!.isNotEmpty && !value.isNumericOnly) {
+                            if (value == null || value.isEmpty) {
+                              return 'Nomor HP tidak boleh kosong';
+                            }
+                            if (value.isNotEmpty && !value.isNumericOnly) {
                               return 'Nomor HP harus berupa angka';
                             }
                             return null;

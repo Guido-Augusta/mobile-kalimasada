@@ -12,6 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 
 class UstadzProfileController extends GetxController {
+  final formKey = GlobalKey<FormState>();
+
   final isLoading = true.obs;
   final isSaveLoading = false.obs;
   final isUploadingImage = false.obs;

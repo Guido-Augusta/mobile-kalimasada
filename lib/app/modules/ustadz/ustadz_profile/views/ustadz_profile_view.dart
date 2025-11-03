@@ -560,7 +560,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Pastikan data yang Anda benar',
+                      'Pastikan data Anda benar',
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 16,
@@ -579,147 +579,215 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                     horizontal: 24,
                     vertical: 20,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'Nama Lengkap',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.black87,
+                  child: Form(
+                    key: controller.formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Nama Lengkap',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: TextField(
+                        const SizedBox(height: 8),
+                        TextFormField(
                           style: TextStyle(color: Colors.black),
                           controller: controller.namaC,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Nama tidak boleh kosong';
+                            }
+                            return null;
+                          },
                           decoration: InputDecoration(
                             hintText: 'Masukkan Nama Lengkap',
                             hintStyle: TextStyle(color: Colors.grey[500]),
-                            border: InputBorder.none,
+                            fillColor: Colors.grey[50],
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.deepPurple),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 12,
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Nomor HP',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.black87,
+                        const SizedBox(height: 16),
+                        Text(
+                          'Nomor HP',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: TextField(
+                        const SizedBox(height: 8),
+                        TextFormField(
                           keyboardType: TextInputType.phone,
                           style: TextStyle(color: Colors.black),
                           controller: controller.noHpC,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Nomor HP tidak boleh kosong';
+                            }
+                            if (value.isNotEmpty && !value.isNumericOnly) {
+                              return 'Nomor HP harus berupa angka';
+                            }
+                            return null;
+                          },
                           decoration: InputDecoration(
                             hintText: 'Masukkan Nomor HP',
                             hintStyle: TextStyle(color: Colors.grey[500]),
-                            border: InputBorder.none,
+                            fillColor: Colors.grey[50],
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.deepPurple),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 12,
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Jenis Kelamin',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        initialValue: controller.jenisKelaminC.text,
-                        decoration: InputDecoration(
-                          fillColor: Colors.grey[50],
-                          filled: true,
-                          hintText: 'Pilih Jenis Kelamin',
-                          hintStyle: TextStyle(color: Colors.grey[500]),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey[300]!),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Jenis Kelamin',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.black87,
                           ),
                         ),
-                        dropdownColor: Colors.white,
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'P',
-                            child: Text('Perempuan'),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          initialValue: controller.jenisKelaminC.text,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Jenis kelamin tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            fillColor: Colors.grey[50],
+                            filled: true,
+                            hintText: 'Pilih Jenis Kelamin',
+                            hintStyle: TextStyle(color: Colors.grey[500]),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.deepPurple),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                          DropdownMenuItem(
-                            value: 'L',
-                            child: Text('Laki-laki'),
+                          dropdownColor: Colors.white,
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'P',
+                              child: Text('Perempuan'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'L',
+                              child: Text('Laki-laki'),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            controller.jenisKelaminC.text = value!;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Alamat',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.black87,
                           ),
-                        ],
-                        onChanged: (value) {
-                          controller.jenisKelaminC.text = value!;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Alamat',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.black87,
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: TextField(
+                        const SizedBox(height: 8),
+                        TextFormField(
                           maxLines: 5,
                           minLines: 3,
                           controller: controller.alamatC,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Alamat tidak boleh kosong';
+                            }
+                            return null;
+                          },
                           decoration: InputDecoration(
                             hintText: 'Masukkan Alamat',
                             hintStyle: TextStyle(color: Colors.grey[500]),
-                            border: InputBorder.none,
+                            fillColor: Colors.grey[50],
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.deepPurple),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 12,
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -764,68 +832,63 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          if (controller.namaC.text.isEmpty ||
-                              controller.noHpC.text.isEmpty ||
-                              controller.alamatC.text.isEmpty ||
-                              controller.jenisKelaminC.text.isEmpty) {
-                            Get.snackbar('Error', 'Semua field harus diisi');
-                            return;
-                          }
-                          if (controller.namaC.text ==
-                                  controller.ustadzData.value?.nama &&
-                              controller.noHpC.text ==
-                                  controller.ustadzData.value?.nomorHp &&
-                              controller.alamatC.text ==
-                                  controller.ustadzData.value?.alamat &&
-                              controller.jenisKelaminC.text ==
-                                  controller.ustadzData.value?.jenisKelamin) {
-                            toastification.show(
-                              context: Get.context!,
-                              title: Wrap(
-                                alignment: WrapAlignment.center,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                children: [
-                                  Icon(Icons.error, color: Colors.white),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Tidak ada perubahan data',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ],
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 10,
-                              ),
-                              icon: Icon(Icons.error, color: Colors.white),
-                              showIcon: true,
-                              backgroundColor: Color(0xFF6B6B6B),
-                              borderSide: BorderSide.none,
-                              alignment: Alignment.bottomCenter,
-                              autoCloseDuration: const Duration(
-                                milliseconds: 2000,
-                              ),
-                              closeButton: ToastCloseButton(
-                                showType: CloseButtonShowType.none,
-                              ),
-                              animationBuilder:
-                                  (context, animation, alignment, child) {
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    );
-                                  },
-                              type: ToastificationType.error,
-                              style: ToastificationStyle.simple,
+                          if (controller.formKey.currentState!.validate()) {
+                            if (controller.namaC.text ==
+                                    controller.ustadzData.value?.nama &&
+                                controller.noHpC.text ==
+                                    controller.ustadzData.value?.nomorHp &&
+                                controller.alamatC.text ==
+                                    controller.ustadzData.value?.alamat &&
+                                controller.jenisKelaminC.text ==
+                                    controller.ustadzData.value?.jenisKelamin) {
+                              toastification.show(
+                                context: Get.context!,
+                                title: Wrap(
+                                  alignment: WrapAlignment.center,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Icon(Icons.error, color: Colors.white),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Tidak ada perubahan data',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 10,
+                                ),
+                                icon: Icon(Icons.error, color: Colors.white),
+                                showIcon: true,
+                                backgroundColor: Color(0xFF6B6B6B),
+                                borderSide: BorderSide.none,
+                                alignment: Alignment.bottomCenter,
+                                autoCloseDuration: const Duration(
+                                  milliseconds: 2000,
+                                ),
+                                closeButton: ToastCloseButton(
+                                  showType: CloseButtonShowType.none,
+                                ),
+                                animationBuilder:
+                                    (context, animation, alignment, child) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                                type: ToastificationType.error,
+                                style: ToastificationStyle.simple,
+                              );
+                              return;
+                            }
+                            controller.updateProfileData(
+                              controller.namaC.text,
+                              controller.noHpC.text,
+                              controller.alamatC.text,
+                              controller.jenisKelaminC.text,
                             );
-                            return;
                           }
-                          controller.updateProfileData(
-                            controller.namaC.text,
-                            controller.noHpC.text,
-                            controller.alamatC.text,
-                            controller.jenisKelaminC.text,
-                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.deepPurpleAccent,

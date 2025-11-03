@@ -487,7 +487,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Pastikan data yang masukkan Anda benar',
+                      'Pastikan data yang Anda benar',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
