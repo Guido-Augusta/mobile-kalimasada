@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:mobile_kalimasada/app/data/models/ustadz.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UstadzHomeController extends GetxController {
@@ -76,11 +77,12 @@ class UstadzHomeController extends GetxController {
         ustadz.value = Ustadz.fromJson(data['data']);
         fotoProfil.value = getImageUrl(ustadz.value!.fotoProfil!);
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Gagal mendapatkan data');
+        ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
     } catch (e) {
-      print(e);
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -103,12 +105,14 @@ class UstadzHomeController extends GetxController {
         await prefs.remove('userId');
         await prefs.remove('roleId');
         Get.offAllNamed('/login');
-        Get.snackbar('Success', 'Logout berhasil');
+        ToastUtils.showSuccessToast('Logout berhasil');
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Logout gagal');
+        ToastUtils.showErrorToast('Logout gagal');
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     }
   }
 }
