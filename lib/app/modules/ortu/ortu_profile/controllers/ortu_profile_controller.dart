@@ -8,6 +8,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/controllers/ortu_home_controller.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,11 +51,6 @@ class OrtuProfileController extends GetxController {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      if (token == null) {
-        Get.snackbar('Error', 'No authentication token found');
-        return;
-      }
-
       final response = await http.get(
         Uri.parse('http://10.0.2.2:5000/api/ortu/$id'),
         headers: {
@@ -71,14 +67,12 @@ class OrtuProfileController extends GetxController {
         fotoProfil.value = getImageUrl(ortu.fotoProfil!);
         print('Ortu detail loaded: ${ortu.nama}');
       } else {
-        Get.snackbar(
-          'Error',
-          'Failed to load santri detail: ${response.statusCode}',
-        );
+        ToastUtils.showErrorToast('Gagal memuat data profil');
       }
     } catch (e) {
-      print('Error in getSantriDetail: $e');
-      Get.snackbar('Error', 'An error occurred: ${e.toString()}');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -99,16 +93,16 @@ class OrtuProfileController extends GetxController {
         print(pickedImage.path);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memilih gambar: $e');
+      ToastUtils.showErrorToast('Gagal memilih gambar');
     }
   }
 
   Future<void> uploadImage(String imagePath) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final roleId = prefs.getString('roleId');
-
     try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final roleId = prefs.getString('roleId');
+
       final request = http.MultipartRequest(
         'PUT',
         Uri.parse('http://10.0.2.2:5000/api/ortu/$roleId'),
@@ -160,15 +154,14 @@ class OrtuProfileController extends GetxController {
         }
 
         Get.back();
-        Get.snackbar('Success', 'Foto profil berhasil diperbarui');
+        ToastUtils.showSuccessToast('Foto profil berhasil diperbarui');
       } else {
-        Get.snackbar(
-          'Error',
-          'Gagal mengupload foto profil (Status: ${response.statusCode})',
-        );
+        ToastUtils.showErrorToast('Gagal mengupload foto profil');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal mengupload foto profil: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isUploadingImage.value = false;
     }
@@ -205,38 +198,44 @@ class OrtuProfileController extends GetxController {
         }
         print(response.body);
         Get.back();
-        Get.snackbar('Success', 'Profil berhasil diperbarui');
+        ToastUtils.showSuccessToast('Profil berhasil diperbarui');
       } else {
-        Get.snackbar('Error', 'Gagal memuat data profil');
+        ToastUtils.showErrorToast('Gagal memperbarui profil');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memuat data profil');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<void> logout() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
     try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+
       final response = await http.post(
         Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
+      print(data);
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');
         await prefs.remove('userId');
         await prefs.remove('roleId');
         Get.offAllNamed('/login');
-        Get.snackbar('Success', 'Logout berhasil');
+        ToastUtils.showSuccessToast('Logout berhasil');
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Logout gagal');
+        ToastUtils.showErrorToast('Logout gagal');
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     }
   }
 }

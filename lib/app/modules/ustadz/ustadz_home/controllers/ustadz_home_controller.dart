@@ -57,11 +57,12 @@ class UstadzHomeController extends GetxController {
   }
 
   Future<void> getUstadz() async {
-    isLoading.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final roleId = prefs.getString('roleId');
     try {
+      isLoading.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final roleId = prefs.getString('roleId');
+
       final response = await get(
         Uri.parse('http://10.0.2.2:5000/api/ustadz/$roleId'),
         headers: {
