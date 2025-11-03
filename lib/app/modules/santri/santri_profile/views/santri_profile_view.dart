@@ -20,42 +20,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: Obx(() {
-        // Loading
-        if (controller.isLoading.value) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6B46C1).withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Color(0xFF6B46C1),
-                      ),
-                      strokeWidth: 3,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Memuat data...',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: const Color(0xFF6B46C1),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-
         final santri = controller.santriDetail.value;
         // Data kosong
         if (santri == null) {
