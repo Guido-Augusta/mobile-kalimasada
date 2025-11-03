@@ -107,251 +107,267 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                       ),
                     ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Password Field
-                      Obx(
-                        () => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              controller.step.value ==
-                                      ForgotPasswordStep.inputEmail
-                                  ? 'Email'
-                                  : controller.step.value ==
-                                        ForgotPasswordStep.tokenVerification
-                                  ? 'Token'
-                                  : 'Password Baru',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            // Email Field
-                            if (controller.step.value ==
-                                ForgotPasswordStep.inputEmail)
-                              TextFormField(
-                                controller: controller.emailC,
-                                keyboardType: TextInputType.emailAddress,
-                                decoration: InputDecoration(
-                                  hintText: 'Masukkan Email',
-                                  prefixIcon: Icon(
-                                    Icons.lock_outline,
-                                    color: Colors.grey[500],
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.deepPurpleAccent.withValues(
-                                        alpha: 0.6,
-                                      ),
-                                      width: 2,
-                                    ),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey[50],
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 16,
-                                  ),
+                  child: Form(
+                    key: controller.formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Form Field
+                        Obx(
+                          () => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                controller.step.value ==
+                                        ForgotPasswordStep.inputEmail
+                                    ? 'Email'
+                                    : controller.step.value ==
+                                          ForgotPasswordStep.tokenVerification
+                                    ? 'Token'
+                                    : 'Password Baru',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[700],
                                 ),
                               ),
-
-                            // Token Verification Field
-                            if (controller.step.value ==
-                                ForgotPasswordStep.tokenVerification)
-                              TextFormField(
-                                controller: controller.tokenC,
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  hintText: 'Masukkan 6 Digit Token',
-                                  prefixIcon: Icon(
-                                    Icons.lock_outline,
-                                    color: Colors.grey[500],
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.deepPurpleAccent.withValues(
-                                        alpha: 0.6,
-                                      ),
-                                      width: 2,
-                                    ),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey[50],
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 16,
-                                  ),
-                                ),
-                              ),
-
-                            // New Password Field
-                            if (controller.step.value ==
-                                ForgotPasswordStep.newPassword)
-                              TextFormField(
-                                controller: controller.newPasswordC,
-                                keyboardType: TextInputType.visiblePassword,
-                                obscureText:
-                                    controller.isNewPasswordHidden.value,
-                                decoration: InputDecoration(
-                                  hintText: 'Masukkan Password Baru',
-                                  prefixIcon: Icon(
-                                    Icons.lock_outline,
-                                    color: Colors.grey[500],
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.deepPurpleAccent.withValues(
-                                        alpha: 0.6,
-                                      ),
-                                      width: 2,
-                                    ),
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      controller.isNewPasswordHidden.value
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
+                              const SizedBox(height: 8),
+                              // Email Field
+                              if (controller.step.value ==
+                                  ForgotPasswordStep.inputEmail)
+                                TextFormField(
+                                  controller: controller.emailC,
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  validator: controller.validateEmail,
+                                  keyboardType: TextInputType.emailAddress,
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan Email',
+                                    prefixIcon: Icon(
+                                      Icons.lock_outline,
                                       color: Colors.grey[500],
                                     ),
-                                    onPressed:
-                                        controller.toggleNewPasswordVisibility,
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey[50],
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 16,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.deepPurpleAccent
+                                            .withValues(alpha: 0.6),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[50],
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 16,
+                                    ),
                                   ),
                                 ),
-                              ),
-                          ],
+
+                              // Token Verification Field
+                              if (controller.step.value ==
+                                  ForgotPasswordStep.tokenVerification)
+                                TextFormField(
+                                  controller: controller.tokenC,
+                                  keyboardType: TextInputType.number,
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  validator: (token) {
+                                    if (token == null || token.isEmpty) {
+                                      return 'Token tidak boleh kosong';
+                                    } else if (token.contains(
+                                      RegExp(r'[^0-9]'),
+                                    )) {
+                                      return 'Token harus angka';
+                                    } else if (token.length != 6) {
+                                      return 'Token harus 6 digit';
+                                    }
+                                    return null;
+                                  },
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan 6 Digit Token',
+                                    prefixIcon: Icon(
+                                      Icons.lock_outline,
+                                      color: Colors.grey[500],
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.deepPurpleAccent
+                                            .withValues(alpha: 0.6),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[50],
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                ),
+
+                              // New Password Field
+                              if (controller.step.value ==
+                                  ForgotPasswordStep.newPassword)
+                                TextFormField(
+                                  controller: controller.newPasswordC,
+                                  autofocus: false,
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  validator: (password) {
+                                    if (password == null || password.isEmpty) {
+                                      return 'Password tidak boleh kosong';
+                                    } else if (password.length < 8) {
+                                      return 'Password minimal 8 karakter';
+                                    }
+                                    return null;
+                                  },
+                                  keyboardType: TextInputType.visiblePassword,
+                                  obscureText:
+                                      controller.isNewPasswordHidden.value,
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan Password Baru',
+                                    prefixIcon: Icon(
+                                      Icons.lock_outline,
+                                      color: Colors.grey[500],
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.deepPurpleAccent
+                                            .withValues(alpha: 0.6),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        controller.isNewPasswordHidden.value
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
+                                        color: Colors.grey[500],
+                                      ),
+                                      onPressed: controller
+                                          .toggleNewPasswordVisibility,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[50],
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 32),
+                        const SizedBox(height: 32),
 
-                      // Submit Button
-                      Obx(
-                        () => ElevatedButton(
-                          onPressed:
-                              !controller.isValidating.value &&
-                                  controller.isButtonEnabled.value
-                              ? () {
-                                  if (controller.step.value ==
-                                      ForgotPasswordStep.inputEmail) {
-                                    if (controller.emailC.text.isEmpty) {
-                                      Get.snackbar(
-                                        'Peringatan',
-                                        'Email tidak boleh kosong',
-                                      );
+                        // Submit Button
+                        Obx(
+                          () => ElevatedButton(
+                            onPressed:
+                                !controller.isValidating.value &&
+                                    controller.isButtonEnabled.value
+                                ? () async {
+                                    Get.focusScope!.unfocus(); // Tutup keyboard
+
+                                    if (controller.step.value ==
+                                        ForgotPasswordStep.inputEmail) {
+                                      if (controller.formKey.currentState!
+                                          .validate()) {
+                                        controller.sendToken();
+                                      }
+                                    } else if (controller.step.value ==
+                                        ForgotPasswordStep.tokenVerification) {
+                                      if (controller.formKey.currentState!
+                                          .validate()) {
+                                        controller.tokenVerification();
+                                      }
                                     } else {
-                                      // TODO: implement inputEmailController
-                                      controller.sendToken();
-                                    }
-                                  } else if (controller.step.value ==
-                                      ForgotPasswordStep.tokenVerification) {
-                                    if (controller.tokenC.text.isEmpty) {
-                                      Get.snackbar(
-                                        'Peringatan',
-                                        'Token tidak boleh kosong',
-                                      );
-                                    } else {
-                                      // TODO: implement tokenVerificationController
-                                      controller.tokenVerification();
-                                    }
-                                  } else {
-                                    if (controller.newPasswordC.text.isEmpty) {
-                                      Get.snackbar(
-                                        'Peringatan',
-                                        'Password tidak boleh kosong',
-                                      );
-                                    } else {
-                                      // TODO: implement newPasswordController
-                                      controller.changePassword();
+                                      if (controller.formKey.currentState!
+                                          .validate()) {
+                                        controller.changePassword();
+                                      }
                                     }
                                   }
-                                }
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurpleAccent,
-                            foregroundColor: Colors.white,
-                            padding: controller.isValidating.value
-                                ? EdgeInsets.symmetric(vertical: 10)
-                                : EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.deepPurpleAccent,
+                              foregroundColor: Colors.white,
+                              padding: controller.isValidating.value
+                                  ? EdgeInsets.symmetric(vertical: 10)
+                                  : EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 2,
+                              shadowColor: Colors.deepPurpleAccent.withValues(
+                                alpha: 0.3,
+                              ),
                             ),
-                            elevation: 2,
-                            shadowColor: Colors.deepPurpleAccent.withValues(
-                              alpha: 0.3,
-                            ),
+                            child: controller.isValidating.value
+                                ? Transform.scale(
+                                    scale: 0.5,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    controller.step.value ==
+                                            ForgotPasswordStep.inputEmail
+                                        ? 'Kirim Token'
+                                        : controller.step.value ==
+                                              ForgotPasswordStep
+                                                  .tokenVerification
+                                        ? 'Verifikasi Token'
+                                        : 'Ubah Password',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                           ),
-                          child: controller.isValidating.value
-                              ? Transform.scale(
-                                  scale: 0.5,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Text(
-                                  controller.step.value ==
-                                          ForgotPasswordStep.inputEmail
-                                      ? 'Kirim Token'
-                                      : controller.step.value ==
-                                            ForgotPasswordStep.tokenVerification
-                                      ? 'Verifikasi Token'
-                                      : 'Ubah Password',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
 

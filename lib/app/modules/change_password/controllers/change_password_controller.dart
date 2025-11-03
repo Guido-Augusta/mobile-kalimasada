@@ -90,6 +90,7 @@ class ChangePasswordController extends GetxController {
       if (response.statusCode == 200) {
         step.value = ChangePasswordStep.newPassword;
         oldPasswordVar.value = oldPassword;
+        formKey.currentState!.reset();
         toastification.show(
           context: Get.context!,
           title: Wrap(

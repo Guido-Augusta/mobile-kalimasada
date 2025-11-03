@@ -241,6 +241,7 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                           onPressed: controller.isValidating.value
                               ? null
                               : () {
+                                  Get.focusScope!.unfocus(); // Tutup keyboard
                                   if (controller.step.value ==
                                       ChangePasswordStep.oldPassword) {
                                     if (controller.formKey.currentState!
