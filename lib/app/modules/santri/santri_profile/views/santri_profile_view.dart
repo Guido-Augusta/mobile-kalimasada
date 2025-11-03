@@ -84,6 +84,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
+                          backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
