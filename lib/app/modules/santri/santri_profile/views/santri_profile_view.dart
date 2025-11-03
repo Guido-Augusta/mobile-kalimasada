@@ -888,7 +888,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
                                 type: ToastificationType.error,
                                 style: ToastificationStyle.simple,
                               );
-
                               return;
                             }
                             controller.updateProfileData(
