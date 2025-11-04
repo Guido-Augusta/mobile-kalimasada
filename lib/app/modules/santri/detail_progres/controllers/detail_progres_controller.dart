@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_surah.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailProgresController extends GetxController {
@@ -21,7 +22,6 @@ class DetailProgresController extends GetxController {
   void onInit() {
     super.onInit();
     getSurahInfo();
-    getDetailProgres();
   }
 
   @override
@@ -30,19 +30,12 @@ class DetailProgresController extends GetxController {
     audioPlayer.dispose();
   }
 
-  // Rest of your existing methods...
-  void getDetailProgres() async {
-    isLoading.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    if (token == null) {
-      Get.snackbar('Error', 'No authentication token found');
-      isLoading.value = false;
-      return;
-    }
-
+  Future<void> getDetailProgres() async {
     try {
+      isLoading.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
       final response = await http.get(
         Uri.parse(
           'http://10.0.2.2:5000/api/hafalan/$santriId/surah/$surahId?mode=tambah',
@@ -58,34 +51,28 @@ class DetailProgresController extends GetxController {
         final data = json.decode(response.body);
         detailProgres.value = DetailHafalan.fromJson(data);
       } else {
-        Get.snackbar('Error', 'Failed to fetch detail progres');
+        ToastUtils.showErrorToast('Gagal memuat ayat');
       }
     } catch (e) {
-      print(e);
-      Get.snackbar('Error', 'Failed to fetch detail progres: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
   void getSurahInfo() async {
-    isLoading.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    if (token == null) {
-      Get.snackbar('Error', 'No authentication token found');
-      isLoading.value = false;
-      return;
-    }
-
     try {
+      isLoading.value = true;
+
       final response = await http.get(
         Uri.parse('http://10.0.2.2:5000/api/alquran/surah/$surahId'),
         headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
+        getDetailProgres();
         final data = json.decode(response.body);
         surahInfo.value = DetailSurah.fromJson(data);
 
@@ -99,11 +86,12 @@ class DetailProgresController extends GetxController {
           audioPlayer.setUrl(audioUrl);
         }
       } else {
-        Get.snackbar('Error', 'Failed to fetch surah info');
+        ToastUtils.showErrorToast('Gagal memuat surah');
       }
     } catch (e) {
-      print(e);
-      Get.snackbar('Error', 'Failed to fetch surah info: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }
