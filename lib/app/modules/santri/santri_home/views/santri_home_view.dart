@@ -15,6 +15,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFF),
+      appBar: AppBar(backgroundColor: Color(0xFFF8FAFF), toolbarHeight: 0),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -531,12 +532,14 @@ class SantriHomeView extends GetView<SantriHomeController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Pondok Kalimasada',
+                      'Kalimasada Tahfidz App',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.green[800],
                       ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
                     Text(
                       'Menuntut ilmu dengan penuh keikhlasan',
