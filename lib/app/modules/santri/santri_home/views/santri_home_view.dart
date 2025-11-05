@@ -924,6 +924,8 @@ class SantriHomeView extends GetView<SantriHomeController> {
         controller.selectedChartType.value = type;
       },
       style: ElevatedButton.styleFrom(
+        splashFactory: NoSplash.splashFactory,
+        shadowColor: Colors.transparent,
         backgroundColor: isSelected
             ? const Color(0xFF6B46C1)
             : Colors.transparent,
