@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:toastification/toastification.dart';
 
 class SplashController extends GetxController {
   final isConnectedToInternet = false.obs;
@@ -74,34 +74,7 @@ class SplashController extends GetxController {
         Get.offAllNamed('/login');
       }
     } catch (e) {
-      toastification.show(
-        context: Get.context!,
-        title: Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.white),
-            SizedBox(width: 10),
-            Text(
-              'Terjadi kesalahan status login',
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        icon: Icon(Icons.error, color: Colors.white),
-        showIcon: true,
-        backgroundColor: Color(0xFF6B6B6B),
-        borderSide: BorderSide.none,
-        alignment: Alignment.bottomCenter,
-        autoCloseDuration: const Duration(milliseconds: 2000),
-        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-        animationBuilder: (context, animation, alignment, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        type: ToastificationType.error,
-        style: ToastificationStyle.simple,
-      );
+      ToastUtils.showErrorToast('Terjadi kesalahan status login');
     }
   }
 
@@ -182,86 +155,15 @@ class SplashController extends GetxController {
         prefs.remove('userId');
         prefs.remove('roleId');
         Get.offAllNamed('/login');
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Token tidak ditemukan\nSilakan login kembali',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 3000),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
+        ToastUtils.showErrorToast(
+          'Token tidak ditemukan\nSilakan login kembali',
         );
       } else {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text('Gagal memuat data', style: TextStyle(color: Colors.white)),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 2000),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Gagal memuat data');
       }
     } catch (e) {
-      toastification.show(
-        context: Get.context!,
-        title: Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.white),
-            SizedBox(width: 10),
-            Text('Terjadi kesalahan', style: TextStyle(color: Colors.white)),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        icon: Icon(Icons.error, color: Colors.white),
-        showIcon: true,
-        backgroundColor: Color(0xFF6B6B6B),
-        borderSide: BorderSide.none,
-        alignment: Alignment.bottomCenter,
-        autoCloseDuration: const Duration(milliseconds: 2000),
-        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-        animationBuilder: (context, animation, alignment, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        type: ToastificationType.error,
-        style: ToastificationStyle.simple,
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     }
   }
@@ -287,86 +189,15 @@ class SplashController extends GetxController {
         prefs.remove('userId');
         prefs.remove('roleId');
         Get.offAllNamed('/login');
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Token tidak ditemukan\nSilakan login kembali',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 3000),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
+        ToastUtils.showErrorToast(
+          'Token tidak ditemukan\nSilakan login kembali',
         );
       } else {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text('Gagal memuat data', style: TextStyle(color: Colors.white)),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 2000),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Gagal memuat data');
       }
     } catch (e) {
-      toastification.show(
-        context: Get.context!,
-        title: Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.white),
-            SizedBox(width: 10),
-            Text('Terjadi kesalahan', style: TextStyle(color: Colors.white)),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        icon: Icon(Icons.error, color: Colors.white),
-        showIcon: true,
-        backgroundColor: Color(0xFF6B6B6B),
-        borderSide: BorderSide.none,
-        alignment: Alignment.bottomCenter,
-        autoCloseDuration: const Duration(milliseconds: 2000),
-        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-        animationBuilder: (context, animation, alignment, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        type: ToastificationType.error,
-        style: ToastificationStyle.simple,
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     }
   }
@@ -392,86 +223,15 @@ class SplashController extends GetxController {
         prefs.remove('userId');
         prefs.remove('roleId');
         Get.offAllNamed('/login');
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Token tidak ditemukan\nSilakan login kembali',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 3000),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
+        ToastUtils.showErrorToast(
+          'Token tidak ditemukan\nSilakan login kembali',
         );
       } else {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text('Gagal memuat data', style: TextStyle(color: Colors.white)),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 2000),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Gagal memuat data');
       }
     } catch (e) {
-      toastification.show(
-        context: Get.context!,
-        title: Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.white),
-            SizedBox(width: 10),
-            Text('Terjadi kesalahan', style: TextStyle(color: Colors.white)),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        icon: Icon(Icons.error, color: Colors.white),
-        showIcon: true,
-        backgroundColor: Color(0xFF6B6B6B),
-        borderSide: BorderSide.none,
-        alignment: Alignment.bottomCenter,
-        autoCloseDuration: const Duration(milliseconds: 2000),
-        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-        animationBuilder: (context, animation, alignment, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        type: ToastificationType.error,
-        style: ToastificationStyle.simple,
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     }
   }

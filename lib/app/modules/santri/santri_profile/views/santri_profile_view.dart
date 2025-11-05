@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
-import 'package:toastification/toastification.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/santri_profile_controller.dart';
@@ -851,44 +851,8 @@ class SantriProfileView extends GetView<SantriProfileController> {
                                           .value!
                                           .tanggalLahir!,
                                     )) {
-                              toastification.show(
-                                context: Get.context!,
-                                title: Wrap(
-                                  alignment: WrapAlignment.center,
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-                                    Icon(Icons.error, color: Colors.white),
-                                    SizedBox(width: 10),
-                                    Text(
-                                      'Tidak ada perubahan data',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ],
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 10,
-                                ),
-                                icon: Icon(Icons.error, color: Colors.white),
-                                showIcon: true,
-                                backgroundColor: Color(0xFF6B6B6B),
-                                borderSide: BorderSide.none,
-                                alignment: Alignment.bottomCenter,
-                                autoCloseDuration: const Duration(
-                                  milliseconds: 2000,
-                                ),
-                                closeButton: ToastCloseButton(
-                                  showType: CloseButtonShowType.none,
-                                ),
-                                animationBuilder:
-                                    (context, animation, alignment, child) {
-                                      return FadeTransition(
-                                        opacity: animation,
-                                        child: child,
-                                      );
-                                    },
-                                type: ToastificationType.error,
-                                style: ToastificationStyle.simple,
+                              ToastUtils.showErrorToast(
+                                'Tidak ada perubahan data',
                               );
                               return;
                             }
