@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/models/peringkat.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PeringkatController extends GetxController {
@@ -19,10 +20,24 @@ class PeringkatController extends GetxController {
   var hasMore = true;
   var isLoadingMore = false.obs;
 
+  final scrollController = ScrollController();
+
   @override
   void onInit() {
     super.onInit();
     getPeringkat();
+    _setupScrollController();
+  }
+
+  void _setupScrollController() {
+    scrollController.addListener(() {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
+        if (hasMore && !isLoadingMore.value) {
+          loadMoreData();
+        }
+      }
+    });
   }
 
   void _resetPagination() {
@@ -37,11 +52,10 @@ class PeringkatController extends GetxController {
   }
 
   Future<void> getPeringkat() async {
-    // http://10.0.2.2:5000/api/santri/peringkat?page=1&limit=10&search=guido&tahapHafalan=level1
-
-    _resetPagination();
-    isLoading.value = true;
     try {
+      _resetPagination();
+
+      isLoading.value = true;
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
@@ -66,13 +80,12 @@ class PeringkatController extends GetxController {
           hasMore = false;
         }
       } else {
-        Get.snackbar(
-          'Error',
-          'Failed to load santri detail: ${response.statusCode}',
-        );
+        ToastUtils.showErrorToast('Gagal memuat data peringkat');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan saat memuat peringkat santri');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -111,11 +124,13 @@ class PeringkatController extends GetxController {
           }
         } else {
           currentPage--;
-          Get.snackbar('Error', 'Gagal memuat data tambahan');
+          ToastUtils.showErrorToast('Gagal memuat data tambahan');
         }
       }
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan saat memuat data tambahan');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoadingMore.value = false;
     }
