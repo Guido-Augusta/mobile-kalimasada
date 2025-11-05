@@ -23,26 +23,9 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       body: RefreshIndicator(
         onRefresh: () async {
           controller.isLoading.value = true;
-          controller.progresHafalan.value = [];
           await controller.getProgresHafalan(controller.santriId);
         },
         child: Obx(() {
-          if (controller.isLoading.value) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text(
-                    'Memuat data...',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                ],
-              ),
-            );
-          }
-
           return CustomScrollView(
             slivers: [
               // Student Info Card
@@ -70,7 +53,28 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
               ),
 
               // Surah Progress List
-              if (controller.progresHafalan.isEmpty)
+              if (controller.isLoading.value)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          color: Colors.deepPurpleAccent,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Memuat data...',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else if (controller.progresHafalan.isEmpty)
                 SliverFillRemaining(
                   child: Center(
                     child: Text(
@@ -136,14 +140,6 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
         ],
       ),
       child: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 56),
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
-          );
-        }
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
