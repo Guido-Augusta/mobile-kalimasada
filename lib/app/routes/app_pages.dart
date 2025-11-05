@@ -7,8 +7,6 @@ import '../modules/detail_surah/bindings/detail_surah_binding.dart';
 import '../modules/detail_surah/views/detail_surah_view.dart';
 import '../modules/forgot_password/bindings/forgot_password_binding.dart';
 import '../modules/forgot_password/views/forgot_password_view.dart';
-import '../modules/home/bindings/home_binding.dart';
-import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
 import '../modules/main/ortu_main/bindings/ortu_main_binding.dart';
@@ -45,8 +43,6 @@ import '../modules/ustadz/progres_hafalan/bindings/progres_hafalan_binding.dart'
 import '../modules/ustadz/progres_hafalan/views/progres_hafalan_view.dart';
 import '../modules/ustadz/riwayat_hafalan/bindings/riwayat_hafalan_binding.dart';
 import '../modules/ustadz/riwayat_hafalan/views/riwayat_hafalan_view.dart';
-import '../modules/ustadz/setoran/bindings/setoran_binding.dart';
-import '../modules/ustadz/setoran/views/setoran_view.dart';
 import '../modules/ustadz/ustadz_home/bindings/ustadz_home_binding.dart';
 import '../modules/ustadz/ustadz_home/views/ustadz_home_view.dart';
 import '../modules/ustadz/ustadz_profile/bindings/ustadz_profile_binding.dart';
@@ -60,7 +56,6 @@ class AppPages {
   static const INITIAL = Routes.SPLASH;
 
   static final routes = [
-    GetPage(name: _Paths.HOME, page: () => HomeView(), binding: HomeBinding()),
     GetPage(
       name: _Paths.LOGIN,
       page: () => const LoginView(),
@@ -134,11 +129,6 @@ class AppPages {
       page: () => OrtuMainView(),
       binding: OrtuMainBinding(),
       middlewares: [AuthMiddleware()],
-    ),
-    GetPage(
-      name: _Paths.SETORAN,
-      page: () => const SetoranView(),
-      binding: SetoranBinding(),
     ),
     GetPage(
       name: _Paths.RIWAYAT_HAFALAN,
