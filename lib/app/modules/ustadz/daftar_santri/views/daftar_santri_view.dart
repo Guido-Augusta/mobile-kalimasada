@@ -38,49 +38,54 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey[200]!,
-                    spreadRadius: 2,
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: TextField(
-                onChanged: (value) {
-                  controller.searchQuery.value = value;
-                  controller.fetchData();
-                },
-                decoration: InputDecoration(
-                  hintText: 'Cari santri...',
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 20,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          controller.fetchData();
+        },
+        child: ListView(
+          controller: controller.scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey[200]!,
+                      spreadRadius: 2,
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  onChanged: (value) {
+                    controller.searchQuery.value = value;
+                    controller.fetchData();
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Cari santri...',
+                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 20,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
-          // Button Filter Tahap Hafalan
-          buttonFilterTahapan(),
+            // Button Filter Tahap Hafalan
+            buttonFilterTahapan(),
 
-          const SizedBox(height: 8),
-          // Student List
-          Expanded(
-            child: Obx(() {
+            const SizedBox(height: 8),
+            // Student List
+            Obx(() {
               if (controller.isLoading.value && controller.santriList.isEmpty) {
                 return _buildLoadingIndicator();
               } else if (controller.santriList.isEmpty) {
@@ -89,31 +94,27 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                   controller.santriList.isEmpty) {
                 return _buildEmptyState();
               }
-              return RefreshIndicator(
-                onRefresh: () async {
-                  controller.fetchData();
-                },
-                child: ListView.builder(
-                  controller: controller.scrollController,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
-                  itemCount:
-                      controller.santriList.length +
-                      (controller.hasMore.value ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index >= controller.santriList.length) {
-                      return _buildLoadMoreIndicator();
-                    }
-                    final santri = controller.santriList[index];
-                    return _buildSantriCard(santri);
-                  },
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
                 ),
+                itemCount:
+                    controller.santriList.length +
+                    (controller.hasMore.value ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index >= controller.santriList.length) {
+                    return _buildLoadMoreIndicator();
+                  }
+                  final santri = controller.santriList[index];
+                  return _buildSantriCard(santri);
+                },
               );
             }),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -337,8 +338,8 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           ),
-                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                         const SizedBox(height: 8),
 
@@ -487,6 +488,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                           }
                         }
                         _showMurajaahDialog(santri);
+                        controller.getProgresHafalan(santri.id.toString());
                       },
                       icon: const Icon(
                         Icons.menu_book_rounded,
@@ -528,6 +530,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                           }
                         }
                         showHafalanDialog(santri);
+                        controller.getProgresHafalan(santri.id.toString());
                       },
                       icon: const Icon(
                         Icons.book,
@@ -591,6 +594,19 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
     }
   }
 
+  String _getTahapLabel2(String? tahap) {
+    switch (tahap?.toLowerCase()) {
+      case 'level1':
+        return 'Level 1 - Juz 30';
+      case 'level2':
+        return 'Level 2 - Surah Pilihan';
+      case 'level3':
+        return 'Level 3 - Juz 1-29';
+      default:
+        return 'Tahap ?';
+    }
+  }
+
   // Method to show hafalan dialog
   void showHafalanDialog(Datum santri) {
     controller.statusSetoran.value = 'TambahHafalan';
@@ -635,13 +651,13 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      santri.nama!,
-                      overflow: TextOverflow.ellipsis,
+                      santri.nama ?? '-',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
                         fontWeight: FontWeight.w500,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 10),
 
@@ -681,12 +697,16 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            _getTahapLabel(santri.tahapHafalan),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
+                          Flexible(
+                            child: Text(
+                              _getTahapLabel2(santri.tahapHafalan),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           ),
                         ],
@@ -818,7 +838,9 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.1,
+                                      ),
                                       blurRadius: 8,
                                       offset: const Offset(0, 4),
                                     ),
@@ -848,6 +870,10 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                                   .selectedSurahHafalan
                                                   .value =
                                               null;
+                                          controller.currentAyat.value = 0;
+                                          controller.totalAyat.value = 0;
+                                          controller.progressPercentage.value =
+                                              0;
                                           controller.detailHafalan.value = null;
                                           controller.inputJumlahAyatController
                                               .clear();
@@ -882,6 +908,54 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                     borderSide: BorderSide(
                                       color: Colors.grey[300]!,
                                     ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              // Progress Info
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      'Progres Ayat',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey[600],
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                  Obx(
+                                    () => Text(
+                                      '${controller.currentAyat.value} / ${controller.totalAyat.value}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              // Progress Bar
+                              Container(
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Obx(
+                                  () => LinearProgressIndicator(
+                                    value: controller.progressPercentage.value,
+                                    backgroundColor: Colors.grey[200],
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(4),
                                   ),
                                 ),
                               ),
@@ -927,6 +1001,8 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                   }
                                   return null;
                                 },
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
                                 enabled: controller.detailHafalan.value != null,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
@@ -1054,12 +1130,17 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     Expanded(
                       child: TextButton(
                         onPressed: () {
-                          controller.selectedSurahHafalan.value = null;
-                          controller.inputJumlahAyatController.text = '';
-                          controller.ayatList.clear();
-                          controller.statusSetoran.value = '';
-                          controller.catatanController.clear();
                           Get.back();
+                          Future.delayed(const Duration(milliseconds: 500), () {
+                            controller.selectedSurahHafalan.value = null;
+                            controller.currentAyat.value = 0;
+                            controller.totalAyat.value = 0;
+                            controller.progressPercentage.value = 0;
+                            controller.inputJumlahAyatController.text = '';
+                            controller.ayatList.clear();
+                            controller.statusSetoran.value = '';
+                            controller.catatanController.clear();
+                          });
                         },
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -1168,13 +1249,13 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      santri.nama!,
-                      overflow: TextOverflow.ellipsis,
+                      santri.nama ?? '-',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
                         fontWeight: FontWeight.w500,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 10),
 
@@ -1215,12 +1296,16 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            _getTahapLabel(santri.tahapHafalan),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
+                          Flexible(
+                            child: Text(
+                              _getTahapLabel2(santri.tahapHafalan),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           ),
                         ],
@@ -1391,6 +1476,10 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                           controller.selectedAyatAkhir.value =
                                               null;
                                           controller.ayatList.clear();
+                                          controller.currentAyat.value = 0;
+                                          controller.totalAyat.value = 0;
+                                          controller.progressPercentage.value =
+                                              0;
                                         },
                                       );
                                     }
@@ -1421,6 +1510,54 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                     borderSide: BorderSide(
                                       color: Colors.grey[300]!,
                                     ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              // Progress Info
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      'Progres Ayat',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey[600],
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                  Obx(
+                                    () => Text(
+                                      '${controller.currentAyat.value} / ${controller.totalAyat.value}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              // Progress Bar
+                              Container(
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Obx(
+                                  () => LinearProgressIndicator(
+                                    value: controller.progressPercentage.value,
+                                    backgroundColor: Colors.grey[200],
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(4),
                                   ),
                                 ),
                               ),
@@ -1545,13 +1682,18 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     Expanded(
                       child: TextButton(
                         onPressed: () {
-                          controller.selectedSurahMurajaah.value = null;
-                          controller.selectedAyatMulai.value = null;
-                          controller.selectedAyatAkhir.value = null;
-                          controller.ayatList.clear();
-                          controller.statusSetoran.value = '';
-                          controller.catatanController.clear();
                           Get.back();
+                          Future.delayed(const Duration(milliseconds: 500), () {
+                            controller.selectedSurahMurajaah.value = null;
+                            controller.selectedAyatMulai.value = null;
+                            controller.selectedAyatAkhir.value = null;
+                            controller.ayatList.clear();
+                            controller.currentAyat.value = 0;
+                            controller.totalAyat.value = 0;
+                            controller.progressPercentage.value = 0;
+                            controller.statusSetoran.value = '';
+                            controller.catatanController.clear();
+                          });
                         },
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
