@@ -1,11 +1,15 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends GetxController {
+  final formKey = GlobalKey<FormState>();
+
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -27,47 +31,59 @@ class LoginController extends GetxController {
 
   /// Handle login process
   void callLoginApi() async {
-    if (emailController.text.isNotEmpty && passwordController.text.isNotEmpty) {
-      try {
-        final response = await post(
-          Uri.parse('http://10.0.2.2:5000/api/auth/login'),
-          body: jsonEncode({
-            'email': emailController.text,
-            'password': passwordController.text,
-            'platform': 'mobile',
-          }),
-          headers: {'Content-Type': 'application/json'},
-        );
+    try {
+      final response = await post(
+        Uri.parse('http://10.0.2.2:5000/api/auth/login'),
+        body: jsonEncode({
+          'email': emailController.text,
+          'password': passwordController.text,
+          'platform': 'mobile',
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
 
-        var data = jsonDecode(response.body);
-        print(response.statusCode);
-        print(data);
+      var data = jsonDecode(response.body);
+      print(response.statusCode);
+      print(data);
 
-        if (response.statusCode == 200) {
-          final SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('token', data['token'].toString());
-          await prefs.setString('role', data['user']['role'].toString());
-          await prefs.setString('userId', data['user']['id'].toString());
-          await prefs.setString('roleId', data['user']['roleId'].toString());
-          Get.snackbar('Success', 'Login berhasil');
-          // Navigate to home or another page
-          if (data['user']['role'] == 'santri') {
-            Get.offAllNamed('/santri-main');
-          } else if (data['user']['role'] == 'ustadz') {
-            Get.offAllNamed('/ustadz-main');
-          } else if (data['user']['role'] == 'ortu') {
-            Get.offAllNamed('/ortu-main');
-          } else {
-            Get.offAllNamed('/home');
-          }
+      if (response.statusCode == 200) {
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', data['token'].toString());
+        await prefs.setString('role', data['user']['role'].toString());
+        await prefs.setString('userId', data['user']['id'].toString());
+        await prefs.setString('roleId', data['user']['roleId'].toString());
+        ToastUtils.showSuccessToast('Login berhasil');
+        // Navigate to home or another page
+        if (data['user']['role'] == 'santri') {
+          Get.offAllNamed('/santri-main');
+        } else if (data['user']['role'] == 'ustadz') {
+          Get.offAllNamed('/ustadz-main');
+        } else if (data['user']['role'] == 'ortu') {
+          Get.offAllNamed('/ortu-main');
         } else {
-          Get.snackbar('Error', data['message'] ?? 'Login gagal');
+          Get.offAllNamed('/home');
         }
-      } catch (e) {
-        Get.snackbar('Error', 'An error occurred: $e');
+      } else if (response.statusCode == 401 || response.statusCode == 404) {
+        ToastUtils.showErrorToast('Email atau password salah');
+      } else {
+        ToastUtils.showErrorToast('Login gagal');
       }
-    } else {
-      Get.snackbar('Error', 'Email and password tidak boleh kosong');
+    } catch (e) {
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     }
+  }
+
+  String? validateEmail(String? email) {
+    RegExp emailRegex = RegExp(
+      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+    );
+    if (email == null || email.isEmpty) {
+      return 'Email tidak boleh kosong';
+    } else if (!emailRegex.hasMatch(email)) {
+      return 'Masukkan email yang valid';
+    }
+    return null;
   }
 }

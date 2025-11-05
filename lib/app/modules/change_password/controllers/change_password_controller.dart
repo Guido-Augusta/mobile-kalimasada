@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum ChangePasswordStep { oldPassword, newPassword }
 
 class ChangePasswordController extends GetxController {
+  final formKey = GlobalKey<FormState>();
+
   var isLoading = false.obs;
   var isValidating = false.obs;
 
@@ -37,8 +40,14 @@ class ChangePasswordController extends GetxController {
       final token = prefs.getString('token');
 
       if (token == null) {
-        Get.snackbar('Error', 'No authentication token found');
-        return;
+        prefs.remove('token');
+        prefs.remove('role');
+        prefs.remove('userId');
+        prefs.remove('roleId');
+        Get.offAllNamed('/login');
+        ToastUtils.showErrorToast(
+          'Token tidak ditemukan\nSilakan login kembali',
+        );
       }
 
       final response = await http.post(
@@ -52,15 +61,19 @@ class ChangePasswordController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
+      print(data);
       if (response.statusCode == 200) {
         step.value = ChangePasswordStep.newPassword;
         oldPasswordVar.value = oldPassword;
-        Get.snackbar('Success', 'Password lama berhasil diverifikasi');
+        formKey.currentState!.reset();
+        ToastUtils.showSuccessToast('Password lama berhasil diverifikasi');
       } else {
-        Get.snackbar('Error', data['error'] ?? 'Gagal diverifikasi');
+        ToastUtils.showErrorToast('Verifikasi gagal');
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isValidating.value = false;
     }
@@ -73,8 +86,14 @@ class ChangePasswordController extends GetxController {
       final token = prefs.getString('token');
 
       if (token == null) {
-        Get.snackbar('Error', 'No authentication token found');
-        return;
+        prefs.remove('token');
+        prefs.remove('role');
+        prefs.remove('userId');
+        prefs.remove('roleId');
+        Get.offAllNamed('/login');
+        ToastUtils.showErrorToast(
+          'Token tidak ditemukan\nSilakan login kembali',
+        );
       }
 
       final response = await http.post(
@@ -91,14 +110,18 @@ class ChangePasswordController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
+      print(data);
       if (response.statusCode == 200) {
-        Get.snackbar('Success', 'Password berhasil diubah');
+        logout();
+        ToastUtils.showSuccessToast('Password berhasil diubah');
         showSuccessDialog();
       } else {
-        Get.snackbar('Error', data['error'] ?? 'Gagal mengubah password');
+        ToastUtils.showErrorToast('Gagal mengubah password');
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isValidating.value = false;
     }
@@ -113,18 +136,19 @@ class ChangePasswordController extends GetxController {
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
+      print(data);
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');
         await prefs.remove('userId');
         await prefs.remove('roleId');
-        Get.offAllNamed('/login');
-        Get.snackbar('Success', 'Silahkan login kembali');
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Logout gagal');
+        ToastUtils.showErrorToast('Gagal logout');
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     }
   }
 
@@ -172,7 +196,10 @@ class ChangePasswordController extends GetxController {
                         height: 48,
                         child: ElevatedButton(
                           onPressed: () {
-                            logout();
+                            Get.offAllNamed('/login');
+                            ToastUtils.showSuccessToast(
+                              'Silahkan login kembali',
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF6B46C1),

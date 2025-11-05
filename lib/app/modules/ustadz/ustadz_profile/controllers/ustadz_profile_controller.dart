@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:path/path.dart' as path;
 
 import 'package:flutter/material.dart';
@@ -12,6 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 
 class UstadzProfileController extends GetxController {
+  final formKey = GlobalKey<FormState>();
+
   final isLoading = true.obs;
   final isSaveLoading = false.obs;
   final isUploadingImage = false.obs;
@@ -33,11 +36,11 @@ class UstadzProfileController extends GetxController {
   }
 
   Future<void> fetchUstadzData() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final roleId = prefs.getString('roleId');
     try {
       isLoading.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final roleId = prefs.getString('roleId');
 
       final response = await http.get(
         Uri.parse('http://10.0.2.2:5000/api/ustadz/$roleId'),
@@ -57,10 +60,12 @@ class UstadzProfileController extends GetxController {
         alamatC.text = ustadz.alamat!;
         jenisKelaminC.text = ustadz.jenisKelamin!;
       } else {
-        Get.snackbar('Error', 'Gagal memuat data profil');
+        ToastUtils.showErrorToast('Gagal memuat data profil');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memuat data profil');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -99,12 +104,14 @@ class UstadzProfileController extends GetxController {
         }
         print(response.body);
         Get.back();
-        Get.snackbar('Success', 'Profil berhasil diperbarui');
+        ToastUtils.showSuccessToast('Profil berhasil diperbarui');
       } else {
-        Get.snackbar('Error', 'Gagal memuat data profil');
+        ToastUtils.showErrorToast('Gagal memperbarui profil');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memuat data profil');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -125,21 +132,16 @@ class UstadzProfileController extends GetxController {
         print(pickedImage.path);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memilih gambar: $e');
+      ToastUtils.showErrorToast('Gagal memilih gambar');
     }
   }
 
   Future<void> uploadImage(String imagePath) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final roleId = prefs.getString('roleId');
-
-    print('DEBUG: Starting upload');
-    print('DEBUG: Token: $token');
-    print('DEBUG: Role ID: $roleId');
-    print('DEBUG: Image path: $imagePath');
-
     try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final roleId = prefs.getString('roleId');
+
       final request = http.MultipartRequest(
         'PUT',
         Uri.parse('http://10.0.2.2:5000/api/ustadz/$roleId'),
@@ -177,15 +179,8 @@ class UstadzProfileController extends GetxController {
 
       request.files.add(multipartFile);
 
-      print('DEBUG: Request prepared, sending...');
-      print('DEBUG: File name: $finalFileName');
-      print('DEBUG: Content type: $contentType');
-
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
-
-      print('DEBUG: Response status: ${response.statusCode}');
-      print('DEBUG: Response body: $responseBody');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(responseBody);
@@ -198,18 +193,12 @@ class UstadzProfileController extends GetxController {
         }
 
         Get.back();
-        Get.snackbar('Success', 'Foto profil berhasil diperbarui');
+        ToastUtils.showSuccessToast('Foto profil berhasil diperbarui');
       } else {
-        print('DEBUG: Upload failed with status: ${response.statusCode}');
-        print('DEBUG: Upload failed with body: $responseBody');
-        Get.snackbar(
-          'Error',
-          'Gagal mengupload foto profil (Status: ${response.statusCode})',
-        );
+        ToastUtils.showErrorToast('Gagal mengupload foto profil');
       }
     } catch (e) {
-      print('DEBUG: Upload error: $e');
-      Get.snackbar('Error', 'Gagal mengupload foto profil: $e');
+      ToastUtils.showErrorToast('Gagal mengupload foto profil');
     } finally {
       isUploadingImage.value = false;
     }
@@ -228,7 +217,6 @@ class UstadzProfileController extends GetxController {
         },
       );
       var data = jsonDecode(response.body);
-      print(response.statusCode);
       print(data);
       if (response.statusCode == 200) {
         await prefs.remove('token');
@@ -236,12 +224,14 @@ class UstadzProfileController extends GetxController {
         await prefs.remove('userId');
         await prefs.remove('roleId');
         Get.offAllNamed('/login');
-        Get.snackbar('Success', 'Logout berhasil');
+        ToastUtils.showSuccessToast('Logout berhasil');
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Logout gagal');
+        ToastUtils.showErrorToast('Logout gagal');
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     }
   }
 

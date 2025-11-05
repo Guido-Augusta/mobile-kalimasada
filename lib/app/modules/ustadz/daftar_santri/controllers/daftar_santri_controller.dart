@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart';
+import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart' as ds;
+import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart' as ph;
 import 'package:mobile_kalimasada/app/data/models/surah.dart' as s;
 import 'package:mobile_kalimasada/app/data/models/ayat_hafalan.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan.dart' as dh;
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:toastification/toastification.dart';
-
 class DaftarSantriController extends GetxController {
   final isLoading = false.obs;
   final isSaveLoading = false.obs;
-  var santriList = <Datum>[].obs;
   var searchQuery = ''.obs;
   var tahapHafalan = 'level1'.obs;
+
+  var santriList = <ds.Datum>[].obs;
+  var progresHafalan = <ph.Datum>[].obs;
+  var progressPercentage = 0.0.obs;
+  var currentAyat = 0.obs;
+  var totalAyat = 0.obs;
 
   final int _perPage = 10;
   var currentPage = 1;
@@ -87,35 +92,7 @@ class DaftarSantriController extends GetxController {
       final token = prefs.getString('token');
 
       if (token == null) {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Anda tidak terautentikasi',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          applyBlurEffect: true,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 1500),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Anda tidak terautentikasi');
         Get.offAllNamed('/login');
         return;
       }
@@ -133,8 +110,8 @@ class DaftarSantriController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final newItems = List<Datum>.from(
-          data['data'].map((x) => Datum.fromJson(x)),
+        final newItems = List<ds.Datum>.from(
+          data['data'].map((x) => ds.Datum.fromJson(x)),
         );
 
         if (newItems.length < _perPage) {
@@ -144,34 +121,7 @@ class DaftarSantriController extends GetxController {
         santriList.addAll(newItems);
       } else {
         currentPage--; // Revert page on error
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Gagal memuat data tambahan',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 1500),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Gagal memuat data tambahan');
       }
     } catch (e) {
       currentPage--; // Revert page on error
@@ -179,34 +129,8 @@ class DaftarSantriController extends GetxController {
       if (_lastErrorShown == null ||
           now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
         _lastErrorShown = now;
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.start,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            direction: Axis.horizontal,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Gagal memuat data\nPeriksa koneksi internet Anda',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(seconds: 2),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
         );
       }
     } finally {
@@ -223,34 +147,7 @@ class DaftarSantriController extends GetxController {
       final token = prefs.getString('token');
 
       if (token == null) {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Anda tidak terautentikasi',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 1500),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Anda tidak terautentikasi');
         Get.offAllNamed('/login');
         return;
       }
@@ -268,8 +165,8 @@ class DaftarSantriController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final items = List<Datum>.from(
-          data['data'].map((x) => Datum.fromJson(x)),
+        final items = List<ds.Datum>.from(
+          data['data'].map((x) => ds.Datum.fromJson(x)),
         );
 
         if (items.length < _perPage) {
@@ -278,60 +175,11 @@ class DaftarSantriController extends GetxController {
 
         santriList.value = items;
       } else {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text('Gagal memuat data', style: TextStyle(color: Colors.white)),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 1500),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Gagal memuat data');
       }
     } catch (e) {
-      toastification.show(
-        context: Get.context!,
-        title: Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.white),
-            SizedBox(width: 10),
-            Text(
-              'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        icon: Icon(Icons.error, color: Colors.white),
-        showIcon: true,
-        backgroundColor: Color(0xFF6B6B6B),
-        borderSide: BorderSide.none,
-        alignment: Alignment.bottomCenter,
-        autoCloseDuration: const Duration(milliseconds: 1500),
-        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-        animationBuilder: (context, animation, alignment, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        type: ToastificationType.error,
-        style: ToastificationStyle.simple,
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     } finally {
       isLoading.value = false;
@@ -353,63 +201,11 @@ class DaftarSantriController extends GetxController {
             .map((json) => s.Surah.fromJson(json))
             .toList();
       } else {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Gagal memuat data surah',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 1500),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Gagal memuat data surah');
       }
     } catch (e) {
-      toastification.show(
-        context: Get.context!,
-        title: Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.white),
-            SizedBox(width: 10),
-            Text(
-              'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        icon: Icon(Icons.error, color: Colors.white),
-        showIcon: true,
-        backgroundColor: Color(0xFF6B6B6B),
-        borderSide: BorderSide.none,
-        alignment: Alignment.bottomCenter,
-        autoCloseDuration: const Duration(milliseconds: 1500),
-        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-        animationBuilder: (context, animation, alignment, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        type: ToastificationType.error,
-        style: ToastificationStyle.simple,
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     } finally {
       isLoadingSurah.value = false;
@@ -420,10 +216,11 @@ class DaftarSantriController extends GetxController {
     String santriId,
     String surahId,
   ) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
     try {
       isLoadingAyat.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
       final response = await http.get(
         Uri.parse(
           'http://10.0.2.2:5000/api/hafalan/$santriId/surah/$surahId?mode=murajaah',
@@ -442,63 +239,11 @@ class DaftarSantriController extends GetxController {
             .map((json) => AyatHafalan.fromJson(json))
             .toList();
       } else {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Gagal memuat data ayat',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 1500),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Gagal memuat data ayat');
       }
     } catch (e) {
-      toastification.show(
-        context: Get.context!,
-        title: Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.white),
-            SizedBox(width: 10),
-            Text(
-              'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        icon: Icon(Icons.error, color: Colors.white),
-        showIcon: true,
-        backgroundColor: Color(0xFF6B6B6B),
-        borderSide: BorderSide.none,
-        alignment: Alignment.bottomCenter,
-        autoCloseDuration: const Duration(milliseconds: 1500),
-        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-        animationBuilder: (context, animation, alignment, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        type: ToastificationType.error,
-        style: ToastificationStyle.simple,
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     } finally {
       isLoadingAyat.value = false;
@@ -515,41 +260,67 @@ class DaftarSantriController extends GetxController {
     selectedAyatAkhir.value = null;
 
     if (newSurah != null) {
+      getProgresAyat(newSurah.id!);
       if (statusSetoran == 'TambahHafalan') {
         getDetailTambahHafalan(santriId, newSurah.id.toString());
       } else if (statusSetoran == 'Murajaah') {
-        // selectedSurahMurajaah.value = newSurah;
         fetchAyatMurajaahForSurah(santriId, newSurah.id.toString());
       } else {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Invalid status setoran',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 1500),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Invalid status setoran');
       }
+    }
+  }
+
+  void getProgresAyat(int surahId) {
+    // Parse progress string to get current and total ayat
+    final progressParts =
+        progresHafalan
+            .where((element) => element.id == surahId)
+            .first
+            .progress
+            ?.split('/') ??
+        ['0', '0'];
+    currentAyat.value = int.tryParse(progressParts[0]) ?? 0;
+    totalAyat.value =
+        progresHafalan
+            .where((element) => element.id == surahId)
+            .first
+            .totalAyat ??
+        int.tryParse(progressParts[1]) ??
+        0;
+    progressPercentage.value = totalAyat.value > 0
+        ? (currentAyat.value / totalAyat.value)
+        : 0.0;
+  }
+
+  Future<void> getProgresHafalan(String santriId) async {
+    try {
+      isLoading.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:5000/api/hafalan/$santriId/surah'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'x-platform': 'mobile',
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        progresHafalan.value = List<ph.Datum>.from(
+          data['data'].map((x) => ph.Datum.fromJson(x)),
+        );
+      } else {
+        ToastUtils.showErrorToast('Gagal memuat ayat');
+      }
+    } catch (e) {
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -573,60 +344,11 @@ class DaftarSantriController extends GetxController {
         final data = jsonDecode(response.body);
         detailHafalan.value = dh.DetailHafalan.fromJson(data);
       } else {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text('Gagal memuat ayat', style: TextStyle(color: Colors.white)),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 1500),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Gagal memuat ayat');
       }
     } catch (e) {
-      toastification.show(
-        context: Get.context!,
-        title: Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.white),
-            SizedBox(width: 10),
-            Text(
-              'Terjadi kesalahan saat memuat ayat\nPeriksa koneksi internet Anda',
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        icon: Icon(Icons.error, color: Colors.white),
-        showIcon: true,
-        backgroundColor: Color(0xFF6B6B6B),
-        borderSide: BorderSide.none,
-        alignment: Alignment.bottomCenter,
-        autoCloseDuration: const Duration(milliseconds: 1500),
-        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-        animationBuilder: (context, animation, alignment, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        type: ToastificationType.error,
-        style: ToastificationStyle.simple,
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     } finally {
       isLoading.value = false;
@@ -663,34 +385,7 @@ class DaftarSantriController extends GetxController {
       // 4. Ambil ayat-ayat berikutnya sesuai jumlah yang diinput
       int jumlahAyatDitambahkan = int.parse(inputJumlahAyatController.text);
       if (jumlahAyatDitambahkan <= 0) {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Jumlah ayat harus lebih dari 0',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 1500),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Jumlah ayat harus lebih dari 0');
         isSaveLoading.value = false;
         return;
       }
@@ -745,106 +440,27 @@ class DaftarSantriController extends GetxController {
         final data = jsonDecode(response.body);
         print(data);
         Get.back();
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.check_circle_outline_rounded, color: Colors.green),
-              SizedBox(width: 10),
-              Text(
-                'Hafalan berhasil ditambahkan',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.check_circle_outline_rounded, color: Colors.green),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 2000),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.success,
-          style: ToastificationStyle.simple,
-        );
+        Future.delayed(const Duration(milliseconds: 500), () {
+          ayatIds = [];
+          inputJumlahAyatController.text = '';
+          selectedSurahHafalan.value = null;
+          currentAyat.value = 0;
+          totalAyat.value = 0;
+          progressPercentage.value = 0;
+          statusSetoran.value = '';
+          catatanController.clear();
+        });
+        ToastUtils.showSuccessToast('Hafalan berhasil ditambahkan');
       } else {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Gagal menambahkan hafalan',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 2000),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Gagal menambahkan hafalan');
       }
     } catch (e) {
-      print(e);
-      toastification.show(
-        context: Get.context!,
-        title: Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.white),
-            SizedBox(width: 10),
-            Text(
-              'Terjadi kesalahan saat menambahkan hafalan\nPeriksa koneksi internet Anda',
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        icon: Icon(Icons.error, color: Colors.white),
-        showIcon: true,
-        backgroundColor: Color(0xFF6B6B6B),
-        borderSide: BorderSide.none,
-        alignment: Alignment.bottomCenter,
-        autoCloseDuration: const Duration(milliseconds: 2000),
-        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-        animationBuilder: (context, animation, alignment, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        type: ToastificationType.error,
-        style: ToastificationStyle.simple,
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     } finally {
       isSaveLoading.value = false;
     }
-
-    ayatIds = [];
-    inputJumlahAyatController.text = '';
-    selectedAyatMulai.value = null;
-    selectedAyatAkhir.value = null;
-    selectedSurahHafalan.value = null;
-    statusSetoran.value = '';
-    catatanController.clear();
-    isSaveLoading.value = false;
   }
 
   void saveMurajaah(String santriId) async {
@@ -884,103 +500,27 @@ class DaftarSantriController extends GetxController {
         final data = jsonDecode(response.body);
         print(data);
         Get.back();
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.check_circle_outline_rounded, color: Colors.green),
-              SizedBox(width: 10),
-              Text(
-                'Murajaah berhasil ditambahkan',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.check_circle_outline_rounded, color: Colors.green),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 2000),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.success,
-          style: ToastificationStyle.simple,
-        );
+        Future.delayed(const Duration(milliseconds: 500), () {
+          selectedAyatMulai.value = null;
+          selectedAyatAkhir.value = null;
+          selectedSurahMurajaah.value = null;
+          statusSetoran.value = '';
+          catatanController.clear();
+          currentAyat.value = 0;
+          totalAyat.value = 0;
+          progressPercentage.value = 0;
+        });
+        ToastUtils.showSuccessToast('Murajaah berhasil ditambahkan');
       } else {
-        toastification.show(
-          context: Get.context!,
-          title: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 10),
-              Text(
-                'Gagal menambahkan hafalan',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          icon: Icon(Icons.error, color: Colors.white),
-          showIcon: true,
-          backgroundColor: Color(0xFF6B6B6B),
-          borderSide: BorderSide.none,
-          alignment: Alignment.bottomCenter,
-          autoCloseDuration: const Duration(milliseconds: 2000),
-          closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-          animationBuilder: (context, animation, alignment, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          type: ToastificationType.error,
-          style: ToastificationStyle.simple,
-        );
+        ToastUtils.showErrorToast('Gagal menambah murajaah');
       }
     } catch (e) {
-      print(e);
-      toastification.show(
-        context: Get.context!,
-        title: Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.white),
-            SizedBox(width: 10),
-            Text(
-              'Terjadi kesalahan saat menambahkan murajaah\nPeriksa koneksi internet Anda',
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        icon: Icon(Icons.error, color: Colors.white),
-        showIcon: true,
-        backgroundColor: Color(0xFF6B6B6B),
-        borderSide: BorderSide.none,
-        alignment: Alignment.bottomCenter,
-        autoCloseDuration: const Duration(milliseconds: 2000),
-        closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
-        animationBuilder: (context, animation, alignment, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        type: ToastificationType.error,
-        style: ToastificationStyle.simple,
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     } finally {
       isSaveLoading.value = false;
     }
-
-    selectedAyatMulai.value = null;
-    selectedAyatAkhir.value = null;
-    selectedSurahMurajaah.value = null;
-    statusSetoran.value = '';
-    catatanController.clear();
   }
 
   String getImageUrl(String imageUrl) {

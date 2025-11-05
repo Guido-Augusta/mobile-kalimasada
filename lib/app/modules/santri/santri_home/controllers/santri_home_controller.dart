@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum ChartType { hafalanBaru, murajaah }
@@ -56,7 +57,6 @@ class SantriHomeController extends GetxController {
   void onInit() {
     super.onInit();
     getSantri();
-    getChart();
   }
 
   void updateRange(String newRange) {
@@ -70,11 +70,12 @@ class SantriHomeController extends GetxController {
   }
 
   Future<void> getSantri() async {
-    isLoading.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final roleId = prefs.getString('roleId');
     try {
+      isLoading.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final roleId = prefs.getString('roleId');
+
       final response = await get(
         Uri.parse('http://10.0.2.2:5000/api/santri/$roleId'),
         headers: {
@@ -87,24 +88,27 @@ class SantriHomeController extends GetxController {
       print(response.statusCode);
       print(data);
       if (response.statusCode == 200) {
+        getChart();
         santri.value = s.Santri.fromJson(data['data']);
         fotoProfil.value = getImageUrl(santri.value!.fotoProfil!);
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Gagal mendapatkan data');
+        ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
     } catch (e) {
-      print(e);
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     }
     isLoading.value = false;
   }
 
   void getChart() async {
-    isLoadingChart.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final roleId = prefs.getString('roleId');
     try {
+      isLoadingChart.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final roleId = prefs.getString('roleId');
+
       final response = await get(
         Uri.parse(
           'http://10.0.2.2:5000/api/chart?range=$range&santriId=$roleId',
@@ -121,28 +125,26 @@ class SantriHomeController extends GetxController {
       if (response.statusCode == 200) {
         chart.value = c.Chart.fromJson(data);
       } else {
-        Get.snackbar(
-          'Error',
-          data['message'] ?? 'Gagal mendapatkan data chart',
-        );
+        ToastUtils.showErrorToast('Gagal mendapatkan data chart');
       }
     } catch (e) {
-      print(e);
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     }
     isLoadingChart.value = false;
   }
 
   Future<void> logout() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
     try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+
       final response = await post(
         Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
-      print(response.statusCode);
       print(data);
       if (response.statusCode == 200) {
         await prefs.remove('token');
@@ -150,12 +152,14 @@ class SantriHomeController extends GetxController {
         await prefs.remove('userId');
         await prefs.remove('roleId');
         Get.offAllNamed('/login');
-        Get.snackbar('Success', 'Logout berhasil');
+        ToastUtils.showSuccessToast('Logout berhasil');
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Logout gagal');
+        ToastUtils.showErrorToast('Logout gagal');
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     }
   }
 }

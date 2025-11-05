@@ -13,36 +13,26 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFF),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight:
-                  MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top,
+        child: RefreshIndicator(
+          onRefresh: () async => controller.getOrtu(),
+          child: ListView(
+            padding: const EdgeInsets.only(
+              top: 20,
+              left: 20,
+              right: 20,
+              bottom: 30,
             ),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                top: 20,
-                left: 20,
-                right: 20,
-                bottom: 30,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  const SizedBox(height: 30),
-                  _buildWelcomeCard(context),
-                  const SizedBox(height: 25),
-                  _buildIslamicDecoration(context),
-                  const SizedBox(height: 25),
-                  _buildChildrenListHeader(),
-                  const SizedBox(height: 14),
-                  _buildChildrenList(context),
-                ],
-              ),
-            ),
+            children: [
+              _buildHeader(context),
+              const SizedBox(height: 30),
+              _buildWelcomeCard(context),
+              const SizedBox(height: 25),
+              _buildIslamicDecoration(context),
+              const SizedBox(height: 25),
+              _buildChildrenListHeader(),
+              const SizedBox(height: 14),
+              _buildChildrenList(context),
+            ],
           ),
         ),
       ),
@@ -106,7 +96,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                 () => Text(
                   controller.ortu.value?.nama ?? '',
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
+                  maxLines: 1,
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -117,6 +107,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
             ],
           ),
         ),
+        const SizedBox(width: 4),
         Container(
           decoration: BoxDecoration(
             color: Colors.red.withValues(alpha: 0.1),
@@ -128,6 +119,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
+                    backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),

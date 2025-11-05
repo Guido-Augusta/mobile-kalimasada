@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProgresHafalanController extends GetxController {
@@ -26,11 +27,11 @@ class ProgresHafalanController extends GetxController {
   }
 
   Future<void> getProgresHafalan(String santriId) async {
-    isLoading.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
     try {
       isLoading.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
       final response = await http.get(
         Uri.parse('http://10.0.2.2:5000/api/hafalan/$santriId/surah'),
         headers: {
@@ -46,10 +47,12 @@ class ProgresHafalanController extends GetxController {
           data['data'].map((x) => Datum.fromJson(x)),
         );
       } else {
-        Get.snackbar('Error', 'Failed to load ayat');
+        ToastUtils.showErrorToast('Gagal memuat ayat');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan saat memuat ayat');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }

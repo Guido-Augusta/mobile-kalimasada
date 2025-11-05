@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart' as o;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OrtuHomeController extends GetxController {
@@ -17,35 +18,6 @@ class OrtuHomeController extends GetxController {
   var childrenList = RxList<s.Santri>();
 
   var currentIndex = 0.obs;
-  var islamicQuotes = [
-    {
-      'quote': 'اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ',
-      'translation': 'Bacalah dengan (menyebut) nama Tuhanmu yang menciptakan!',
-      'source': 'QS. Al-Alaq: 1',
-    },
-    {
-      'quote': 'وَقُل رَّبِّ زِدْنِي عِلْمًا',
-      'translation':
-          'Dan katakanlah: "Ya Tuhanku, tambahkanlah kepadaku ilmu pengetahuan"',
-      'source': 'QS. Thaha: 114',
-    },
-    {
-      'quote': 'إِنَّ مَعَ الْعُسْرِ يُسْرًا',
-      'translation': 'Sesungguhnya beserta kesulitan ada kemudahan',
-      'source': 'QS. Al-Insyirah: 6',
-    },
-    {
-      'quote': 'فَاذْكُرُونِي أَذْكُرْكُمْ',
-      'translation': 'Maka ingatlah kepada-Ku, Aku pun akan ingat kepadamu',
-      'source': 'QS. Al-Baqarah: 152',
-    },
-    {
-      'quote': 'وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ',
-      'translation':
-          'Dan tidak ada keberhasilanku melainkan dengan (pertolongan) Allah',
-      'source': 'QS. Hud: 88',
-    },
-  ];
 
   @override
   void onInit() {
@@ -59,11 +31,12 @@ class OrtuHomeController extends GetxController {
   }
 
   void getOrtu() async {
-    isLoading.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final roleId = prefs.getString('roleId');
     try {
+      isLoading.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final roleId = prefs.getString('roleId');
+
       final response = await get(
         Uri.parse('http://10.0.2.2:5000/api/ortu/$roleId'),
         headers: {
@@ -83,11 +56,12 @@ class OrtuHomeController extends GetxController {
           await getChildrenList();
         }
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Gagal mendapatkan data');
+        ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
     } catch (e) {
-      print(e);
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     }
     isLoading.value = false;
   }
@@ -111,11 +85,12 @@ class OrtuHomeController extends GetxController {
           s.Santri.fromJson(data['data']),
         );
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Gagal mendapatkan data');
+        ToastUtils.showErrorToast('Gagal mendapatkan data anak');
       }
     } catch (e) {
-      print(e);
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     }
   }
 
@@ -130,8 +105,7 @@ class OrtuHomeController extends GetxController {
         }
       }
     } catch (e) {
-      print(e);
-      Get.snackbar('Error', 'Gagal memuat data anak');
+      ToastUtils.showErrorToast('Gagal memuat data anak');
     }
     isLoadingChildren.value = false;
   }
@@ -153,12 +127,14 @@ class OrtuHomeController extends GetxController {
         await prefs.remove('userId');
         await prefs.remove('roleId');
         Get.offAllNamed('/login');
-        Get.snackbar('Success', 'Logout berhasil');
+        ToastUtils.showSuccessToast('Logout berhasil');
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Logout gagal');
+        ToastUtils.showErrorToast('Logout gagal');
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     }
   }
 }

@@ -3,7 +3,6 @@ part of 'app_pages.dart';
 
 abstract class Routes {
   Routes._();
-  static const HOME = _Paths.HOME;
   static const LOGIN = _Paths.LOGIN;
   static const SPLASH = _Paths.SPLASH;
   static const SANTRI_HOME = _Paths.SANTRI_HOME;
@@ -17,7 +16,6 @@ abstract class Routes {
   static const USTADZ_MAIN = _Paths.USTADZ_MAIN;
   static const SANTRI_MAIN = _Paths.SANTRI_MAIN;
   static const ORTU_MAIN = _Paths.ORTU_MAIN;
-  static const SETORAN = _Paths.SETORAN;
   static const RIWAYAT_HAFALAN = _Paths.RIWAYAT_HAFALAN;
   static const DETAIL_RIWAYAT_HAFALAN = _Paths.DETAIL_RIWAYAT_HAFALAN;
   static const PERINGKAT = _Paths.PERINGKAT;
@@ -32,7 +30,6 @@ abstract class Routes {
 
 abstract class _Paths {
   _Paths._();
-  static const HOME = '/home';
   static const LOGIN = '/login';
   static const SPLASH = '/splash';
   static const SANTRI_HOME = '/santri-home';
@@ -46,7 +43,6 @@ abstract class _Paths {
   static const USTADZ_MAIN = '/ustadz-main';
   static const SANTRI_MAIN = '/santri-main';
   static const ORTU_MAIN = '/ortu-main';
-  static const SETORAN = '/setoran';
   static const RIWAYAT_HAFALAN = '/riwayat-hafalan';
   static const DETAIL_RIWAYAT_HAFALAN = '/detail-riwayat-hafalan';
   static const PERINGKAT = '/peringkat';

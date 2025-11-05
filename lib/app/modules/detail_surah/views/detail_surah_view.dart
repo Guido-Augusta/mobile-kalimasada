@@ -46,13 +46,13 @@ class DetailSurahView extends GetView<DetailSurahController> {
                 Container(
                   padding: EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.book_outlined,
                     size: 48,
-                    color: Colors.grey[400],
+                    color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -242,13 +242,13 @@ class DetailSurahView extends GetView<DetailSurahController> {
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                          color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.format_list_numbered_outlined,
                           size: 48,
-                          color: Colors.grey[400],
+                          color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
                         ),
                       ),
                       const SizedBox(height: 16),

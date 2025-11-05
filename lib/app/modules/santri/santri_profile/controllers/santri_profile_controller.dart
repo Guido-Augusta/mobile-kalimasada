@@ -6,13 +6,15 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
 import 'package:mobile_kalimasada/app/modules/santri/santri_home/controllers/santri_home_controller.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SantriProfileController extends GetxController {
+  final formKey = GlobalKey<FormState>();
+
   var isLoading = false.obs;
   var isSaveLoading = false.obs;
   var santriDetail = Rxn<Santri>();
@@ -36,11 +38,6 @@ class SantriProfileController extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     santriId = prefs.getString('roleId');
 
-    if (santriDetail.value?.tanggalLahir != null) {
-      tanggalLahirC.text = DateFormat(
-        'yyyy-MM-dd',
-      ).format(santriDetail.value!.tanggalLahir!);
-    }
     getSantriDetail(santriId!);
   }
 
@@ -62,7 +59,7 @@ class SantriProfileController extends GetxController {
   String getOrangTuaByTipe(List<OrangTua> orangTua, String tipe) {
     try {
       final orangTuaByTipe = orangTua.firstWhere(
-        (element) => element.tipe == tipe,
+        (element) => element.tipe?.toLowerCase() == tipe,
       );
       return orangTuaByTipe.nama ?? '-';
     } catch (e) {
@@ -75,11 +72,6 @@ class SantriProfileController extends GetxController {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-
-      if (token == null) {
-        Get.snackbar('Error', 'No authentication token found');
-        return;
-      }
 
       final response = await http.get(
         Uri.parse('http://10.0.2.2:5000/api/santri/$id'),
@@ -97,14 +89,12 @@ class SantriProfileController extends GetxController {
         fotoProfil.value = getImageUrl(santri.fotoProfil!);
         print('Santri detail loaded: ${santri.nama}');
       } else {
-        Get.snackbar(
-          'Error',
-          'Failed to load santri detail: ${response.statusCode}',
-        );
+        ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
     } catch (e) {
-      print('Error in getSantriDetail: $e');
-      Get.snackbar('Error', 'An error occurred: ${e.toString()}');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -125,16 +115,16 @@ class SantriProfileController extends GetxController {
         print(pickedImage.path);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memilih gambar: $e');
+      ToastUtils.showErrorToast('Gagal memilih gambar');
     }
   }
 
   Future<void> uploadImage(String imagePath) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final roleId = prefs.getString('roleId');
-
     try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final roleId = prefs.getString('roleId');
+
       final request = http.MultipartRequest(
         'PUT',
         Uri.parse('http://10.0.2.2:5000/api/santri/$roleId'),
@@ -186,15 +176,14 @@ class SantriProfileController extends GetxController {
         }
 
         Get.back();
-        Get.snackbar('Success', 'Foto profil berhasil diperbarui');
+        ToastUtils.showSuccessToast('Foto profil berhasil diperbarui');
       } else {
-        Get.snackbar(
-          'Error',
-          'Gagal mengupload foto profil (Status: ${response.statusCode})',
-        );
+        ToastUtils.showErrorToast('Gagal mengupload foto profil');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal mengupload foto profil: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isUploadingImage.value = false;
     }
@@ -207,11 +196,11 @@ class SantriProfileController extends GetxController {
     String? jenisKelamin,
     String? tanggalLahir,
   ) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final roleId = prefs.getString('roleId');
     try {
       isLoading.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final roleId = prefs.getString('roleId');
 
       final response = await http.put(
         Uri.parse('http://10.0.2.2:5000/api/santri/$roleId'),
@@ -236,38 +225,44 @@ class SantriProfileController extends GetxController {
         print(response.body);
         print('Tanggal Lahir: $tanggalLahir');
         Get.back();
-        Get.snackbar('Success', 'Profil berhasil diperbarui');
+        ToastUtils.showSuccessToast('Profil berhasil diperbarui');
       } else {
-        Get.snackbar('Error', 'Gagal memuat data profil');
+        ToastUtils.showErrorToast('Gagal memperbarui data profil');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memuat data profil');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<void> logout() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
     try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+
       final response = await http.post(
         Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
+      print(data);
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');
         await prefs.remove('userId');
         await prefs.remove('roleId');
         Get.offAllNamed('/login');
-        Get.snackbar('Success', 'Logout berhasil');
+        ToastUtils.showSuccessToast('Logout berhasil');
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Logout gagal');
+        ToastUtils.showErrorToast('Logout gagal');
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     }
   }
 }

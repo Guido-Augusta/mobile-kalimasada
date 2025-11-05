@@ -27,78 +27,67 @@ class PeringkatView extends GetView<PeringkatController> {
         ),
       ),
       body: SafeArea(
-        child: NotificationListener<ScrollNotification>(
-          onNotification: (ScrollNotification scrollInfo) {
-            if (!controller.isLoading.value &&
-                !controller.isLoadingMore.value &&
-                scrollInfo.metrics.pixels ==
-                    scrollInfo.metrics.maxScrollExtent &&
-                controller.hasMore) {
-              controller.loadMoreData();
-            }
-            return true;
+        child: RefreshIndicator(
+          onRefresh: () async {
+            controller.getPeringkat();
           },
-          child: RefreshIndicator(
-            onRefresh: () async {
-              controller.getPeringkat();
-            },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(context),
-                    const SizedBox(height: 24),
-                    // Search Bar
-                    _buildSearchBar(),
-                    const SizedBox(height: 24),
-                    _buildFilterChips(),
-                    const SizedBox(height: 20),
-                    Obx(
-                      () => controller.isLoading.value
-                          ? Container(
-                              height: 200,
-                              alignment: Alignment.center,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Color(0xFF6B46C1),
-                                    ),
+          child: SingleChildScrollView(
+            controller: controller.scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context),
+                  const SizedBox(height: 24),
+                  // Search Bar
+                  _buildSearchBar(),
+                  const SizedBox(height: 24),
+                  _buildFilterChips(),
+                  const SizedBox(height: 20),
+                  Obx(
+                    () => controller.isLoading.value
+                        ? Container(
+                            height: 200,
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Color(0xFF6B46C1),
                                   ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'Memuat peringkat...',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      color: const Color(0xFF6B7280),
-                                    ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Memuat peringkat...',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: const Color(0xFF6B7280),
                                   ),
-                                ],
-                              ),
-                            )
-                          : controller.peringkat.isEmpty
-                          ? _buildEmptyState()
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount:
-                                  controller.peringkat.length +
-                                  (controller.hasMore ? 1 : 0),
-                              itemBuilder: (context, index) {
-                                if (index >= controller.peringkat.length) {
-                                  return _buildLoadMoreIndicator();
-                                }
-                                final santri = controller.peringkat[index];
-                                return _buildRankingCard(santri, index);
-                              },
+                                ),
+                              ],
                             ),
-                    ),
-                  ],
-                ),
+                          )
+                        : controller.peringkat.isEmpty
+                        ? _buildEmptyState()
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount:
+                                controller.peringkat.length +
+                                (controller.hasMore ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (index >= controller.peringkat.length) {
+                                return _buildLoadMoreIndicator();
+                              }
+                              final santri = controller.peringkat[index];
+                              return _buildRankingCard(santri, index);
+                            },
+                          ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -239,7 +228,7 @@ class PeringkatView extends GetView<PeringkatController> {
                       ),
                     ),
                     Text(
-                      'Lihat peringkat berdasarkan poin',
+                      'Lihat peringkat berdasarkan jumlah poin hafalan',
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: Colors.white.withValues(alpha: 0.8),
@@ -475,13 +464,13 @@ class PeringkatView extends GetView<PeringkatController> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
+              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(50),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.emoji_events_outlined,
               size: 48,
-              color: Color(0xFF9CA3AF),
+              color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
             ),
           ),
           const SizedBox(height: 16),
@@ -492,16 +481,12 @@ class PeringkatView extends GetView<PeringkatController> {
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF111827),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Tarik ke bawah untuk refresh',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: const Color(0xFF6B7280),
-            ),
+            style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
           ),
         ],
       ),

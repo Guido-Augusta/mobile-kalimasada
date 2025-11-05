@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 
 enum ForgotPasswordStep { inputEmail, tokenVerification, newPassword }
 
 class ForgotPasswordController extends GetxController {
+  final formKey = GlobalKey<FormState>();
+
   var isLoading = false.obs;
   var isValidating = false.obs;
 
@@ -37,6 +40,18 @@ class ForgotPasswordController extends GetxController {
     isNewPasswordHidden.value = !isNewPasswordHidden.value;
   }
 
+  String? validateEmail(String? email) {
+    RegExp emailRegex = RegExp(
+      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+    );
+    if (email == null || email.isEmpty) {
+      return 'Email tidak boleh kosong';
+    } else if (!emailRegex.hasMatch(email)) {
+      return 'Masukkan email yang valid';
+    }
+    return null;
+  }
+
   void startCountdown() {
     countdown.value = 300; // Reset to 5 minutes
     _timer?.cancel();
@@ -62,20 +77,30 @@ class ForgotPasswordController extends GetxController {
 
       final response = await http.post(
         Uri.parse('http://10.0.2.2:5000/api/auth/forgot-password'),
-        headers: {'Content-Type': 'application/json', 'x-platform': 'mobile'},
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': emailC.text}),
       );
 
       var data = jsonDecode(response.body);
+      print(data);
       if (response.statusCode == 200) {
         step.value = ForgotPasswordStep.tokenVerification;
+        formKey.currentState!.reset();
         startCountdown();
-        Get.snackbar('Success', 'Token berhasil dikirim');
+        ToastUtils.showSuccessToast(
+          'Token berhasil dikirim',
+          alignment: Alignment.topCenter,
+        );
       } else {
-        Get.snackbar('Error', data['error'] ?? 'Gagal mengirim token');
+        ToastUtils.showErrorToast(
+          'Gagal mengirim token',
+          alignment: Alignment.topCenter,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isValidating.value = false;
     }
@@ -87,20 +112,30 @@ class ForgotPasswordController extends GetxController {
 
       final response = await http.post(
         Uri.parse('http://10.0.2.2:5000/api/auth/verify-token'),
-        headers: {'Content-Type': 'application/json', 'x-platform': 'mobile'},
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'token': tokenC.text}),
       );
 
       var data = jsonDecode(response.body);
+      print(data);
       if (response.statusCode == 200) {
         tokenVar.value = tokenC.text;
         step.value = ForgotPasswordStep.newPassword;
-        Get.snackbar('Success', 'Token berhasil diverifikasi');
+        formKey.currentState!.reset();
+        ToastUtils.showSuccessToast(
+          'Token berhasil diverifikasi',
+          alignment: Alignment.topCenter,
+        );
       } else {
-        Get.snackbar('Error', data['error'] ?? 'Gagal diverifikasi');
+        ToastUtils.showErrorToast(
+          'Gagal diverifikasi',
+          alignment: Alignment.topCenter,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isValidating.value = false;
     }
@@ -112,7 +147,7 @@ class ForgotPasswordController extends GetxController {
 
       final response = await http.post(
         Uri.parse('http://10.0.2.2:5000/api/auth/reset-password'),
-        headers: {'Content-Type': 'application/json', 'x-platform': 'mobile'},
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'token': tokenVar.value,
           'newPassword': newPasswordC.text,
@@ -120,14 +155,23 @@ class ForgotPasswordController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
+      print(data);
       if (response.statusCode == 200) {
-        Get.snackbar('Success', 'Password berhasil diubah');
+        ToastUtils.showSuccessToast(
+          'Password berhasil diubah',
+          alignment: Alignment.topCenter,
+        );
         showSuccessDialog();
       } else {
-        Get.snackbar('Error', data['error'] ?? 'Gagal mengubah password');
+        ToastUtils.showErrorToast(
+          'Gagal mengubah password',
+          alignment: Alignment.topCenter,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isValidating.value = false;
     }

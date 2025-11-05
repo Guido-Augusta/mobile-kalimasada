@@ -28,12 +28,11 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
       ),
       body: Obx(() {
         final riwayat = controller.riwayatHafalan.value;
-        if (riwayat == null || riwayat.santri == null) {
-          return const Center(child: Text('Data tidak ditemukan'));
-        }
 
         return RefreshIndicator(
-          onRefresh: () async => controller.refreshRiwayatHafalan(),
+          onRefresh: () async {
+            controller.refreshRiwayatHafalan();
+          },
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             controller: controller.scrollController,
@@ -86,7 +85,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  riwayat.santri!.nama ?? 'Nama Santri',
+                                  riwayat?.santri?.nama ?? 'Nama Santri',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 20,
@@ -96,7 +95,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
-                                  riwayat.santri!.noInduk ?? '-',
+                                  riwayat?.santri?.noInduk ?? '-',
                                   style: TextStyle(
                                     color: Colors.white.withValues(alpha: 0.8),
                                     fontSize: 14,
@@ -191,6 +190,19 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
               ),
 
               // Riwayat List
+              if (controller.isLoading.value)
+                const SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text('Memuat data...'),
+                      ],
+                    ),
+                  ),
+                ),
               if (controller.allRiwayatData.isEmpty)
                 SliverFillRemaining(
                   child: Center(

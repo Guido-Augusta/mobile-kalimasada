@@ -13,36 +13,28 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFF),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight:
-                  MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top,
+        child: RefreshIndicator(
+          onRefresh: () async {
+            controller.getUstadz();
+          },
+          child: ListView(
+            padding: const EdgeInsets.only(
+              top: 20,
+              left: 20,
+              right: 20,
+              bottom: 30,
             ),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                top: 20,
-                left: 20,
-                right: 20,
-                bottom: 30,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  const SizedBox(height: 30),
-                  _buildWelcomeCard(context),
-                  const SizedBox(height: 25),
-                  _buildFeatureCards(context),
-                  const SizedBox(height: 25),
-                  _buildIslamicQuoteSlider(context),
-                  const SizedBox(height: 25),
-                  _buildIslamicDecoration(context),
-                ],
-              ),
-            ),
+            children: [
+              _buildHeader(context),
+              const SizedBox(height: 30),
+              _buildWelcomeCard(context),
+              const SizedBox(height: 25),
+              _buildFeatureCards(context),
+              const SizedBox(height: 25),
+              _buildIslamicQuoteSlider(context),
+              const SizedBox(height: 25),
+              _buildIslamicDecoration(context),
+            ],
           ),
         ),
       ),
@@ -106,7 +98,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                 () => Text(
                   controller.ustadz.value?.nama ?? '',
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
+                  maxLines: 1,
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -117,6 +109,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
             ],
           ),
         ),
+        const SizedBox(width: 4),
         Container(
           decoration: BoxDecoration(
             color: Colors.red.withValues(alpha: 0.1),
@@ -128,6 +121,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
+                    backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
