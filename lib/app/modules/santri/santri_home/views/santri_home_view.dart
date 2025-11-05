@@ -19,7 +19,6 @@ class SantriHomeView extends GetView<SantriHomeController> {
         child: RefreshIndicator(
           onRefresh: () async {
             controller.getSantri();
-            controller.getChart();
           },
           child: ListView(
             padding: const EdgeInsets.only(

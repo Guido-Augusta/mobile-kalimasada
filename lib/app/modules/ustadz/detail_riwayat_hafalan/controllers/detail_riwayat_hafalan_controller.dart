@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/models/detail_riwayat_hafalan.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailRiwayatHafalanController extends GetxController {
@@ -21,17 +22,11 @@ class DetailRiwayatHafalanController extends GetxController {
   }
 
   void getDetailRiwayatHafalan() async {
-    isLoading.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    if (token == null) {
-      Get.snackbar('Error', 'No authentication token found');
-      isLoading.value = false;
-      return;
-    }
-
     try {
+      isLoading.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
       // Konversi semua arguments ke string untuk memastikan tipe data yang benar
       final santriIdStr = santriId?.toString() ?? '';
       final surahIdStr = surahId?.toString() ?? '';
@@ -42,7 +37,7 @@ class DetailRiwayatHafalanController extends GetxController {
           surahIdStr.isEmpty ||
           tanggalRiwayatStr.isEmpty ||
           statusStr.isEmpty) {
-        Get.snackbar('Error', 'Data tidak lengkap');
+        ToastUtils.showErrorToast('Data tidak lengkap');
         isLoading.value = false;
         return;
       }
@@ -63,15 +58,12 @@ class DetailRiwayatHafalanController extends GetxController {
         final riwayat = DetailRiwayatHafalan.fromJson(data);
         detailRiwayatHafalan.value = riwayat;
       } else {
-        print('Error response: ${response.body}');
-        Get.snackbar(
-          'Error',
-          'Gagal memuat detail riwayat hafalan: ${response.statusCode}',
-        );
+        ToastUtils.showErrorToast('Gagal memuat detail riwayat hafalan');
       }
     } catch (e) {
-      print('Error in getDetailRiwayatHafalan: $e');
-      Get.snackbar('Error', 'Terjadi kesalahan: ${e.toString()}');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }

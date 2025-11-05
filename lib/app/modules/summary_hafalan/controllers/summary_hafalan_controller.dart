@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/models/summary_hafalan.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SummaryHafalanController extends GetxController {
@@ -19,10 +21,13 @@ class SummaryHafalanController extends GetxController {
 
   var summaryHafalanList = <Datum>[].obs;
 
+  final scrollController = ScrollController();
+
   @override
   void onInit() {
     super.onInit();
     getSummaryHafalan();
+    _setupScrollController();
   }
 
   void updateStatusFilter(String type) {
@@ -43,6 +48,17 @@ class SummaryHafalanController extends GetxController {
     summaryHafalanList.clear();
   }
 
+  void _setupScrollController() {
+    scrollController.addListener(() {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
+        if (hasMore && !isLoadingMore) {
+          loadMoreData();
+        }
+      }
+    });
+  }
+
   void getSummaryHafalan() async {
     try {
       isLoading.value = true;
@@ -50,11 +66,6 @@ class SummaryHafalanController extends GetxController {
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-
-      if (token == null) {
-        Get.snackbar('Error', 'No authentication token found');
-        return;
-      }
 
       final response = await http.get(
         Uri.parse(
@@ -79,19 +90,11 @@ class SummaryHafalanController extends GetxController {
 
         summaryHafalanList.value = items;
       } else {
-        Get.snackbar(
-          'Error',
-          'Gagal mendapatkan data',
-          snackPosition: SnackPosition.BOTTOM,
-          duration: const Duration(seconds: 1),
-        );
+        ToastUtils.showErrorToast('Gagal memuat data');
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Terjadi kesalahan saat memuat data',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 1),
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     } finally {
       isLoading.value = false;
@@ -101,17 +104,12 @@ class SummaryHafalanController extends GetxController {
   void loadMoreData() async {
     if (isLoadingMore || !hasMore) return;
 
-    isLoadingMore = true;
-    currentPage++;
-
     try {
+      isLoadingMore = true;
+      currentPage++;
+
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-
-      if (token == null) {
-        Get.snackbar('Error', 'No authentication token found');
-        return;
-      }
 
       final response = await http.get(
         Uri.parse(
@@ -136,19 +134,11 @@ class SummaryHafalanController extends GetxController {
 
         summaryHafalanList.addAll(items);
       } else {
-        Get.snackbar(
-          'Error',
-          'Gagal mendapatkan data',
-          snackPosition: SnackPosition.BOTTOM,
-          duration: const Duration(seconds: 1),
-        );
+        ToastUtils.showErrorToast('Gagal memuat data');
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Terjadi kesalahan saat memuat data',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 1),
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     } finally {
       isLoadingMore = false;

@@ -41,6 +41,8 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
           controller.getSummaryHafalan();
         },
         child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          controller: controller.scrollController,
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
@@ -226,15 +228,16 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                       if (controller.summaryHafalanList.isEmpty) {
                         return _buildEmptyState();
                       }
-                      return SizedBox.shrink();
-                    }),
-
-                    Obx(
-                      () => ListView.separated(
+                      return ListView.separated(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        itemCount: controller.summaryHafalanList.length,
+                        itemCount:
+                            controller.summaryHafalanList.length +
+                            (controller.hasMore ? 1 : 0),
                         itemBuilder: (context, index) {
+                          if (index >= controller.summaryHafalanList.length) {
+                            return _buildLoadMoreIndicator();
+                          }
                           final summaryHafalan =
                               controller.summaryHafalanList[index];
                           return _buildSummaryHafalanCard(summaryHafalan);
@@ -242,8 +245,8 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                         separatorBuilder: (context, index) {
                           return const SizedBox(height: 4);
                         },
-                      ),
-                    ),
+                      );
+                    }),
                   ],
                 ),
               ),
@@ -625,6 +628,17 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLoadMoreIndicator() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
+        ),
       ),
     );
   }

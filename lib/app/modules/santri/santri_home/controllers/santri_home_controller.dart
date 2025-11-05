@@ -57,7 +57,6 @@ class SantriHomeController extends GetxController {
   void onInit() {
     super.onInit();
     getSantri();
-    getChart();
   }
 
   void updateRange(String newRange) {
@@ -89,6 +88,7 @@ class SantriHomeController extends GetxController {
       print(response.statusCode);
       print(data);
       if (response.statusCode == 200) {
+        getChart();
         santri.value = s.Santri.fromJson(data['data']);
         fotoProfil.value = getImageUrl(santri.value!.fotoProfil!);
       } else {

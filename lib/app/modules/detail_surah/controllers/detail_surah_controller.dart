@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_surah.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailSurahController extends GetxController {
@@ -26,16 +27,11 @@ class DetailSurahController extends GetxController {
   }
 
   void getDetailSurah() async {
-    isLoading.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    if (token == null) {
-      Get.snackbar('Error', 'No authentication token found');
-      return;
-    }
-
     try {
+      isLoading.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
       final response = await http.get(
         Uri.parse('http://10.0.2.2:5000/api/alquran/surah/$surahId'),
         headers: {
@@ -58,10 +54,12 @@ class DetailSurahController extends GetxController {
           audioPlayer.setUrl(audioUrl);
         }
       } else {
-        Get.snackbar('Error', 'Failed to fetch detail surah');
+        ToastUtils.showErrorToast('Gagal memuat data');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch detail surah');
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
     } finally {
       isLoading.value = false;
     }
