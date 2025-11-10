@@ -34,11 +34,13 @@ class DetailProgresView extends GetView<DetailProgresController> {
         centerTitle: true,
       ),
       body: Obx(() {
-        if (controller.isLoading.value) {
+        if (controller.isSurahInfoLoading.value ||
+            controller.isDetailProgresLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (controller.detailProgres.value == null) {
+        if (controller.detailProgres.value == null &&
+            controller.surahInfo.value == null) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

@@ -83,6 +83,7 @@ class SplashController extends GetxController {
       PopScope(
         onPopInvokedWithResult: (didPop, result) => false,
         child: AlertDialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

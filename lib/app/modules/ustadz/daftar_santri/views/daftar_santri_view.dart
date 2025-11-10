@@ -93,25 +93,26 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
               } else if (controller.searchQuery.value.isNotEmpty &&
                   controller.santriList.isEmpty) {
                 return _buildEmptyState();
+              } else {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
+                  itemCount:
+                      controller.santriList.length +
+                      (controller.hasMore.value ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index >= controller.santriList.length) {
+                      return _buildLoadMoreIndicator();
+                    }
+                    final santri = controller.santriList[index];
+                    return _buildSantriCard(santri);
+                  },
+                );
               }
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                itemCount:
-                    controller.santriList.length +
-                    (controller.hasMore.value ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index >= controller.santriList.length) {
-                    return _buildLoadMoreIndicator();
-                  }
-                  final santri = controller.santriList[index];
-                  return _buildSantriCard(santri);
-                },
-              );
             }),
           ],
         ),
@@ -1761,40 +1762,31 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
   }
 
   Widget _buildEmptyState() {
-    return RefreshIndicator(
-      onRefresh: () async {
-        controller.fetchData();
-      },
-      child: ListView(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 100),
-              Icon(Icons.people_outline, size: 80, color: Colors.grey[400]),
-              const SizedBox(height: 16),
-              Text(
-                'Tidak ada data santri',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Obx(
-                () => Text(
-                  controller.searchQuery.value.isNotEmpty &&
-                          controller.santriList.isEmpty
-                      ? 'Santri tidak ditemukan di ${controller.getTahapanFilter(controller.tahapHafalan.value)}'
-                      : 'Data santri akan muncul di sini',
-                  style: TextStyle(color: Colors.grey[500], fontSize: 14),
-                ),
-              ),
-            ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const SizedBox(height: 100),
+        Icon(Icons.people_outline, size: 80, color: Colors.grey[400]),
+        const SizedBox(height: 16),
+        Text(
+          'Tidak ada data santri',
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 8),
+        Obx(
+          () => Text(
+            controller.searchQuery.value.isNotEmpty &&
+                    controller.santriList.isEmpty
+                ? 'Santri tidak ditemukan di ${controller.getTahapanFilter(controller.tahapHafalan.value)}'
+                : 'Data santri akan muncul di sini',
+            style: TextStyle(color: Colors.grey[500], fontSize: 14),
+          ),
+        ),
+      ],
     );
   }
 

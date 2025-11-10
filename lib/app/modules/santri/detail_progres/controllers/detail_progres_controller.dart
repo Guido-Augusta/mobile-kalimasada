@@ -10,7 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailProgresController extends GetxController {
   // Existing variables
-  RxBool isLoading = false.obs;
+  RxBool isSurahInfoLoading = false.obs;
+  RxBool isDetailProgresLoading = false.obs;
   final santriId = Get.arguments['santriId'].toString();
   final surahId = Get.arguments['surahId'].toString();
   var detailProgres = Rxn<DetailHafalan>();
@@ -30,9 +31,9 @@ class DetailProgresController extends GetxController {
     audioPlayer.dispose();
   }
 
-  Future<void> getDetailProgres() async {
+  void getDetailProgres() async {
     try {
-      isLoading.value = true;
+      isDetailProgresLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
@@ -58,13 +59,13 @@ class DetailProgresController extends GetxController {
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     } finally {
-      isLoading.value = false;
+      isDetailProgresLoading.value = false;
     }
   }
 
   void getSurahInfo() async {
     try {
-      isLoading.value = true;
+      isSurahInfoLoading.value = true;
 
       final response = await http.get(
         Uri.parse('http://10.0.2.2:5000/api/alquran/surah/$surahId'),
@@ -73,6 +74,7 @@ class DetailProgresController extends GetxController {
 
       if (response.statusCode == 200) {
         getDetailProgres();
+
         final data = json.decode(response.body);
         surahInfo.value = DetailSurah.fromJson(data);
 
@@ -93,7 +95,7 @@ class DetailProgresController extends GetxController {
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     } finally {
-      isLoading.value = false;
+      isSurahInfoLoading.value = false;
     }
   }
 }
