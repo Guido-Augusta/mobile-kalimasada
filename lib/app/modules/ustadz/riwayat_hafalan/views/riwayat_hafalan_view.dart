@@ -212,18 +212,22 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: Colors.grey[100],
+                            color: Colors.deepPurpleAccent.withValues(
+                              alpha: 0.1,
+                            ),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.book_outlined,
                             size: 48,
-                            color: Colors.grey[400],
+                            color: Colors.deepPurpleAccent.withValues(
+                              alpha: 0.5,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Belum ada riwayat hafalan',
+                          'Tidak ada riwayat hafalan',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],

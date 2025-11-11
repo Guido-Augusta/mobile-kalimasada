@@ -23,137 +23,148 @@ class AlquranView extends GetView<AlquranController> {
       ),
       body: RefreshIndicator(
         onRefresh: () async => controller.fetchSurahList(),
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-                child: Column(
-                  children: [
-                    // Search Bar
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
+        child: Obx(
+          () => CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+                  child: Column(
+                    children: [
+                      // Search Bar
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.deepPurpleAccent.withValues(
+                                alpha: 0.1,
+                              ),
+                              spreadRadius: 2,
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          controller: controller.searchController,
+                          onChanged: (value) {
+                            controller.searchQuery.value = value;
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Cari surah...',
+                            prefixIcon: const Icon(
+                              Icons.search,
+                              color: Colors.grey,
+                            ),
+                            suffixIcon: Obx(() {
+                              if (controller.searchQuery.value.isNotEmpty) {
+                                return IconButton(
+                                  icon: const Icon(
+                                    Icons.clear,
+                                    color: Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    controller.searchQuery.value = '';
+                                    controller.searchController.clear();
+                                  },
+                                );
+                              } else {
+                                return const SizedBox.shrink();
+                              }
+                            }),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
+
+              if (controller.isLoadingSurah.value)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          color: Colors.deepPurpleAccent,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Memuat data...',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else if (controller.surahList.isEmpty)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(24),
+                          decoration: BoxDecoration(
                             color: Colors.deepPurpleAccent.withValues(
                               alpha: 0.1,
                             ),
-                            spreadRadius: 2,
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+                            shape: BoxShape.circle,
                           ),
-                        ],
-                      ),
-                      child: TextField(
-                        controller: controller.searchController,
-                        onChanged: (value) {
-                          controller.searchQuery.value = value;
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Cari surah...',
-                          prefixIcon: const Icon(
-                            Icons.search,
-                            color: Colors.grey,
-                          ),
-                          suffixIcon: Obx(() {
-                            if (controller.searchQuery.value.isNotEmpty) {
-                              return IconButton(
-                                icon: const Icon(
-                                  Icons.clear,
-                                  color: Colors.grey,
-                                ),
-                                onPressed: () {
-                                  controller.searchQuery.value = '';
-                                  controller.searchController.clear();
-                                },
-                              );
-                            } else {
-                              return const SizedBox.shrink();
-                            }
-                          }),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 20,
+                          child: Icon(
+                            Icons.book_outlined,
+                            size: 48,
+                            color: Colors.deepPurpleAccent.withValues(
+                              alpha: 0.5,
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Data tidak ditemukan',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            ),
-
-            if (controller.isLoadingSurah.value)
-              SliverFillRemaining(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(color: Colors.deepPurpleAccent),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Memuat data...',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                      ),
-                    ],
                   ),
                 ),
-              )
-            else if (controller.surahList.isEmpty)
-              SliverFillRemaining(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.book_outlined,
-                          size: 48,
-                          color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Data tidak ditemukan',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+
+              if (controller.searchQuery.value.isNotEmpty &&
+                  controller.filteredSurahList.isEmpty)
+                const SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      'Surah tidak ditemukan',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                 ),
-              ),
 
-            if (controller.searchQuery.value.isNotEmpty &&
-                controller.filteredSurahList.isEmpty)
-              const SliverFillRemaining(
-                child: Center(
-                  child: Text(
-                    'Surah tidak ditemukan',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final surah = controller.filteredSurahList[index];
+                  return surahCard(surah);
+                }, childCount: controller.filteredSurahList.length),
               ),
-
-            SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final surah = controller.filteredSurahList[index];
-                return surahCard(surah);
-              }, childCount: controller.filteredSurahList.length),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

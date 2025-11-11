@@ -93,26 +93,25 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
               } else if (controller.searchQuery.value.isNotEmpty &&
                   controller.santriList.isEmpty) {
                 return _buildEmptyState();
-              } else {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
-                  itemCount:
-                      controller.santriList.length +
-                      (controller.hasMore.value ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index >= controller.santriList.length) {
-                      return _buildLoadMoreIndicator();
-                    }
-                    final santri = controller.santriList[index];
-                    return _buildSantriCard(santri);
-                  },
-                );
               }
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
+                itemCount:
+                    controller.santriList.length +
+                    (controller.hasMore.value ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index >= controller.santriList.length) {
+                    return _buildLoadMoreIndicator();
+                  }
+                  final santri = controller.santriList[index];
+                  return _buildSantriCard(santri);
+                },
+              );
             }),
           ],
         ),
