@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_kalimasada/app/data/models/riwayat_hafalan.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../controllers/riwayat_hafalan_controller.dart';
 
 class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
@@ -27,8 +28,6 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Obx(() {
-        final riwayat = controller.riwayatHafalan.value;
-
         return RefreshIndicator(
           onRefresh: () async {
             controller.refreshRiwayatHafalan();
@@ -37,242 +36,297 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
             physics: const AlwaysScrollableScrollPhysics(),
             controller: controller.scrollController,
             slivers: [
-              // Santri Header Card as Sliver
-              SliverToBoxAdapter(
-                child: Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.all(16),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.deepPurpleAccent,
-                        Colors.deepPurple[700]!,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF6B46C1).withValues(alpha: 0.2),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.person_rounded,
-                              color: Colors.white,
-                              size: 28,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  riwayat?.santri?.nama ?? 'Nama Santri',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  riwayat?.santri?.noInduk ?? '-',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.8),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          _buildInfoCard(
-                            'Total Poin',
-                            '${controller.riwayatHafalan.value?.santri?.totalPoin ?? 0}',
-                          ),
-                          const SizedBox(width: 12),
-                          _buildInfoCard(
-                            'Tahap Hafalan',
-                            getTahapanLabel(
-                              controller
-                                      .riwayatHafalan
-                                      .value
-                                      ?.santri
-                                      ?.tahapHafalan ??
-                                  '-',
-                            ),
-                            flex: 3,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Filter Tambah Hafalan dan Murajaah
-              SliverToBoxAdapter(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[200]!),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withValues(alpha: 0.1),
-                        spreadRadius: 1,
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      _buildFilterButton(
-                        'Tambah Hafalan',
-                        controller.filterType.value == 'TambahHafalan',
-                        onTap: () => controller.updateFilter('TambahHafalan'),
-                      ),
-                      const SizedBox(width: 12),
-                      _buildFilterButton(
-                        'Murajaah',
-                        controller.filterType.value == 'Murajaah',
-                        onTap: () => controller.updateFilter('Murajaah'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Total setoran info
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 8,
-                  ),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      '${controller.riwayatHafalan.value?.pagination?.totalData ?? 0} Setoran',
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ),
-                ),
-              ),
-
-              // Riwayat List
-              if (controller.isLoading.value)
-                const SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 16),
-                        Text('Memuat data...'),
-                      ],
-                    ),
-                  ),
-                ),
-              if (controller.allRiwayatData.isEmpty)
-                SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurpleAccent.withValues(
-                              alpha: 0.1,
-                            ),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.book_outlined,
-                            size: 48,
-                            color: Colors.deepPurpleAccent.withValues(
-                              alpha: 0.5,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Tidak ada riwayat hafalan',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              else
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index == controller.allRiwayatData.length) {
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFF6B46C1),
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-
-                      final datum = controller.allRiwayatData[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: _buildRiwayatCard(
-                          datum,
-                          controller.riwayatHafalan.value!,
-                        ),
-                      );
-                    },
-                    childCount:
-                        controller.allRiwayatData.length +
-                        (controller.hasMore.value ? 1 : 0),
-                  ),
-                ),
+              _buildHeader(),
+              _buildFilter(),
+              _buildTotalSetoran(),
+              _buildRiwayatList(),
             ],
           ),
         );
       }),
+    );
+  }
+
+  Widget _buildRiwayatList() {
+    if (controller.isLoading.value) {
+      return _loadingState();
+    }
+    if ((controller.filterType.toLowerCase() == 'tambahhafalan' &&
+            controller.riwayatHafalanData.isEmpty) ||
+        (controller.filterType.toLowerCase() == 'murajaah' &&
+            controller.riwayatMurajaahData.isEmpty)) {
+      return _emptyState();
+    } else {
+      return SliverPadding(
+        padding: const EdgeInsets.only(bottom: 40),
+        sliver: _buildRiwayatListData(),
+      );
+    }
+  }
+
+  SliverList _buildRiwayatListData() {
+    return SliverList.separated(
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      itemBuilder: (context, index) {
+        final isHafalan =
+            controller.filterType.toLowerCase() == 'tambahhafalan';
+        final items = isHafalan
+            ? controller.riwayatHafalanData
+            : controller.riwayatMurajaahData;
+        if (index >= items.length) {
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.0,
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B46C1)),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: _buildRiwayatCard(
+            items[index],
+            controller.profilSantri.value!,
+          ),
+        );
+      },
+      itemCount: () {
+        final isHafalan =
+            controller.filterType.toLowerCase() == 'tambahhafalan';
+        final items = isHafalan
+            ? controller.riwayatHafalanData
+            : controller.riwayatMurajaahData;
+        final hasMore = isHafalan
+            ? controller.hasMoreHafalan.value
+            : controller.hasMoreMurajaah.value;
+
+        // Add 1 to item count if there are more items to load
+        return items.length + (hasMore ? 1 : 0);
+      }(),
+    );
+  }
+
+  SliverFillRemaining _emptyState() {
+    return SliverFillRemaining(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.book_outlined,
+                size: 48,
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Tidak ada riwayat hafalan',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  SliverFillRemaining _loadingState() {
+    return const SliverFillRemaining(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Memuat data...'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  SliverToBoxAdapter _buildTotalSetoran() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: Skeletonizer(
+            enabled: controller.isLoading.value,
+            child: Text(
+              '${controller.filterType.toLowerCase() == 'tambahhafalan' ? controller.totalSetoranHafalan : controller.totalSetoranMurajaah} Setoran',
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  SliverToBoxAdapter _buildFilter() {
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[200]!),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withValues(alpha: 0.1),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            _buildFilterButton(
+              'Tambah Hafalan',
+              controller.filterType.value == 'TambahHafalan',
+              onTap: () => controller.updateFilter('TambahHafalan'),
+            ),
+            const SizedBox(width: 12),
+            _buildFilterButton(
+              'Murajaah',
+              controller.filterType.value == 'Murajaah',
+              onTap: () => controller.updateFilter('Murajaah'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  SliverToBoxAdapter _buildHeader() {
+    return SliverToBoxAdapter(
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF6B46C1).withValues(alpha: 0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.person_rounded,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Nama Santri
+                      Skeletonizer(
+                        enabled: controller.isLoading.value,
+                        effect: ShimmerEffect(
+                          baseColor: Colors.white.withValues(alpha: 0.2),
+                          highlightColor: Colors.white.withValues(alpha: 0.4),
+                        ),
+                        child: controller.isLoading.value
+                            ? Text(
+                                'Nama Lengkap Santri',
+                                style: TextStyle(fontSize: 20),
+                                maxLines: 1,
+                              )
+                            : Text(
+                                controller.profilSantri.value?.nama ?? '-',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                      ),
+
+                      // No Induk
+                      Skeletonizer(
+                        enabled: controller.isLoading.value,
+                        effect: ShimmerEffect(
+                          baseColor: Colors.white.withValues(alpha: 0.2),
+                          highlightColor: Colors.white.withValues(alpha: 0.4),
+                        ),
+                        child: controller.isLoading.value
+                            ? Text('Nomor Indouk Santri', maxLines: 1)
+                            : Text(
+                                controller.profilSantri.value?.noInduk ?? '-',
+
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.8),
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                _buildInfoCard(
+                  'Total Poin',
+                  '${controller.profilSantri.value?.totalPoin ?? 0}',
+                ),
+                const SizedBox(width: 12),
+                _buildInfoCard(
+                  'Tahap Hafalan',
+                  getTahapanLabel(
+                    controller.profilSantri.value?.tahapHafalan ?? '-',
+                  ),
+                  flex: 3,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -300,15 +354,22 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+            Skeletonizer(
+              enabled: controller.isLoading.value,
+              effect: ShimmerEffect(
+                baseColor: Colors.white.withValues(alpha: 0.2),
+                highlightColor: Colors.white.withValues(alpha: 0.4),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              child: Text(
+                value,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
@@ -316,133 +377,129 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
     );
   }
 
-  Widget _buildRiwayatCard(Datum datum, RiwayatHafalan riwayatHafalan) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Card(
-        color: Colors.white,
-        elevation: 1,
-        shadowColor: Colors.black.withValues(alpha: 0.05),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.grey[200]!, width: 1),
-        ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            Get.toNamed(
-              '/detail-riwayat-hafalan',
-              arguments: {
-                'santriId': riwayatHafalan.santri?.id,
-                'surahId': datum.surahId,
-                'tanggalRiwayat': datum.tanggal,
-                'status': datum.status,
-              },
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            datum.namaSurah ?? '-',
-                            style: GoogleFonts.amiri(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF6B46C1),
-                            ),
+  Widget _buildRiwayatCard(Datum datum, Santri santri) {
+    return Card(
+      color: Colors.white,
+      elevation: 1,
+      shadowColor: Colors.black.withValues(alpha: 0.05),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey[200]!, width: 1),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          Get.toNamed(
+            '/detail-riwayat-hafalan',
+            arguments: {
+              'santriId': santri.id,
+              'surahId': datum.surahId,
+              'tanggalRiwayat': datum.tanggal,
+              'status': datum.status,
+            },
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          datum.namaSurah ?? '-',
+                          style: GoogleFonts.amiri(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF6B46C1),
                           ),
-                          if (datum.namaSurahLatin != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: Text(
-                                datum.namaSurahLatin!,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey[600],
-                                  fontStyle: FontStyle.italic,
-                                ),
+                        ),
+                        if (datum.namaSurahLatin != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              datum.namaSurahLatin!,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[600],
+                                fontStyle: FontStyle.italic,
                               ),
                             ),
-                        ],
+                          ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(datum.status),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      _getStatusText(datum.status),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(datum.status),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        _getStatusText(datum.status),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    _buildDetailItem(
-                      Icons.calendar_today_rounded,
-                      datum.tanggal != null
-                          ? DateFormat(
-                              'dd MMM yyyy',
-                              'id_ID',
-                            ).format(datum.tanggal!)
-                          : '-',
-                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildDetailItem(
+                    Icons.calendar_today_rounded,
+                    datum.tanggal != null
+                        ? DateFormat(
+                            'dd MMM yyyy',
+                            'id_ID',
+                          ).format(datum.tanggal!)
+                        : '-',
+                  ),
+                  const SizedBox(width: 24),
+                  _buildDetailItem(
+                    Icons.format_list_numbered_rounded,
+                    '${datum.jumlahAyat ?? 0} ayat',
+                  ),
+                  if (controller.filterType.value == 'TambahHafalan')
                     const SizedBox(width: 24),
+                  if (controller.filterType.value == 'TambahHafalan')
                     _buildDetailItem(
-                      Icons.format_list_numbered_rounded,
-                      '${datum.jumlahAyat ?? 0} ayat',
+                      Icons.star_rounded,
+                      '${datum.totalPoin ?? 0} poin',
                     ),
-                    if (controller.filterType.value == 'TambahHafalan')
-                      const SizedBox(width: 24),
-                    if (controller.filterType.value == 'TambahHafalan')
-                      _buildDetailItem(
-                        Icons.star_rounded,
-                        '${datum.totalPoin ?? 0} poin',
-                      ),
-                    const Spacer(),
-                    // Small delete button
-                    if (controller.userRole == 'ustadz')
-                      InkWell(
-                        borderRadius: BorderRadius.circular(8),
-                        onTap: () =>
-                            _showDeleteConfirmation(datum, riwayatHafalan),
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.red[50],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.delete_outline_rounded,
-                            size: 18,
-                            color: Colors.red[400],
-                          ),
+                  const Spacer(),
+                  // Small delete button
+                  if (controller.userRole == 'ustadz')
+                    InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () => _showDeleteConfirmation(datum, santri),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.red[50],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.delete_outline_rounded,
+                          size: 18,
+                          color: Colors.red[400],
                         ),
                       ),
-                  ],
-                ),
-              ],
-            ),
+                    ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
@@ -532,7 +589,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
     }
   }
 
-  void _showDeleteConfirmation(Datum datum, RiwayatHafalan riwayatHafalan) {
+  void _showDeleteConfirmation(Datum datum, Santri santri) {
     Get.dialog(
       AlertDialog(
         backgroundColor: Colors.white,
@@ -553,7 +610,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
           ElevatedButton(
             onPressed: () {
               controller.deleteRiwayatHafalan(
-                riwayatHafalan.santri!.id!,
+                santri.id!,
                 datum.surahId!,
                 DateFormat('yyyy-MM-dd', 'id_ID').format(datum.tanggal!),
                 datum.status!,
