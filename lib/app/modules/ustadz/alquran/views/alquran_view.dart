@@ -157,11 +157,14 @@ class AlquranView extends GetView<AlquranController> {
                   ),
                 ),
 
-              SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final surah = controller.filteredSurahList[index];
-                  return surahCard(surah);
-                }, childCount: controller.filteredSurahList.length),
+              SliverPadding(
+                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final surah = controller.filteredSurahList[index];
+                    return surahCard(surah);
+                  }, childCount: controller.filteredSurahList.length),
+                ),
               ),
             ],
           ),
@@ -256,7 +259,7 @@ class AlquranView extends GetView<AlquranController> {
               // Nama surah Arab
               Text(
                 surah.nama!,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
