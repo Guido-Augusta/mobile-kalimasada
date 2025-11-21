@@ -66,21 +66,37 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                           ),
                         ],
                       ),
-                      child: TextField(
-                        onChanged: (value) {
-                          controller.searchQuery.value = value;
-                          controller.getSummaryHafalan();
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Cari santri...',
-                          prefixIcon: const Icon(
-                            Icons.search,
-                            color: Colors.grey,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 20,
+                      child: Obx(
+                        () => TextField(
+                          controller: controller.searchController,
+                          onChanged: (value) {
+                            controller.searchQuery.value = value;
+                            controller.getSummaryHafalan();
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Cari santri...',
+                            prefixIcon: const Icon(
+                              Icons.search,
+                              color: Colors.grey,
+                            ),
+                            suffixIcon: controller.searchQuery.value.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(
+                                      Icons.clear_rounded,
+                                      color: Colors.grey,
+                                    ),
+                                    onPressed: () {
+                                      controller.searchQuery.value = '';
+                                      controller.searchController.clear();
+                                      controller.getSummaryHafalan();
+                                    },
+                                  )
+                                : null,
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 20,
+                            ),
                           ),
                         ),
                       ),
@@ -121,6 +137,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                                   onChanged: (String? newValue) {
                                     if (newValue != null) {
                                       controller.status.value = newValue;
+                                      controller.summaryHafalanList.clear();
                                       controller.getSummaryHafalan();
                                     }
                                   },
@@ -158,6 +175,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                                   onChanged: (String? newValue) {
                                     if (newValue != null) {
                                       controller.level.value = newValue;
+                                      controller.summaryHafalanList.clear();
                                       controller.getSummaryHafalan();
                                     }
                                   },
@@ -176,7 +194,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               child: Text(
-                                'Riwayat ${controller.status.value == 'murajaah' ? 'Murajaah' : 'Hafalan'} Terakhir',
+                                'Daftar Santri',
                                 style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
@@ -222,18 +240,19 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                     ),
                     const SizedBox(height: 16),
                     Obx(() {
-                      if (controller.isLoading.value) {
+                      if (controller.isLoading.value &&
+                          controller.searchQuery.value.isEmpty) {
                         return _buildLoadingIndicator();
                       }
                       if (controller.summaryHafalanList.isEmpty) {
                         return _buildEmptyState();
                       }
-                      return ListView.separated(
+                      return ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount:
                             controller.summaryHafalanList.length +
-                            (controller.hasMore ? 1 : 0),
+                            (controller.hasMore.value ? 1 : 0),
                         itemBuilder: (context, index) {
                           if (index >= controller.summaryHafalanList.length) {
                             return _buildLoadMoreIndicator();
@@ -241,9 +260,6 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                           final summaryHafalan =
                               controller.summaryHafalanList[index];
                           return _buildSummaryHafalanCard(summaryHafalan);
-                        },
-                        separatorBuilder: (context, index) {
-                          return const SizedBox(height: 4);
                         },
                       );
                     }),

@@ -77,13 +77,8 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
           return const Padding(
             padding: EdgeInsets.all(16.0),
             child: Center(
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.0,
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B46C1)),
-                ),
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B46C1)),
               ),
             ),
           );
