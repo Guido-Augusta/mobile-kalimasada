@@ -272,7 +272,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                                 controller.profilSantri.value?.nama ?? '-',
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 maxLines: 2,
@@ -293,6 +293,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                                 controller.profilSantri.value?.noInduk ?? '-',
 
                                 style: TextStyle(
+                                  fontSize: 16,
                                   color: Colors.white.withValues(alpha: 0.8),
                                 ),
                               ),

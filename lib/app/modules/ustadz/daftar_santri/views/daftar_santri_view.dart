@@ -47,38 +47,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
             // Search Bar
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey[200]!,
-                      spreadRadius: 2,
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  onChanged: (value) {
-                    controller.searchQuery.value = value;
-                    controller.fetchData();
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Cari santri...',
-                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            _buildSearchBar(),
 
             // Button Filter Tahap Hafalan
             buttonFilterTahapan(),
@@ -86,7 +55,8 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
             const SizedBox(height: 8),
             // Student List
             Obx(() {
-              if (controller.isLoading.value && controller.santriList.isEmpty) {
+              if (controller.isLoading.value &&
+                  controller.searchQuery.value.isEmpty) {
                 return _buildLoadingIndicator();
               } else if (controller.santriList.isEmpty) {
                 return _buildEmptyState();
@@ -119,6 +89,54 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
     );
   }
 
+  Padding _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey[200]!,
+              spreadRadius: 2,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Obx(
+          () => TextField(
+            controller: controller.searchController,
+            onChanged: (value) {
+              controller.searchQuery.value = value;
+              controller.fetchData();
+            },
+            decoration: InputDecoration(
+              hintText: 'Cari santri...',
+              prefixIcon: const Icon(Icons.search, color: Colors.grey),
+              suffixIcon: controller.searchQuery.value.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear_rounded, color: Colors.grey),
+                      onPressed: () {
+                        controller.searchQuery.value = '';
+                        controller.searchController.clear();
+                        controller.fetchData();
+                      },
+                    )
+                  : null,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 16,
+                horizontal: 20,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Padding buttonFilterTahapan() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -128,8 +146,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
             () => Expanded(
               child: InkWell(
                 onTap: () {
-                  controller.tahapHafalan.value = 'level1';
-                  controller.fetchData();
+                  controller.changeTahapHafalan('level1');
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -173,8 +190,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
             () => Expanded(
               child: InkWell(
                 onTap: () {
-                  controller.tahapHafalan.value = 'level2';
-                  controller.fetchData();
+                  controller.changeTahapHafalan('level2');
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -218,8 +234,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
             () => Expanded(
               child: InkWell(
                 onTap: () {
-                  controller.tahapHafalan.value = 'level3';
-                  controller.fetchData();
+                  controller.changeTahapHafalan('level3');
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -480,15 +495,14 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () async {
-                        // Check if surah list is empty
-                        if (controller.surahList.isEmpty) {
-                          await controller.fetchSurahs();
-                          if (controller.surahList.isEmpty) {
-                            return;
-                          }
+                        await controller.getProgresHafalan(
+                          santri.id.toString(),
+                        );
+                        if (controller.surahList.isEmpty ||
+                            controller.progresHafalan.isEmpty) {
+                          return;
                         }
                         _showMurajaahDialog(santri);
-                        controller.getProgresHafalan(santri.id.toString());
                       },
                       icon: const Icon(
                         Icons.menu_book_rounded,
@@ -522,15 +536,14 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () async {
-                        // Check if surah list is empty
-                        if (controller.surahList.isEmpty) {
-                          await controller.fetchSurahs();
-                          if (controller.surahList.isEmpty) {
-                            return;
-                          }
+                        await controller.getProgresHafalan(
+                          santri.id.toString(),
+                        );
+                        if (controller.surahList.isEmpty ||
+                            controller.progresHafalan.isEmpty) {
+                          return;
                         }
                         showHafalanDialog(santri);
-                        controller.getProgresHafalan(santri.id.toString());
                       },
                       icon: const Icon(
                         Icons.book,
@@ -1136,6 +1149,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                             controller.currentAyat.value = 0;
                             controller.totalAyat.value = 0;
                             controller.progressPercentage.value = 0;
+                            controller.progresHafalan.value = [];
                             controller.inputJumlahAyatController.text = '';
                             controller.ayatList.clear();
                             controller.statusSetoran.value = '';
@@ -1570,6 +1584,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                         // Ayat Dropdown
                         Obx(() {
                           return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
                                 child: _BuildAyatHafalanDropdown(
@@ -1691,6 +1706,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                             controller.currentAyat.value = 0;
                             controller.totalAyat.value = 0;
                             controller.progressPercentage.value = 0;
+                            controller.progresHafalan.value = [];
                             controller.statusSetoran.value = '';
                             controller.catatanController.clear();
                           });
@@ -1805,6 +1821,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const SizedBox(height: 100),
           CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
           ),

@@ -14,7 +14,10 @@ import 'dart:convert';
 class DaftarSantriController extends GetxController {
   final isLoading = false.obs;
   final isSaveLoading = false.obs;
+
   var searchQuery = ''.obs;
+  var searchController = TextEditingController();
+
   var tahapHafalan = 'level1'.obs;
 
   var santriList = <ds.Datum>[].obs;
@@ -23,7 +26,7 @@ class DaftarSantriController extends GetxController {
   var currentAyat = 0.obs;
   var totalAyat = 0.obs;
 
-  final int _perPage = 10;
+  final int _perPage = 20;
   var currentPage = 1;
   var hasMore = true.obs;
   var isLoadingMore = false.obs;
@@ -67,7 +70,6 @@ class DaftarSantriController extends GetxController {
   void _resetPagination() {
     currentPage = 1;
     hasMore.value = true;
-    santriList.clear();
   }
 
   void _setupScrollController() {
@@ -79,6 +81,70 @@ class DaftarSantriController extends GetxController {
         }
       }
     });
+  }
+
+  void fetchData() async {
+    try {
+      isLoading.value = true;
+      _resetPagination();
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        ToastUtils.showErrorToast('Anda tidak terautentikasi');
+        Get.offAllNamed('/login');
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse(
+          'http://10.0.2.2:5000/api/santri?page=$currentPage&limit=$_perPage&tahapHafalan=${tahapHafalan.value}&search=${searchQuery.value}',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'x-platform': 'mobile',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        santriList.clear();
+        final data = jsonDecode(response.body);
+        final items = List<ds.Datum>.from(
+          data['data'].map((x) => ds.Datum.fromJson(x)),
+        );
+
+        if (items.length < _perPage) {
+          hasMore.value = false;
+        }
+
+        santriList.value = items;
+        fetchSurahs();
+      } else {
+        ToastUtils.showErrorToast('Gagal memuat data');
+      }
+    } catch (e) {
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void changeTahapHafalan(String tahapHafalan) {
+    if (tahapHafalan.toLowerCase() == this.tahapHafalan.value.toLowerCase()) {
+      return;
+    }
+    this.tahapHafalan.value = tahapHafalan;
+    santriList.clear();
+    fetchData();
   }
 
   void loadMoreData() async {
@@ -138,55 +204,7 @@ class DaftarSantriController extends GetxController {
     }
   }
 
-  void fetchData() async {
-    try {
-      isLoading.value = true;
-      _resetPagination();
-
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
-        ToastUtils.showErrorToast('Anda tidak terautentikasi');
-        Get.offAllNamed('/login');
-        return;
-      }
-
-      final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/santri?page=$currentPage&limit=$_perPage&tahapHafalan=${tahapHafalan.value}&search=${searchQuery.value}',
-        ),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final items = List<ds.Datum>.from(
-          data['data'].map((x) => ds.Datum.fromJson(x)),
-        );
-
-        if (items.length < _perPage) {
-          hasMore.value = false;
-        }
-
-        santriList.value = items;
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat data');
-      }
-    } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> fetchSurahs() async {
+  void fetchSurahs() async {
     try {
       isLoadingSurah.value = true;
       final response = await http.get(
@@ -295,7 +313,6 @@ class DaftarSantriController extends GetxController {
 
   Future<void> getProgresHafalan(String santriId) async {
     try {
-      isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
@@ -316,11 +333,14 @@ class DaftarSantriController extends GetxController {
         ToastUtils.showErrorToast('Gagal memuat ayat');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
-    } finally {
-      isLoading.value = false;
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     }
   }
 
