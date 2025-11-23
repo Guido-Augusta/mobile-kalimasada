@@ -17,7 +17,7 @@ class SummaryHafalanController extends GetxController {
   var level = 'level1'.obs;
   var filterBy = 'desc'.obs;
 
-  final int _perPage = 10;
+  final int _perPage = 15;
   var currentPage = 1;
   var hasMore = true.obs;
   var isLoadingMore = false.obs;

@@ -17,7 +17,7 @@ class RiwayatHafalanController extends GetxController {
   var riwayatHafalanData = <Datum>[].obs;
   var riwayatMurajaahData = <Datum>[].obs;
 
-  final int _perPage = 10;
+  final int _perPage = 15;
   var currentPageHafalan = 1;
   var currentPageMurajaah = 1;
   var hasMoreHafalan = true.obs;

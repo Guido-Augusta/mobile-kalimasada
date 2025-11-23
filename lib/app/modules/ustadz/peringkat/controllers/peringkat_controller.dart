@@ -15,12 +15,14 @@ class PeringkatController extends GetxController {
   var searchQuery = ''.obs;
   var searchController = TextEditingController();
 
-  final int _perPage = 10;
+  final int _perPage = 15;
   var currentPage = 1;
   var hasMore = true;
   var isLoadingMore = false.obs;
 
   final scrollController = ScrollController();
+
+  DateTime? _lastErrorShown;
 
   @override
   void onInit() {
@@ -43,7 +45,6 @@ class PeringkatController extends GetxController {
   void _resetPagination() {
     currentPage = 1;
     hasMore = true;
-    peringkat.clear();
   }
 
   String getImageUrl(String imageUrl) {
@@ -71,6 +72,7 @@ class PeringkatController extends GetxController {
       );
 
       if (response.statusCode == 200) {
+        peringkat.clear();
         final data = jsonDecode(response.body);
         peringkat.value = List<Datum>.from(
           data['data'].map((x) => Datum.fromJson(x)),
@@ -83,12 +85,26 @@ class PeringkatController extends GetxController {
         ToastUtils.showErrorToast('Gagal memuat data peringkat');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void changeTahapFilter(String value) {
+    if (selectedTahap.value.toLowerCase() == value.toLowerCase()) {
+      return;
+    }
+    selectedTahap.value = value;
+    peringkat.clear();
+    getPeringkat();
   }
 
   Future<void> loadMoreData() async {
@@ -128,9 +144,14 @@ class PeringkatController extends GetxController {
         }
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoadingMore.value = false;
     }
