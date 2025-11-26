@@ -4,7 +4,7 @@ class ProgresHafalan {
   ProgresHafalan({required this.santri, required this.data});
 
   final Santri? santri;
-  List<Datum> data;
+  final List<Datum> data;
 
   factory ProgresHafalan.fromJson(Map<String, dynamic> json) {
     return ProgresHafalan(
@@ -75,6 +75,7 @@ class Santri {
     required this.nama,
     required this.tahapHafalan,
     required this.totalPoin,
+    required this.noInduk,
     required this.orangTua,
   });
 
@@ -82,6 +83,7 @@ class Santri {
   final String? nama;
   final String? tahapHafalan;
   final int? totalPoin;
+  final String? noInduk;
   final List<OrangTua> orangTua;
 
   factory Santri.fromJson(Map<String, dynamic> json) {
@@ -90,6 +92,7 @@ class Santri {
       nama: json["nama"],
       tahapHafalan: json["tahapHafalan"],
       totalPoin: json["totalPoin"],
+      noInduk: json["noInduk"],
       orangTua: json["orangTua"] == null
           ? []
           : List<OrangTua>.from(
@@ -103,12 +106,13 @@ class Santri {
     "nama": nama,
     "tahapHafalan": tahapHafalan,
     "totalPoin": totalPoin,
+    "noInduk": noInduk,
     "orangTua": orangTua.map((x) => x.toJson()).toList(),
   };
 
   @override
   String toString() {
-    return "$id, $nama, $tahapHafalan, $totalPoin, $orangTua, ";
+    return "$id, $nama, $tahapHafalan, $totalPoin, $noInduk, $orangTua, ";
   }
 }
 

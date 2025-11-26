@@ -8,14 +8,18 @@ import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProgresHafalanController extends GetxController {
+  var userRole = ''.obs;
   var isLoading = false.obs;
+
   late String santriId;
   var santriData = Rxn<Santri>();
   var progresHafalan = <Datum>[].obs;
-  var searchQuery = ''.obs;
   var filteredSurahList = <Datum>[].obs;
+
   var searchController = TextEditingController();
-  var userRole = ''.obs;
+  var searchQuery = ''.obs;
+
+  DateTime? _lastErrorShown;
 
   @override
   Future<void> onInit() async {
@@ -50,11 +54,18 @@ class ProgresHafalanController extends GetxController {
         ToastUtils.showErrorToast('Gagal memuat ayat');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
-      isLoading.value = false;
+      Future.delayed(const Duration(milliseconds: 300), () {
+        isLoading.value = false;
+      });
     }
   }
 

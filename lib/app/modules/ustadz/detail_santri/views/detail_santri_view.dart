@@ -846,7 +846,15 @@ class DetailSantriView extends GetView<DetailSantriController> {
           _buildInfoTile(
             icon: Icons.phone,
             label: 'No. Telepon',
-            value: santri.nomorHp ?? '-',
+            value: () {
+              if (santri.nomorHp == null) {
+                return '-';
+              } else if (santri.nomorHp!.isEmpty) {
+                return '-';
+              } else {
+                return santri.nomorHp!;
+              }
+            }(),
             telepon: santri.nomorHp,
           ),
 

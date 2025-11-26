@@ -55,7 +55,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
             controller.riwayatHafalanData.isEmpty) ||
         (controller.filterType.toLowerCase() == 'murajaah' &&
             controller.riwayatMurajaahData.isEmpty)) {
-      return _emptyState();
+      return _buildEmptyState();
     } else {
       return SliverPadding(
         padding: const EdgeInsets.only(bottom: 40),
@@ -108,7 +108,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
     );
   }
 
-  SliverFillRemaining _emptyState() {
+  SliverFillRemaining _buildEmptyState() {
     return SliverFillRemaining(
       child: Center(
         child: Column(
@@ -129,11 +129,15 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
             const SizedBox(height: 16),
             Text(
               'Tidak ada riwayat hafalan',
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 fontSize: 16,
-                color: Colors.grey[600],
                 fontWeight: FontWeight.w500,
               ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Tarik ke bawah untuk refresh',
+              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
             ),
           ],
         ),
@@ -163,7 +167,9 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         child: Align(
           alignment: Alignment.centerRight,
           child: Skeletonizer(
-            enabled: controller.isLoading.value,
+            enabled:
+                controller.isLoading.value ||
+                controller.profilSantri.value == null,
             child: Text(
               '${controller.filterType.toLowerCase() == 'tambahhafalan' ? controller.totalSetoranHafalan : controller.totalSetoranMurajaah} Setoran',
               style: const TextStyle(fontSize: 14),
@@ -257,7 +263,9 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                     children: [
                       // Nama Santri
                       Skeletonizer(
-                        enabled: controller.isLoading.value,
+                        enabled:
+                            controller.isLoading.value ||
+                            controller.profilSantri.value == null,
                         effect: ShimmerEffect(
                           baseColor: Colors.white.withValues(alpha: 0.2),
                           highlightColor: Colors.white.withValues(alpha: 0.4),
@@ -265,11 +273,16 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                         child: controller.isLoading.value
                             ? Text(
                                 'Nama Lengkap Santri',
-                                style: TextStyle(fontSize: 20),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 maxLines: 1,
                               )
                             : Text(
-                                controller.profilSantri.value?.nama ?? '-',
+                                controller.profilSantri.value?.nama ??
+                                    'Nama Lengkap Santri',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
@@ -282,15 +295,25 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
 
                       // No Induk
                       Skeletonizer(
-                        enabled: controller.isLoading.value,
+                        enabled:
+                            controller.isLoading.value ||
+                            controller.profilSantri.value == null,
                         effect: ShimmerEffect(
                           baseColor: Colors.white.withValues(alpha: 0.2),
                           highlightColor: Colors.white.withValues(alpha: 0.4),
                         ),
                         child: controller.isLoading.value
-                            ? Text('Nomor Indouk Santri', maxLines: 1)
+                            ? Text(
+                                'Nomor Induk',
+                                maxLines: 1,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white.withValues(alpha: 0.8),
+                                ),
+                              )
                             : Text(
-                                controller.profilSantri.value?.noInduk ?? '-',
+                                controller.profilSantri.value?.noInduk ??
+                                    'Nomor Induk',
 
                                 style: TextStyle(
                                   fontSize: 16,
@@ -308,7 +331,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
               children: [
                 _buildInfoCard(
                   'Total Poin',
-                  '${controller.profilSantri.value?.totalPoin ?? 0}',
+                  '${controller.profilSantri.value?.totalPoin ?? 'Poin'}',
                 ),
                 const SizedBox(width: 12),
                 _buildInfoCard(
@@ -342,16 +365,27 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.8),
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
+            Skeletonizer(
+              enabled:
+                  controller.isLoading.value ||
+                  controller.profilSantri.value == null,
+              effect: ShimmerEffect(
+                baseColor: Colors.white.withValues(alpha: 0.2),
+                highlightColor: Colors.white.withValues(alpha: 0.4),
+              ),
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             Skeletonizer(
-              enabled: controller.isLoading.value,
+              enabled:
+                  controller.isLoading.value ||
+                  controller.profilSantri.value == null,
               effect: ShimmerEffect(
                 baseColor: Colors.white.withValues(alpha: 0.2),
                 highlightColor: Colors.white.withValues(alpha: 0.4),
@@ -510,20 +544,21 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
           decoration: BoxDecoration(
             color: isActive
-                ? (controller.filterType.value == 'TambahHafalan'
-                      ? Color(0xFF10B981)
-                      : Colors.orangeAccent)
+                ? Colors.deepPurpleAccent.withValues(alpha: 0.2)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isActive ? Colors.transparent : Colors.grey[300]!,
+              color: isActive
+                  ? Colors.deepPurpleAccent.withValues(alpha: 0.3)
+                  : Colors.grey[300]!,
+              width: isActive ? 2 : 1,
             ),
           ),
           child: Text(
             text,
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              color: isActive ? Colors.white : Colors.grey[700],
+              color: isActive ? Colors.deepPurple : Colors.grey[700],
               fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
               fontSize: 14,
             ),
@@ -581,7 +616,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
       case 'level3':
         return 'Level 3 - Juz 1-29';
       default:
-        return '-';
+        return 'Tahap Hafalan';
     }
   }
 
