@@ -40,399 +40,395 @@ class DetailSantriView extends GetView<DetailSantriController> {
         body: Obx(() {
           final santri = controller.santriDetail.value;
 
+          // Loading
           if (controller.isLoading.value) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text(
-                    'Loading...',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            );
+            return _buildLoadingState();
           }
-          // Data kosong
+          // Empty Data
           if (santri == null) {
-            return RefreshIndicator(
-              onRefresh: () async {
-                controller.getSantriDetail(controller.santriId);
-              },
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: SizedBox(
-                  height:
-                      MediaQuery.of(context).size.height -
-                      kToolbarHeight -
-                      MediaQuery.of(context).padding.top,
-                  width: MediaQuery.of(context).size.width,
+            return _buildEmptyState(context);
+          }
+
+          // Main Content
+          return _buildContent(santri);
+        }),
+        bottomNavigationBar: controller.santriDetail.value != null
+            ? _buildBottomButtons()
+            : null,
+      ),
+    );
+  }
+
+  RefreshIndicator _buildContent(Santri santri) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        controller.getSantriDetail(controller.santriId);
+      },
+      child: CustomScrollView(
+        slivers: [
+          // Custom App Bar with Gradient Background
+          SliverAppBar(
+            centerTitle: true,
+            title: Text(
+              'Detail Santri',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Get.back(),
+            ),
+            actions: [
+              if (controller.userRole == 'ustadz')
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined, color: Colors.white),
+                  onPressed: () {
+                    _showEditTahapDialog();
+                  },
+                ),
+            ],
+            expandedHeight: 280,
+            pinned: false,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
+                  ),
+                ),
+                child: SafeArea(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.person_off,
-                          size: 40,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Data santri tidak ditemukan',
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
+                      // Profile Section
+                      const SizedBox(height: 40),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Profile Picture with Border
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 4,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: ClipOval(
+                                child: CachedNetworkImage(
+                                  imageUrl: controller.getImageUrl(
+                                    santri.fotoProfil!,
+                                  ),
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => Container(
+                                    color: Colors.grey[300],
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 40,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Container(
+                                        color: Colors.grey[300],
+                                        child: const Icon(
+                                          Icons.person,
+                                          size: 40,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Name
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: Text(
+                                santri.nama ?? 'Nama tidak tersedia',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            // Badges Wrap
+                            Wrap(
+                              direction: Axis.horizontal,
+                              alignment: WrapAlignment.center,
+                              runAlignment: WrapAlignment.center,
+                              children: [
+                                // Tahap Badge
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: BoxDecoration(
+                                          color: _getTahapColor(
+                                            santri.tahapHafalan!,
+                                          ),
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        getTahapLabel(santri.tahapHafalan),
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                if (controller.userRole == 'ustadz')
+                                  const SizedBox(width: 8),
+
+                                // Gender Badge
+                                if (controller.userRole == 'ustadz')
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          santri.jenisKelamin?.toLowerCase() ==
+                                                  'l'
+                                              ? Icons.male
+                                              : Icons.female,
+                                          size: 14,
+                                          color: Colors.white,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          santri.jenisKelamin?.toLowerCase() ==
+                                                  'l'
+                                              ? 'Laki-laki'
+                                              : 'Perempuan',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 12,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                // Point Badge
+                                if (controller.userRole == 'ortu')
+                                  const SizedBox(width: 8),
+                                if (controller.userRole == 'ortu')
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.star_border_rounded,
+                                          size: 14,
+                                          color: Colors.white,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '${santri.totalPoin} Poin',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 12,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              controller.getSantriDetail(controller.santriId);
-            },
-            child: CustomScrollView(
-              slivers: [
-                // Custom App Bar with Gradient Background
-                SliverAppBar(
-                  centerTitle: true,
-                  title: Text(
-                    'Detail Santri',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Get.back(),
-                  ),
-                  actions: [
-                    if (controller.userRole == 'ustadz')
-                      IconButton(
-                        icon: const Icon(
-                          Icons.edit_outlined,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          _showEditTahapDialog();
-                        },
-                      ),
-                  ],
-                  expandedHeight: 280,
-                  pinned: false,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.deepPurpleAccent,
-                            Colors.deepPurple[700]!,
-                          ],
-                        ),
-                      ),
-                      child: SafeArea(
-                        child: Column(
-                          children: [
-                            // Profile Section
-                            const SizedBox(height: 40),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Profile Picture with Border
-                                  Container(
-                                    width: 120,
-                                    height: 120,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 4,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(
-                                            alpha: 0.2,
-                                          ),
-                                          blurRadius: 20,
-                                          offset: const Offset(0, 8),
-                                        ),
-                                      ],
-                                    ),
-                                    child: ClipOval(
-                                      child: CachedNetworkImage(
-                                        imageUrl: controller.getImageUrl(
-                                          santri.fotoProfil!,
-                                        ),
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) =>
-                                            Container(
-                                              color: Colors.grey[300],
-                                              child: const Icon(
-                                                Icons.person,
-                                                size: 40,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                        errorWidget: (context, url, error) =>
-                                            Container(
-                                              color: Colors.grey[300],
-                                              child: const Icon(
-                                                Icons.person,
-                                                size: 40,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 16),
-
-                                  // Name
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    child: Text(
-                                      santri.nama ?? 'Nama tidak tersedia',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 8),
-
-                                  // Badges Wrap
-                                  Wrap(
-                                    direction: Axis.horizontal,
-                                    alignment: WrapAlignment.center,
-                                    runAlignment: WrapAlignment.center,
-                                    children: [
-                                      // Tahap Badge
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 6,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.2,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                          border: Border.all(
-                                            color: Colors.white.withValues(
-                                              alpha: 0.3,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              width: 8,
-                                              height: 8,
-                                              decoration: BoxDecoration(
-                                                color: _getTahapColor(
-                                                  santri.tahapHafalan!,
-                                                ),
-                                                shape: BoxShape.circle,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              getTahapLabel(
-                                                santri.tahapHafalan,
-                                              ),
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 12,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-
-                                      if (controller.userRole == 'ustadz')
-                                        const SizedBox(width: 8),
-
-                                      // Gender Badge
-                                      if (controller.userRole == 'ustadz')
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withValues(
-                                              alpha: 0.2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            border: Border.all(
-                                              color: Colors.white.withValues(
-                                                alpha: 0.3,
-                                              ),
-                                            ),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                santri.jenisKelamin
-                                                            ?.toLowerCase() ==
-                                                        'l'
-                                                    ? Icons.male
-                                                    : Icons.female,
-                                                size: 14,
-                                                color: Colors.white,
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                santri.jenisKelamin
-                                                            ?.toLowerCase() ==
-                                                        'l'
-                                                    ? 'Laki-laki'
-                                                    : 'Perempuan',
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 12,
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-
-                                      // Point Badge
-                                      if (controller.userRole == 'ortu')
-                                        const SizedBox(width: 8),
-                                      if (controller.userRole == 'ortu')
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withValues(
-                                              alpha: 0.2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            border: Border.all(
-                                              color: Colors.white.withValues(
-                                                alpha: 0.3,
-                                              ),
-                                            ),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons.star_border_rounded,
-                                                size: 14,
-                                                color: Colors.white,
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                '${santri.totalPoin} Poin',
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 12,
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Main Content
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      // Stats Cards
-                      if (controller.userRole.toLowerCase() == 'ustadz')
-                        _buildStatsCards(santri),
-
-                      if (controller.userRole.toLowerCase() == 'ustadz')
-                        const SizedBox(height: 24),
-
-                      // Personal Information
-                      _buildPersonalInfoSection(santri),
-
-                      const SizedBox(height: 24),
-
-                      // Parents Information
-                      _buildParentsInfoSection(santri),
-
-                      const SizedBox(height: 24),
-
-                      // Wali Kelas Information
-                      _buildWaliKelasSection(santri),
-
-                      const SizedBox(height: 24),
-
-                      // Grafik Hafalan
-                      _buildChartHafalanSection(santri),
-
-                      const SizedBox(height: 50), // Space for bottom buttons
-                    ]),
-                  ),
-                ),
-              ],
             ),
-          );
-        }),
-        bottomNavigationBar: controller.santriDetail.value != null
-            ? _buildBottomButtons()
-            : null,
+          ),
+
+          // Main Content
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                // Stats Cards
+                if (controller.userRole.toLowerCase() == 'ustadz')
+                  _buildStatsCards(santri),
+
+                if (controller.userRole.toLowerCase() == 'ustadz')
+                  const SizedBox(height: 24),
+
+                // Personal Information
+                _buildPersonalInfoSection(santri),
+
+                const SizedBox(height: 24),
+
+                // Parents Information
+                _buildParentsInfoSection(santri),
+
+                const SizedBox(height: 24),
+
+                // Wali Kelas Information
+                _buildWaliKelasSection(santri),
+
+                const SizedBox(height: 24),
+
+                // Grafik Hafalan
+                _buildChartHafalanSection(santri),
+
+                const SizedBox(height: 50), // Space for bottom buttons
+              ]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  RefreshIndicator _buildEmptyState(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        controller.getSantriDetail(controller.santriId);
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height:
+              MediaQuery.of(context).size.height -
+              kToolbarHeight -
+              MediaQuery.of(context).padding.top,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Icon(
+                  Icons.person,
+                  size: 48,
+                  color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Data santri tidak ditemukan',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Tarik ke bawah untuk refresh',
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Center _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 16),
+          Text(
+            'Loading...',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }

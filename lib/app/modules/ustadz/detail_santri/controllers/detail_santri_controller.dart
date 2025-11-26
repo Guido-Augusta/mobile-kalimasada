@@ -24,6 +24,8 @@ class DetailSantriController extends GetxController {
   var range = '1w'.obs;
   var selectedChartType = ChartType.hafalanBaru.obs;
 
+  DateTime? _lastErrorShown;
+
   @override
   void onInit() {
     super.onInit();
@@ -78,9 +80,14 @@ class DetailSantriController extends GetxController {
         ToastUtils.showErrorToast('Gagal mendapatkan data santri');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
