@@ -10,7 +10,7 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         title: const Text(
           'Detail Riwayat Hafalan',

@@ -26,10 +26,13 @@ class DetailSurahView extends GetView<DetailSurahController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF8FAFC),
-        title: Text('Detail Surah'),
+        backgroundColor: const Color(0xFFF1F5F9),
+        title: Text(
+          'Detail Surah',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         surfaceTintColor: Colors.transparent,
       ),

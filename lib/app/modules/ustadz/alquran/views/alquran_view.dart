@@ -10,7 +10,7 @@ class AlquranView extends GetView<AlquranController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.deepPurpleAccent,

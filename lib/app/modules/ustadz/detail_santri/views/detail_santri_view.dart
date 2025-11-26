@@ -17,14 +17,14 @@ class DetailSantriView extends GetView<DetailSantriController> {
   Widget build(BuildContext context) {
     return Obx(
       () => Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: const Color(0xFFF1F5F9),
         appBar: controller.santriDetail.value == null
             ? AppBar(
                 title: const Text(
                   'Detail Santri',
                   style: TextStyle(
                     fontSize: 20,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),

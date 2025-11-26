@@ -14,7 +14,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFf1f5f9),
+      backgroundColor: Color(0xFFF1F5F9),
       appBar: AppBar(
         title: const Text(
           'Daftar Santri',

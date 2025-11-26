@@ -12,18 +12,15 @@ class PeringkatView extends GetView<PeringkatController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF8FAFF),
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: const Color(0xFFF1F5F9),
         elevation: 0,
         centerTitle: true,
         title: Text(
           'Peringkat Santri',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF111827),
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
       body: SafeArea(
@@ -35,7 +32,7 @@ class PeringkatView extends GetView<PeringkatController> {
             controller: controller.scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -83,7 +80,10 @@ class PeringkatView extends GetView<PeringkatController> {
                                 return _buildLoadMoreIndicator();
                               }
                               final santri = controller.peringkat[index];
-                              return _buildRankingCard(santri, index);
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: _buildRankingCard(santri, index),
+                              );
                             },
                           ),
                   ),
@@ -274,6 +274,7 @@ class PeringkatView extends GetView<PeringkatController> {
                 color: controller.selectedTahap.value == value
                     ? Colors.deepPurpleAccent.withValues(alpha: 0.3)
                     : Colors.transparent,
+                width: controller.selectedTahap.value == value ? 2 : 1,
               ),
               boxShadow: [
                 BoxShadow(
@@ -305,8 +306,11 @@ class PeringkatView extends GetView<PeringkatController> {
   Widget _buildRankingCard(Datum item, int index) {
     return InkWell(
       onTap: () => Get.toNamed('/detail-santri', arguments: item.id.toString()),
+      borderRadius: BorderRadius.circular(16),
+      hoverColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -324,8 +328,8 @@ class PeringkatView extends GetView<PeringkatController> {
           children: [
             // Rank Number
             Container(
-              width: 40,
-              height: 40,
+              constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+              padding: EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: index < 3

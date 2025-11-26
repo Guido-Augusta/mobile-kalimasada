@@ -12,7 +12,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFf1f5f9),
+      backgroundColor: Color(0xFFF1F5F9),
       appBar: AppBar(
         title: const Text(
           'Riwayat Terakhir',
@@ -46,10 +46,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
                 child: Column(
                   children: [
                     // Search Bar
@@ -259,7 +256,10 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                           }
                           final summaryHafalan =
                               controller.summaryHafalanList[index];
-                          return _buildSummaryHafalanCard(summaryHafalan);
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: _buildSummaryHafalanCard(summaryHafalan),
+                          );
                         },
                       );
                     }),
@@ -302,317 +302,314 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
           ).format(summaryHafalan.terakhirHafalan!.tanggal!)
         : '';
 
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        onTap: () {
-          Get.toNamed(
-            '/detail-santri',
-            arguments: summaryHafalan.id.toString(),
-          );
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.white, Colors.grey[50]!],
+    return InkWell(
+      onTap: () {
+        Get.toNamed('/detail-santri', arguments: summaryHafalan.id.toString());
+      },
+      borderRadius: BorderRadius.circular(16),
+      hoverColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header with name and date
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Name and ID
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          summaryHafalan.nama ?? 'Nama Santri',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[800],
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          summaryHafalan.noInduk ?? '-',
-                          style: GoogleFonts.poppins(
-                            fontSize: 13,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w400,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Date badge
-                  if (hasLastHafalan)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple[50],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.deepPurple[100]!),
-                      ),
-                      child: Text(
-                        tanggal,
+          ],
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with name and date
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Name and ID
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        summaryHafalan.nama ?? 'Nama Santri',
                         style: GoogleFonts.poppins(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.deepPurple,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        summaryHafalan.noInduk ?? '-',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w400,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Date badge
+                if (hasLastHafalan)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.deepPurple[100]!),
+                    ),
+                    child: Text(
+                      tanggal,
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.deepPurple,
                       ),
                     ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // Last hafalan info
-              if (hasLastHafalan)
-                InkWell(
-                  onTap: () {
-                    Get.toNamed(
-                      '/detail-progres',
-                      arguments: {
-                        'santriId': summaryHafalan.id,
-                        'surahId': summaryHafalan.terakhirHafalan?.surahId,
-                      },
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[200]!, width: 1),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        // Surah icon
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurple[50],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            Icons.menu_book_rounded,
-                            color: Colors.deepPurple[600],
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Surah info
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                surahName,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[800],
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Ayat $ayatDetail',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(width: 4),
-
-                        // Status badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isMurajaah
-                                ? Colors.orange[50]
-                                : Colors.green[50],
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isMurajaah
-                                  ? Colors.orange[100]!
-                                  : Colors.green[100]!,
-                            ),
-                          ),
-                          child: Text(
-                            isMurajaah ? 'Murajaah' : 'Hafalan',
-                            style: GoogleFonts.poppins(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: isMurajaah
-                                  ? Colors.orange[800]
-                                  : Colors.green[800],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
-                )
-              else
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // Last hafalan info
+            if (hasLastHafalan)
+              InkWell(
+                onTap: () {
+                  Get.toNamed(
+                    '/detail-progres',
+                    arguments: {
+                      'santriId': summaryHafalan.id,
+                      'surahId': summaryHafalan.terakhirHafalan?.surahId,
+                    },
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey[50],
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.grey[200]!, width: 1),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Belum ada riwayat ${isMurajaah ? 'murajaah' : 'hafalan'}',
-                      style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
                       ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      // Surah icon
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple[50],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.menu_book_rounded,
+                          color: Colors.deepPurple[600],
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+
+                      // Surah info
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              surahName,
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[800],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Ayat $ayatDetail',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(width: 4),
+
+                      // Status badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isMurajaah
+                              ? Colors.orange[50]
+                              : Colors.green[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isMurajaah
+                                ? Colors.orange[100]!
+                                : Colors.green[100]!,
+                          ),
+                        ),
+                        child: Text(
+                          isMurajaah ? 'Murajaah' : 'Hafalan',
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: isMurajaah
+                                ? Colors.orange[800]
+                                : Colors.green[800],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[200]!, width: 1),
+                ),
+                child: Center(
+                  child: Text(
+                    'Belum ada riwayat ${isMurajaah ? 'murajaah' : 'hafalan'}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+
+            const SizedBox(height: 12),
+
+            // Action buttons
+            Row(
+              children: [
+                // Detail Button
+                Expanded(
+                  flex: 5,
+                  child: ElevatedButton.icon(
+                    onPressed: hasLastHafalan
+                        ? () {
+                            Get.toNamed(
+                              '/detail-riwayat-hafalan',
+                              arguments: {
+                                'santriId': summaryHafalan.id,
+                                'surahId':
+                                    summaryHafalan.terakhirHafalan?.surahId,
+                                'tanggalRiwayat':
+                                    summaryHafalan.terakhirHafalan?.tanggal,
+                                'status':
+                                    summaryHafalan.terakhirHafalan?.status,
+                              },
+                            );
+                          }
+                        : () {},
+                    icon: Icon(
+                      Icons.visibility_outlined,
+                      size: 18,
+                      color: hasLastHafalan ? Colors.white : Colors.grey[400],
+                    ),
+                    label: Text(
+                      'Lihat Detail',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: hasLastHafalan ? Colors.white : Colors.grey[400],
+                      ),
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: hasLastHafalan
+                          ? Colors.deepPurpleAccent.withValues(alpha: 0.8)
+                          : Colors.grey[200],
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 0,
                     ),
                   ),
                 ),
 
-              const SizedBox(height: 12),
+                const SizedBox(width: 12),
 
-              // Action buttons
-              Row(
-                children: [
-                  // Detail Button
-                  Expanded(
-                    flex: 5,
-                    child: ElevatedButton.icon(
-                      onPressed: hasLastHafalan
-                          ? () {
-                              Get.toNamed(
-                                '/detail-riwayat-hafalan',
-                                arguments: {
-                                  'santriId': summaryHafalan.id,
-                                  'surahId':
-                                      summaryHafalan.terakhirHafalan?.surahId,
-                                  'tanggalRiwayat':
-                                      summaryHafalan.terakhirHafalan?.tanggal,
-                                  'status':
-                                      summaryHafalan.terakhirHafalan?.status,
-                                },
-                              );
-                            }
-                          : () {},
-                      icon: Icon(
-                        Icons.visibility_outlined,
-                        size: 18,
-                        color: hasLastHafalan ? Colors.white : Colors.grey[400],
+                // Hafalan Button
+                Expanded(
+                  flex: 4,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Get.toNamed(
+                        '/progres-hafalan',
+                        arguments: {'santriId': summaryHafalan.id.toString()},
+                      );
+                    },
+                    icon: Icon(
+                      Icons.book_outlined,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      'Hafalan',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
-                      label: Text(
-                        'Lihat Detail',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: hasLastHafalan
-                              ? Colors.white
-                              : Colors.grey[400],
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.withValues(alpha: 0.8),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: hasLastHafalan
-                            ? Colors.deepPurpleAccent.withValues(alpha: 0.8)
-                            : Colors.grey[200],
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        elevation: 0,
-                      ),
+                      elevation: 0,
                     ),
                   ),
-
-                  const SizedBox(width: 12),
-
-                  // Hafalan Button
-                  Expanded(
-                    flex: 4,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Get.toNamed(
-                          '/progres-hafalan',
-                          arguments: {'santriId': summaryHafalan.id.toString()},
-                        );
-                      },
-                      icon: Icon(
-                        Icons.book_outlined,
-                        size: 18,
-                        color: Colors.white,
-                      ),
-                      label: Text(
-                        'Hafalan',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.withValues(alpha: 0.8),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        elevation: 0,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

@@ -26,11 +26,14 @@ class DetailProgresView extends GetView<DetailProgresController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: const Color(0xFFF1F5F9),
         surfaceTintColor: Colors.transparent,
-        title: Text('Detail Progres'),
+        title: Text(
+          'Detail Progres',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
       ),
       body: Obx(() {

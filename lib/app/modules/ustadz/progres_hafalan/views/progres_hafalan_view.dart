@@ -11,7 +11,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.deepPurpleAccent,
@@ -130,7 +130,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -442,20 +442,16 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       highlightColor: Colors.transparent,
       splashColor: Colors.transparent,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.deepPurpleAccent.withValues(alpha: 0.2),
-            width: 1,
-          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 0.5,
               offset: const Offset(0, 2),
+              spreadRadius: 0.5,
             ),
           ],
         ),

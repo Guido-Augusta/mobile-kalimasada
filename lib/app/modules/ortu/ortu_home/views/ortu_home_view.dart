@@ -11,8 +11,8 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
-      appBar: AppBar(backgroundColor: Color(0xFFF8FAFF), toolbarHeight: 0),
+      backgroundColor: const Color(0xFFF1F5F9),
+      appBar: AppBar(backgroundColor: Color(0xFFF1F5F9), toolbarHeight: 0),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async => controller.getOrtu(),

@@ -12,7 +12,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         title: const Text(
           'Riwayat Hafalan',
@@ -66,7 +66,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
 
   SliverList _buildRiwayatListData() {
     return SliverList.separated(
-      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      separatorBuilder: (context, index) => const SizedBox(height: 6),
       itemBuilder: (context, index) {
         final isHafalan =
             controller.filterType.toLowerCase() == 'tambahhafalan';
@@ -411,7 +411,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
     return Card(
       color: Colors.white,
       elevation: 1,
-      shadowColor: Colors.black.withValues(alpha: 0.05),
+      shadowColor: Colors.black.withValues(alpha: 0.5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: Colors.grey[200]!, width: 1),
