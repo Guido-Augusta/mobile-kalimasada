@@ -24,7 +24,6 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          controller.isLoading.value = true;
           await controller.getProgresHafalan(controller.santriId);
         },
         child: Obx(() {
