@@ -34,6 +34,10 @@ class SummaryHafalanController extends GetxController {
     super.onInit();
     getSummaryHafalan();
     _setupScrollController();
+
+    debounce(searchQuery, (callback) {
+      getSummaryHafalan();
+    }, time: const Duration(milliseconds: 700));
   }
 
   void updateFilterBy() {

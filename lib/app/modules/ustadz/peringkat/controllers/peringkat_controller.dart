@@ -30,6 +30,10 @@ class PeringkatController extends GetxController {
     super.onInit();
     getPeringkat();
     _setupScrollController();
+
+    debounce(searchQuery, (callback) {
+      getPeringkat();
+    }, time: const Duration(milliseconds: 700));
   }
 
   void _setupScrollController() {

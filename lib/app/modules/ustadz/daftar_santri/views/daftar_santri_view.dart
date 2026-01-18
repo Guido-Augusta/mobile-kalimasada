@@ -110,7 +110,6 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
             controller: controller.searchController,
             onChanged: (value) {
               controller.searchQuery.value = value;
-              controller.fetchData();
             },
             decoration: InputDecoration(
               hintText: 'Cari santri...',
@@ -121,7 +120,6 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                       onPressed: () {
                         controller.searchQuery.value = '';
                         controller.searchController.clear();
-                        controller.fetchData();
                       },
                     )
                   : null,

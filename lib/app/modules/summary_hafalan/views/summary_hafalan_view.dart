@@ -68,7 +68,6 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                           controller: controller.searchController,
                           onChanged: (value) {
                             controller.searchQuery.value = value;
-                            controller.getSummaryHafalan();
                           },
                           decoration: InputDecoration(
                             hintText: 'Cari santri...',
@@ -85,7 +84,6 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                                     onPressed: () {
                                       controller.searchQuery.value = '';
                                       controller.searchController.clear();
-                                      controller.getSummaryHafalan();
                                     },
                                   )
                                 : null,

@@ -115,7 +115,6 @@ class PeringkatView extends GetView<PeringkatController> {
           controller: controller.searchController,
           onChanged: (value) {
             controller.searchQuery.value = value;
-            controller.getPeringkat();
           },
           decoration: InputDecoration(
             hintText: 'Cari santri...',
@@ -131,7 +130,6 @@ class PeringkatView extends GetView<PeringkatController> {
                     onPressed: () {
                       controller.searchQuery.value = '';
                       controller.searchController.clear();
-                      controller.getPeringkat();
                     },
                   )
                 : const SizedBox.shrink(),

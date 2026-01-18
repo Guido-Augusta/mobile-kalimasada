@@ -58,8 +58,13 @@ class DaftarSantriController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
     fetchData();
     _setupScrollController();
+
+    debounce(searchQuery, (callback) {
+      fetchData();
+    }, time: const Duration(milliseconds: 700));
   }
 
   @override
