@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -88,7 +89,9 @@ class SantriProfileController extends GetxController {
         final santri = Santri.fromJson(data['data']);
         santriDetail.value = santri;
         fotoProfil.value = getImageUrl(santri.fotoProfil!);
-        print('Santri detail loaded: ${santri.nama}');
+        if (kDebugMode) {
+          print('Santri detail loaded: ${santri.nama}');
+        }
       } else {
         ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
@@ -113,7 +116,9 @@ class SantriProfileController extends GetxController {
       if (pickedImage != null) {
         isUploadingImage.value = true;
         await uploadImage(pickedImage.path);
-        print(pickedImage.path);
+        if (kDebugMode) {
+          print(pickedImage.path);
+        }
       }
     } catch (e) {
       ToastUtils.showErrorToast('Gagal memilih gambar');
@@ -223,8 +228,10 @@ class SantriProfileController extends GetxController {
         if (Get.isRegistered<SantriHomeController>()) {
           Get.find<SantriHomeController>().getSantri();
         }
-        print(response.body);
-        print('Tanggal Lahir: $tanggalLahir');
+        if (kDebugMode) {
+          print(response.body);
+          print('Tanggal Lahir: $tanggalLahir');
+        }
         Get.back();
         ToastUtils.showSuccessToast('Profil berhasil diperbarui');
       } else {
@@ -249,7 +256,9 @@ class SantriProfileController extends GetxController {
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');

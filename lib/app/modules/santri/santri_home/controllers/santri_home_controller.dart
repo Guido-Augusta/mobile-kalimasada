@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
@@ -86,8 +87,10 @@ class SantriHomeController extends GetxController {
         },
       );
       var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print(data);
+      if (kDebugMode) {
+        print(response.statusCode);
+        print(data);
+      }
       if (response.statusCode == 200) {
         getChart();
         santri.value = s.Santri.fromJson(data['data']);
@@ -123,8 +126,10 @@ class SantriHomeController extends GetxController {
         },
       );
       var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print(data);
+      if (kDebugMode) {
+        print(response.statusCode);
+        print(data);
+      }
       if (response.statusCode == 200) {
         chart.value = c.Chart.fromJson(data);
       } else {
@@ -148,7 +153,9 @@ class SantriHomeController extends GetxController {
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');

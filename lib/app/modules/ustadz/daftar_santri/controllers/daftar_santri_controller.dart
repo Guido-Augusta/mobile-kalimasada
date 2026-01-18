@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
@@ -27,7 +28,7 @@ class DaftarSantriController extends GetxController {
   var currentAyat = 0.obs;
   var totalAyat = 0.obs;
 
-  final int _perPage = 20;
+  final int _perPage = 5;
   var currentPage = 1;
   var hasMore = true.obs;
   var isLoadingMore = false.obs;
@@ -455,11 +456,13 @@ class DaftarSantriController extends GetxController {
       }
     }
 
-    print('santriId: $santriId');
-    print('ustadzId: $ustadzId');
-    print('ayatIds: $ayatIds');
-    print('statusSetoran: ${statusSetoran.value}');
-    print('catatan: ${catatanController.text}');
+    if (kDebugMode) {
+      print('santriId: $santriId');
+      print('ustadzId: $ustadzId');
+      print('ayatIds: $ayatIds');
+      print('statusSetoran: ${statusSetoran.value}');
+      print('catatan: ${catatanController.text}');
+    }
     try {
       final response = await http.post(
         Uri.parse(ApiUrl.saveSetoran),
@@ -478,7 +481,9 @@ class DaftarSantriController extends GetxController {
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print(data);
+        if (kDebugMode) {
+          print(data);
+        }
         Get.back();
         Future.delayed(const Duration(milliseconds: 500), () {
           ayatIds = [];
@@ -515,11 +520,13 @@ class DaftarSantriController extends GetxController {
         (index) => selectedAyatMulai.value!.id! + index,
       );
     }
-    print(santriId);
-    print(ustadzId);
-    print(ayatIds);
-    print(statusSetoran.value);
-    print(catatanController.text);
+    if (kDebugMode) {
+      print(santriId);
+      print(ustadzId);
+      print(ayatIds);
+      print(statusSetoran.value);
+      print(catatanController.text);
+    }
     try {
       final response = await http.post(
         Uri.parse(ApiUrl.saveSetoran),
@@ -538,7 +545,9 @@ class DaftarSantriController extends GetxController {
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print(data);
+        if (kDebugMode) {
+          print(data);
+        }
         Get.back();
         Future.delayed(const Duration(milliseconds: 500), () {
           selectedAyatMulai.value = null;

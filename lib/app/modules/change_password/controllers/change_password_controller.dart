@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -62,7 +63,9 @@ class ChangePasswordController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         step.value = ChangePasswordStep.newPassword;
         oldPasswordVar.value = oldPassword;
@@ -111,7 +114,9 @@ class ChangePasswordController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         logout();
         ToastUtils.showSuccessToast('Password berhasil diubah');
@@ -137,7 +142,9 @@ class ChangePasswordController extends GetxController {
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');

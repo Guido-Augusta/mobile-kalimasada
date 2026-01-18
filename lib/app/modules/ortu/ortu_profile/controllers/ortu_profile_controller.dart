@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -66,7 +67,9 @@ class OrtuProfileController extends GetxController {
         final ortu = Ortu.fromJson(data['data']);
         ortuDetail.value = ortu;
         fotoProfil.value = getImageUrl(ortu.fotoProfil!);
-        print('Ortu detail loaded: ${ortu.nama}');
+        if (kDebugMode) {
+          print('Ortu detail loaded: ${ortu.nama}');
+        }
       } else {
         ToastUtils.showErrorToast('Gagal memuat data profil');
       }
@@ -91,7 +94,9 @@ class OrtuProfileController extends GetxController {
       if (pickedImage != null) {
         isUploadingImage.value = true;
         await uploadImage(pickedImage.path);
-        print(pickedImage.path);
+        if (kDebugMode) {
+          print(pickedImage.path);
+        }
       }
     } catch (e) {
       ToastUtils.showErrorToast('Gagal memilih gambar');
@@ -197,7 +202,9 @@ class OrtuProfileController extends GetxController {
         if (Get.isRegistered<OrtuHomeController>()) {
           Get.find<OrtuHomeController>().getOrtu();
         }
-        print(response.body);
+        if (kDebugMode) {
+          print(response.body);
+        }
         Get.back();
         ToastUtils.showSuccessToast('Profil berhasil diperbarui');
       } else {
@@ -222,7 +229,9 @@ class OrtuProfileController extends GetxController {
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');

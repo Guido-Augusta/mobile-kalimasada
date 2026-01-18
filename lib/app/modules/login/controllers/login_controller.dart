@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -44,8 +45,10 @@ class LoginController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print(data);
+      if (kDebugMode) {
+        print(response.statusCode);
+        print(data);
+      }
 
       if (response.statusCode == 200) {
         final SharedPreferences prefs = await SharedPreferences.getInstance();

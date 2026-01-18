@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -59,10 +60,12 @@ class SplashController extends GetxController {
       final role = prefs.getString('role');
       final userId = prefs.getString('userId');
       final roleId = prefs.getString('roleId');
-      print(token);
-      print(role);
-      print('userId: $userId');
-      print('roleId: $roleId');
+      if (kDebugMode) {
+        print(token);
+        print(role);
+        print('userId: $userId');
+        print('roleId: $roleId');
+      }
       if (token != null) {
         if (role == 'santri') {
           getSantri();

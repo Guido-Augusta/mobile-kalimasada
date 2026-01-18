@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
@@ -73,8 +74,10 @@ class UstadzHomeController extends GetxController {
         },
       );
       var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print(data);
+      if (kDebugMode) {
+        print(response.statusCode);
+        print(data);
+      }
       if (response.statusCode == 200) {
         ustadz.value = Ustadz.fromJson(data['data']);
         fotoProfil.value = getImageUrl(ustadz.value!.fotoProfil!);
@@ -99,8 +102,10 @@ class UstadzHomeController extends GetxController {
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print(data);
+      if (kDebugMode) {
+        print(response.statusCode);
+        print(data);
+      }
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');

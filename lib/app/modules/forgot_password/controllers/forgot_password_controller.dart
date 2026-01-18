@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -83,7 +84,9 @@ class ForgotPasswordController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         step.value = ForgotPasswordStep.tokenVerification;
         formKey.currentState!.reset();
@@ -118,7 +121,9 @@ class ForgotPasswordController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         tokenVar.value = tokenC.text;
         step.value = ForgotPasswordStep.newPassword;
@@ -156,7 +161,9 @@ class ForgotPasswordController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         ToastUtils.showSuccessToast(
           'Password berhasil diubah',

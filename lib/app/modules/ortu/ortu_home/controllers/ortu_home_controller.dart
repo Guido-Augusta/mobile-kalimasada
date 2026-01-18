@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
@@ -47,8 +48,10 @@ class OrtuHomeController extends GetxController {
         },
       );
       var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print(data);
+      if (kDebugMode) {
+        print(response.statusCode);
+        print(data);
+      }
       if (response.statusCode == 200) {
         ortu.value = o.Ortu.fromJson(data['data']);
         fotoProfil.value = getImageUrl(ortu.value!.fotoProfil!);
@@ -120,8 +123,10 @@ class OrtuHomeController extends GetxController {
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print(data);
+      if (kDebugMode) {
+        print(response.statusCode);
+        print(data);
+      }
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');

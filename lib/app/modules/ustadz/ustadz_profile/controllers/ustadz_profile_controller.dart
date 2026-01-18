@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:path/path.dart' as path;
@@ -103,7 +104,9 @@ class UstadzProfileController extends GetxController {
         if (Get.isRegistered<UstadzHomeController>()) {
           Get.find<UstadzHomeController>().getUstadz();
         }
-        print(response.body);
+        if (kDebugMode) {
+          print(response.body);
+        }
         Get.back();
         ToastUtils.showSuccessToast('Profil berhasil diperbarui');
       } else {
@@ -130,7 +133,9 @@ class UstadzProfileController extends GetxController {
       if (pickedImage != null) {
         isUploadingImage.value = true;
         await uploadImage(pickedImage.path);
-        print(pickedImage.path);
+        if (kDebugMode) {
+          print(pickedImage.path);
+        }
       }
     } catch (e) {
       ToastUtils.showErrorToast('Gagal memilih gambar');
@@ -218,7 +223,9 @@ class UstadzProfileController extends GetxController {
         },
       );
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');
