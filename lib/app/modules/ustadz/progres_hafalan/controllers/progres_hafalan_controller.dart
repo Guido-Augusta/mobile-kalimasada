@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,7 +38,7 @@ class ProgresHafalanController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/hafalan/$santriId/surah'),
+        Uri.parse(ApiUrl.progresHafalan(santriId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

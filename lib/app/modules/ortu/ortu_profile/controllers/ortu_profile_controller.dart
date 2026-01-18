@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/controllers/ortu_home_controller.dart';
@@ -45,14 +46,14 @@ class OrtuProfileController extends GetxController {
     return newImageUrl;
   }
 
-  Future<void> getOrtuDetail(String id) async {
+  Future<void> getOrtuDetail(String ortuId) async {
     try {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/ortu/$id'),
+        Uri.parse(ApiUrl.ortu(ortuId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -101,11 +102,11 @@ class OrtuProfileController extends GetxController {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final ortuId = prefs.getString('roleId');
 
       final request = http.MultipartRequest(
         'PUT',
-        Uri.parse('http://10.0.2.2:5000/api/ortu/$roleId'),
+        Uri.parse(ApiUrl.ortu(ortuId!)),
       );
 
       request.headers['Authorization'] = 'Bearer $token';
@@ -174,12 +175,12 @@ class OrtuProfileController extends GetxController {
   ) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-    final roleId = prefs.getString('roleId');
+    final ortuId = prefs.getString('roleId');
     try {
       isLoading.value = true;
 
       final response = await http.put(
-        Uri.parse('http://10.0.2.2:5000/api/ortu/$roleId'),
+        Uri.parse(ApiUrl.ortu(ortuId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -192,7 +193,7 @@ class OrtuProfileController extends GetxController {
         }),
       );
       if (response.statusCode == 200) {
-        getOrtuDetail(roleId!);
+        getOrtuDetail(ortuId);
         if (Get.isRegistered<OrtuHomeController>()) {
           Get.find<OrtuHomeController>().getOrtu();
         }
@@ -217,7 +218,7 @@ class OrtuProfileController extends GetxController {
       final userId = prefs.getString('userId');
 
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
+        Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);

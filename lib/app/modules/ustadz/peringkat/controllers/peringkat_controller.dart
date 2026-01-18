@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/peringkat.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,7 +16,7 @@ class PeringkatController extends GetxController {
   var searchQuery = ''.obs;
   var searchController = TextEditingController();
 
-  final int _perPage = 15;
+  final int _perPage = 20;
   var currentPage = 1;
   var hasMore = true;
   var isLoadingMore = false.obs;
@@ -60,10 +61,19 @@ class PeringkatController extends GetxController {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
+      final queryParams = {
+        'page': currentPage.toString(),
+        'limit': _perPage.toString(),
+        'search': searchQuery.value,
+        'tahapHafalan': selectedTahap.value,
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.santriRank,
+      ).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/santri/peringkat?page=$currentPage&limit=$_perPage&search=${searchQuery.value}&tahapHafalan=${selectedTahap.value}',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -111,16 +121,26 @@ class PeringkatController extends GetxController {
     if (isLoadingMore.value || !hasMore) return;
 
     isLoadingMore.value = true;
+    final originalPage = currentPage;
     currentPage++;
 
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       if (token != null) {
+        final queryParams = {
+          'page': currentPage.toString(),
+          'limit': _perPage.toString(),
+          'search': searchQuery.value,
+          'tahapHafalan': selectedTahap.value,
+        };
+
+        final uri = Uri.parse(
+          ApiUrl.santriRank,
+        ).replace(queryParameters: queryParams);
+
         final response = await http.get(
-          Uri.parse(
-            'http://10.0.2.2:5000/api/santri/peringkat?page=$currentPage&limit=$_perPage&search=${searchQuery.value}&tahapHafalan=${selectedTahap.value}',
-          ),
+          uri,
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',
@@ -139,11 +159,14 @@ class PeringkatController extends GetxController {
             hasMore = false;
           }
         } else {
-          currentPage--;
+          currentPage = originalPage;
           ToastUtils.showErrorToast('Gagal memuat data tambahan');
         }
+      } else {
+        ToastUtils.showErrorToast('Gagal memuat data tambahan');
       }
     } catch (e) {
+      currentPage = originalPage;
       final now = DateTime.now();
       if (_lastErrorShown == null ||
           now.difference(_lastErrorShown!) > Duration(seconds: 3)) {

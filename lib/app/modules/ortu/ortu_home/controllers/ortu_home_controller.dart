@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:http/http.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart' as o;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
@@ -35,10 +36,10 @@ class OrtuHomeController extends GetxController {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final ortuId = prefs.getString('roleId');
 
       final response = await get(
-        Uri.parse('http://10.0.2.2:5000/api/ortu/$roleId'),
+        Uri.parse(ApiUrl.ortu(ortuId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -71,7 +72,7 @@ class OrtuHomeController extends GetxController {
     final token = prefs.getString('token');
     try {
       final response = await get(
-        Uri.parse('http://10.0.2.2:5000/api/santri/$santriId'),
+        Uri.parse(ApiUrl.santriDetail(santriId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -115,7 +116,7 @@ class OrtuHomeController extends GetxController {
     final userId = prefs.getString('userId');
     try {
       final response = await post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
+        Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);

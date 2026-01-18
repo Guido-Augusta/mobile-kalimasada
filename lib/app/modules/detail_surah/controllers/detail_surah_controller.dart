@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_surah.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,7 +34,7 @@ class DetailSurahController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/alquran/surah/$surahId'),
+        Uri.parse(ApiUrl.surahDetail(surahId)),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

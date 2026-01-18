@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_riwayat_hafalan.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,10 +43,14 @@ class DetailRiwayatHafalanController extends GetxController {
         return;
       }
 
+      final queryParams = {'tanggal': tanggalRiwayatStr, 'status': statusStr};
+
+      final uri = Uri.parse(
+        ApiUrl.detailRiwayatHafalan(santriIdStr, surahIdStr),
+      ).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/riwayat/detail/$santriIdStr/surah/$surahIdStr?tanggal=$tanggalRiwayatStr&status=$statusStr',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

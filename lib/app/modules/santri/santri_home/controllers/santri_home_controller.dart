@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:http/http.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
@@ -74,10 +75,10 @@ class SantriHomeController extends GetxController {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final santriId = prefs.getString('roleId');
 
       final response = await get(
-        Uri.parse('http://10.0.2.2:5000/api/santri/$roleId'),
+        Uri.parse(ApiUrl.santriDetail(santriId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -107,12 +108,14 @@ class SantriHomeController extends GetxController {
       isLoadingChart.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final santriId = prefs.getString('roleId');
+
+      final queryParams = {'range': range.value, 'santriId': santriId};
+
+      final uri = Uri.parse(ApiUrl.chart).replace(queryParameters: queryParams);
 
       final response = await get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/chart?range=$range&santriId=$roleId',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -141,7 +144,7 @@ class SantriHomeController extends GetxController {
       final userId = prefs.getString('userId');
 
       final response = await post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
+        Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);

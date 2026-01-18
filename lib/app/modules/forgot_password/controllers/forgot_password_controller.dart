@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 
 enum ForgotPasswordStep { inputEmail, tokenVerification, newPassword }
@@ -76,7 +77,7 @@ class ForgotPasswordController extends GetxController {
       isValidating.value = true;
 
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/forgot-password'),
+        Uri.parse(ApiUrl.forgotPassword),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': emailC.text}),
       );
@@ -111,7 +112,7 @@ class ForgotPasswordController extends GetxController {
       isValidating.value = true;
 
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/verify-token'),
+        Uri.parse(ApiUrl.verifyToken),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'token': tokenC.text}),
       );
@@ -146,7 +147,7 @@ class ForgotPasswordController extends GetxController {
       isValidating.value = true;
 
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/reset-password'),
+        Uri.parse(ApiUrl.resetPassword),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'token': tokenVar.value,

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -139,9 +140,9 @@ class SplashController extends GetxController {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final santriId = prefs.getString('roleId');
       final response = await get(
-        Uri.parse('http://10.0.2.2:5000/api/santri/$roleId'),
+        Uri.parse(ApiUrl.santriDetail(santriId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -173,9 +174,9 @@ class SplashController extends GetxController {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final ustadzId = prefs.getString('roleId');
       final response = await get(
-        Uri.parse('http://10.0.2.2:5000/api/ustadz/$roleId'),
+        Uri.parse(ApiUrl.ustadz(ustadzId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -207,9 +208,9 @@ class SplashController extends GetxController {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final ortuId = prefs.getString('roleId');
       final response = await get(
-        Uri.parse('http://10.0.2.2:5000/api/ortu/$roleId'),
+        Uri.parse(ApiUrl.ortu(ortuId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

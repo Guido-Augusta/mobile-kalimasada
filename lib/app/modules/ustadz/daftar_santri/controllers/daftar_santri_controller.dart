@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart' as ds;
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart' as ph;
 import 'package:mobile_kalimasada/app/data/models/surah.dart' as s;
@@ -97,10 +98,19 @@ class DaftarSantriController extends GetxController {
         return;
       }
 
+      final queryParams = {
+        'page': currentPage.toString(),
+        'limit': _perPage.toString(),
+        'tahapHafalan': tahapHafalan.value,
+        'search': searchQuery.value,
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.santriList,
+      ).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/santri?page=$currentPage&limit=$_perPage&tahapHafalan=${tahapHafalan.value}&search=${searchQuery.value}',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -163,10 +173,19 @@ class DaftarSantriController extends GetxController {
         return;
       }
 
+      final queryParams = {
+        'page': currentPage.toString(),
+        'limit': _perPage.toString(),
+        'tahapHafalan': tahapHafalan.value,
+        'search': searchQuery.value,
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.santriList,
+      ).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/santri?page=$currentPage&limit=$_perPage&tahapHafalan=${tahapHafalan.value}&search=${searchQuery.value}',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -208,7 +227,7 @@ class DaftarSantriController extends GetxController {
     try {
       isLoadingSurah.value = true;
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/alquran/'),
+        Uri.parse(ApiUrl.surahList),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -240,9 +259,7 @@ class DaftarSantriController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/$santriId/surah/$surahId?mode=murajaah',
-        ),
+        Uri.parse(ApiUrl.detailHafalanPerSurahMurajaah(santriId, surahId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -317,7 +334,7 @@ class DaftarSantriController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/hafalan/$santriId/surah'),
+        Uri.parse(ApiUrl.progresHafalan(santriId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -351,9 +368,7 @@ class DaftarSantriController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/$santriId/surah/$surahId?mode=tambah',
-        ),
+        Uri.parse(ApiUrl.detailHafalanPerSurahTambah(santriId, surahId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -442,7 +457,7 @@ class DaftarSantriController extends GetxController {
     print('catatan: ${catatanController.text}');
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/hafalan'),
+        Uri.parse(ApiUrl.saveSetoran),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -502,7 +517,7 @@ class DaftarSantriController extends GetxController {
     print(catatanController.text);
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/hafalan'),
+        Uri.parse(ApiUrl.saveSetoran),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

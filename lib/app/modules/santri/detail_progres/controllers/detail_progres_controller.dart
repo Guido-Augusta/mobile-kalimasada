@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_surah.dart' hide Ayat;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
@@ -53,9 +54,7 @@ class DetailProgresController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/$santriId/surah/$surahId?mode=tambah',
-        ),
+        Uri.parse(ApiUrl.detailHafalanPerSurahTambah(santriId, surahId)),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -84,7 +83,7 @@ class DetailProgresController extends GetxController {
       isSurahInfoLoading.value = true;
 
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/alquran/surah/$surahId'),
+        Uri.parse(ApiUrl.surahDetail(surahId)),
         headers: {'Content-Type': 'application/json'},
       );
 

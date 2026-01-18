@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
 import 'package:mobile_kalimasada/app/modules/santri/santri_home/controllers/santri_home_controller.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
@@ -67,14 +68,14 @@ class SantriProfileController extends GetxController {
     }
   }
 
-  Future<void> getSantriDetail(String id) async {
+  Future<void> getSantriDetail(String santriId) async {
     try {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/santri/$id'),
+        Uri.parse(ApiUrl.santriDetail(santriId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -123,11 +124,11 @@ class SantriProfileController extends GetxController {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final santriId = prefs.getString('roleId');
 
       final request = http.MultipartRequest(
         'PUT',
-        Uri.parse('http://10.0.2.2:5000/api/santri/$roleId'),
+        Uri.parse(ApiUrl.santriDetail(santriId!)),
       );
 
       request.headers['Authorization'] = 'Bearer $token';
@@ -200,10 +201,10 @@ class SantriProfileController extends GetxController {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final santriId = prefs.getString('roleId');
 
       final response = await http.put(
-        Uri.parse('http://10.0.2.2:5000/api/santri/$roleId'),
+        Uri.parse(ApiUrl.santriDetail(santriId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -218,7 +219,7 @@ class SantriProfileController extends GetxController {
         }),
       );
       if (response.statusCode == 200) {
-        getSantriDetail(roleId!);
+        getSantriDetail(santriId);
         if (Get.isRegistered<SantriHomeController>()) {
           Get.find<SantriHomeController>().getSantri();
         }
@@ -244,7 +245,7 @@ class SantriProfileController extends GetxController {
       final userId = prefs.getString('userId');
 
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
+        Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/summary_hafalan.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -64,10 +65,21 @@ class SummaryHafalanController extends GetxController {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
+      final queryParams = {
+        'page': currentPage.toString(),
+        'limit': _perPage.toString(),
+        'status': status.value,
+        'tahapHafalan': level.value,
+        'sortByAyat': filterBy.value,
+        'name': searchQuery.value,
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.summaryHafalan,
+      ).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/all-santri/latest?page=$currentPage&limit=$_perPage&status=${status.value}&tahapHafalan=${level.value}&sortByAyat=${filterBy.value}&name=${searchQuery.value}',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -120,10 +132,21 @@ class SummaryHafalanController extends GetxController {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
+      final queryParams = {
+        'page': currentPage.toString(),
+        'limit': _perPage.toString(),
+        'status': status.value,
+        'tahapHafalan': level.value,
+        'sortByAyat': filterBy.value,
+        'name': searchQuery.value,
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.summaryHafalan,
+      ).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/all-santri/latest?page=$currentPage&limit=$_perPage&status=${status.value}&tahapHafalan=${level.value}&sortByAyat=${filterBy.value}&name=${searchQuery.value}',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

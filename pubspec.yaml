@@ -35,6 +35,7 @@ dependencies:
   fl_chart: ^1.1.1
   flutter:
     sdk: flutter
+  flutter_dotenv: ^6.0.0
   flutter_launcher_icons: ^0.14.4
   flutter_svg: ^2.0.10+1
   get: ^4.7.2
@@ -69,6 +70,7 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   assets:
+    - .env
     - assets/fonts/
     - assets/images/
     - assets/icons/

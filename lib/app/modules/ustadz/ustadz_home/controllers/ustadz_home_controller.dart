@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:http/http.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/ustadz.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,10 +62,10 @@ class UstadzHomeController extends GetxController {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final ustadzId = prefs.getString('roleId');
 
       final response = await get(
-        Uri.parse('http://10.0.2.2:5000/api/ustadz/$roleId'),
+        Uri.parse(ApiUrl.ustadz(ustadzId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -94,7 +95,7 @@ class UstadzHomeController extends GetxController {
     final userId = prefs.getString('userId');
     try {
       final response = await post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
+        Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);

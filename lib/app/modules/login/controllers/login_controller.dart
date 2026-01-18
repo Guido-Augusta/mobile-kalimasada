@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,7 +34,7 @@ class LoginController extends GetxController {
   void callLoginApi() async {
     try {
       final response = await post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/login'),
+        Uri.parse(ApiUrl.login),
         body: jsonEncode({
           'email': emailController.text,
           'password': passwordController.text,

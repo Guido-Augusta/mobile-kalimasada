@@ -43,3 +43,24 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# --- TAMBAHAN PENTING (SECURITY) ---
+# 1. Environment Variables
+.env
+.env.production
+.env.development
+# Kecualikan file example agar tim tahu format env-nya
+!.env.example 
+
+# 2. Android Signing Keys
+android/key.properties
+*.jks
+*.keystore
+
+# 3. iOS CocoaPods
+ios/Pods/
+
+# --- SYSTEM FILES (Windows/Mac) ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini

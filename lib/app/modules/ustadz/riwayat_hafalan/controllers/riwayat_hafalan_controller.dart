@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/riwayat_hafalan.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -71,7 +72,7 @@ class RiwayatHafalanController extends GetxController {
     super.onClose();
   }
 
-  Future<void> getRiwayatHafalan(String id) async {
+  Future<void> getRiwayatHafalan(String santriId) async {
     try {
       isLoading.value = true;
       currentPageHafalan = 1;
@@ -86,10 +87,18 @@ class RiwayatHafalanController extends GetxController {
         return;
       }
 
+      final queryParams = {
+        'page': currentPageHafalan.toString(),
+        'limit': _perPage.toString(),
+        'status': 'TambahHafalan',
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.riwayatHafalan(santriId),
+      ).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/riwayat/$id?page=$currentPageHafalan&limit=$_perPage&status=TambahHafalan',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -127,7 +136,7 @@ class RiwayatHafalanController extends GetxController {
     }
   }
 
-  Future<void> getRiwayatMurajaah(String id) async {
+  Future<void> getRiwayatMurajaah(String santriId) async {
     try {
       isLoading.value = true;
       currentPageMurajaah = 1;
@@ -142,10 +151,18 @@ class RiwayatHafalanController extends GetxController {
         return;
       }
 
+      final queryParams = {
+        'page': currentPageMurajaah.toString(),
+        'limit': _perPage.toString(),
+        'status': 'Murajaah',
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.riwayatHafalan(santriId),
+      ).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/riwayat/$id?page=$currentPageMurajaah&limit=$_perPage&status=Murajaah',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -201,10 +218,18 @@ class RiwayatHafalanController extends GetxController {
         return;
       }
 
+      final queryParams = {
+        'page': currentPageHafalan.toString(),
+        'limit': _perPage.toString(),
+        'status': 'TambahHafalan',
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.riwayatHafalan(santriId),
+      ).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/riwayat/$santriId?page=$currentPageHafalan&limit=$_perPage&status=TambahHafalan',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -259,10 +284,18 @@ class RiwayatHafalanController extends GetxController {
         return;
       }
 
+      final queryParams = {
+        'page': currentPageMurajaah.toString(),
+        'limit': _perPage.toString(),
+        'status': 'Murajaah',
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.riwayatHafalan(santriId),
+      ).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/riwayat/$santriId?page=$currentPageMurajaah&limit=$_perPage&status=Murajaah',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -326,7 +359,7 @@ class RiwayatHafalanController extends GetxController {
       }
 
       final response = await http.delete(
-        Uri.parse('http://10.0.2.2:5000/api/hafalan/riwayat'),
+        Uri.parse(ApiUrl.deleteRiwayatHafalan),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
