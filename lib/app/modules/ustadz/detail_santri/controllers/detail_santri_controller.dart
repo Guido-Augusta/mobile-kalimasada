@@ -12,11 +12,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum ChartType { hafalanBaru, murajaah }
 
 class DetailSantriController extends GetxController {
+  String userRole = '';
+
+  // Helper methods
+  bool get isUstadz => userRole == 'ustadz';
+  bool get isSantri => userRole == 'santri';
+  bool get isOrtu => userRole == 'ortu';
+
   var isLoading = false.obs;
   var isSaveLoading = false.obs;
   var santriDetail = Rxn<s.Santri>();
   var santriId = Get.arguments;
-  String userRole = '';
 
   var selectedTahap = ''.obs;
 
@@ -41,7 +47,7 @@ class DetailSantriController extends GetxController {
   String getOrangTuaByTipe(List<s.OrangTua> orangTua, String tipe) {
     try {
       final orangTuaByTipe = orangTua.firstWhere(
-        (element) => element.tipe == tipe,
+        (element) => element.tipe?.toLowerCase() == tipe.toLowerCase(),
       );
       return orangTuaByTipe.nama ?? '-';
     } catch (e) {

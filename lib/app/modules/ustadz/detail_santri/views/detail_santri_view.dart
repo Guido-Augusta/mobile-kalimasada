@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
+import 'package:mobile_kalimasada/app/extentions/orang_tua_extention.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -82,7 +83,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
               onPressed: () => Get.back(),
             ),
             actions: [
-              if (controller.userRole == 'ustadz')
+              if (controller.isUstadz)
                 IconButton(
                   icon: const Icon(Icons.edit_outlined, color: Colors.white),
                   onPressed: () {
@@ -225,11 +226,9 @@ class DetailSantriView extends GetView<DetailSantriController> {
                                   ),
                                 ),
 
-                                if (controller.userRole == 'ustadz')
+                                if (controller.isUstadz) ...[
                                   const SizedBox(width: 8),
-
-                                // Gender Badge
-                                if (controller.userRole == 'ustadz')
+                                  // Gender Badge
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 8,
@@ -272,11 +271,11 @@ class DetailSantriView extends GetView<DetailSantriController> {
                                       ],
                                     ),
                                   ),
+                                ],
 
                                 // Point Badge
-                                if (controller.userRole == 'ortu')
+                                if (controller.isOrtu) ...[
                                   const SizedBox(width: 8),
-                                if (controller.userRole == 'ortu')
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 8,
@@ -313,6 +312,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                                       ],
                                     ),
                                   ),
+                                ],
                               ],
                             ),
                           ],
@@ -331,11 +331,10 @@ class DetailSantriView extends GetView<DetailSantriController> {
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 // Stats Cards
-                if (controller.userRole.toLowerCase() == 'ustadz')
+                if (controller.isUstadz) ...[
                   _buildStatsCards(santri),
-
-                if (controller.userRole.toLowerCase() == 'ustadz')
                   const SizedBox(height: 24),
+                ],
 
                 // Personal Information
                 _buildPersonalInfoSection(santri),
@@ -355,7 +354,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                 // Grafik Hafalan
                 _buildChartHafalanSection(santri),
 
-                const SizedBox(height: 50), // Space for bottom buttons
+                const SizedBox(height: 50),
               ]),
             ),
           ),
@@ -815,9 +814,8 @@ class DetailSantriView extends GetView<DetailSantriController> {
             value: santri.user?.email ?? '-',
           ),
 
-          if (controller.userRole == 'ortu') const SizedBox(height: 12),
-
-          if (controller.userRole == 'ortu')
+          if (controller.isOrtu) ...[
+            const SizedBox(height: 12),
             _buildInfoTile(
               icon: santri.jenisKelamin?.toLowerCase() == 'l'
                   ? Icons.male
@@ -827,6 +825,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                   ? 'Laki-laki'
                   : 'Perempuan',
             ),
+          ],
 
           const SizedBox(height: 12),
 
@@ -887,11 +886,9 @@ class DetailSantriView extends GetView<DetailSantriController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (santri.orangTua.any(
-            (element) => element.tipe == 'Ayah' || element.tipe == 'Ibu',
-          ))
+          if (santri.orangTua.hasOrangTua)
             Text(
-              'Informasi Orang Tua',
+              santri.orangTua.sectionTitle,
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -899,9 +896,9 @@ class DetailSantriView extends GetView<DetailSantriController> {
               ),
             ),
 
-          if (santri.orangTua.any((element) => element.tipe == 'Wali'))
+          if (santri.orangTua.hasWali)
             Text(
-              'Informasi Wali',
+              santri.orangTua.sectionTitle,
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -909,13 +906,9 @@ class DetailSantriView extends GetView<DetailSantriController> {
               ),
             ),
 
-          if (santri.orangTua.any(
-            (element) =>
-                element.tipe == 'Wali' &&
-                (element.tipe == 'Ayah' || element.tipe == 'Ibu'),
-          ))
+          if (santri.orangTua.hasOrangTua && santri.orangTua.hasWali)
             Text(
-              'Informasi Orang Tua/Wali',
+              santri.orangTua.sectionTitle,
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -923,34 +916,32 @@ class DetailSantriView extends GetView<DetailSantriController> {
               ),
             ),
 
-          if (santri.orangTua.any((element) => element.tipe == 'Ayah'))
+          if (santri.orangTua.hasAyah) ...[
             const SizedBox(height: 16),
-
-          if (santri.orangTua.any((element) => element.tipe == 'Ayah'))
             _buildInfoTile(
               icon: Icons.person,
               label: 'Ayah',
               value: controller.getOrangTuaByTipe(santri.orangTua, 'Ayah'),
             ),
+          ],
 
-          if (santri.orangTua.any((element) => element.tipe == 'Ibu'))
+          if (santri.orangTua.hasIbu) ...[
             const SizedBox(height: 12),
-
-          if (santri.orangTua.any((element) => element.tipe == 'Ibu'))
             _buildInfoTile(
               icon: Icons.person,
               label: 'Ibu',
               value: controller.getOrangTuaByTipe(santri.orangTua, 'Ibu'),
             ),
+          ],
 
-          const SizedBox(height: 12),
-
-          if (santri.orangTua.any((element) => element.tipe == 'Wali'))
+          if (santri.orangTua.hasWali) ...[
+            const SizedBox(height: 12),
             _buildInfoTile(
               icon: Icons.person,
               label: 'Wali',
               value: controller.getOrangTuaByTipe(santri.orangTua, 'Wali'),
             ),
+          ],
         ],
       ),
     );
@@ -995,6 +986,33 @@ class DetailSantriView extends GetView<DetailSantriController> {
                 ? santri.waliKelas.first.nomorHp
                 : '',
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChartHafalanSection(Santri santri) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildChartHeader(),
+          const SizedBox(height: 16),
+          _buildChartTypeSelector(),
+          const SizedBox(height: 16),
+          _buildChart(),
         ],
       ),
     );
@@ -1046,33 +1064,6 @@ class DetailSantriView extends GetView<DetailSantriController> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildChartHafalanSection(Santri santri) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildChartHeader(),
-          const SizedBox(height: 16),
-          _buildChartTypeSelector(),
-          const SizedBox(height: 16),
-          _buildChart(),
-        ],
-      ),
     );
   }
 
