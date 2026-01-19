@@ -12,8 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 class DetailProgresController extends GetxController {
-  RxBool isFabVisible = true.obs;
-
   RxBool isSurahInfoLoading = false.obs;
   RxBool isDetailProgresLoading = false.obs;
   final santriId = Get.arguments['santriId'].toString();
@@ -22,6 +20,8 @@ class DetailProgresController extends GetxController {
   var surahInfo = Rxn<DetailSurah>();
 
   AudioPlayer audioPlayer = AudioPlayer();
+
+  RxBool isFabVisible = true.obs;
 
   final listC = ListController();
   final scrollC = ScrollController();

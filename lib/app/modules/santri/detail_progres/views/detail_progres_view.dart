@@ -137,7 +137,13 @@ class DetailProgresView extends GetView<DetailProgresController> {
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(
+                height:
+                    (MediaQuery.of(Get.context!).size.height -
+                        MediaQuery.of(Get.context!).padding.top -
+                        AppBar().preferredSize.height) *
+                    0.05,
+              ),
             ],
           ),
         );

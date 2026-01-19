@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
@@ -7,6 +8,7 @@ import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_surah.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
 class DetailSurahController extends GetxController {
   RxBool isLoading = false.obs;
@@ -14,6 +16,12 @@ class DetailSurahController extends GetxController {
   var detailSurah = Rxn<DetailSurah>();
 
   AudioPlayer audioPlayer = AudioPlayer();
+
+  RxBool isFabVisible = true.obs;
+
+  final listC = ListController();
+  final scrollC = ScrollController();
+  RxInt lastCheckedAyat = 0.obs;
 
   @override
   void onInit() {
