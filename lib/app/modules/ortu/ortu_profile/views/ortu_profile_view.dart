@@ -1,13 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/ortu_profile_controller.dart';
 
@@ -884,9 +882,9 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
           const SizedBox(height: 12),
 
           _buildInfoTile(
-            icon: Icons.location_on,
-            label: 'Alamat',
-            value: ortu.alamat ?? 'Tidak ada data',
+            icon: Icons.person,
+            label: 'Peran',
+            value: ortu.tipe ?? 'Tidak ada data',
           ),
 
           const SizedBox(height: 12),
@@ -904,9 +902,9 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
           const SizedBox(height: 12),
 
           _buildInfoTile(
-            icon: Icons.person,
-            label: 'Peran',
-            value: ortu.tipe ?? 'Tidak ada data',
+            icon: Icons.location_on,
+            label: 'Alamat',
+            value: ortu.alamat ?? 'Tidak ada data',
           ),
         ],
       ),
@@ -962,60 +960,6 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
               ],
             ),
           ),
-
-          if (telepon != null &&
-              telepon.isNotEmpty &&
-              controller.userRole != 'ortu')
-            Row(
-              children: [
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: SvgPicture.asset(
-                    'assets/icons/whatsapp.svg',
-                    width: 20,
-                    colorFilter: const ColorFilter.mode(
-                      Color(0xFF25D366),
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  onPressed: () {
-                    String formattedNomor = telepon;
-                    if (telepon.startsWith('0')) {
-                      formattedNomor = '+62${telepon.substring(1)}';
-                    }
-
-                    final whatsappUrl = "https://wa.me/$formattedNomor";
-                    launchUrl(Uri.parse(whatsappUrl));
-                  },
-                  style: IconButton.styleFrom(
-                    backgroundColor: const Color(
-                      0xFF25D366,
-                    ).withValues(alpha: 0.1),
-                    shape: const CircleBorder(),
-                  ),
-                ),
-
-                const SizedBox(width: 4),
-
-                IconButton(
-                  icon: const Icon(
-                    Icons.phone,
-                    size: 18,
-                    color: Colors.deepPurpleAccent,
-                  ),
-                  onPressed: () {
-                    final phoneUrl = "tel:$telepon";
-                    launchUrl(Uri.parse(phoneUrl));
-                  },
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.deepPurpleAccent.withValues(
-                      alpha: 0.1,
-                    ),
-                    shape: const CircleBorder(),
-                  ),
-                ),
-              ],
-            ),
         ],
       ),
     );
