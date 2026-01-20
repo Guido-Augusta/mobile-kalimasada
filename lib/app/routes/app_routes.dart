@@ -26,6 +26,7 @@ abstract class Routes {
   static const CHANGE_PASSWORD = _Paths.CHANGE_PASSWORD;
   static const FORGOT_PASSWORD = _Paths.FORGOT_PASSWORD;
   static const SUMMARY_HAFALAN = _Paths.SUMMARY_HAFALAN;
+  static const DETAIL_ORTU = _Paths.DETAIL_ORTU;
 }
 
 abstract class _Paths {
@@ -53,4 +54,5 @@ abstract class _Paths {
   static const CHANGE_PASSWORD = '/change-password';
   static const FORGOT_PASSWORD = '/forgot-password';
   static const SUMMARY_HAFALAN = '/summary-hafalan';
+  static const DETAIL_ORTU = '/detail-ortu';
 }

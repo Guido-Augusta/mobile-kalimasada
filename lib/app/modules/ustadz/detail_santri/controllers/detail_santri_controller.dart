@@ -55,6 +55,17 @@ class DetailSantriController extends GetxController {
     }
   }
 
+  String getOrangTuaIdByTipe(List<s.OrangTua> orangTua, String tipe) {
+    try {
+      final orangTuaByTipe = orangTua.firstWhere(
+        (element) => element.tipe?.toLowerCase() == tipe.toLowerCase(),
+      );
+      return orangTuaByTipe.id?.toString() ?? '-';
+    } catch (e) {
+      return '-';
+    }
+  }
+
   Future<void> getSantriDetail(String santriId) async {
     try {
       isLoading.value = true;

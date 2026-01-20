@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../middleware/auth_middleware.dart';
 import '../modules/change_password/bindings/change_password_binding.dart';
 import '../modules/change_password/views/change_password_view.dart';
+import '../modules/detail_ortu/bindings/detail_ortu_binding.dart';
+import '../modules/detail_ortu/views/detail_ortu_view.dart';
 import '../modules/detail_surah/bindings/detail_surah_binding.dart';
 import '../modules/detail_surah/views/detail_surah_view.dart';
 import '../modules/forgot_password/bindings/forgot_password_binding.dart';
@@ -179,6 +181,11 @@ class AppPages {
       name: _Paths.SUMMARY_HAFALAN,
       page: () => const SummaryHafalanView(),
       binding: SummaryHafalanBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAIL_ORTU,
+      page: () => const DetailOrtuView(),
+      binding: DetailOrtuBinding(),
     ),
   ];
 }

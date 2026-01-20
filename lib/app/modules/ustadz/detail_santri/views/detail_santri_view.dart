@@ -922,6 +922,8 @@ class DetailSantriView extends GetView<DetailSantriController> {
               icon: Icons.person,
               label: 'Ayah',
               value: controller.getOrangTuaByTipe(santri.orangTua, 'Ayah'),
+              isParentInfo: true,
+              ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Ayah'),
             ),
           ],
 
@@ -931,6 +933,8 @@ class DetailSantriView extends GetView<DetailSantriController> {
               icon: Icons.person,
               label: 'Ibu',
               value: controller.getOrangTuaByTipe(santri.orangTua, 'Ibu'),
+              isParentInfo: true,
+              ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Ibu'),
             ),
           ],
 
@@ -940,6 +944,8 @@ class DetailSantriView extends GetView<DetailSantriController> {
               icon: Icons.person,
               label: 'Wali',
               value: controller.getOrangTuaByTipe(santri.orangTua, 'Wali'),
+              isParentInfo: true,
+              ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Wali'),
             ),
           ],
         ],
@@ -1397,6 +1403,8 @@ class DetailSantriView extends GetView<DetailSantriController> {
     required String label,
     required String value,
     String? telepon,
+    bool? isParentInfo,
+    String? ortuId,
   }) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -1441,6 +1449,21 @@ class DetailSantriView extends GetView<DetailSantriController> {
               ],
             ),
           ),
+
+          if (isParentInfo == true) ...[
+            const SizedBox(width: 8),
+            IconButton(
+              onPressed: () {
+                Get.toNamed('/detail-ortu', arguments: {'ortuId': ortuId});
+              },
+              icon: const Icon(
+                Icons.keyboard_arrow_right_rounded,
+                color: Colors.deepPurpleAccent,
+              ),
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+            ),
+          ],
 
           if (telepon != null && telepon.isNotEmpty)
             Row(

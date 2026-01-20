@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
+import 'package:mobile_kalimasada/app/extentions/orang_tua_extention.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -1192,13 +1193,9 @@ class SantriProfileView extends GetView<SantriProfileController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (santri.orangTua.any(
-            (element) =>
-                element.tipe?.toLowerCase() == 'ayah' ||
-                element.tipe?.toLowerCase() == 'ibu',
-          ))
+          if (santri.orangTua.hasOrangTua)
             Text(
-              'Informasi Orang Tua',
+              santri.orangTua.sectionTitle,
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -1206,11 +1203,9 @@ class SantriProfileView extends GetView<SantriProfileController> {
               ),
             ),
 
-          if (santri.orangTua.any(
-            (element) => element.tipe?.toLowerCase() == 'wali',
-          ))
+          if (santri.orangTua.hasWali)
             Text(
-              'Informasi Wali',
+              santri.orangTua.sectionTitle,
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -1218,17 +1213,9 @@ class SantriProfileView extends GetView<SantriProfileController> {
               ),
             ),
 
-          if (santri.orangTua.any(
-            (element) =>
-                element.tipe?.toLowerCase() == 'wali' &&
-                santri.orangTua.any(
-                  (element) =>
-                      element.tipe?.toLowerCase() == 'ayah' ||
-                      element.tipe?.toLowerCase() == 'ibu',
-                ),
-          ))
+          if (santri.orangTua.hasOrangTua && santri.orangTua.hasWali)
             Text(
-              'Informasi Orang Tua & Wali',
+              santri.orangTua.sectionTitle,
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -1236,58 +1223,38 @@ class SantriProfileView extends GetView<SantriProfileController> {
               ),
             ),
 
-          if (santri.orangTua.any(
-            (element) =>
-                element.tipe?.toLowerCase() == 'ayah' ||
-                element.tipe?.toLowerCase() == 'ibu' ||
-                element.tipe?.toLowerCase() == 'wali',
-          ))
+          if (santri.orangTua.hasAyah) ...[
             const SizedBox(height: 16),
-
-          if (santri.orangTua.any(
-            (element) => element.tipe?.toLowerCase() == 'ayah',
-          ))
             _buildInfoTile(
               icon: Icons.person,
               label: 'Ayah',
-              value: controller.getOrangTuaByTipe(santri.orangTua, 'ayah'),
+              value: controller.getOrangTuaByTipe(santri.orangTua, 'Ayah'),
+              isParentInfo: true,
+              ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Ayah'),
             ),
+          ],
 
-          if (santri.orangTua.any(
-            (element) =>
-                element.tipe?.toLowerCase() == 'ayah' &&
-                santri.orangTua.any(
-                  (element) =>
-                      element.tipe?.toLowerCase() == 'ibu' ||
-                      element.tipe?.toLowerCase() == 'wali',
-                ),
-          ))
+          if (santri.orangTua.hasIbu) ...[
             const SizedBox(height: 12),
-
-          if (santri.orangTua.any(
-            (element) => element.tipe?.toLowerCase() == 'ibu',
-          ))
             _buildInfoTile(
               icon: Icons.person,
               label: 'Ibu',
-              value: controller.getOrangTuaByTipe(santri.orangTua, 'ibu'),
+              value: controller.getOrangTuaByTipe(santri.orangTua, 'Ibu'),
+              isParentInfo: true,
+              ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Ibu'),
             ),
+          ],
 
-          if (santri.orangTua.any(
-            (element) =>
-                element.tipe?.toLowerCase() == 'ibu' &&
-                element.tipe?.toLowerCase() == 'wali',
-          ))
+          if (santri.orangTua.hasWali) ...[
             const SizedBox(height: 12),
-
-          if (santri.orangTua.any(
-            (element) => element.tipe?.toLowerCase() == 'wali',
-          ))
             _buildInfoTile(
               icon: Icons.person,
               label: 'Wali',
-              value: controller.getOrangTuaByTipe(santri.orangTua, 'wali'),
+              value: controller.getOrangTuaByTipe(santri.orangTua, 'Wali'),
+              isParentInfo: true,
+              ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Wali'),
             ),
+          ],
         ],
       ),
     );
@@ -1342,6 +1309,8 @@ class SantriProfileView extends GetView<SantriProfileController> {
     required String label,
     required String value,
     String? telepon,
+    bool? isParentInfo,
+    String? ortuId,
   }) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -1386,6 +1355,21 @@ class SantriProfileView extends GetView<SantriProfileController> {
               ],
             ),
           ),
+
+          if (isParentInfo == true) ...[
+            const SizedBox(width: 8),
+            IconButton(
+              onPressed: () {
+                Get.toNamed('/detail-ortu', arguments: {'ortuId': ortuId});
+              },
+              icon: const Icon(
+                Icons.keyboard_arrow_right_rounded,
+                color: Colors.deepPurpleAccent,
+              ),
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+            ),
+          ],
 
           if (telepon != null && telepon.isNotEmpty)
             Row(
