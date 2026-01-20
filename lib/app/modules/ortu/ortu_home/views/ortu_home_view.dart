@@ -230,7 +230,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                       style: GoogleFonts.poppins(
                         fontSize: controller.ortu.value?.tipe != 'wali'
                             ? 18
-                            : 22,
+                            : 20,
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
                         height: 1.2,
@@ -663,7 +663,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Kalimasada Tahfidz App',
+                      'Kalimasada: Tahfidz App',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -696,7 +696,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
             child: Text(
               'طَلَبُ الْعِلْمِ فَرِيْضَةٌ عَلَى كُلِّ مُسْلِمٍ',
               style: GoogleFonts.amiri(
-                fontSize: 18,
+                fontSize: 20,
                 color: Colors.green[800],
                 fontWeight: FontWeight.w600,
               ),

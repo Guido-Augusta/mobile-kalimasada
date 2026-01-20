@@ -15,38 +15,6 @@ class UstadzHomeController extends GetxController {
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
           .obs;
 
-  // List of Islamic motivational quotes
-  var currentIndex = 0.obs;
-  var islamicQuotes = [
-    {
-      'quote': 'اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ',
-      'translation': 'Bacalah dengan (menyebut) nama Tuhanmu yang menciptakan!',
-      'source': 'QS. Al-Alaq: 1',
-    },
-    {
-      'quote': 'وَقُل رَّبِّ زِدْنِي عِلْمًا',
-      'translation':
-          'Dan katakanlah: "Ya Tuhanku, tambahkanlah kepadaku ilmu pengetahuan"',
-      'source': 'QS. Thaha: 114',
-    },
-    {
-      'quote': 'إِنَّ مَعَ الْعُسْرِ يُسْرًا',
-      'translation': 'Sesungguhnya beserta kesulitan ada kemudahan',
-      'source': 'QS. Al-Insyirah: 6',
-    },
-    {
-      'quote': 'فَاذْكُرُونِي أَذْكُرْكُمْ',
-      'translation': 'Maka ingatlah kepada-Ku, Aku pun akan ingat kepadamu',
-      'source': 'QS. Al-Baqarah: 152',
-    },
-    {
-      'quote': 'وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ',
-      'translation':
-          'Dan tidak ada keberhasilanku melainkan dengan (pertolongan) Allah',
-      'source': 'QS. Hud: 88',
-    },
-  ];
-
   @override
   void onInit() {
     super.onInit();
