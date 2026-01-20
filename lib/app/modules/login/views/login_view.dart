@@ -160,12 +160,7 @@ class LoginView extends GetView<LoginController> {
                                 controller: controller.passwordController,
                                 autovalidateMode:
                                     AutovalidateMode.onUserInteraction,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Password tidak boleh kosong';
-                                  }
-                                  return null;
-                                },
+                                validator: controller.validatePassword,
                                 obscureText: controller.isPasswordHidden.value,
                                 decoration: InputDecoration(
                                   hintText: 'Masukkan Password Anda',

@@ -90,4 +90,13 @@ class LoginController extends GetxController {
     }
     return null;
   }
+
+  String? validatePassword(String? password) {
+    if (password == null || password.isEmpty) {
+      return 'Password tidak boleh kosong';
+    } else if (password.length < 8) {
+      return 'Password minimal 8 karakter';
+    }
+    return null;
+  }
 }
