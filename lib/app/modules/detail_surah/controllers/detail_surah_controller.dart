@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -41,13 +42,15 @@ class DetailSurahController extends GetxController {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      final response = await http.get(
-        Uri.parse(ApiUrl.surahDetail(surahId)),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(ApiUrl.surahDetail(surahId)),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -60,7 +63,17 @@ class DetailSurahController extends GetxController {
               .replaceAll('localhost', '10.0.2.2')
               .replaceAll('127.0.0.1', '10.0.2.2');
 
-          audioPlayer.setUrl(audioUrl);
+          try {
+            await audioPlayer.setUrl(audioUrl);
+            if (kDebugMode) {
+              print('Audio loaded successfully');
+            }
+          } catch (e) {
+            if (kDebugMode) {
+              print('Audio loading error: $e');
+            }
+            ToastUtils.showErrorToast('Gagal memuat audio');
+          }
         }
       } else {
         ToastUtils.showErrorToast('Gagal memuat data');

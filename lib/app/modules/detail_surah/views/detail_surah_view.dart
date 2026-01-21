@@ -40,6 +40,9 @@ class DetailSurahView extends GetView<DetailSurahController> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: Obx(() {
+        if (controller.detailSurah.value == null) {
+          return const SizedBox.shrink();
+        }
         return AnimatedSlide(
           duration: const Duration(milliseconds: 300),
           offset: controller.isFabVisible.value
@@ -130,7 +133,19 @@ class DetailSurahView extends GetView<DetailSurahController> {
       }),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(color: Colors.deepPurpleAccent),
+                const SizedBox(height: 16),
+                Text(
+                  'Memuat data...',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                ),
+              ],
+            ),
+          );
         }
 
         if (controller.detailSurah.value == null) {

@@ -105,10 +105,14 @@ class DetailProgresController extends GetxController {
 
           try {
             await audioPlayer.setUrl(audioUrl);
+            if (kDebugMode) {
+              print('Audio loaded successfully');
+            }
           } catch (e) {
             if (kDebugMode) {
               print('Audio loading error: $e');
             }
+            ToastUtils.showErrorToast('Gagal memuat audio');
           }
         }
       } else {
