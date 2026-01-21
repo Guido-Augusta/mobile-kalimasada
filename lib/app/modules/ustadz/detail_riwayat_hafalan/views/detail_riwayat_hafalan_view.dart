@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../controllers/detail_riwayat_hafalan_controller.dart';
+import 'package:mobile_kalimasada/app/data/models/detail_riwayat_hafalan.dart';
 
 class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
   const DetailRiwayatHafalanView({super.key});
@@ -93,119 +94,7 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
         return CustomScrollView(
           slivers: [
             // Header Card
-            SliverToBoxAdapter(
-              child: Container(
-                width: double.infinity,
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF6B46C1).withValues(alpha: 0.2),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.book_rounded,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Surah',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                spacing: 8,
-                                children: [
-                                  Text(
-                                    detail.data?.surah?.namaLatin ?? '-',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  if (detail.data?.surah?.nama != null)
-                                    Text(
-                                      '|',
-                                      style: TextStyle(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.6,
-                                        ),
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  if (detail.data?.surah?.nama != null)
-                                    Text(
-                                      detail.data?.surah?.nama ?? '-',
-                                      style: GoogleFonts.amiri(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.9,
-                                        ),
-                                        fontSize: 20,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        _buildInfoCard(
-                          'Jumlah Ayat',
-                          '${detail.data?.daftarAyat.length} Ayat',
-                        ),
-                        const SizedBox(width: 12),
-                        _buildInfoCard(
-                          'Status',
-                          _getStatusText(detail.data?.status),
-                          flex: 3,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            _buildHeaderCard(detail),
 
             // Detail Information
             SliverToBoxAdapter(
@@ -240,12 +129,17 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
                           'Ustadz',
                           detail.data?.ustadz?.nama ?? '-',
                         ),
-                        const SizedBox(height: 12),
-                        _buildDetailItem(
-                          Icons.star_rounded,
-                          'Total Poin',
-                          detail.data?.totalPoin.toString() ?? '-',
-                        ),
+
+                        if (detail.data!.status!.toLowerCase() !=
+                            'murajaah') ...[
+                          const SizedBox(height: 12),
+                          _buildDetailItem(
+                            Icons.star_rounded,
+                            'Total Poin',
+                            detail.data?.totalPoin.toString() ?? '-',
+                          ),
+                        ],
+
                         const SizedBox(height: 16),
                         SizedBox(
                           width: double.infinity,
@@ -255,7 +149,7 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
                             icon: const Icon(Icons.note_alt_outlined),
                             label: const Text('Lihat Catatan'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6B46C1),
+                              backgroundColor: Colors.orangeAccent,
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
@@ -451,6 +345,111 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
     );
   }
 
+  SliverToBoxAdapter _buildHeaderCard(DetailRiwayatHafalan detail) {
+    return SliverToBoxAdapter(
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF6B46C1).withValues(alpha: 0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.book_rounded,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Surah',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        children: [
+                          Text(
+                            detail.data?.surah?.namaLatin ?? '-',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(width: 4),
+                          if (detail.data?.surah?.nama != null)
+                            Text(
+                              detail.data?.surah?.nama ?? '-',
+                              style: GoogleFonts.amiri(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontSize: 20,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                _buildInfoCard(
+                  'Jumlah Ayat',
+                  '${detail.data?.daftarAyat.length} Ayat',
+                ),
+                const SizedBox(width: 12),
+                _buildInfoCard(
+                  'Status',
+                  _getStatusText(detail.data?.status),
+                  flex: 3,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildInfoCard(String title, String value, {int flex = 2}) {
     return Expanded(
       flex: flex,
@@ -482,7 +481,7 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
               value,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
               overflow: TextOverflow.ellipsis,
@@ -563,14 +562,14 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
         backgroundColor: Colors.white,
         title: const Row(
           children: [
-            Icon(Icons.note_rounded, color: Color(0xFF6B46C1), size: 24),
+            Icon(Icons.note_alt_rounded, color: Colors.deepPurple, size: 24),
             SizedBox(width: 8),
             Text(
               'Catatan Hafalan',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF6B46C1),
+                color: Colors.deepPurple,
               ),
             ),
           ],
@@ -611,9 +610,7 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF6B46C1),
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.deepPurple),
             child: const Text('Tutup'),
           ),
         ],
