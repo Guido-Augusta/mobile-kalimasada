@@ -40,6 +40,10 @@ class DetailProgresView extends GetView<DetailProgresController> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: Obx(() {
+        if (controller.surahInfo.value == null &&
+            controller.detailProgres.value == null) {
+          return SizedBox.shrink();
+        }
         return AnimatedSlide(
           duration: const Duration(milliseconds: 300),
           offset: controller.isFabVisible.value

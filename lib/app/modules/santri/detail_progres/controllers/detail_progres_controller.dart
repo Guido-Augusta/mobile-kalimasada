@@ -1,5 +1,6 @@
 // detail_progres_controller.dart
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -82,10 +83,12 @@ class DetailProgresController extends GetxController {
     try {
       isSurahInfoLoading.value = true;
 
-      final response = await http.get(
-        Uri.parse(ApiUrl.surahDetail(surahId)),
-        headers: {'Content-Type': 'application/json'},
-      );
+      final response = await http
+          .get(
+            Uri.parse(ApiUrl.surahDetail(surahId)),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         getDetailProgres();
@@ -100,12 +103,21 @@ class DetailProgresController extends GetxController {
               .replaceAll('localhost', '10.0.2.2')
               .replaceAll('127.0.0.1', '10.0.2.2');
 
-          audioPlayer.setUrl(audioUrl);
+          try {
+            await audioPlayer.setUrl(audioUrl);
+          } catch (e) {
+            if (kDebugMode) {
+              print('Audio loading error: $e');
+            }
+          }
         }
       } else {
         ToastUtils.showErrorToast('Gagal memuat surah');
       }
     } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
