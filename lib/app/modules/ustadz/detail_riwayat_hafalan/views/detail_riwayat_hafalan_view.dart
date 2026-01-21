@@ -14,16 +14,12 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
       appBar: AppBar(
         title: const Text(
           'Detail Riwayat Hafalan',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
-        backgroundColor: Colors.deepPurpleAccent,
+        backgroundColor: const Color(0xFFF1F5F9),
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {

@@ -16,16 +16,11 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
       appBar: AppBar(
         title: const Text(
           'Riwayat Terakhir',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            fontSize: 20,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         centerTitle: true,
-        backgroundColor: Colors.deepPurpleAccent,
+        backgroundColor: const Color(0xFFF1F5F9),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline_rounded),
