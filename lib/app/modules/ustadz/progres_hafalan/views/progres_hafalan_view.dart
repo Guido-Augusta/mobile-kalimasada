@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart';
@@ -15,154 +16,224 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.deepPurpleAccent,
-        foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF1F5F9),
+        surfaceTintColor: Colors.transparent,
         title: const Text(
           'Progres Hafalan',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      floatingActionButton: Obx(() {
+        return AnimatedSlide(
+          duration: const Duration(milliseconds: 300),
+          offset: controller.isFabVisible.value
+              ? Offset.zero
+              : const Offset(2, 0), // geser ke kanan
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FloatingActionButton(
+                heroTag: 'scroll_up',
+                backgroundColor: Colors.deepPurpleAccent,
+                mini: true,
+                onPressed: () {
+                  controller.scrollC.animateTo(
+                    0,
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.fastLinearToSlowEaseIn,
+                  );
+                },
+                child: const Icon(
+                  Icons.keyboard_arrow_up_outlined,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 10),
+              FloatingActionButton(
+                heroTag: 'scroll_down',
+                backgroundColor: Colors.deepPurpleAccent,
+                mini: true,
+                onPressed: () {
+                  controller.scrollC.animateTo(
+                    controller.scrollC.position.maxScrollExtent,
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.fastLinearToSlowEaseIn,
+                  );
+                },
+                child: const Icon(
+                  Icons.keyboard_arrow_down_outlined,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(
+                height:
+                    (MediaQuery.of(Get.context!).size.height -
+                        MediaQuery.of(Get.context!).padding.top -
+                        AppBar().preferredSize.height) *
+                    0.05,
+              ),
+            ],
+          ),
+        );
+      }),
+
       body: RefreshIndicator(
         onRefresh: () async {
           await controller.getProgresHafalan(controller.santriId);
         },
         child: Obx(() {
-          return CustomScrollView(
-            slivers: [
-              // Student Info Card
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                  child: buildSantriInfoCard(),
-                ),
-              ),
-
-              // Search Bar
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                  child: buildSearchBar(),
-                ),
-              ),
-
-              // Progress Header
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-                  child: buildProgressHeader(),
-                ),
-              ),
-
-              // Surah Progress List
-              if (controller.isLoading.value)
-                SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          color: Colors.deepPurpleAccent,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Memuat data...',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
+          return NotificationListener<UserScrollNotification>(
+            onNotification: (notification) {
+              if (notification.direction == ScrollDirection.reverse) {
+                if (controller.isFabVisible.value) {
+                  controller.isFabVisible.value = false;
+                }
+              } else if (notification.direction == ScrollDirection.forward) {
+                if (!controller.isFabVisible.value) {
+                  controller.isFabVisible.value = true;
+                }
+              }
+              return true;
+            },
+            child: CustomScrollView(
+              controller: controller.scrollC,
+              slivers: [
+                // Student Info Card
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                    child: buildSantriInfoCard(),
                   ),
-                )
-              else if (controller.progresHafalan.isEmpty)
-                SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurpleAccent.withValues(
-                              alpha: 0.1,
-                            ),
-                            shape: BoxShape.circle,
+                ),
+
+                // Search Bar
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                    child: buildSearchBar(),
+                  ),
+                ),
+
+                // Progress Header
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+                    child: buildProgressHeader(),
+                  ),
+                ),
+
+                // Surah Progress List
+                if (controller.isLoading.value)
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                            color: Colors.deepPurpleAccent,
                           ),
-                          child: Icon(
-                            Icons.book_outlined,
-                            size: 48,
-                            color: Colors.deepPurpleAccent.withValues(
-                              alpha: 0.5,
+                          const SizedBox(height: 16),
+                          Text(
+                            'Memuat data...',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Tidak ada data',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Tarik ke bawah untuk refresh',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                )
-              else if (controller.searchQuery.value.isNotEmpty &&
-                  controller.filteredSurahList.isEmpty)
-                SliverFillRemaining(
-                  child: Center(
-                    child: Text(
-                      'Tidak ada hasil pencarian',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                  )
+                else if (controller.progresHafalan.isEmpty)
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.deepPurpleAccent.withValues(
+                                alpha: 0.1,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.book_outlined,
+                              size: 48,
+                              color: Colors.deepPurpleAccent.withValues(
+                                alpha: 0.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Tidak ada data',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tarik ke bawah untuk refresh',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        // Check if this is the last item (doa khatam card)
-                        final surahList = controller.searchQuery.value.isEmpty
-                            ? controller.progresHafalan
-                            : controller.filteredSurahList;
+                  )
+                else if (controller.searchQuery.value.isNotEmpty &&
+                    controller.filteredSurahList.isEmpty)
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Text(
+                        'Tidak ada hasil pencarian',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                      ),
+                    ),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          // Check if this is the last item (doa khatam card)
+                          final surahList = controller.searchQuery.value.isEmpty
+                              ? controller.progresHafalan
+                              : controller.filteredSurahList;
 
-                        if (index == surahList.length) {
-                          // Return doa khatam card as the last item
+                          if (index == surahList.length) {
+                            // Return doa khatam card as the last item
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _buildDoaKhatamCard(),
+                            );
+                          }
+
+                          // Return surah progress card
+                          final surah = surahList[index];
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 12),
-                            child: _buildDoaKhatamCard(),
+                            child: _buildSurahProgressCard(surah, index),
                           );
-                        }
-
-                        // Return surah progress card
-                        final surah = surahList[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _buildSurahProgressCard(surah, index),
-                        );
-                      },
-                      childCount:
-                          (controller.searchQuery.value.isEmpty
-                              ? controller.progresHafalan.length
-                              : controller.filteredSurahList.length) +
-                          1, // Add 1 for the doa khatam card
+                        },
+                        childCount:
+                            (controller.searchQuery.value.isEmpty
+                                ? controller.progresHafalan.length
+                                : controller.filteredSurahList.length) +
+                            1, // Add 1 for the doa khatam card
+                      ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           );
         }),
       ),

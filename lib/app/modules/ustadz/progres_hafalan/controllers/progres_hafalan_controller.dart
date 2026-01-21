@@ -20,6 +20,10 @@ class ProgresHafalanController extends GetxController {
   var searchController = TextEditingController();
   var searchQuery = ''.obs;
 
+  RxBool isFabVisible = true.obs;
+
+  final scrollC = ScrollController();
+
   DateTime? _lastErrorShown;
 
   @override
