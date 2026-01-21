@@ -7,6 +7,8 @@ import '../modules/detail_ortu/bindings/detail_ortu_binding.dart';
 import '../modules/detail_ortu/views/detail_ortu_view.dart';
 import '../modules/detail_surah/bindings/detail_surah_binding.dart';
 import '../modules/detail_surah/views/detail_surah_view.dart';
+import '../modules/doa_khatam/bindings/doa_khatam_binding.dart';
+import '../modules/doa_khatam/views/doa_khatam_view.dart';
 import '../modules/forgot_password/bindings/forgot_password_binding.dart';
 import '../modules/forgot_password/views/forgot_password_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -186,6 +188,11 @@ class AppPages {
       name: _Paths.DETAIL_ORTU,
       page: () => const DetailOrtuView(),
       binding: DetailOrtuBinding(),
+    ),
+    GetPage(
+      name: _Paths.DOA_KHATAM,
+      page: () => const DoaKhatamView(),
+      binding: DoaKhatamBinding(),
     ),
   ];
 }

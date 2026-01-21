@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../controllers/progres_hafalan_controller.dart';
 
@@ -133,17 +134,31 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        final surah = controller.searchQuery.value.isEmpty
-                            ? controller.progresHafalan[index]
-                            : controller.filteredSurahList[index];
+                        // Check if this is the last item (doa khatam card)
+                        final surahList = controller.searchQuery.value.isEmpty
+                            ? controller.progresHafalan
+                            : controller.filteredSurahList;
+
+                        if (index == surahList.length) {
+                          // Return doa khatam card as the last item
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: _buildDoaKhatamCard(),
+                          );
+                        }
+
+                        // Return surah progress card
+                        final surah = surahList[index];
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: _buildSurahProgressCard(surah, index),
                         );
                       },
-                      childCount: controller.searchQuery.value.isEmpty
-                          ? controller.progresHafalan.length
-                          : controller.filteredSurahList.length,
+                      childCount:
+                          (controller.searchQuery.value.isEmpty
+                              ? controller.progresHafalan.length
+                              : controller.filteredSurahList.length) +
+                          1, // Add 1 for the doa khatam card
                     ),
                   ),
                 ),
@@ -572,6 +587,94 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDoaKhatamCard() {
+    return FutureBuilder<String?>(
+      future: AuthService.getCurrentRole(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data == 'santri') {
+          return InkWell(
+            onTap: () {
+              // Navigate to doa khatam page or show dialog
+              Get.toNamed('/doa-khatam');
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.deepPurple[700]!, Colors.deepPurpleAccent],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 0.5,
+                    offset: const Offset(0, 2),
+                    spreadRadius: 0.5,
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.menu_book_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Doa Khatam Al-Qur\'an',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Doa setelah menyelesaikan pembacaan Al-Qur\'an',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.keyboard_arrow_right_rounded,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Jika bukan santri, jangan tampilkan apa-apa
+        return const SizedBox.shrink();
+      },
     );
   }
 }
