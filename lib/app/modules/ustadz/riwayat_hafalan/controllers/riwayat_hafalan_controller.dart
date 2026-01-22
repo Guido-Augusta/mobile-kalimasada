@@ -42,10 +42,7 @@ class RiwayatHafalanController extends GetxController {
   }
 
   Future<void> _loadInitialData() async {
-    await Future.wait([
-      getRiwayatHafalan(santriId),
-      getRiwayatMurajaah(santriId),
-    ]);
+    await getRiwayatData(santriId);
   }
 
   void _setupScrollController() {
@@ -72,11 +69,13 @@ class RiwayatHafalanController extends GetxController {
     super.onClose();
   }
 
-  Future<void> getRiwayatHafalan(String santriId) async {
+  Future<void> getRiwayatData(String santriId) async {
     try {
       isLoading.value = true;
       currentPageHafalan = 1;
+      currentPageMurajaah = 1;
       hasMoreHafalan.value = true;
+      hasMoreMurajaah.value = true;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
@@ -87,38 +86,49 @@ class RiwayatHafalanController extends GetxController {
         return;
       }
 
-      final queryParams = {
-        'page': currentPageHafalan.toString(),
-        'limit': _perPage.toString(),
-        'status': 'TambahHafalan',
-      };
-
-      final uri = Uri.parse(
-        ApiUrl.riwayatHafalan(santriId),
-      ).replace(queryParameters: queryParams);
-
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
+      // Buat 2 request secara paralel
+      final hafalanFuture = _getRiwayatByStatus(
+        santriId,
+        token,
+        'TambahHafalan',
+        currentPageHafalan,
+      );
+      final murajaahFuture = _getRiwayatByStatus(
+        santriId,
+        token,
+        'Murajaah',
+        currentPageMurajaah,
       );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+      // Tunggu kedua request selesai
+      final results = await Future.wait([hafalanFuture, murajaahFuture]);
+
+      final hafalanResponse = results[0];
+      final murajaahResponse = results[1];
+
+      // Proses response hafalan
+      if (hafalanResponse.statusCode == 200) {
+        final data = jsonDecode(hafalanResponse.body);
         final riwayat = RiwayatHafalan.fromJson(data);
         profilSantri.value = riwayat.santri;
         totalSetoranHafalan = riwayat.pagination?.totalData ?? 0;
-        // Clear existing data and add new ones
         riwayatHafalanData.clear();
         riwayatHafalanData.addAll(riwayat.data);
-
-        // Check if there are more pages
         hasMoreHafalan.value = riwayat.data.length >= _perPage;
       } else {
-        ToastUtils.showErrorToast('Gagal memuat data');
+        ToastUtils.showErrorToast('Gagal memuat data hafalan');
+      }
+
+      // Proses response murajaah
+      if (murajaahResponse.statusCode == 200) {
+        final data = jsonDecode(murajaahResponse.body);
+        final riwayat = RiwayatHafalan.fromJson(data);
+        totalSetoranMurajaah = riwayat.pagination?.totalData ?? 0;
+        riwayatMurajaahData.clear();
+        riwayatMurajaahData.addAll(riwayat.data);
+        hasMoreMurajaah.value = riwayat.data.length >= _perPage;
+      } else {
+        ToastUtils.showErrorToast('Gagal memuat data murajaah');
       }
     } catch (e) {
       final now = DateTime.now();
@@ -136,67 +146,31 @@ class RiwayatHafalanController extends GetxController {
     }
   }
 
-  Future<void> getRiwayatMurajaah(String santriId) async {
-    try {
-      isLoading.value = true;
-      currentPageMurajaah = 1;
-      hasMoreMurajaah.value = true;
+  // Helper function untuk membuat request berdasarkan status
+  Future<http.Response> _getRiwayatByStatus(
+    String santriId,
+    String token,
+    String status,
+    int page,
+  ) async {
+    final queryParams = {
+      'page': page.toString(),
+      'limit': _perPage.toString(),
+      'status': status,
+    };
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+    final uri = Uri.parse(
+      ApiUrl.riwayatHafalan(santriId),
+    ).replace(queryParameters: queryParams);
 
-      if (token == null) {
-        ToastUtils.showErrorToast('Anda tidak terautentikasi');
-        Get.offAllNamed('/login');
-        return;
-      }
-
-      final queryParams = {
-        'page': currentPageMurajaah.toString(),
-        'limit': _perPage.toString(),
-        'status': 'Murajaah',
-      };
-
-      final uri = Uri.parse(
-        ApiUrl.riwayatHafalan(santriId),
-      ).replace(queryParameters: queryParams);
-
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final riwayat = RiwayatHafalan.fromJson(data);
-        totalSetoranMurajaah = riwayat.pagination?.totalData ?? 0;
-        // Clear existing data and add new ones
-        riwayatMurajaahData.clear();
-        riwayatMurajaahData.addAll(riwayat.data);
-
-        // Check if there are more pages
-        hasMoreMurajaah.value = riwayat.data.length >= _perPage;
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat data');
-      }
-    } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
-      }
-    } finally {
-      Future.delayed(const Duration(milliseconds: 300), () {
-        isLoading.value = false;
-      });
-    }
+    return await http.get(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+        'x-platform': 'mobile',
+      },
+    );
   }
 
   void loadMoreRiwayatHafalan() async {
@@ -332,11 +306,12 @@ class RiwayatHafalanController extends GetxController {
   }
 
   void refreshRiwayatHafalan() {
-    getRiwayatHafalan(santriId);
-    getRiwayatMurajaah(santriId);
+    getRiwayatData(santriId);
   }
 
   void updateFilter(String type) {
+    if (isLoading.value) return;
+
     if (filterType.value.toLowerCase() != type.toLowerCase()) {
       filterType.value = type;
     }

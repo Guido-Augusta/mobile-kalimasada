@@ -29,7 +29,7 @@ class DaftarSantriController extends GetxController {
   var currentAyat = 0.obs;
   var totalAyat = 0.obs;
 
-  final int _perPage = 5;
+  final int _perPage = 15;
   var currentPage = 1;
   var hasMore = true.obs;
   var isLoadingMore = false.obs;

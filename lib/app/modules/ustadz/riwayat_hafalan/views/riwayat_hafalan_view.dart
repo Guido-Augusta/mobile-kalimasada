@@ -47,10 +47,12 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
     if (controller.isLoading.value) {
       return _loadingState();
     }
-    if ((controller.filterType.toLowerCase() == 'tambahhafalan' &&
-            controller.riwayatHafalanData.isEmpty) ||
-        (controller.filterType.toLowerCase() == 'murajaah' &&
-            controller.riwayatMurajaahData.isEmpty)) {
+    final isHafalan = controller.filterType.toLowerCase() == 'tambahhafalan';
+    final items = isHafalan
+        ? controller.riwayatHafalanData
+        : controller.riwayatMurajaahData;
+
+    if (items.isEmpty) {
       return _buildEmptyState();
     } else {
       return SliverPadding(
@@ -536,27 +538,34 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-          decoration: BoxDecoration(
-            color: isActive
-                ? Colors.deepPurpleAccent.withValues(alpha: 0.2)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isActive
-                  ? Colors.deepPurpleAccent.withValues(alpha: 0.3)
-                  : Colors.grey[300]!,
-              width: isActive ? 2 : 1,
-            ),
+        child: Skeletonizer(
+          enabled: controller.isLoading.value,
+          effect: ShimmerEffect(
+            baseColor: Colors.white.withValues(alpha: 0.2),
+            highlightColor: Colors.white.withValues(alpha: 0.4),
           ),
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              color: isActive ? Colors.deepPurple : Colors.grey[700],
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-              fontSize: 14,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            decoration: BoxDecoration(
+              color: isActive
+                  ? Colors.deepPurpleAccent.withValues(alpha: 0.2)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isActive
+                    ? Colors.deepPurpleAccent.withValues(alpha: 0.3)
+                    : Colors.grey[300]!,
+                width: isActive ? 2 : 1,
+              ),
+            ),
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                color: isActive ? Colors.deepPurple : Colors.grey[700],
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                fontSize: 14,
+              ),
             ),
           ),
         ),
