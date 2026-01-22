@@ -164,7 +164,12 @@ class SplashController extends GetxController {
           'Token tidak ditemukan\nSilakan login kembali',
         );
       } else {
-        ToastUtils.showErrorToast('Gagal memuat data');
+        prefs.remove('token');
+        prefs.remove('role');
+        prefs.remove('userId');
+        prefs.remove('roleId');
+        Get.offAllNamed('/login');
+        ToastUtils.showErrorToast('Gagal memuat data\nSilakan login kembali');
       }
     } catch (e) {
       ToastUtils.showErrorToast(
@@ -198,7 +203,12 @@ class SplashController extends GetxController {
           'Token tidak ditemukan\nSilakan login kembali',
         );
       } else {
-        ToastUtils.showErrorToast('Gagal memuat data');
+        prefs.remove('token');
+        prefs.remove('role');
+        prefs.remove('userId');
+        prefs.remove('roleId');
+        Get.offAllNamed('/login');
+        ToastUtils.showErrorToast('Gagal memuat data\nSilakan login kembali');
       }
     } catch (e) {
       ToastUtils.showErrorToast(
@@ -232,7 +242,12 @@ class SplashController extends GetxController {
           'Token tidak ditemukan\nSilakan login kembali',
         );
       } else {
-        ToastUtils.showErrorToast('Gagal memuat data');
+        prefs.remove('token');
+        prefs.remove('role');
+        prefs.remove('userId');
+        prefs.remove('roleId');
+        Get.offAllNamed('/login');
+        ToastUtils.showErrorToast('Gagal memuat data\nSilakan login kembali');
       }
     } catch (e) {
       ToastUtils.showErrorToast(
