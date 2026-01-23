@@ -170,6 +170,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
                                   width: 16,
                                   height: 16,
                                   child: CircularProgressIndicator(
+                                    strokeWidth: 1,
                                     color: Colors.white,
                                   ),
                                 )

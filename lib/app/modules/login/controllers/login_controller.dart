@@ -34,6 +34,7 @@ class LoginController extends GetxController {
   /// Handle login process
   void callLoginApi() async {
     try {
+      isLoading.value = true;
       final response = await post(
         Uri.parse(ApiUrl.login),
         body: jsonEncode({
@@ -76,6 +77,8 @@ class LoginController extends GetxController {
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 

@@ -130,6 +130,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                                         width: 16,
                                         height: 16,
                                         child: CircularProgressIndicator(
+                                          strokeWidth: 1,
                                           color: Colors.white,
                                         ),
                                       )

@@ -127,6 +127,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                                         width: 16,
                                         height: 16,
                                         child: CircularProgressIndicator(
+                                          strokeWidth: 1,
                                           color: Colors.white,
                                         ),
                                       )
