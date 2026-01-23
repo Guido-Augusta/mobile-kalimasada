@@ -17,53 +17,11 @@ class SantriProfileView extends GetView<SantriProfileController> {
   const SantriProfileView({super.key});
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
-      body: Obx(() {
-        final santri = controller.santriDetail.value;
-        // Data kosong
-        if (santri == null) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.person_off,
-                    size: 40,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Data santri tidak ditemukan',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-
-        return RefreshIndicator(
-          onRefresh: () async {
-            controller.getSantriDetail(controller.santriId!);
-          },
-          child: CustomScrollView(
-            slivers: [
-              // Custom App Bar with Gradient Background
-              SliverAppBar(
-                centerTitle: true,
-                title: Text(
+    return Obx(
+      () => Scaffold(
+        appBar: controller.santriDetail.value == null
+            ? AppBar(
+                title: const Text(
                   'Profil Santri',
                   style: TextStyle(
                     fontSize: 20,
@@ -71,297 +29,383 @@ class SantriProfileView extends GetView<SantriProfileController> {
                     color: Colors.white,
                   ),
                 ),
-                actions: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.logout_rounded,
-                      color: Colors.redAccent,
-                    ),
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          title: Text(
-                            'Logout',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          content: Text(
-                            'Apakah anda yakin ingin logout?',
-                            style: GoogleFonts.poppins(),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Get.back();
-                              },
-                              child: Text(
-                                'Tidak',
-                                style: GoogleFonts.poppins(
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ),
-                            Obx(
-                              () => ElevatedButton(
-                                onPressed: controller.isLoadingLogout.value
-                                    ? null
-                                    : () {
-                                        controller.logout();
-                                      },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 8,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: controller.isLoadingLogout.value
-                                    ? const SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 1,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    : Text(
-                                        'Ya',
-                                        style: GoogleFonts.poppins(
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                centerTitle: true,
+                backgroundColor: Colors.deepPurpleAccent,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Get.back(),
+                ),
+              )
+            : null,
+        backgroundColor: const Color(0xFFF1F5F9),
+        body: Obx(() {
+          final santri = controller.santriDetail.value;
+          // Data kosong
+          if (santri == null) {
+            return RefreshIndicator(
+              onRefresh: () async {
+                controller.getSantriDetail();
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height:
+                      MediaQuery.of(context).size.height -
+                      kToolbarHeight -
+                      MediaQuery.of(context).padding.top,
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Icon(
+                          Icons.person,
+                          size: 48,
+                          color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Data santri tidak ditemukan',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Tarik ke bawah untuk refresh',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              controller.getSantriDetail();
+            },
+            child: CustomScrollView(
+              slivers: [
+                // Custom App Bar with Gradient Background
+                SliverAppBar(
+                  centerTitle: true,
+                  title: Text(
+                    'Profil Santri',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
-                ],
-                expandedHeight: 280,
-                pinned: false,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.deepPurpleAccent,
-                          Colors.deepPurple[700]!,
-                        ],
+                  actions: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.logout_rounded,
+                        color: Colors.redAccent,
                       ),
-                    ),
-                    child: SafeArea(
-                      child: Column(
-                        children: [
-                          // Profile Section
-                          const SizedBox(height: 40),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Profile Picture with Border and Shadow
-                                Stack(
-                                  children: [
-                                    Container(
-                                      width: 120,
-                                      height: 120,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 4,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(
-                                              alpha: 0.2,
-                                            ),
-                                            blurRadius: 20,
-                                            offset: const Offset(0, 8),
-                                          ),
-                                        ],
-                                      ),
-                                      child: ClipOval(
-                                        child: CachedNetworkImage(
-                                          imageUrl: controller.getImageUrl(
-                                            controller.fotoProfil.value,
-                                          ),
-                                          fit: BoxFit.cover,
-                                          placeholder: (context, url) =>
-                                              Container(
-                                                color: Colors.grey[300],
-                                                child: const Icon(
-                                                  Icons.person,
-                                                  size: 40,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                          errorWidget: (context, url, error) =>
-                                              Container(
-                                                color: Colors.grey[300],
-                                                child: const Icon(
-                                                  Icons.person,
-                                                  size: 40,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: Material(
-                                        shape: const CircleBorder(),
-                                        child: InkWell(
-                                          onTap: () {
-                                            _showEditPhotoProfileBottomSheet();
-                                          },
-                                          customBorder: const CircleBorder(),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(6),
-                                            decoration: const BoxDecoration(
-                                              color: Colors.white,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(
-                                              Icons.camera_alt,
-                                              color: Colors.deepPurpleAccent,
-                                              size: 20,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                const SizedBox(height: 16),
-
-                                // Name
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  child: Text(
-                                    santri.nama ?? 'Nama tidak tersedia',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    textAlign: TextAlign.center,
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            title: Text(
+                              'Logout',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            content: Text(
+                              'Apakah anda yakin ingin logout?',
+                              style: GoogleFonts.poppins(),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Get.back();
+                                },
+                                child: Text(
+                                  'Tidak',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.grey[600],
                                   ),
                                 ),
-
-                                const SizedBox(height: 8),
-
-                                // Tahap Badge
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.2),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.3,
-                                      ),
+                              ),
+                              Obx(
+                                () => ElevatedButton(
+                                  onPressed: controller.isLoadingLogout.value
+                                      ? null
+                                      : () {
+                                          controller.logout();
+                                        },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 8,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize
-                                        .min, // Pastikan row hanya mengambil lebar seperlunya
-                                    children: [
-                                      Container(
-                                        width: 8,
-                                        height: 8,
-                                        decoration: BoxDecoration(
-                                          color: _getTahapColor(
-                                            santri.tahapHafalan!,
-                                          ),
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Flexible(
-                                        // Gunakan Flexible untuk mencegah overflow teks
-                                        child: Text(
-                                          getTahapLabel(santri.tahapHafalan),
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
+                                  child: controller.isLoadingLogout.value
+                                      ? const SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 1,
                                             color: Colors.white,
+                                          ),
+                                        )
+                                      : Text(
+                                          'Ya',
+                                          style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w500,
                                           ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
+                                        ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                  expandedHeight: 280,
+                  pinned: false,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.deepPurpleAccent,
+                            Colors.deepPurple[700]!,
+                          ],
+                        ),
+                      ),
+                      child: SafeArea(
+                        child: Column(
+                          children: [
+                            // Profile Section
+                            const SizedBox(height: 40),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Profile Picture with Border and Shadow
+                                  Stack(
+                                    children: [
+                                      Container(
+                                        width: 120,
+                                        height: 120,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 4,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(
+                                                alpha: 0.2,
+                                              ),
+                                              blurRadius: 20,
+                                              offset: const Offset(0, 8),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ClipOval(
+                                          child: CachedNetworkImage(
+                                            imageUrl: controller.getImageUrl(
+                                              controller.fotoProfil.value,
+                                            ),
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) =>
+                                                Container(
+                                                  color: Colors.grey[300],
+                                                  child: const Icon(
+                                                    Icons.person,
+                                                    size: 40,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Container(
+                                                      color: Colors.grey[300],
+                                                      child: const Icon(
+                                                        Icons.person,
+                                                        size: 40,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: Material(
+                                          shape: const CircleBorder(),
+                                          child: InkWell(
+                                            onTap: () {
+                                              _showEditPhotoProfileBottomSheet();
+                                            },
+                                            customBorder: const CircleBorder(),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: const BoxDecoration(
+                                                color: Colors.white,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.camera_alt,
+                                                color: Colors.deepPurpleAccent,
+                                                size: 20,
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
+
+                                  const SizedBox(height: 16),
+
+                                  // Name
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                    child: Text(
+                                      santri.nama ?? 'Nama tidak tersedia',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 8),
+
+                                  // Tahap Badge
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize
+                                          .min, // Pastikan row hanya mengambil lebar seperlunya
+                                      children: [
+                                        Container(
+                                          width: 8,
+                                          height: 8,
+                                          decoration: BoxDecoration(
+                                            color: _getTahapColor(
+                                              santri.tahapHafalan!,
+                                            ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Flexible(
+                                          // Gunakan Flexible untuk mencegah overflow teks
+                                          child: Text(
+                                            getTahapLabel(santri.tahapHafalan),
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 12,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-              // Main Content
-              SliverPadding(
-                padding: const EdgeInsets.all(16),
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    // Stats Cards
-                    _buildStatsCards(santri),
+                // Main Content
+                SliverPadding(
+                  padding: const EdgeInsets.all(16),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      // Stats Cards
+                      _buildStatsCards(santri),
 
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    // Personal Information
-                    _buildPersonalInfoSection(santri),
+                      // Personal Information
+                      _buildPersonalInfoSection(santri),
 
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    // Parents Information
-                    _buildParentsInfoSection(santri),
+                      // Parents Information
+                      _buildParentsInfoSection(santri),
 
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    // Wali Kelas Information
-                    _buildWaliKelasSection(santri),
+                      // Wali Kelas Information
+                      _buildWaliKelasSection(santri),
 
-                    const SizedBox(height: 50), // Space for bottom buttons
-                  ]),
+                      const SizedBox(height: 50), // Space for bottom buttons
+                    ]),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      }),
+              ],
+            ),
+          );
+        }),
+      ),
     );
   }
 

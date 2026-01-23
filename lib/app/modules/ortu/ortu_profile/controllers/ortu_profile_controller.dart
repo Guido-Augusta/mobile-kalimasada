@@ -21,8 +21,6 @@ class OrtuProfileController extends GetxController {
   var isSaveLoading = false.obs;
   var isLoadingLogout = false.obs;
   var ortuDetail = Rxn<Ortu>();
-  String? ortuId;
-  String? userRole;
 
   final imagePicker = ImagePicker();
   var isUploadingImage = false.obs;
@@ -37,10 +35,7 @@ class OrtuProfileController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    ortuId = prefs.getString('roleId');
-    userRole = prefs.getString('role');
-    getOrtuDetail(ortuId!);
+    getOrtuDetail();
   }
 
   String getImageUrl(String imageUrl) {
@@ -48,14 +43,15 @@ class OrtuProfileController extends GetxController {
     return newImageUrl;
   }
 
-  Future<void> getOrtuDetail(String ortuId) async {
+  Future<void> getOrtuDetail() async {
     try {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+      final ortuId = prefs.getString('roleId');
 
       final response = await http.get(
-        Uri.parse(ApiUrl.ortu(ortuId)),
+        Uri.parse(ApiUrl.ortu(ortuId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -199,7 +195,7 @@ class OrtuProfileController extends GetxController {
         }),
       );
       if (response.statusCode == 200) {
-        getOrtuDetail(ortuId);
+        getOrtuDetail();
         if (Get.isRegistered<OrtuHomeController>()) {
           Get.find<OrtuHomeController>().getOrtu();
         }

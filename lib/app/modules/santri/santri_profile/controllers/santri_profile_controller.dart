@@ -38,10 +38,7 @@ class SantriProfileController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    santriId = prefs.getString('roleId');
-
-    getSantriDetail(santriId!);
+    getSantriDetail();
   }
 
   @override
@@ -81,14 +78,15 @@ class SantriProfileController extends GetxController {
     }
   }
 
-  Future<void> getSantriDetail(String santriId) async {
+  Future<void> getSantriDetail() async {
     try {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+      final santriId = prefs.getString('roleId');
 
       final response = await http.get(
-        Uri.parse(ApiUrl.santriDetail(santriId)),
+        Uri.parse(ApiUrl.santriDetail(santriId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -236,7 +234,7 @@ class SantriProfileController extends GetxController {
         }),
       );
       if (response.statusCode == 200) {
-        getSantriDetail(santriId);
+        getSantriDetail();
         if (Get.isRegistered<SantriHomeController>()) {
           Get.find<SantriHomeController>().getSantri();
         }
