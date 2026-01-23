@@ -751,6 +751,11 @@ class SantriProfileView extends GetView<SantriProfileController> {
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
                           initialValue: controller.jenisKelaminC.text,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (value) {
