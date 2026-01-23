@@ -516,6 +516,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
 
     return InkWell(
       onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
         Get.toNamed(
           '/detail-progres',
           arguments: {
@@ -668,7 +669,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
         if (snapshot.hasData && snapshot.data == 'santri') {
           return InkWell(
             onTap: () {
-              // Navigate to doa khatam page or show dialog
+              FocusManager.instance.primaryFocus?.unfocus();
               Get.toNamed('/doa-khatam');
             },
             child: Container(

@@ -297,6 +297,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
 
     return InkWell(
       onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
         Get.toNamed('/detail-santri', arguments: summaryHafalan.id.toString());
       },
       borderRadius: BorderRadius.circular(16),
@@ -383,6 +384,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
             if (hasLastHafalan)
               InkWell(
                 onTap: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
                   Get.toNamed(
                     '/detail-progres',
                     arguments: {
@@ -520,6 +522,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                   child: ElevatedButton.icon(
                     onPressed: hasLastHafalan
                         ? () {
+                            FocusManager.instance.primaryFocus?.unfocus();
                             Get.toNamed(
                               '/detail-riwayat-hafalan',
                               arguments: {
@@ -570,6 +573,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                   flex: 4,
                   child: ElevatedButton.icon(
                     onPressed: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
                       Get.toNamed(
                         '/progres-hafalan',
                         arguments: {'santriId': summaryHafalan.id.toString()},

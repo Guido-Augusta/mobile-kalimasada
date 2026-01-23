@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
 
@@ -190,6 +191,7 @@ class AlquranView extends GetView<AlquranController> {
       ),
       child: InkWell(
         onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
           Get.toNamed('/detail-surah', arguments: surah.id);
         },
         highlightColor: Colors.transparent,

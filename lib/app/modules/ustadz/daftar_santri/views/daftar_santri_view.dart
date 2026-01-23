@@ -280,6 +280,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
       shadowColor: Colors.grey.withValues(alpha: 0.1),
       child: InkWell(
         onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
           Get.toNamed('/detail-santri', arguments: santri.id.toString());
         },
         borderRadius: BorderRadius.circular(16),
