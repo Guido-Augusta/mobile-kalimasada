@@ -19,6 +19,7 @@ class OrtuProfileController extends GetxController {
 
   var isLoading = false.obs;
   var isSaveLoading = false.obs;
+  var isLoadingLogout = false.obs;
   var ortuDetail = Rxn<Ortu>();
   String? ortuId;
   String? userRole;
@@ -219,11 +220,11 @@ class OrtuProfileController extends GetxController {
     }
   }
 
-  Future<void> logout() async {
+  void logout() async {
     try {
+      isLoadingLogout.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
-
       final response = await http.post(
         Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
@@ -246,6 +247,8 @@ class OrtuProfileController extends GetxController {
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
+    } finally {
+      isLoadingLogout.value = false;
     }
   }
 }

@@ -19,6 +19,7 @@ class SantriProfileController extends GetxController {
 
   var isLoading = false.obs;
   var isSaveLoading = false.obs;
+  var isLoadingLogout = false.obs;
   var santriDetail = Rxn<Santri>();
   String? santriId;
 
@@ -257,11 +258,11 @@ class SantriProfileController extends GetxController {
     }
   }
 
-  Future<void> logout() async {
+  void logout() async {
     try {
+      isLoadingLogout.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
-
       final response = await http.post(
         Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
@@ -284,6 +285,8 @@ class SantriProfileController extends GetxController {
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
+    } finally {
+      isLoadingLogout.value = false;
     }
   }
 }

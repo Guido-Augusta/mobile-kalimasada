@@ -19,6 +19,7 @@ class UstadzProfileController extends GetxController {
 
   final isLoading = true.obs;
   final isSaveLoading = false.obs;
+  final isLoadingLogout = false.obs;
   final isUploadingImage = false.obs;
   var ustadzData = Rxn<Ustadz>();
   var fotoProfil =
@@ -210,17 +211,14 @@ class UstadzProfileController extends GetxController {
     }
   }
 
-  Future<void> logout() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final userId = prefs.getString('userId');
+  void logout() async {
     try {
+      isLoadingLogout.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
       final response = await http.post(
         Uri.parse(ApiUrl.logout(userId!)),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
       if (kDebugMode) {
@@ -240,6 +238,8 @@ class UstadzProfileController extends GetxController {
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
+    } finally {
+      isLoadingLogout.value = false;
     }
   }
 

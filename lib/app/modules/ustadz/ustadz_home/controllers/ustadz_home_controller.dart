@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UstadzHomeController extends GetxController {
   var isLoading = false.obs;
+  var isLoadingLogout = false.obs;
   var ustadz = Rxn<Ustadz>();
   var fotoProfil =
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
@@ -62,6 +63,7 @@ class UstadzHomeController extends GetxController {
   }
 
   Future<void> logout() async {
+    isLoadingLogout.value = true;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     try {
@@ -88,6 +90,8 @@ class UstadzHomeController extends GetxController {
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
+    } finally {
+      isLoadingLogout.value = false;
     }
   }
 }

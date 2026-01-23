@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
@@ -14,6 +15,7 @@ enum ChartType { hafalanBaru, murajaah }
 class SantriHomeController extends GetxController {
   var isLoading = false.obs;
   var isLoadingChart = false.obs;
+  var isLoadingLogout = false.obs;
   var fotoProfil =
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
           .obs;
@@ -112,12 +114,12 @@ class SantriHomeController extends GetxController {
     isLoadingChart.value = false;
   }
 
-  Future<void> logout() async {
+  void logout() async {
     try {
+      isLoadingLogout.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
-
-      final response = await post(
+      final response = await http.post(
         Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
       );
@@ -139,6 +141,8 @@ class SantriHomeController extends GetxController {
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
+    } finally {
+      isLoadingLogout.value = false;
     }
   }
 }

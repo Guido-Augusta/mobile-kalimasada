@@ -118,7 +118,7 @@ class ChangePasswordController extends GetxController {
         print(data);
       }
       if (response.statusCode == 200) {
-        logout();
+        await logout();
         ToastUtils.showSuccessToast('Password berhasil diubah');
         showSuccessDialog();
       } else {

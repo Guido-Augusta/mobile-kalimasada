@@ -104,26 +104,38 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                                 ),
                               ),
                             ),
-                            TextButton(
-                              onPressed: () {
-                                controller.logout();
-                              },
-                              style: TextButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 8,
+                            Obx(
+                              () => ElevatedButton(
+                                onPressed: controller.isLoadingLogout.value
+                                    ? null
+                                    : () {
+                                        controller.logout();
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 8,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: Text(
-                                'Ya',
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                child: controller.isLoadingLogout.value
+                                    ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : Text(
+                                        'Ya',
+                                        style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
                               ),
                             ),
                           ],

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart' as o;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
@@ -12,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class OrtuHomeController extends GetxController {
   var isLoading = false.obs;
   var isLoadingChildren = false.obs;
+  var isLoadingLogout = false.obs;
   var fotoProfil =
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
           .obs;
@@ -114,17 +116,17 @@ class OrtuHomeController extends GetxController {
     isLoadingChildren.value = false;
   }
 
-  Future<void> logout() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
+  void logout() async {
     try {
-      final response = await post(
+      isLoadingLogout.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+      final response = await http.post(
         Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
       if (kDebugMode) {
-        print(response.statusCode);
         print(data);
       }
       if (response.statusCode == 200) {
@@ -141,6 +143,8 @@ class OrtuHomeController extends GetxController {
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
+    } finally {
+      isLoadingLogout.value = false;
     }
   }
 }
