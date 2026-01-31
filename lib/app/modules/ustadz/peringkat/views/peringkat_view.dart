@@ -12,18 +12,15 @@ class PeringkatView extends GetView<PeringkatController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF8FAFF),
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: const Color(0xFFF1F5F9),
         elevation: 0,
         centerTitle: true,
         title: Text(
           'Peringkat Santri',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF111827),
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
       body: SafeArea(
@@ -35,7 +32,7 @@ class PeringkatView extends GetView<PeringkatController> {
             controller: controller.scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -44,7 +41,7 @@ class PeringkatView extends GetView<PeringkatController> {
                   // Search Bar
                   _buildSearchBar(),
                   const SizedBox(height: 24),
-                  _buildFilterChips(),
+                  _buildFilter(),
                   const SizedBox(height: 20),
                   Obx(
                     () => controller.isLoading.value
@@ -83,7 +80,10 @@ class PeringkatView extends GetView<PeringkatController> {
                                 return _buildLoadMoreIndicator();
                               }
                               final santri = controller.peringkat[index];
-                              return _buildRankingCard(santri, index);
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: _buildRankingCard(santri, index),
+                              );
                             },
                           ),
                   ),
@@ -115,7 +115,6 @@ class PeringkatView extends GetView<PeringkatController> {
           controller: controller.searchController,
           onChanged: (value) {
             controller.searchQuery.value = value;
-            controller.getPeringkat();
           },
           decoration: InputDecoration(
             hintText: 'Cari santri...',
@@ -131,7 +130,6 @@ class PeringkatView extends GetView<PeringkatController> {
                     onPressed: () {
                       controller.searchQuery.value = '';
                       controller.searchController.clear();
-                      controller.getPeringkat();
                     },
                   )
                 : const SizedBox.shrink(),
@@ -244,25 +242,24 @@ class PeringkatView extends GetView<PeringkatController> {
     );
   }
 
-  Widget _buildFilterChips() {
+  Widget _buildFilter() {
     return Row(
       children: [
-        _buildFilterChip('Level 1', 'level1'),
+        _buildFilterButton('Level 1', 'level1'),
         const SizedBox(width: 8),
-        _buildFilterChip('Level 2', 'level2'),
+        _buildFilterButton('Level 2', 'level2'),
         const SizedBox(width: 8),
-        _buildFilterChip('Level 3', 'level3'),
+        _buildFilterButton('Level 3', 'level3'),
       ],
     );
   }
 
-  Widget _buildFilterChip(String label, String value) {
+  Widget _buildFilterButton(String label, String value) {
     return Obx(
       () => Expanded(
         child: GestureDetector(
           onTap: () {
-            controller.selectedTahap.value = value;
-            controller.getPeringkat();
+            controller.changeTahapFilter(value);
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -275,6 +272,7 @@ class PeringkatView extends GetView<PeringkatController> {
                 color: controller.selectedTahap.value == value
                     ? Colors.deepPurpleAccent.withValues(alpha: 0.3)
                     : Colors.transparent,
+                width: controller.selectedTahap.value == value ? 2 : 1,
               ),
               boxShadow: [
                 BoxShadow(
@@ -306,8 +304,11 @@ class PeringkatView extends GetView<PeringkatController> {
   Widget _buildRankingCard(Datum item, int index) {
     return InkWell(
       onTap: () => Get.toNamed('/detail-santri', arguments: item.id.toString()),
+      borderRadius: BorderRadius.circular(16),
+      hoverColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -325,8 +326,8 @@ class PeringkatView extends GetView<PeringkatController> {
           children: [
             // Rank Number
             Container(
-              width: 40,
-              height: 40,
+              constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+              padding: EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: index < 3
@@ -390,7 +391,7 @@ class PeringkatView extends GetView<PeringkatController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.nama ?? 'Unknown',
+                    item.nama ?? '-',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -476,7 +477,7 @@ class PeringkatView extends GetView<PeringkatController> {
           const SizedBox(height: 16),
           Text(
             controller.searchQuery.isEmpty
-                ? 'Belum ada data peringkat'
+                ? 'Tidak ada data peringkat'
                 : 'Data santri tidak ditemukan',
             style: GoogleFonts.poppins(
               fontSize: 16,

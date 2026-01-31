@@ -3,38 +3,41 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/summary_hafalan.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SummaryHafalanController extends GetxController {
   var isLoading = false.obs;
+
   var searchQuery = ''.obs;
+  var searchController = TextEditingController();
+
   var status = 'tambahHafalan'.obs;
   var level = 'level1'.obs;
   var filterBy = 'desc'.obs;
 
-  final int _perPage = 10;
+  final int _perPage = 15;
   var currentPage = 1;
-  var hasMore = true;
-  var isLoadingMore = false;
+  var hasMore = true.obs;
+  var isLoadingMore = false.obs;
 
   var summaryHafalanList = <Datum>[].obs;
 
   final scrollController = ScrollController();
+
+  DateTime? _lastErrorShown;
 
   @override
   void onInit() {
     super.onInit();
     getSummaryHafalan();
     _setupScrollController();
-  }
 
-  void updateStatusFilter(String type) {
-    if (status.value.toLowerCase() != type.toLowerCase()) {
-      status.value = type;
-    }
-    getSummaryHafalan();
+    debounce(searchQuery, (callback) {
+      getSummaryHafalan();
+    }, time: const Duration(milliseconds: 700));
   }
 
   void updateFilterBy() {
@@ -44,15 +47,14 @@ class SummaryHafalanController extends GetxController {
 
   void _resetPagination() {
     currentPage = 1;
-    hasMore = true;
-    summaryHafalanList.clear();
+    hasMore.value = true;
   }
 
   void _setupScrollController() {
     scrollController.addListener(() {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
-        if (hasMore && !isLoadingMore) {
+        if (hasMore.value && !isLoadingMore.value) {
           loadMoreData();
         }
       }
@@ -67,10 +69,21 @@ class SummaryHafalanController extends GetxController {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
+      final queryParams = {
+        'page': currentPage.toString(),
+        'limit': _perPage.toString(),
+        'status': status.value,
+        'tahapHafalan': level.value,
+        'sortByAyat': filterBy.value,
+        'name': searchQuery.value,
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.summaryHafalan,
+      ).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/all-santri/latest?page=$currentPage&limit=$_perPage&status=${status.value}&tahapHafalan=${level.value}&sortByAyat=${filterBy.value}&name=${searchQuery.value}',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -79,42 +92,65 @@ class SummaryHafalanController extends GetxController {
       );
 
       if (response.statusCode == 200) {
+        summaryHafalanList.clear();
+
         final data = jsonDecode(response.body);
         final items = List<Datum>.from(
           data['data'].map((x) => Datum.fromJson(x)),
         );
 
         if (items.length < _perPage) {
-          hasMore = false;
+          hasMore.value = false;
         }
 
         summaryHafalanList.value = items;
       } else {
-        ToastUtils.showErrorToast('Gagal memuat data');
+        final now = DateTime.now();
+        if (_lastErrorShown == null ||
+            now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+          _lastErrorShown = now;
+          ToastUtils.showErrorToast('Gagal memuat data');
+        }
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
   }
 
   void loadMoreData() async {
-    if (isLoadingMore || !hasMore) return;
+    if (isLoadingMore.value || !hasMore.value) return;
 
     try {
-      isLoadingMore = true;
+      isLoadingMore.value = true;
       currentPage++;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
+      final queryParams = {
+        'page': currentPage.toString(),
+        'limit': _perPage.toString(),
+        'status': status.value,
+        'tahapHafalan': level.value,
+        'sortByAyat': filterBy.value,
+        'name': searchQuery.value,
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.summaryHafalan,
+      ).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/all-santri/latest?page=$currentPage&limit=$_perPage&status=${status.value}&tahapHafalan=${level.value}&sortByAyat=${filterBy.value}&name=${searchQuery.value}',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -129,19 +165,31 @@ class SummaryHafalanController extends GetxController {
         );
 
         if (items.length < _perPage) {
-          hasMore = false;
+          hasMore.value = false;
         }
 
         summaryHafalanList.addAll(items);
       } else {
-        ToastUtils.showErrorToast('Gagal memuat data');
+        currentPage--; // Revert page on error
+        final now = DateTime.now();
+        if (_lastErrorShown == null ||
+            now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+          _lastErrorShown = now;
+          ToastUtils.showErrorToast('Gagal memuat data');
+        }
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      currentPage--; // Revert page on error
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
-      isLoadingMore = false;
+      isLoadingMore.value = false;
     }
   }
 

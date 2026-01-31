@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/controllers/ortu_home_controller.dart';
@@ -17,9 +19,8 @@ class OrtuProfileController extends GetxController {
 
   var isLoading = false.obs;
   var isSaveLoading = false.obs;
+  var isLoadingLogout = false.obs;
   var ortuDetail = Rxn<Ortu>();
-  String? ortuId;
-  String? userRole;
 
   final imagePicker = ImagePicker();
   var isUploadingImage = false.obs;
@@ -34,10 +35,7 @@ class OrtuProfileController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    ortuId = prefs.getString('roleId');
-    userRole = prefs.getString('role');
-    getOrtuDetail(ortuId!);
+    getOrtuDetail();
   }
 
   String getImageUrl(String imageUrl) {
@@ -45,14 +43,15 @@ class OrtuProfileController extends GetxController {
     return newImageUrl;
   }
 
-  Future<void> getOrtuDetail(String id) async {
+  Future<void> getOrtuDetail() async {
     try {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+      final ortuId = prefs.getString('roleId');
 
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/ortu/$id'),
+        Uri.parse(ApiUrl.ortu(ortuId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -65,7 +64,9 @@ class OrtuProfileController extends GetxController {
         final ortu = Ortu.fromJson(data['data']);
         ortuDetail.value = ortu;
         fotoProfil.value = getImageUrl(ortu.fotoProfil!);
-        print('Ortu detail loaded: ${ortu.nama}');
+        if (kDebugMode) {
+          print('Ortu detail loaded: ${ortu.nama}');
+        }
       } else {
         ToastUtils.showErrorToast('Gagal memuat data profil');
       }
@@ -90,7 +91,9 @@ class OrtuProfileController extends GetxController {
       if (pickedImage != null) {
         isUploadingImage.value = true;
         await uploadImage(pickedImage.path);
-        print(pickedImage.path);
+        if (kDebugMode) {
+          print(pickedImage.path);
+        }
       }
     } catch (e) {
       ToastUtils.showErrorToast('Gagal memilih gambar');
@@ -101,11 +104,11 @@ class OrtuProfileController extends GetxController {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final ortuId = prefs.getString('roleId');
 
       final request = http.MultipartRequest(
         'PUT',
-        Uri.parse('http://10.0.2.2:5000/api/ortu/$roleId'),
+        Uri.parse(ApiUrl.ortu(ortuId!)),
       );
 
       request.headers['Authorization'] = 'Bearer $token';
@@ -174,12 +177,12 @@ class OrtuProfileController extends GetxController {
   ) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-    final roleId = prefs.getString('roleId');
+    final ortuId = prefs.getString('roleId');
     try {
       isLoading.value = true;
 
       final response = await http.put(
-        Uri.parse('http://10.0.2.2:5000/api/ortu/$roleId'),
+        Uri.parse(ApiUrl.ortu(ortuId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -192,11 +195,13 @@ class OrtuProfileController extends GetxController {
         }),
       );
       if (response.statusCode == 200) {
-        getOrtuDetail(roleId!);
+        getOrtuDetail();
         if (Get.isRegistered<OrtuHomeController>()) {
           Get.find<OrtuHomeController>().getOrtu();
         }
-        print(response.body);
+        if (kDebugMode) {
+          print(response.body);
+        }
         Get.back();
         ToastUtils.showSuccessToast('Profil berhasil diperbarui');
       } else {
@@ -211,17 +216,19 @@ class OrtuProfileController extends GetxController {
     }
   }
 
-  Future<void> logout() async {
+  void logout() async {
     try {
+      isLoadingLogout.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
-
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
+        Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');
@@ -236,6 +243,8 @@ class OrtuProfileController extends GetxController {
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
+    } finally {
+      isLoadingLogout.value = false;
     }
   }
 }

@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
@@ -12,6 +15,7 @@ enum ChartType { hafalanBaru, murajaah }
 class SantriHomeController extends GetxController {
   var isLoading = false.obs;
   var isLoadingChart = false.obs;
+  var isLoadingLogout = false.obs;
   var fotoProfil =
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
           .obs;
@@ -21,37 +25,6 @@ class SantriHomeController extends GetxController {
   var range = '1w'.obs;
 
   var selectedChartType = ChartType.hafalanBaru.obs;
-
-  var currentIndex = 0.obs;
-  var islamicQuotes = [
-    {
-      'quote': 'اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ',
-      'translation': 'Bacalah dengan (menyebut) nama Tuhanmu yang menciptakan!',
-      'source': 'QS. Al-Alaq: 1',
-    },
-    {
-      'quote': 'وَقُل رَّبِّ زِدْنِي عِلْمًا',
-      'translation':
-          'Dan katakanlah: "Ya Tuhanku, tambahkanlah kepadaku ilmu pengetahuan"',
-      'source': 'QS. Thaha: 114',
-    },
-    {
-      'quote': 'إِنَّ مَعَ الْعُسْرِ يُسْرًا',
-      'translation': 'Sesungguhnya beserta kesulitan ada kemudahan',
-      'source': 'QS. Al-Insyirah: 6',
-    },
-    {
-      'quote': 'فَاذْكُرُونِي أَذْكُرْكُمْ',
-      'translation': 'Maka ingatlah kepada-Ku, Aku pun akan ingat kepadamu',
-      'source': 'QS. Al-Baqarah: 152',
-    },
-    {
-      'quote': 'وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ',
-      'translation':
-          'Dan tidak ada keberhasilanku melainkan dengan (pertolongan) Allah',
-      'source': 'QS. Hud: 88',
-    },
-  ];
 
   @override
   void onInit() {
@@ -74,10 +47,10 @@ class SantriHomeController extends GetxController {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final santriId = prefs.getString('roleId');
 
       final response = await get(
-        Uri.parse('http://10.0.2.2:5000/api/santri/$roleId'),
+        Uri.parse(ApiUrl.santriDetail(santriId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -85,8 +58,10 @@ class SantriHomeController extends GetxController {
         },
       );
       var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print(data);
+      if (kDebugMode) {
+        print(response.statusCode);
+        print(data);
+      }
       if (response.statusCode == 200) {
         getChart();
         santri.value = s.Santri.fromJson(data['data']);
@@ -107,12 +82,14 @@ class SantriHomeController extends GetxController {
       isLoadingChart.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final santriId = prefs.getString('roleId');
+
+      final queryParams = {'range': range.value, 'santriId': santriId};
+
+      final uri = Uri.parse(ApiUrl.chart).replace(queryParameters: queryParams);
 
       final response = await get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/chart?range=$range&santriId=$roleId',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -120,8 +97,10 @@ class SantriHomeController extends GetxController {
         },
       );
       var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print(data);
+      if (kDebugMode) {
+        print(response.statusCode);
+        print(data);
+      }
       if (response.statusCode == 200) {
         chart.value = c.Chart.fromJson(data);
       } else {
@@ -135,17 +114,19 @@ class SantriHomeController extends GetxController {
     isLoadingChart.value = false;
   }
 
-  Future<void> logout() async {
+  void logout() async {
     try {
+      isLoadingLogout.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
-
-      final response = await post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
+      final response = await http.post(
+        Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');
@@ -160,6 +141,8 @@ class SantriHomeController extends GetxController {
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
+    } finally {
+      isLoadingLogout.value = false;
     }
   }
 }

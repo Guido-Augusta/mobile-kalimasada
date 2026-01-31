@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:path/path.dart' as path;
 
@@ -17,6 +19,7 @@ class UstadzProfileController extends GetxController {
 
   final isLoading = true.obs;
   final isSaveLoading = false.obs;
+  final isLoadingLogout = false.obs;
   final isUploadingImage = false.obs;
   var ustadzData = Rxn<Ustadz>();
   var fotoProfil =
@@ -40,10 +43,10 @@ class UstadzProfileController extends GetxController {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final ustadzId = prefs.getString('roleId');
 
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/ustadz/$roleId'),
+        Uri.parse(ApiUrl.ustadz(ustadzId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -79,12 +82,12 @@ class UstadzProfileController extends GetxController {
   ) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-    final roleId = prefs.getString('roleId');
+    final ustadzId = prefs.getString('roleId');
     try {
       isLoading.value = true;
 
       final response = await http.put(
-        Uri.parse('http://10.0.2.2:5000/api/ustadz/$roleId'),
+        Uri.parse(ApiUrl.ustadz(ustadzId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -102,7 +105,9 @@ class UstadzProfileController extends GetxController {
         if (Get.isRegistered<UstadzHomeController>()) {
           Get.find<UstadzHomeController>().getUstadz();
         }
-        print(response.body);
+        if (kDebugMode) {
+          print(response.body);
+        }
         Get.back();
         ToastUtils.showSuccessToast('Profil berhasil diperbarui');
       } else {
@@ -129,7 +134,9 @@ class UstadzProfileController extends GetxController {
       if (pickedImage != null) {
         isUploadingImage.value = true;
         await uploadImage(pickedImage.path);
-        print(pickedImage.path);
+        if (kDebugMode) {
+          print(pickedImage.path);
+        }
       }
     } catch (e) {
       ToastUtils.showErrorToast('Gagal memilih gambar');
@@ -140,11 +147,11 @@ class UstadzProfileController extends GetxController {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final ustadzId = prefs.getString('roleId');
 
       final request = http.MultipartRequest(
         'PUT',
-        Uri.parse('http://10.0.2.2:5000/api/ustadz/$roleId'),
+        Uri.parse(ApiUrl.ustadz(ustadzId!)),
       );
 
       request.headers['Authorization'] = 'Bearer $token';
@@ -204,20 +211,19 @@ class UstadzProfileController extends GetxController {
     }
   }
 
-  Future<void> logout() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final userId = prefs.getString('userId');
+  void logout() async {
     try {
+      isLoadingLogout.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        Uri.parse(ApiUrl.logout(userId!)),
+        headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');
@@ -232,6 +238,8 @@ class UstadzProfileController extends GetxController {
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
+    } finally {
+      isLoadingLogout.value = false;
     }
   }
 

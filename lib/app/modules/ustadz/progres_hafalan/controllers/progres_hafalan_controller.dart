@@ -3,19 +3,28 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProgresHafalanController extends GetxController {
+  var userRole = ''.obs;
   var isLoading = false.obs;
+
   late String santriId;
   var santriData = Rxn<Santri>();
   var progresHafalan = <Datum>[].obs;
-  var searchQuery = ''.obs;
   var filteredSurahList = <Datum>[].obs;
+
   var searchController = TextEditingController();
-  var userRole = ''.obs;
+  var searchQuery = ''.obs;
+
+  RxBool isFabVisible = true.obs;
+
+  final scrollC = ScrollController();
+
+  DateTime? _lastErrorShown;
 
   @override
   Future<void> onInit() async {
@@ -33,7 +42,7 @@ class ProgresHafalanController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/hafalan/$santriId/surah'),
+        Uri.parse(ApiUrl.progresHafalan(santriId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -50,11 +59,18 @@ class ProgresHafalanController extends GetxController {
         ToastUtils.showErrorToast('Gagal memuat ayat');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
-      isLoading.value = false;
+      Future.delayed(const Duration(milliseconds: 300), () {
+        isLoading.value = false;
+      });
     }
   }
 

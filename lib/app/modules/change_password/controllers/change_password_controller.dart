@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -51,7 +53,7 @@ class ChangePasswordController extends GetxController {
       }
 
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/verify-old-password'),
+        Uri.parse(ApiUrl.verifyOldPassword),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -61,7 +63,9 @@ class ChangePasswordController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         step.value = ChangePasswordStep.newPassword;
         oldPasswordVar.value = oldPassword;
@@ -97,7 +101,7 @@ class ChangePasswordController extends GetxController {
       }
 
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/change-password'),
+        Uri.parse(ApiUrl.changePassword),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -110,9 +114,11 @@ class ChangePasswordController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
-        logout();
+        await logout();
         ToastUtils.showSuccessToast('Password berhasil diubah');
         showSuccessDialog();
       } else {
@@ -132,11 +138,13 @@ class ChangePasswordController extends GetxController {
     final userId = prefs.getString('userId');
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
+        Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');

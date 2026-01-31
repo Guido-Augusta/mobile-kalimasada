@@ -1,22 +1,32 @@
 // detail_progres_controller.dart
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan.dart';
-import 'package:mobile_kalimasada/app/data/models/detail_surah.dart';
+import 'package:mobile_kalimasada/app/data/models/detail_surah.dart' hide Ayat;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
 class DetailProgresController extends GetxController {
-  // Existing variables
-  RxBool isLoading = false.obs;
+  RxBool isSurahInfoLoading = false.obs;
+  RxBool isDetailProgresLoading = false.obs;
   final santriId = Get.arguments['santriId'].toString();
   final surahId = Get.arguments['surahId'].toString();
   var detailProgres = Rxn<DetailHafalan>();
   var surahInfo = Rxn<DetailSurah>();
 
   AudioPlayer audioPlayer = AudioPlayer();
+
+  RxBool isFabVisible = true.obs;
+
+  final listC = ListController();
+  final scrollC = ScrollController();
+  RxInt lastCheckedAyat = 0.obs;
 
   @override
   void onInit() {
@@ -30,16 +40,22 @@ class DetailProgresController extends GetxController {
     audioPlayer.dispose();
   }
 
-  Future<void> getDetailProgres() async {
+  void getLastCheckedIndex(List<Ayat> ayat) {
+    for (int i = 0; i < ayat.length; i++) {
+      if (ayat[i].checked == true) {
+        lastCheckedAyat.value = i;
+      }
+    }
+  }
+
+  void getDetailProgres() async {
     try {
-      isLoading.value = true;
+      isDetailProgresLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/hafalan/$santriId/surah/$surahId?mode=tambah',
-        ),
+        Uri.parse(ApiUrl.detailHafalanPerSurahTambah(santriId, surahId)),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -50,6 +66,7 @@ class DetailProgresController extends GetxController {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         detailProgres.value = DetailHafalan.fromJson(data);
+        getLastCheckedIndex(detailProgres.value!.ayat);
       } else {
         ToastUtils.showErrorToast('Gagal memuat ayat');
       }
@@ -58,21 +75,24 @@ class DetailProgresController extends GetxController {
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     } finally {
-      isLoading.value = false;
+      isDetailProgresLoading.value = false;
     }
   }
 
   void getSurahInfo() async {
     try {
-      isLoading.value = true;
+      isSurahInfoLoading.value = true;
 
-      final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/alquran/surah/$surahId'),
-        headers: {'Content-Type': 'application/json'},
-      );
+      final response = await http
+          .get(
+            Uri.parse(ApiUrl.surahDetail(surahId)),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         getDetailProgres();
+
         final data = json.decode(response.body);
         surahInfo.value = DetailSurah.fromJson(data);
 
@@ -83,17 +103,30 @@ class DetailProgresController extends GetxController {
               .replaceAll('localhost', '10.0.2.2')
               .replaceAll('127.0.0.1', '10.0.2.2');
 
-          audioPlayer.setUrl(audioUrl);
+          try {
+            await audioPlayer.setUrl(audioUrl);
+            if (kDebugMode) {
+              print('Audio loaded successfully');
+            }
+          } catch (e) {
+            if (kDebugMode) {
+              print('Audio loading error: $e');
+            }
+            ToastUtils.showErrorToast('Gagal memuat audio');
+          }
         }
       } else {
         ToastUtils.showErrorToast('Gagal memuat surah');
       }
     } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
     } finally {
-      isLoading.value = false;
+      isSurahInfoLoading.value = false;
     }
   }
 }

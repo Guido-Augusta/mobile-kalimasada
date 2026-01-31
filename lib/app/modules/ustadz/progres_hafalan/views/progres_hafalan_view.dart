@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../controllers/progres_hafalan_controller.dart';
 
 class ProgresHafalanView extends GetView<ProgresHafalanController> {
@@ -9,111 +13,227 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.deepPurpleAccent,
-        foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF1F5F9),
+        surfaceTintColor: Colors.transparent,
         title: const Text(
           'Progres Hafalan',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      floatingActionButton: Obx(() {
+        return AnimatedSlide(
+          duration: const Duration(milliseconds: 300),
+          offset: controller.isFabVisible.value
+              ? Offset.zero
+              : const Offset(2, 0), // geser ke kanan
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FloatingActionButton(
+                heroTag: 'scroll_up',
+                backgroundColor: Colors.deepPurpleAccent,
+                mini: true,
+                onPressed: () {
+                  controller.scrollC.animateTo(
+                    0,
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.fastLinearToSlowEaseIn,
+                  );
+                },
+                child: const Icon(
+                  Icons.keyboard_arrow_up_outlined,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 10),
+              FloatingActionButton(
+                heroTag: 'scroll_down',
+                backgroundColor: Colors.deepPurpleAccent,
+                mini: true,
+                onPressed: () {
+                  controller.scrollC.animateTo(
+                    controller.scrollC.position.maxScrollExtent,
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.fastLinearToSlowEaseIn,
+                  );
+                },
+                child: const Icon(
+                  Icons.keyboard_arrow_down_outlined,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(
+                height:
+                    (MediaQuery.of(Get.context!).size.height -
+                        MediaQuery.of(Get.context!).padding.top -
+                        AppBar().preferredSize.height) *
+                    0.05,
+              ),
+            ],
+          ),
+        );
+      }),
+
       body: RefreshIndicator(
         onRefresh: () async {
-          controller.isLoading.value = true;
           await controller.getProgresHafalan(controller.santriId);
         },
         child: Obx(() {
-          return CustomScrollView(
-            slivers: [
-              // Student Info Card
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                  child: buildSantriInfoCard(),
+          return NotificationListener<UserScrollNotification>(
+            onNotification: (notification) {
+              if (notification.direction == ScrollDirection.reverse) {
+                if (controller.isFabVisible.value) {
+                  controller.isFabVisible.value = false;
+                }
+              } else if (notification.direction == ScrollDirection.forward) {
+                if (!controller.isFabVisible.value) {
+                  controller.isFabVisible.value = true;
+                }
+              }
+              return true;
+            },
+            child: CustomScrollView(
+              controller: controller.scrollC,
+              slivers: [
+                // Student Info Card
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                    child: buildSantriInfoCard(),
+                  ),
                 ),
-              ),
 
-              // Search Bar
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                  child: buildSearchBar(),
+                // Search Bar
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                    child: buildSearchBar(),
+                  ),
                 ),
-              ),
 
-              // Progress Header
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-                  child: buildProgressHeader(),
+                // Progress Header
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+                    child: buildProgressHeader(),
+                  ),
                 ),
-              ),
 
-              // Surah Progress List
-              if (controller.isLoading.value)
-                SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          color: Colors.deepPurpleAccent,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Memuat data...',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 16,
+                // Surah Progress List
+                if (controller.isLoading.value)
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                            color: Colors.deepPurpleAccent,
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 16),
+                          Text(
+                            'Memuat data...',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else if (controller.progresHafalan.isEmpty)
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.deepPurpleAccent.withValues(
+                                alpha: 0.1,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.book_outlined,
+                              size: 48,
+                              color: Colors.deepPurpleAccent.withValues(
+                                alpha: 0.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Tidak ada data',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tarik ke bawah untuk refresh',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else if (controller.searchQuery.value.isNotEmpty &&
+                    controller.filteredSurahList.isEmpty)
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Text(
+                        'Tidak ada hasil pencarian',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                      ),
+                    ),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          // Check if this is the last item (doa khatam card)
+                          final surahList = controller.searchQuery.value.isEmpty
+                              ? controller.progresHafalan
+                              : controller.filteredSurahList;
+
+                          if (index == surahList.length) {
+                            // Return doa khatam card as the last item
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _buildDoaKhatamCard(),
+                            );
+                          }
+
+                          // Return surah progress card
+                          final surah = surahList[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: _buildSurahProgressCard(surah, index),
+                          );
+                        },
+                        childCount:
+                            (controller.searchQuery.value.isEmpty
+                                ? controller.progresHafalan.length
+                                : controller.filteredSurahList.length) +
+                            1, // Add 1 for the doa khatam card
+                      ),
                     ),
                   ),
-                )
-              else if (controller.progresHafalan.isEmpty)
-                SliverFillRemaining(
-                  child: Center(
-                    child: Text(
-                      'Tidak ada progres hafalan',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                    ),
-                  ),
-                )
-              else if (controller.searchQuery.value.isNotEmpty &&
-                  controller.filteredSurahList.isEmpty)
-                SliverFillRemaining(
-                  child: Center(
-                    child: Text(
-                      'Tidak ada hasil pencarian',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                    ),
-                  ),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final surah = controller.searchQuery.value.isEmpty
-                            ? controller.progresHafalan[index]
-                            : controller.filteredSurahList[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _buildSurahProgressCard(surah, index),
-                        );
-                      },
-                      childCount: controller.searchQuery.value.isEmpty
-                          ? controller.progresHafalan.length
-                          : controller.filteredSurahList.length,
-                    ),
-                  ),
-                ),
-            ],
+              ],
+            ),
           );
         }),
       ),
@@ -133,156 +253,118 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.deepPurpleAccent.withValues(alpha: 0.3),
+            color: const Color(0xFF6B46C1).withValues(alpha: 0.2),
             blurRadius: 12,
-            offset: const Offset(0, 6),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Obx(() {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Student Name Section
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      width: 1,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.person_rounded,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Nama Santri
+                    Skeletonizer(
+                      enabled:
+                          controller.isLoading.value ||
+                          controller.santriData.value == null,
+                      effect: ShimmerEffect(
+                        baseColor: Colors.white.withValues(alpha: 0.2),
+                        highlightColor: Colors.white.withValues(alpha: 0.4),
+                      ),
+                      child: controller.isLoading.value
+                          ? Text(
+                              'Nama Lengkap Santri',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                            )
+                          : Text(
+                              controller.santriData.value?.nama ??
+                                  'Nama Lengkap Santri',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                     ),
-                  ),
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Santri',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white.withValues(alpha: 0.8),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        controller.santriData.value?.nama ?? 'Nama Santri',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          height: 1.2,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
 
-            const SizedBox(height: 24),
-
-            // Info Cards Row
-            Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        width: 1,
+                    // No Induk
+                    Skeletonizer(
+                      enabled:
+                          controller.isLoading.value ||
+                          controller.santriData.value == null,
+                      effect: ShimmerEffect(
+                        baseColor: Colors.white.withValues(alpha: 0.2),
+                        highlightColor: Colors.white.withValues(alpha: 0.4),
                       ),
+                      child: controller.isLoading.value
+                          ? Text(
+                              'Nomor Induk',
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white.withValues(alpha: 0.8),
+                              ),
+                            )
+                          : Text(
+                              controller.santriData.value?.noInduk ??
+                                  'Nomor Induk',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white.withValues(alpha: 0.8),
+                              ),
+                            ),
                     ),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Tahap Hafalan',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          controller.getLabelTahapan(
-                            controller.santriData.value?.tahapHafalan ?? '-',
-                          ),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Total Poin',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          controller.santriData.value?.totalPoin.toString() ??
-                              '0',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              _buildInfoCard(
+                'Total Poin',
+                '${controller.santriData.value?.totalPoin ?? 'Poin'}',
+              ),
+              const SizedBox(width: 12),
+              _buildInfoCard(
+                'Tahap Hafalan',
+                getTahapanLabel(
+                  controller.santriData.value?.tahapHafalan ?? '-',
                 ),
-              ],
-            ),
-          ],
-        );
-      }),
+                flex: 3,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -330,6 +412,77 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
     );
   }
 
+  String getTahapanLabel(String tahapan) {
+    switch (tahapan.toLowerCase()) {
+      case 'level1':
+        return 'Level 1 - Juz 30';
+      case 'level2':
+        return 'Level 2 - Surah Pilihan';
+      case 'level3':
+        return 'Level 3 - Juz 1-29';
+      default:
+        return 'Tahap Hafalan';
+    }
+  }
+
+  Widget _buildInfoCard(String title, String value, {int flex = 2}) {
+    return Expanded(
+      flex: flex,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Skeletonizer(
+              enabled:
+                  controller.isLoading.value ||
+                  controller.santriData.value == null,
+              effect: ShimmerEffect(
+                baseColor: Colors.white.withValues(alpha: 0.2),
+                highlightColor: Colors.white.withValues(alpha: 0.4),
+              ),
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Skeletonizer(
+              enabled:
+                  controller.isLoading.value ||
+                  controller.santriData.value == null,
+              effect: ShimmerEffect(
+                baseColor: Colors.white.withValues(alpha: 0.2),
+                highlightColor: Colors.white.withValues(alpha: 0.4),
+              ),
+              child: Text(
+                value,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Row buildProgressHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -363,6 +516,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
 
     return InkWell(
       onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
         Get.toNamed(
           '/detail-progres',
           arguments: {
@@ -374,20 +528,16 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       highlightColor: Colors.transparent,
       splashColor: Colors.transparent,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.deepPurpleAccent.withValues(alpha: 0.2),
-            width: 1,
-          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 0.5,
               offset: const Offset(0, 2),
+              spreadRadius: 0.5,
             ),
           ],
         ),
@@ -509,6 +659,94 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDoaKhatamCard() {
+    return FutureBuilder<String?>(
+      future: AuthService.getCurrentRole(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data == 'santri') {
+          return InkWell(
+            onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              Get.toNamed('/doa-khatam');
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.deepPurple[700]!, Colors.deepPurpleAccent],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 0.5,
+                    offset: const Offset(0, 2),
+                    spreadRadius: 0.5,
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.menu_book_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Doa Khatam Al-Qur\'an',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Doa setelah menyelesaikan pembacaan Al-Qur\'an',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.keyboard_arrow_right_rounded,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Jika bukan santri, jangan tampilkan apa-apa
+        return const SizedBox.shrink();
+      },
     );
   }
 }

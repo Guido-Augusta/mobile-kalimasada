@@ -11,8 +11,8 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
-      appBar: AppBar(backgroundColor: Color(0xFFF8FAFF), toolbarHeight: 0),
+      backgroundColor: const Color(0xFFF1F5F9),
+      appBar: AppBar(backgroundColor: Color(0xFFF1F5F9), toolbarHeight: 0),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async => controller.getOrtu(),
@@ -142,26 +142,39 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                           style: GoogleFonts.poppins(color: Colors.grey[600]),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          controller.logout();
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 8,
+                      Obx(
+                        () => ElevatedButton(
+                          onPressed: controller.isLoadingLogout.value
+                              ? null
+                              : () {
+                                  controller.logout();
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 8,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          'Ya',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w500,
-                          ),
+                          child: controller.isLoadingLogout.value
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 1,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  'Ya',
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                         ),
                       ),
                     ],
@@ -230,7 +243,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                       style: GoogleFonts.poppins(
                         fontSize: controller.ortu.value?.tipe != 'wali'
                             ? 18
-                            : 22,
+                            : 20,
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
                         height: 1.2,
@@ -663,7 +676,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Kalimasada Tahfidz App',
+                      'Kalimasada: Tahfidz App',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -696,7 +709,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
             child: Text(
               'طَلَبُ الْعِلْمِ فَرِيْضَةٌ عَلَى كُلِّ مُسْلِمٍ',
               style: GoogleFonts.amiri(
-                fontSize: 18,
+                fontSize: 20,
                 color: Colors.green[800],
                 fontWeight: FontWeight.w600,
               ),

@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,8 +34,9 @@ class LoginController extends GetxController {
   /// Handle login process
   void callLoginApi() async {
     try {
+      isLoading.value = true;
       final response = await post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/login'),
+        Uri.parse(ApiUrl.login),
         body: jsonEncode({
           'email': emailController.text,
           'password': passwordController.text,
@@ -43,8 +46,10 @@ class LoginController extends GetxController {
       );
 
       var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print(data);
+      if (kDebugMode) {
+        print(response.statusCode);
+        print(data);
+      }
 
       if (response.statusCode == 200) {
         final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -72,6 +77,8 @@ class LoginController extends GetxController {
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -83,6 +90,15 @@ class LoginController extends GetxController {
       return 'Email tidak boleh kosong';
     } else if (!emailRegex.hasMatch(email)) {
       return 'Masukkan email yang valid';
+    }
+    return null;
+  }
+
+  String? validatePassword(String? password) {
+    if (password == null || password.isEmpty) {
+      return 'Password tidak boleh kosong';
+    } else if (password.length < 8) {
+      return 'Password minimal 8 karakter';
     }
     return null;
   }

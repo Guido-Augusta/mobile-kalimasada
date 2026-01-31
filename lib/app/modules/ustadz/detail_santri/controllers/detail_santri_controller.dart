@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
 import 'package:mobile_kalimasada/app/modules/ustadz/daftar_santri/controllers/daftar_santri_controller.dart';
@@ -11,11 +12,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum ChartType { hafalanBaru, murajaah }
 
 class DetailSantriController extends GetxController {
+  String userRole = '';
+
+  // Helper methods
+  bool get isUstadz => userRole == 'ustadz';
+  bool get isSantri => userRole == 'santri';
+  bool get isOrtu => userRole == 'ortu';
+
   var isLoading = false.obs;
   var isSaveLoading = false.obs;
   var santriDetail = Rxn<s.Santri>();
   var santriId = Get.arguments;
-  String userRole = '';
 
   var selectedTahap = ''.obs;
 
@@ -23,6 +30,8 @@ class DetailSantriController extends GetxController {
   var chart = Rxn<c.Chart>();
   var range = '1w'.obs;
   var selectedChartType = ChartType.hafalanBaru.obs;
+
+  DateTime? _lastErrorShown;
 
   @override
   void onInit() {
@@ -38,7 +47,7 @@ class DetailSantriController extends GetxController {
   String getOrangTuaByTipe(List<s.OrangTua> orangTua, String tipe) {
     try {
       final orangTuaByTipe = orangTua.firstWhere(
-        (element) => element.tipe == tipe,
+        (element) => element.tipe?.toLowerCase() == tipe.toLowerCase(),
       );
       return orangTuaByTipe.nama ?? '-';
     } catch (e) {
@@ -46,7 +55,18 @@ class DetailSantriController extends GetxController {
     }
   }
 
-  Future<void> getSantriDetail(String id) async {
+  String getOrangTuaIdByTipe(List<s.OrangTua> orangTua, String tipe) {
+    try {
+      final orangTuaByTipe = orangTua.firstWhere(
+        (element) => element.tipe?.toLowerCase() == tipe.toLowerCase(),
+      );
+      return orangTuaByTipe.id?.toString() ?? '-';
+    } catch (e) {
+      return '-';
+    }
+  }
+
+  Future<void> getSantriDetail(String santriId) async {
     try {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -60,7 +80,7 @@ class DetailSantriController extends GetxController {
       }
 
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/santri/$id'),
+        Uri.parse(ApiUrl.santriDetail(santriId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -78,9 +98,14 @@ class DetailSantriController extends GetxController {
         ToastUtils.showErrorToast('Gagal mendapatkan data santri');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
@@ -92,7 +117,7 @@ class DetailSantriController extends GetxController {
     final token = prefs.getString('token');
     try {
       final response = await http.put(
-        Uri.parse('http://10.0.2.2:5000/api/santri/$santriId'),
+        Uri.parse(ApiUrl.santriDetail(santriId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -126,10 +151,15 @@ class DetailSantriController extends GetxController {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     try {
+      final queryParams = {
+        'range': range.value,
+        'santriId': santriId.toString(),
+      };
+
+      final uri = Uri.parse(ApiUrl.chart).replace(queryParameters: queryParams);
+
       final response = await http.get(
-        Uri.parse(
-          'http://10.0.2.2:5000/api/chart?range=$range&santriId=$santriId',
-        ),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

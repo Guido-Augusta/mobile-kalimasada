@@ -11,8 +11,8 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
-      appBar: AppBar(backgroundColor: Color(0xFFF8FAFF), toolbarHeight: 0),
+      backgroundColor: const Color(0xFFF1F5F9),
+      appBar: AppBar(backgroundColor: Color(0xFFF1F5F9), toolbarHeight: 0),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -31,8 +31,6 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
               _buildWelcomeCard(context),
               const SizedBox(height: 25),
               _buildFeatureCards(context),
-              const SizedBox(height: 25),
-              _buildIslamicQuoteSlider(context),
               const SizedBox(height: 25),
               _buildIslamicDecoration(context),
             ],
@@ -144,26 +142,39 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                           style: GoogleFonts.poppins(color: Colors.grey[600]),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          controller.logout();
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 8,
+                      Obx(
+                        () => ElevatedButton(
+                          onPressed: controller.isLoadingLogout.value
+                              ? null
+                              : () {
+                                  controller.logout();
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 8,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          'Ya',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w500,
-                          ),
+                          child: controller.isLoadingLogout.value
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 1,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  'Ya',
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                         ),
                       ),
                     ],
@@ -230,8 +241,8 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                         'Dashboard ${controller.ustadz.value?.jenisKelamin == 'L' ? 'Ustadz' : 'Ustadzah'}',
                         style: GoogleFonts.poppins(
                           fontSize: controller.ustadz.value?.jenisKelamin == 'L'
-                              ? 22
-                              : 20,
+                              ? 20
+                              : 18,
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
                           height: 1.2,
@@ -282,218 +293,6 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
     );
   }
 
-  Widget _buildIslamicQuoteSlider(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Motivasi Islami',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.deepPurple[800],
-          ),
-        ),
-        const SizedBox(height: 15),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
-            border: Border.all(
-              color: Colors.deepPurple.withValues(alpha: 0.1),
-              width: 1,
-            ),
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurple.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.format_quote_rounded,
-                      color: Colors.deepPurple,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Obx(
-                        //   () => Align(
-                        //     alignment: Alignment.centerRight,
-                        //     child: Text(
-                        //       controller.islamicQuotes[controller
-                        //           .currentIndex
-                        //           .value]['quote']!,
-                        //       style: GoogleFonts.amiri(
-                        //         fontSize: 22,
-                        //         color: Colors.deepPurple[800],
-                        //         fontWeight: FontWeight.w600,
-                        //         height: 1.5,
-                        //       ),
-                        //       textAlign: TextAlign.right,
-                        //     ),
-                        //   ),
-                        // ),
-                        // const SizedBox(height: 8),
-                        Obx(
-                          () => Text(
-                            controller.islamicQuotes[controller
-                                .currentIndex
-                                .value]['translation']!,
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w400,
-                              height: 1.4,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Obx(
-                          () => Text(
-                            controller.islamicQuotes[controller
-                                .currentIndex
-                                .value]['source']!,
-                            style: GoogleFonts.poppins(
-                              fontSize: 11,
-                              color: Colors.deepPurple,
-                              fontWeight: FontWeight.w500,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Obx(
-                () => Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    controller.islamicQuotes.length,
-                    (index) => AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: controller.currentIndex.value == index ? 24 : 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: controller.currentIndex.value == index
-                            ? Colors.deepPurple
-                            : Colors.deepPurple.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      controller.currentIndex.value =
-                          (controller.currentIndex.value -
-                              1 +
-                              controller.islamicQuotes.length) %
-                          controller.islamicQuotes.length;
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.arrow_back_ios,
-                            color: Colors.deepPurple,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Sebelumnya',
-                            style: GoogleFonts.poppins(
-                              fontSize: 11,
-                              color: Colors.deepPurple,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      controller.currentIndex.value =
-                          (controller.currentIndex.value + 1) %
-                          controller.islamicQuotes.length;
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Selanjutnya',
-                            style: GoogleFonts.poppins(
-                              fontSize: 11,
-                              color: Colors.deepPurple,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.deepPurple,
-                            size: 14,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildIslamicDecoration(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -531,7 +330,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Kalimasada Tahfidz App',
+                      'Kalimasada: Tahfidz App',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -564,7 +363,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
             child: Text(
               'طَلَبُ الْعِلْمِ فَرِيْضَةٌ عَلَى كُلِّ مُسْلِمٍ',
               style: GoogleFonts.amiri(
-                fontSize: 18,
+                fontSize: 20,
                 color: Colors.green[800],
                 fontWeight: FontWeight.w600,
               ),
@@ -653,7 +452,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                       Text(
                         'Daftar Santri',
                         style: GoogleFonts.poppins(
-                          fontSize: 22,
+                          fontSize: 20,
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
                         ),

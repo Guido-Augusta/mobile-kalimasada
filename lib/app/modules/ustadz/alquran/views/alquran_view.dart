@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
 
 import '../controllers/alquran_controller.dart';
+import 'package:mobile_kalimasada/app/data/models/surah.dart';
 
 class AlquranView extends GetView<AlquranController> {
   const AlquranView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.deepPurpleAccent,
@@ -22,8 +24,9 @@ class AlquranView extends GetView<AlquranController> {
       ),
       body: RefreshIndicator(
         onRefresh: () async => controller.fetchSurahList(),
-        child: Obx(() {
-          return CustomScrollView(
+        child: Obx(
+          () => CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
@@ -155,125 +158,116 @@ class AlquranView extends GetView<AlquranController> {
                   ),
                 ),
 
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Obx(
-                    () => ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: controller.filteredSurahList.length,
-                      itemBuilder: (context, index) {
-                        final surah = controller.filteredSurahList[index];
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withValues(alpha: 0.1),
-                                spreadRadius: 1,
-                                blurRadius: 3,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: InkWell(
-                            onTap: () {
-                              Get.toNamed('/detail-surah', arguments: surah.id);
-                            },
-                            highlightColor: Colors.transparent,
-                            splashColor: Colors.transparent,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 16,
-                              ),
-                              child: Row(
-                                children: [
-                                  // Nomor surah dengan octagon frame
-                                  Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/octagon_frame.png',
-                                        width: 45,
-                                        height: 45,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      Text(
-                                        surah.nomor.toString(),
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(width: 16),
-                                  // Nama surah Latin dan info
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          surah.namaLatin!,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Wrap(
-                                          children: [
-                                            Text(
-                                              surah.tempatTurun!,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                            ),
-                                            Text(
-                                              ' • ${surah.totalAyat.toString()} Ayat',
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  // Nama surah Arab
-                                  Text(
-                                    surah.nama!,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+              SliverPadding(
+                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final surah = controller.filteredSurahList[index];
+                    return surahCard(surah);
+                  }, childCount: controller.filteredSurahList.length),
                 ),
               ),
             ],
-          );
-        }),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container surahCard(Surah surah) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          Get.toNamed('/detail-surah', arguments: surah.id);
+        },
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: Row(
+            children: [
+              // Nomor surah dengan octagon frame
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/octagon_frame.png',
+                    width: 45,
+                    height: 45,
+                    fit: BoxFit.cover,
+                  ),
+                  Text(
+                    surah.nomor.toString(),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 16),
+              // Nama surah Latin dan info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      surah.namaLatin!,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Wrap(
+                      children: [
+                        Text(
+                          surah.tempatTurun!,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                        Text(
+                          ' • ${surah.totalAyat.toString()} Ayat',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              // Nama surah Arab
+              Text(
+                surah.nama!,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

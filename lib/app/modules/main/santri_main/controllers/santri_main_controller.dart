@@ -1,20 +1,27 @@
 import 'package:get/get.dart';
+import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 
 class SantriMainController extends GetxController {
   final currentIndex = 0.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
+  DateTime? lastBackPressTime;
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
+  Future<bool> onWillPop() async {
+    final currentTime = DateTime.now();
 
-  @override
-  void onClose() {
-    super.onClose();
+    // Jika di halaman home dan bukan back pertama
+    if (currentIndex.value == 0) {
+      if (lastBackPressTime == null ||
+          currentTime.difference(lastBackPressTime!) > Duration(seconds: 2)) {
+        lastBackPressTime = currentTime;
+        ToastUtils.showErrorToast('Tekan sekali lagi untuk keluar');
+        return false; // Prevent exit
+      }
+      return true; // Allow exit
+    }
+
+    // Jika bukan di halaman home, navigasi ke home
+    currentIndex.value = 0;
+    return false; // Prevent exit
   }
 }

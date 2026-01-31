@@ -11,7 +11,7 @@ class SplashView extends GetView<SplashController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Color(0xFFF1F5F9),
       body: Padding(
         padding: const EdgeInsets.only(bottom: 20),
         child: Stack(

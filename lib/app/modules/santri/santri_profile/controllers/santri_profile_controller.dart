@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
 import 'package:mobile_kalimasada/app/modules/santri/santri_home/controllers/santri_home_controller.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
@@ -17,6 +19,7 @@ class SantriProfileController extends GetxController {
 
   var isLoading = false.obs;
   var isSaveLoading = false.obs;
+  var isLoadingLogout = false.obs;
   var santriDetail = Rxn<Santri>();
   String? santriId;
 
@@ -35,10 +38,7 @@ class SantriProfileController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    santriId = prefs.getString('roleId');
-
-    getSantriDetail(santriId!);
+    getSantriDetail();
   }
 
   @override
@@ -59,7 +59,7 @@ class SantriProfileController extends GetxController {
   String getOrangTuaByTipe(List<OrangTua> orangTua, String tipe) {
     try {
       final orangTuaByTipe = orangTua.firstWhere(
-        (element) => element.tipe?.toLowerCase() == tipe,
+        (element) => element.tipe?.toLowerCase() == tipe.toLowerCase(),
       );
       return orangTuaByTipe.nama ?? '-';
     } catch (e) {
@@ -67,14 +67,26 @@ class SantriProfileController extends GetxController {
     }
   }
 
-  Future<void> getSantriDetail(String id) async {
+  String getOrangTuaIdByTipe(List<OrangTua> orangTua, String tipe) {
+    try {
+      final orangTuaById = orangTua.firstWhere(
+        (element) => element.tipe?.toLowerCase() == tipe.toLowerCase(),
+      );
+      return orangTuaById.id.toString();
+    } catch (e) {
+      return '-';
+    }
+  }
+
+  Future<void> getSantriDetail() async {
     try {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+      final santriId = prefs.getString('roleId');
 
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/santri/$id'),
+        Uri.parse(ApiUrl.santriDetail(santriId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -87,7 +99,9 @@ class SantriProfileController extends GetxController {
         final santri = Santri.fromJson(data['data']);
         santriDetail.value = santri;
         fotoProfil.value = getImageUrl(santri.fotoProfil!);
-        print('Santri detail loaded: ${santri.nama}');
+        if (kDebugMode) {
+          print('Santri detail loaded: ${santri.nama}');
+        }
       } else {
         ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
@@ -112,7 +126,9 @@ class SantriProfileController extends GetxController {
       if (pickedImage != null) {
         isUploadingImage.value = true;
         await uploadImage(pickedImage.path);
-        print(pickedImage.path);
+        if (kDebugMode) {
+          print(pickedImage.path);
+        }
       }
     } catch (e) {
       ToastUtils.showErrorToast('Gagal memilih gambar');
@@ -123,11 +139,11 @@ class SantriProfileController extends GetxController {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final santriId = prefs.getString('roleId');
 
       final request = http.MultipartRequest(
         'PUT',
-        Uri.parse('http://10.0.2.2:5000/api/santri/$roleId'),
+        Uri.parse(ApiUrl.santriDetail(santriId!)),
       );
 
       request.headers['Authorization'] = 'Bearer $token';
@@ -200,10 +216,10 @@ class SantriProfileController extends GetxController {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      final roleId = prefs.getString('roleId');
+      final santriId = prefs.getString('roleId');
 
       final response = await http.put(
-        Uri.parse('http://10.0.2.2:5000/api/santri/$roleId'),
+        Uri.parse(ApiUrl.santriDetail(santriId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -218,12 +234,14 @@ class SantriProfileController extends GetxController {
         }),
       );
       if (response.statusCode == 200) {
-        getSantriDetail(roleId!);
+        getSantriDetail();
         if (Get.isRegistered<SantriHomeController>()) {
           Get.find<SantriHomeController>().getSantri();
         }
-        print(response.body);
-        print('Tanggal Lahir: $tanggalLahir');
+        if (kDebugMode) {
+          print(response.body);
+          print('Tanggal Lahir: $tanggalLahir');
+        }
         Get.back();
         ToastUtils.showSuccessToast('Profil berhasil diperbarui');
       } else {
@@ -238,17 +256,19 @@ class SantriProfileController extends GetxController {
     }
   }
 
-  Future<void> logout() async {
+  void logout() async {
     try {
+      isLoadingLogout.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
-
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/api/auth/logout/$userId'),
+        Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       if (response.statusCode == 200) {
         await prefs.remove('token');
         await prefs.remove('role');
@@ -263,6 +283,8 @@ class SantriProfileController extends GetxController {
       ToastUtils.showErrorToast(
         'Terjadi kesalahan\nPeriksa koneksi internet Anda',
       );
+    } finally {
+      isLoadingLogout.value = false;
     }
   }
 }

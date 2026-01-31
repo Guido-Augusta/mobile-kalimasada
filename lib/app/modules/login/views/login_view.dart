@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
 
@@ -10,7 +11,15 @@ class LoginView extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: const Color(0xFFF1F5F9),
+      appBar: AppBar(
+        backgroundColor: Color(0xFFF1F5F9),
+        toolbarHeight: 0,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -160,12 +169,7 @@ class LoginView extends GetView<LoginController> {
                                 controller: controller.passwordController,
                                 autovalidateMode:
                                     AutovalidateMode.onUserInteraction,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Password tidak boleh kosong';
-                                  }
-                                  return null;
-                                },
+                                validator: controller.validatePassword,
                                 obscureText: controller.isPasswordHidden.value,
                                 decoration: InputDecoration(
                                   hintText: 'Masukkan Password Anda',
