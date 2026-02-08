@@ -16,6 +16,8 @@ class UstadzHomeController extends GetxController {
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
           .obs;
 
+  DateTime? _lastErrorShown;
+
   @override
   void onInit() {
     super.onInit();
@@ -54,9 +56,14 @@ class UstadzHomeController extends GetxController {
         ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
@@ -84,12 +91,22 @@ class UstadzHomeController extends GetxController {
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {
-        ToastUtils.showErrorToast('Logout gagal');
+        final now = DateTime.now();
+        if (_lastErrorShown == null ||
+            now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+          _lastErrorShown = now;
+          ToastUtils.showErrorToast('Logout gagal');
+        }
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoadingLogout.value = false;
     }

@@ -18,6 +18,15 @@ class UstadzMainView extends GetView<UstadzMainController> {
   UstadzMainView({super.key});
   @override
   Widget build(BuildContext context) {
+    // Preload data saat build
+    final ustadzHomeController = Get.find<UstadzHomeController>();
+    if (ustadzHomeController.ustadz.value == null &&
+        !ustadzHomeController.isLoading.value) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ustadzHomeController.getUstadz();
+      });
+    }
+
     Widget body() {
       switch (controller.currentIndex.value) {
         case 0:

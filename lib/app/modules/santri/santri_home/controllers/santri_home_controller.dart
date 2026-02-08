@@ -26,6 +26,8 @@ class SantriHomeController extends GetxController {
 
   var selectedChartType = ChartType.hafalanBaru.obs;
 
+  DateTime? _lastErrorShown;
+
   @override
   void onInit() {
     super.onInit();
@@ -70,9 +72,14 @@ class SantriHomeController extends GetxController {
         ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     }
     isLoading.value = false;
   }
@@ -135,12 +142,22 @@ class SantriHomeController extends GetxController {
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {
-        ToastUtils.showErrorToast('Logout gagal');
+        final now = DateTime.now();
+        if (_lastErrorShown == null ||
+            now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+          _lastErrorShown = now;
+          ToastUtils.showErrorToast('Logout gagal');
+        }
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoadingLogout.value = false;
     }

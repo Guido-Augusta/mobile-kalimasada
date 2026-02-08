@@ -15,6 +15,15 @@ class SantriMainView extends GetView<SantriMainController> {
   SantriMainView({super.key});
   @override
   Widget build(BuildContext context) {
+    // Preload data saat build
+    final santriHomeController = Get.find<SantriHomeController>();
+    if (santriHomeController.santri.value == null &&
+        !santriHomeController.isLoading.value) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        santriHomeController.getSantri();
+      });
+    }
+
     Widget body() {
       switch (controller.currentIndex.value) {
         case 0:

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../controllers/ortu_home_controller.dart';
 
@@ -94,14 +95,17 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
               ),
               const SizedBox(height: 2),
               Obx(
-                () => Text(
-                  controller.ortu.value?.nama ?? '',
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.deepPurple[800],
+                () => Skeletonizer(
+                  enabled: controller.isLoading.value,
+                  child: Text(
+                    controller.ortu.value?.nama ?? '',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.deepPurple[800],
+                    ),
                   ),
                 ),
               ),
