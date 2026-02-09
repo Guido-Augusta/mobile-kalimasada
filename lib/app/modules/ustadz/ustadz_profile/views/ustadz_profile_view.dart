@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/data/models/ustadz.dart';
-import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import '../controllers/ustadz_profile_controller.dart';
 
 class UstadzProfileView extends GetView<UstadzProfileController> {
@@ -893,19 +892,6 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (controller.formKey.currentState!.validate()) {
-                            if (controller.namaC.text ==
-                                    controller.ustadzData.value?.nama &&
-                                controller.noHpC.text ==
-                                    controller.ustadzData.value?.nomorHp &&
-                                controller.alamatC.text ==
-                                    controller.ustadzData.value?.alamat &&
-                                controller.jenisKelaminC.text ==
-                                    controller.ustadzData.value?.jenisKelamin) {
-                              ToastUtils.showErrorToast(
-                                'Tidak ada perubahan data',
-                              );
-                              return;
-                            }
                             controller.updateProfileData(
                               controller.namaC.text,
                               controller.noHpC.text,

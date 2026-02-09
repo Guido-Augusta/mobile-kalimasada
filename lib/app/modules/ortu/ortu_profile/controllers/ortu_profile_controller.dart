@@ -32,6 +32,9 @@ class OrtuProfileController extends GetxController {
   var noHpC = TextEditingController();
   var alamatC = TextEditingController();
 
+  DateTime? _lastErrorShown;
+  DateTime? _lastNoChangeShown;
+
   @override
   void onInit() async {
     super.onInit();
@@ -71,9 +74,14 @@ class OrtuProfileController extends GetxController {
         ToastUtils.showErrorToast('Gagal memuat data profil');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
@@ -175,11 +183,27 @@ class OrtuProfileController extends GetxController {
     String? noHp,
     String? alamat,
   ) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final ortuId = prefs.getString('roleId');
     try {
       isLoading.value = true;
+      // Cek apakah ada perubahan
+      bool hasNoChange =
+          (nama == ortuDetail.value?.nama &&
+          noHp == ortuDetail.value?.nomorHp &&
+          alamat == ortuDetail.value?.alamat);
+
+      if (hasNoChange) {
+        final now = DateTime.now();
+        if (_lastNoChangeShown == null ||
+            now.difference(_lastNoChangeShown!) > Duration(seconds: 3)) {
+          _lastNoChangeShown = now;
+          ToastUtils.showErrorToast('Tidak ada perubahan data');
+        }
+        return;
+      }
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final ortuId = prefs.getString('roleId');
 
       final response = await http.put(
         Uri.parse(ApiUrl.ortu(ortuId!)),
@@ -208,9 +232,14 @@ class OrtuProfileController extends GetxController {
         ToastUtils.showErrorToast('Gagal memperbarui profil');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
@@ -240,9 +269,14 @@ class OrtuProfileController extends GetxController {
         ToastUtils.showErrorToast('Logout gagal');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoadingLogout.value = false;
     }

@@ -15,6 +15,8 @@ class AlquranController extends GetxController {
   var lastReadSurah = Rxn<Surah>();
   var searchController = TextEditingController();
 
+  DateTime? _lastErrorShown;
+
   @override
   void onInit() {
     super.onInit();
@@ -44,9 +46,14 @@ class AlquranController extends GetxController {
         ToastUtils.showErrorToast('Gagal memuat surah');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoadingSurah.value = false;
     }

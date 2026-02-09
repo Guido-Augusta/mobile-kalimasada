@@ -35,6 +35,9 @@ class SantriProfileController extends GetxController {
   var jenisKelaminC = TextEditingController();
   var tanggalLahirC = TextEditingController();
 
+  DateTime? _lastErrorShown;
+  DateTime? _lastNoChangeShown;
+
   @override
   void onInit() async {
     super.onInit();
@@ -106,9 +109,14 @@ class SantriProfileController extends GetxController {
         ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
@@ -214,6 +222,24 @@ class SantriProfileController extends GetxController {
   ) async {
     try {
       isLoading.value = true;
+
+      bool hasNoChange =
+          (nama == santriDetail.value?.nama &&
+          noHp == santriDetail.value?.nomorHp &&
+          alamat == santriDetail.value?.alamat &&
+          jenisKelamin == santriDetail.value?.jenisKelamin &&
+          tanggalLahir == formatDate(santriDetail.value!.tanggalLahir!));
+
+      if (hasNoChange) {
+        final now = DateTime.now();
+        if (_lastNoChangeShown == null ||
+            now.difference(_lastNoChangeShown!) > Duration(seconds: 3)) {
+          _lastNoChangeShown = now;
+          ToastUtils.showErrorToast('Tidak ada perubahan data');
+        }
+        return;
+      }
+
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       final santriId = prefs.getString('roleId');
@@ -248,9 +274,14 @@ class SantriProfileController extends GetxController {
         ToastUtils.showErrorToast('Gagal memperbarui data profil');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
@@ -277,14 +308,29 @@ class SantriProfileController extends GetxController {
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {
-        ToastUtils.showErrorToast('Logout gagal');
+        final now = DateTime.now();
+        if (_lastErrorShown == null ||
+            now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+          _lastErrorShown = now;
+          ToastUtils.showErrorToast('Logout gagal');
+        }
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoadingLogout.value = false;
     }
+  }
+
+  // Format the date to display in the text field
+  String formatDate(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 }

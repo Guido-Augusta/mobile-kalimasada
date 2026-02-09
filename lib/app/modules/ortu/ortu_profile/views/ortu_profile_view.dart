@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart';
-import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 
 import '../controllers/ortu_profile_controller.dart';
 
@@ -700,17 +699,6 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (controller.formKey.currentState!.validate()) {
-                            if (controller.namaC.text ==
-                                    controller.ortuDetail.value?.nama &&
-                                controller.noHpC.text ==
-                                    controller.ortuDetail.value?.nomorHp &&
-                                controller.alamatC.text ==
-                                    controller.ortuDetail.value?.alamat) {
-                              ToastUtils.showErrorToast(
-                                'Tidak ada perubahan data',
-                              );
-                              return;
-                            }
                             controller.updateProfileData(
                               controller.namaC.text,
                               controller.noHpC.text,
