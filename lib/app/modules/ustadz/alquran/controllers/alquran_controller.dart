@@ -30,10 +30,12 @@ class AlquranController extends GetxController {
     try {
       isLoadingSurah.value = true;
 
-      final response = await http.get(
-        Uri.parse(ApiUrl.surahList),
-        headers: {'Content-Type': 'application/json'},
-      );
+      final response = await http
+          .get(
+            Uri.parse(ApiUrl.surahList),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);

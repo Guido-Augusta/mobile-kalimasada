@@ -696,32 +696,39 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (controller.formKey.currentState!.validate()) {
-                            controller.updateProfileData(
-                              controller.namaC.text,
-                              controller.noHpC.text,
-                              controller.alamatC.text,
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurpleAccent,
-                          padding: controller.isSaveLoading.value
-                              ? EdgeInsets.symmetric(vertical: 4)
-                              : EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      child: Obx(
+                        () => ElevatedButton(
+                          onPressed: controller.isSaveLoading.value
+                              ? null
+                              : () {
+                                  if (controller.formKey.currentState!
+                                      .validate()) {
+                                    controller.updateProfileData(
+                                      controller.namaC.text,
+                                      controller.noHpC.text,
+                                      controller.alamatC.text,
+                                    );
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurpleAccent,
+                            padding: controller.isSaveLoading.value
+                                ? EdgeInsets.symmetric(vertical: 4)
+                                : EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
                           ),
-                          elevation: 0,
-                        ),
-                        child: Obx(
-                          () => controller.isSaveLoading.value
-                              ? Transform.scale(
-                                  scale: 0.5,
-                                  child: const CircularProgressIndicator(
-                                    color: Colors.white,
+                          child: controller.isSaveLoading.value
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: Transform.scale(
+                                    scale: 0.8,
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 )
                               : Text(

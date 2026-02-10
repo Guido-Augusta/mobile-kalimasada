@@ -184,7 +184,7 @@ class OrtuProfileController extends GetxController {
     String? alamat,
   ) async {
     try {
-      isLoading.value = true;
+      isSaveLoading.value = true;
       // Cek apakah ada perubahan
       bool hasNoChange =
           (nama == ortuDetail.value?.nama &&
@@ -205,26 +205,25 @@ class OrtuProfileController extends GetxController {
       final token = prefs.getString('token');
       final ortuId = prefs.getString('roleId');
 
-      final response = await http.put(
-        Uri.parse(ApiUrl.ortu(ortuId!)),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-        body: jsonEncode({
-          'nama': nama ?? ortuDetail.value?.nama,
-          'nomorHp': noHp ?? ortuDetail.value?.nomorHp,
-          'alamat': alamat ?? ortuDetail.value?.alamat,
-        }),
-      );
+      final response = await http
+          .put(
+            Uri.parse(ApiUrl.ortu(ortuId!)),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+              'x-platform': 'mobile',
+            },
+            body: jsonEncode({
+              'nama': nama ?? ortuDetail.value?.nama,
+              'nomorHp': noHp ?? ortuDetail.value?.nomorHp,
+              'alamat': alamat ?? ortuDetail.value?.alamat,
+            }),
+          )
+          .timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
         getOrtuDetail();
         if (Get.isRegistered<OrtuHomeController>()) {
           Get.find<OrtuHomeController>().getOrtu();
-        }
-        if (kDebugMode) {
-          print(response.body);
         }
         Get.back();
         ToastUtils.showSuccessToast('Profil berhasil diperbarui');
@@ -241,7 +240,7 @@ class OrtuProfileController extends GetxController {
         );
       }
     } finally {
-      isLoading.value = false;
+      isSaveLoading.value = false;
     }
   }
 
@@ -250,10 +249,12 @@ class OrtuProfileController extends GetxController {
       isLoadingLogout.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
-      final response = await http.post(
-        Uri.parse(ApiUrl.logout(userId!)),
-        headers: {'Content-Type': 'application/json'},
-      );
+      final response = await http
+          .post(
+            Uri.parse(ApiUrl.logout(userId!)),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (kDebugMode) {
         print(data);

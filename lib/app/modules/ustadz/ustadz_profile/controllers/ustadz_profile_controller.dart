@@ -89,7 +89,7 @@ class UstadzProfileController extends GetxController {
     String? jenisKelamin,
   ) async {
     try {
-      isLoading.value = true;
+      isSaveLoading.value = true;
       bool hasNoChange =
           (nama == ustadzData.value?.nama &&
           noHp == ustadzData.value?.nomorHp &&
@@ -109,20 +109,22 @@ class UstadzProfileController extends GetxController {
       final token = prefs.getString('token');
       final ustadzId = prefs.getString('roleId');
 
-      final response = await http.put(
-        Uri.parse(ApiUrl.ustadz(ustadzId!)),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-        body: jsonEncode({
-          'nama': nama ?? ustadzData.value?.nama,
-          'nomorHp': noHp ?? ustadzData.value?.nomorHp,
-          'alamat': alamat ?? ustadzData.value?.alamat,
-          'jenisKelamin': jenisKelamin ?? ustadzData.value?.jenisKelamin,
-        }),
-      );
+      final response = await http
+          .put(
+            Uri.parse(ApiUrl.ustadz(ustadzId!)),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+              'x-platform': 'mobile',
+            },
+            body: jsonEncode({
+              'nama': nama ?? ustadzData.value?.nama,
+              'nomorHp': noHp ?? ustadzData.value?.nomorHp,
+              'alamat': alamat ?? ustadzData.value?.alamat,
+              'jenisKelamin': jenisKelamin ?? ustadzData.value?.jenisKelamin,
+            }),
+          )
+          .timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
         fetchUstadzData();
         if (Get.isRegistered<UstadzHomeController>()) {
@@ -146,7 +148,7 @@ class UstadzProfileController extends GetxController {
         );
       }
     } finally {
-      isLoading.value = false;
+      isSaveLoading.value = false;
     }
   }
 
@@ -244,10 +246,12 @@ class UstadzProfileController extends GetxController {
       isLoadingLogout.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
-      final response = await http.post(
-        Uri.parse(ApiUrl.logout(userId!)),
-        headers: {'Content-Type': 'application/json'},
-      );
+      final response = await http
+          .post(
+            Uri.parse(ApiUrl.logout(userId!)),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (kDebugMode) {
         print(data);

@@ -221,8 +221,7 @@ class SantriProfileController extends GetxController {
     String? tanggalLahir,
   ) async {
     try {
-      isLoading.value = true;
-
+      isSaveLoading.value = true;
       bool hasNoChange =
           (nama == santriDetail.value?.nama &&
           noHp == santriDetail.value?.nomorHp &&
@@ -244,29 +243,27 @@ class SantriProfileController extends GetxController {
       final token = prefs.getString('token');
       final santriId = prefs.getString('roleId');
 
-      final response = await http.put(
-        Uri.parse(ApiUrl.santriDetail(santriId!)),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-        body: jsonEncode({
-          'nama': nama ?? santriDetail.value?.nama,
-          'nomorHp': noHp ?? santriDetail.value?.nomorHp,
-          'alamat': alamat ?? santriDetail.value?.alamat,
-          'jenisKelamin': jenisKelamin ?? santriDetail.value?.jenisKelamin,
-          'tanggalLahir': tanggalLahir,
-        }),
-      );
+      final response = await http
+          .put(
+            Uri.parse(ApiUrl.santriDetail(santriId!)),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+              'x-platform': 'mobile',
+            },
+            body: jsonEncode({
+              'nama': nama ?? santriDetail.value?.nama,
+              'nomorHp': noHp ?? santriDetail.value?.nomorHp,
+              'alamat': alamat ?? santriDetail.value?.alamat,
+              'jenisKelamin': jenisKelamin ?? santriDetail.value?.jenisKelamin,
+              'tanggalLahir': tanggalLahir,
+            }),
+          )
+          .timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
         getSantriDetail();
         if (Get.isRegistered<SantriHomeController>()) {
           Get.find<SantriHomeController>().getSantri();
-        }
-        if (kDebugMode) {
-          print(response.body);
-          print('Tanggal Lahir: $tanggalLahir');
         }
         Get.back();
         ToastUtils.showSuccessToast('Profil berhasil diperbarui');
@@ -283,7 +280,7 @@ class SantriProfileController extends GetxController {
         );
       }
     } finally {
-      isLoading.value = false;
+      isSaveLoading.value = false;
     }
   }
 
@@ -292,10 +289,12 @@ class SantriProfileController extends GetxController {
       isLoadingLogout.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
-      final response = await http.post(
-        Uri.parse(ApiUrl.logout(userId!)),
-        headers: {'Content-Type': 'application/json'},
-      );
+      final response = await http
+          .post(
+            Uri.parse(ApiUrl.logout(userId!)),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (kDebugMode) {
         print(data);
