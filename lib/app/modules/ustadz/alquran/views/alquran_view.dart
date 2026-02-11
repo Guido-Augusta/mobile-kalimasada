@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../controllers/alquran_controller.dart';
 import 'package:mobile_kalimasada/app/data/models/surah.dart';
@@ -23,7 +23,9 @@ class AlquranView extends GetView<AlquranController> {
         centerTitle: true,
       ),
       body: RefreshIndicator(
-        onRefresh: () async => controller.fetchSurahList(),
+        onRefresh: () async {
+          controller.fetchSurahList();
+        },
         child: Obx(
           () => CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -136,10 +138,17 @@ class AlquranView extends GetView<AlquranController> {
                         const SizedBox(height: 16),
                         Text(
                           'Data tidak ditemukan',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: 16,
-                            color: Colors.grey[600],
                             fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Tarik ke bawah untuk refresh',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.grey,
                           ),
                         ),
                       ],

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../controllers/ortu_home_controller.dart';
 
@@ -94,14 +95,22 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
               ),
               const SizedBox(height: 2),
               Obx(
-                () => Text(
-                  controller.ortu.value?.nama ?? '',
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.deepPurple[800],
+                () => Skeletonizer(
+                  enabled:
+                      controller.isLoading.value ||
+                      controller.ortu.value?.nama == null,
+                  child: Text(
+                    (controller.isLoading.value ||
+                            controller.ortu.value?.nama == null)
+                        ? 'Loading Name'
+                        : (controller.ortu.value?.nama ?? ''),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.deepPurple[800],
+                    ),
                   ),
                 ),
               ),
@@ -310,10 +319,42 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
         return const Center(child: CircularProgressIndicator());
       }
       if (controller.childrenList.isEmpty) {
-        return const Center(
-          child: Text(
-            'Tidak ada data anak',
-            style: TextStyle(color: Colors.grey),
+        return SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.25,
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: Icon(
+                    Icons.people_rounded,
+                    size: 48,
+                    color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Data anak tidak ditemukan',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Tarik ke bawah untuk refresh',
+                  style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+                ),
+              ],
+            ),
           ),
         );
       }

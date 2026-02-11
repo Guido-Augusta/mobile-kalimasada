@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:toastification/toastification.dart';
 
 class ToastUtils {
@@ -10,7 +9,6 @@ class ToastUtils {
     Alignment alignment = Alignment.bottomCenter,
   }) {
     toastification.show(
-      context: Get.context!,
       title: Wrap(
         alignment: WrapAlignment.center,
         crossAxisAlignment: WrapCrossAlignment.center,
@@ -43,7 +41,6 @@ class ToastUtils {
     Alignment alignment = Alignment.bottomCenter,
   }) {
     toastification.show(
-      context: Get.context!,
       title: Wrap(
         alignment: WrapAlignment.center,
         crossAxisAlignment: WrapCrossAlignment.center,

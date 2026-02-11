@@ -43,7 +43,7 @@ class LoginController extends GetxController {
           'platform': 'mobile',
         }),
         headers: {'Content-Type': 'application/json'},
-      );
+      ).timeout(const Duration(seconds: 30));
 
       var data = jsonDecode(response.body);
       if (kDebugMode) {
@@ -57,16 +57,19 @@ class LoginController extends GetxController {
         await prefs.setString('role', data['user']['role'].toString());
         await prefs.setString('userId', data['user']['id'].toString());
         await prefs.setString('roleId', data['user']['roleId'].toString());
-        ToastUtils.showSuccessToast('Login berhasil');
+
         // Navigate to home or another page
         if (data['user']['role'] == 'santri') {
           Get.offAllNamed('/santri-main');
+          ToastUtils.showSuccessToast('Login berhasil');
         } else if (data['user']['role'] == 'ustadz') {
           Get.offAllNamed('/ustadz-main');
+          ToastUtils.showSuccessToast('Login berhasil');
         } else if (data['user']['role'] == 'ortu') {
           Get.offAllNamed('/ortu-main');
+          ToastUtils.showSuccessToast('Login berhasil');
         } else {
-          Get.offAllNamed('/home');
+          ToastUtils.showSuccessToast('Role tidak ditemukan');
         }
       } else if (response.statusCode == 401 || response.statusCode == 404) {
         ToastUtils.showErrorToast('Email atau password salah');

@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
 import 'package:mobile_kalimasada/app/extentions/orang_tua_extention.dart';
-import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/santri_profile_controller.dart';
@@ -893,57 +892,41 @@ class SantriProfileView extends GetView<SantriProfileController> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (controller.formKey.currentState!.validate()) {
-                            if (controller.namaC.text ==
-                                    controller.santriDetail.value?.nama &&
-                                controller.noHpC.text ==
-                                    controller.santriDetail.value?.nomorHp &&
-                                controller.alamatC.text ==
-                                    controller.santriDetail.value?.alamat &&
-                                controller.jenisKelaminC.text ==
-                                    controller
-                                        .santriDetail
-                                        .value
-                                        ?.jenisKelamin &&
-                                controller.tanggalLahirC.text ==
-                                    formatDate(
-                                      controller
-                                          .santriDetail
-                                          .value!
-                                          .tanggalLahir!,
-                                    )) {
-                              ToastUtils.showErrorToast(
-                                'Tidak ada perubahan data',
-                              );
-                              return;
-                            }
-                            controller.updateProfileData(
-                              controller.namaC.text,
-                              controller.noHpC.text,
-                              controller.alamatC.text,
-                              controller.jenisKelaminC.text,
-                              controller.tanggalLahirC.text,
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurpleAccent,
-                          padding: controller.isSaveLoading.value
-                              ? EdgeInsets.symmetric(vertical: 4)
-                              : EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      child: Obx(
+                        () => ElevatedButton(
+                          onPressed: controller.isSaveLoading.value
+                              ? null
+                              : () {
+                                  if (controller.formKey.currentState!
+                                      .validate()) {
+                                    controller.updateProfileData(
+                                      controller.namaC.text,
+                                      controller.noHpC.text,
+                                      controller.alamatC.text,
+                                      controller.jenisKelaminC.text,
+                                      controller.tanggalLahirC.text,
+                                    );
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurpleAccent,
+                            padding: controller.isSaveLoading.value
+                                ? EdgeInsets.symmetric(vertical: 4)
+                                : EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
                           ),
-                          elevation: 0,
-                        ),
-                        child: Obx(
-                          () => controller.isSaveLoading.value
-                              ? Transform.scale(
-                                  scale: 0.5,
-                                  child: const CircularProgressIndicator(
-                                    color: Colors.white,
+                          child: controller.isSaveLoading.value
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: Transform.scale(
+                                    scale: 0.8,
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 )
                               : Text(

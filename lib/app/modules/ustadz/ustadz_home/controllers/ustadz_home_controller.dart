@@ -9,12 +9,14 @@ import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UstadzHomeController extends GetxController {
-  var isLoading = false.obs;
+  var isLoading = true.obs;
   var isLoadingLogout = false.obs;
   var ustadz = Rxn<Ustadz>();
   var fotoProfil =
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
           .obs;
+
+  DateTime? _lastErrorShown;
 
   @override
   void onInit() {
@@ -41,7 +43,7 @@ class UstadzHomeController extends GetxController {
           'Authorization': 'Bearer $token',
           'x-platform': 'mobile',
         },
-      );
+      ).timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (kDebugMode) {
         print(response.statusCode);
@@ -54,9 +56,14 @@ class UstadzHomeController extends GetxController {
         ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
@@ -70,7 +77,7 @@ class UstadzHomeController extends GetxController {
       final response = await post(
         Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
-      );
+      ).timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (kDebugMode) {
         print(response.statusCode);
@@ -84,12 +91,22 @@ class UstadzHomeController extends GetxController {
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {
-        ToastUtils.showErrorToast('Logout gagal');
+        final now = DateTime.now();
+        if (_lastErrorShown == null ||
+            now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+          _lastErrorShown = now;
+          ToastUtils.showErrorToast('Logout gagal');
+        }
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoadingLogout.value = false;
     }

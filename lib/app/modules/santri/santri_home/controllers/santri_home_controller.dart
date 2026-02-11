@@ -13,8 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum ChartType { hafalanBaru, murajaah }
 
 class SantriHomeController extends GetxController {
-  var isLoading = false.obs;
-  var isLoadingChart = false.obs;
+  var isLoading = true.obs;
+  var isLoadingChart = true.obs;
   var isLoadingLogout = false.obs;
   var fotoProfil =
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
@@ -25,6 +25,8 @@ class SantriHomeController extends GetxController {
   var range = '1w'.obs;
 
   var selectedChartType = ChartType.hafalanBaru.obs;
+
+  DateTime? _lastErrorShown;
 
   @override
   void onInit() {
@@ -45,6 +47,7 @@ class SantriHomeController extends GetxController {
   Future<void> getSantri() async {
     try {
       isLoading.value = true;
+      isLoadingChart.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       final santriId = prefs.getString('roleId');
@@ -56,7 +59,7 @@ class SantriHomeController extends GetxController {
           'Authorization': 'Bearer $token',
           'x-platform': 'mobile',
         },
-      );
+      ).timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (kDebugMode) {
         print(response.statusCode);
@@ -70,11 +73,18 @@ class SantriHomeController extends GetxController {
         ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
+    } finally {
+      isLoading.value = false;
+      isLoadingChart.value = false;
     }
-    isLoading.value = false;
   }
 
   void getChart() async {
@@ -95,7 +105,7 @@ class SantriHomeController extends GetxController {
           'Authorization': 'Bearer $token',
           'x-platform': 'mobile',
         },
-      );
+      ).timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (kDebugMode) {
         print(response.statusCode);
@@ -119,10 +129,12 @@ class SantriHomeController extends GetxController {
       isLoadingLogout.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
-      final response = await http.post(
-        Uri.parse(ApiUrl.logout(userId!)),
-        headers: {'Content-Type': 'application/json'},
-      );
+      final response = await http
+          .post(
+            Uri.parse(ApiUrl.logout(userId!)),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (kDebugMode) {
         print(data);
@@ -135,12 +147,22 @@ class SantriHomeController extends GetxController {
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {
-        ToastUtils.showErrorToast('Logout gagal');
+        final now = DateTime.now();
+        if (_lastErrorShown == null ||
+            now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+          _lastErrorShown = now;
+          ToastUtils.showErrorToast('Logout gagal');
+        }
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoadingLogout.value = false;
     }
