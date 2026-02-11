@@ -101,9 +101,14 @@ class SantriHomeView extends GetView<SantriHomeController> {
               const SizedBox(height: 2),
               Obx(
                 () => Skeletonizer(
-                  enabled: controller.isLoading.value,
+                  enabled:
+                      controller.isLoading.value ||
+                      controller.santri.value?.nama == null,
                   child: Text(
-                    controller.santri.value?.nama ?? '',
+                    controller.isLoading.value ||
+                            controller.santri.value?.nama == null
+                        ? 'Loading Name'
+                        : (controller.santri.value?.nama ?? ''),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: GoogleFonts.poppins(
@@ -639,26 +644,29 @@ class SantriHomeView extends GetView<SantriHomeController> {
             border: Border.all(color: Colors.grey.shade300),
           ),
           child: Obx(
-            () => DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: controller.range.value,
-                icon: const Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  size: 20,
-                  color: Colors.grey,
+            () => AbsorbPointer(
+              absorbing: controller.isLoadingChart.value,
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: controller.range.value,
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    size: 20,
+                    color: Colors.grey,
+                  ),
+                  dropdownColor: Colors.white,
+                  items: [
+                    _buildDropdownItem('1w', '1 Minggu'),
+                    _buildDropdownItem('1m', '1 Bulan'),
+                    _buildDropdownItem('3m', '3 Bulan'),
+                  ],
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      controller.range.value = newValue;
+                      controller.getChart();
+                    }
+                  },
                 ),
-                dropdownColor: Colors.white,
-                items: [
-                  _buildDropdownItem('1w', '1 Minggu'),
-                  _buildDropdownItem('1m', '1 Bulan'),
-                  _buildDropdownItem('3m', '3 Bulan'),
-                ],
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    controller.range.value = newValue;
-                    controller.getChart();
-                  }
-                },
               ),
             ),
           ),
@@ -755,7 +763,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 10,
             offset: const Offset(0, 2),
@@ -763,6 +771,14 @@ class SantriHomeView extends GetView<SantriHomeController> {
         ],
       ),
       child: Obx(() {
+        if (controller.isLoadingChart.value) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 32.0),
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
         if (controller.chart.value == null ||
             controller.chart.value!.data.isEmpty) {
           return Center(

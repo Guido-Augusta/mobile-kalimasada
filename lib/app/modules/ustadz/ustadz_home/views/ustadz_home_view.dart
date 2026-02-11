@@ -96,9 +96,14 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
               const SizedBox(height: 2),
               Obx(
                 () => Skeletonizer(
-                  enabled: controller.isLoading.value,
+                  enabled:
+                      controller.isLoading.value ||
+                      controller.ustadz.value?.nama == null,
                   child: Text(
-                    controller.ustadz.value?.nama ?? '',
+                    controller.isLoading.value ||
+                            controller.ustadz.value?.nama == null
+                        ? 'Loading Name'
+                        : (controller.ustadz.value?.nama ?? ''),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: GoogleFonts.poppins(

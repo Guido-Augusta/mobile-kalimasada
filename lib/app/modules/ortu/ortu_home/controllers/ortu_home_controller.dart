@@ -11,8 +11,8 @@ import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OrtuHomeController extends GetxController {
-  var isLoading = false.obs;
-  var isLoadingChildren = false.obs;
+  var isLoading = true.obs;
+  var isLoadingChildren = true.obs;
   var isLoadingLogout = false.obs;
   var fotoProfil =
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
@@ -50,7 +50,7 @@ class OrtuHomeController extends GetxController {
           'Authorization': 'Bearer $token',
           'x-platform': 'mobile',
         },
-      );
+      ).timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (kDebugMode) {
         print(response.statusCode);
@@ -61,6 +61,7 @@ class OrtuHomeController extends GetxController {
         fotoProfil.value = getImageUrl(ortu.value!.fotoProfil!);
 
         if (ortu.value?.santri != null && ortu.value!.santri.isNotEmpty) {
+          isLoadingChildren.value = true;
           await getChildrenList();
         }
       } else {
@@ -75,14 +76,31 @@ class OrtuHomeController extends GetxController {
           'Terjadi kesalahan\nPeriksa koneksi internet Anda',
         );
       }
+    } finally {
+      isLoading.value = false;
+      isLoadingChildren.value = false;
     }
-    isLoading.value = false;
+  }
+
+  Future<void> getChildrenList() async {
+    try {
+      childrenList.clear();
+
+      if (ortu.value?.santri != null) {
+        final futures = ortu.value!.santri
+            .map((santri) => getChildren(santri.id.toString()))
+            .toList();
+        await Future.wait(futures, eagerError: false);
+      }
+    } catch (e) {
+      ToastUtils.showErrorToast('Gagal memuat data anak');
+    }
   }
 
   Future<void> getChildren(String santriId) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
     try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
       final response = await get(
         Uri.parse(ApiUrl.santriDetail(santriId)),
         headers: {
@@ -90,7 +108,7 @@ class OrtuHomeController extends GetxController {
           'Authorization': 'Bearer $token',
           'x-platform': 'mobile',
         },
-      );
+      ).timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (response.statusCode == 200) {
         childrenList.addIf(
@@ -101,26 +119,8 @@ class OrtuHomeController extends GetxController {
         ToastUtils.showErrorToast('Gagal mendapatkan data anak');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      ToastUtils.showErrorToast('Terjadi kesalahan\nCoba refresh');
     }
-  }
-
-  Future<void> getChildrenList() async {
-    try {
-      isLoadingChildren.value = true;
-      childrenList.clear();
-
-      if (ortu.value?.santri != null) {
-        for (var santri in ortu.value!.santri) {
-          await getChildren(santri.id.toString());
-        }
-      }
-    } catch (e) {
-      ToastUtils.showErrorToast('Gagal memuat data anak');
-    }
-    isLoadingChildren.value = false;
   }
 
   void logout() async {
@@ -128,10 +128,12 @@ class OrtuHomeController extends GetxController {
       isLoadingLogout.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
-      final response = await http.post(
-        Uri.parse(ApiUrl.logout(userId!)),
-        headers: {'Content-Type': 'application/json'},
-      );
+      final response = await http
+          .post(
+            Uri.parse(ApiUrl.logout(userId!)),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (kDebugMode) {
         print(data);

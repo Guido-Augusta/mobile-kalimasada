@@ -9,7 +9,7 @@ import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UstadzHomeController extends GetxController {
-  var isLoading = false.obs;
+  var isLoading = true.obs;
   var isLoadingLogout = false.obs;
   var ustadz = Rxn<Ustadz>();
   var fotoProfil =
@@ -43,7 +43,7 @@ class UstadzHomeController extends GetxController {
           'Authorization': 'Bearer $token',
           'x-platform': 'mobile',
         },
-      );
+      ).timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (kDebugMode) {
         print(response.statusCode);
@@ -77,7 +77,7 @@ class UstadzHomeController extends GetxController {
       final response = await post(
         Uri.parse(ApiUrl.logout(userId!)),
         headers: {'Content-Type': 'application/json'},
-      );
+      ).timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
       if (kDebugMode) {
         print(response.statusCode);

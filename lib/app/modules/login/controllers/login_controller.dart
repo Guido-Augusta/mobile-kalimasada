@@ -6,9 +6,6 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
-import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/controllers/ortu_home_controller.dart';
-import 'package:mobile_kalimasada/app/modules/santri/santri_home/controllers/santri_home_controller.dart';
-import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_home/controllers/ustadz_home_controller.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -46,7 +43,7 @@ class LoginController extends GetxController {
           'platform': 'mobile',
         }),
         headers: {'Content-Type': 'application/json'},
-      );
+      ).timeout(const Duration(seconds: 30));
 
       var data = jsonDecode(response.body);
       if (kDebugMode) {
@@ -63,18 +60,12 @@ class LoginController extends GetxController {
 
         // Navigate to home or another page
         if (data['user']['role'] == 'santri') {
-          final santriHomeC = Get.put(SantriHomeController());
-          await santriHomeC.getSantri();
           Get.offAllNamed('/santri-main');
           ToastUtils.showSuccessToast('Login berhasil');
         } else if (data['user']['role'] == 'ustadz') {
-          final ustadzHomeController = Get.put(UstadzHomeController());
-          await ustadzHomeController.getUstadz();
           Get.offAllNamed('/ustadz-main');
           ToastUtils.showSuccessToast('Login berhasil');
         } else if (data['user']['role'] == 'ortu') {
-          final ortuHomeController = Get.put(OrtuHomeController());
-          await ortuHomeController.getOrtu();
           Get.offAllNamed('/ortu-main');
           ToastUtils.showSuccessToast('Login berhasil');
         } else {

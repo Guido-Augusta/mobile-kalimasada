@@ -18,15 +18,6 @@ class OrtuMainView extends GetView<OrtuMainController> {
   OrtuMainView({super.key});
   @override
   Widget build(BuildContext context) {
-    // Preload data saat build
-    final ortuHomeController = Get.find<OrtuHomeController>();
-    if (ortuHomeController.ortu.value == null &&
-        !ortuHomeController.isLoading.value) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ortuHomeController.getOrtu();
-      });
-    }
-
     Widget body() {
       switch (controller.currentIndex.value) {
         case 0:
