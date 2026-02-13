@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 
 import '../middleware/auth_middleware.dart';
+import '../modules/admin_home/bindings/admin_home_binding.dart';
+import '../modules/admin_home/views/admin_home_view.dart';
 import '../modules/change_password/bindings/change_password_binding.dart';
 import '../modules/change_password/views/change_password_view.dart';
 import '../modules/detail_ortu/bindings/detail_ortu_binding.dart';
@@ -193,6 +195,11 @@ class AppPages {
       name: _Paths.DOA_KHATAM,
       page: () => const DoaKhatamView(),
       binding: DoaKhatamBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_HOME,
+      page: () => const AdminHomeView(),
+      binding: AdminHomeBinding(),
     ),
   ];
 }

@@ -73,6 +73,8 @@ class SplashController extends GetxController {
           getUstadz();
         } else if (role == 'ortu') {
           getOrtu();
+        } else if (role == 'admin') {
+          Get.offAllNamed('/admin-home');
         }
       } else {
         Get.offAllNamed('/login');

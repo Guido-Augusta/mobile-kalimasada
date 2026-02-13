@@ -28,6 +28,7 @@ abstract class Routes {
   static const SUMMARY_HAFALAN = _Paths.SUMMARY_HAFALAN;
   static const DETAIL_ORTU = _Paths.DETAIL_ORTU;
   static const DOA_KHATAM = _Paths.DOA_KHATAM;
+  static const ADMIN_HOME = _Paths.ADMIN_HOME;
 }
 
 abstract class _Paths {
@@ -57,4 +58,5 @@ abstract class _Paths {
   static const SUMMARY_HAFALAN = '/summary-hafalan';
   static const DETAIL_ORTU = '/detail-ortu';
   static const DOA_KHATAM = '/doa-khatam';
+  static const ADMIN_HOME = '/admin-home';
 }
