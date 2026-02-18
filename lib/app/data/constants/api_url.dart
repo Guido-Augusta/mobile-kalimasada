@@ -79,4 +79,8 @@ class ApiUrl {
 
   // CHART
   static String get chart => '$baseUrl/chart';
+
+  // ADMIN
+  // DELETE SANTRI
+  static String deleteSantri(String santriId) => '$baseUrl/santri/$santriId';
 }

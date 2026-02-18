@@ -1,28 +1,26 @@
-// GET http://localhost:5000/api/santri?page=1&limit=10&tahapHafalan=level1
-
 class DaftarSantri {
-  DaftarSantri({required this.data, required this.totalData});
+  DaftarSantri({required this.data, required this.totalSantri});
 
   final List<Datum> data;
-  final int? totalData;
+  final int? totalSantri;
 
   factory DaftarSantri.fromJson(Map<String, dynamic> json) {
     return DaftarSantri(
       data: json["data"] == null
           ? []
           : List<Datum>.from(json["data"]!.map((x) => Datum.fromJson(x))),
-      totalData: json["totalData"],
+      totalSantri: json["totalSantri"],
     );
   }
 
   Map<String, dynamic> toJson() => {
     "data": data.map((x) => x.toJson()).toList(),
-    "totalData": totalData,
+    "totalSantri": totalSantri,
   };
 
   @override
   String toString() {
-    return "$data, $totalData, ";
+    return "$data, $totalSantri, ";
   }
 }
 
@@ -36,6 +34,7 @@ class Datum {
     required this.jenisKelamin,
     required this.tanggalLahir,
     required this.fotoProfil,
+    required this.noInduk,
     required this.tahapHafalan,
     required this.totalPoin,
     required this.peringkat,
@@ -53,6 +52,7 @@ class Datum {
   final String? jenisKelamin;
   final DateTime? tanggalLahir;
   final String? fotoProfil;
+  final String? noInduk;
   final String? tahapHafalan;
   final int? totalPoin;
   final int? peringkat;
@@ -71,6 +71,7 @@ class Datum {
       jenisKelamin: json["jenisKelamin"],
       tanggalLahir: DateTime.tryParse(json["tanggalLahir"] ?? ""),
       fotoProfil: json["fotoProfil"],
+      noInduk: json["noInduk"],
       tahapHafalan: json["tahapHafalan"],
       totalPoin: json["totalPoin"],
       peringkat: json["peringkat"],
@@ -94,6 +95,7 @@ class Datum {
     "jenisKelamin": jenisKelamin,
     "tanggalLahir": tanggalLahir?.toIso8601String(),
     "fotoProfil": fotoProfil,
+    "noInduk": noInduk,
     "tahapHafalan": tahapHafalan,
     "totalPoin": totalPoin,
     "peringkat": peringkat,
@@ -105,7 +107,7 @@ class Datum {
 
   @override
   String toString() {
-    return "$id, $userId, $nama, $nomorHp, $alamat, $jenisKelamin, $tanggalLahir, $fotoProfil, $tahapHafalan, $totalPoin, $peringkat, $createdAt, $poinUpdatedAt, $user, $orangTua, ";
+    return "$id, $userId, $nama, $nomorHp, $alamat, $jenisKelamin, $tanggalLahir, $fotoProfil, $noInduk, $tahapHafalan, $totalPoin, $peringkat, $createdAt, $poinUpdatedAt, $user, $orangTua, ";
   }
 }
 

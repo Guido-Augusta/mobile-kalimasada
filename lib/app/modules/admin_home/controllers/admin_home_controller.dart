@@ -11,7 +11,7 @@ class AdminHomeController extends GetxController {
   var isLoadingLogout = false.obs;
   DateTime? _lastErrorShown;
 
-  Future<void> logout() async {
+  void logout() async {
     isLoadingLogout.value = true;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart';
@@ -33,52 +34,91 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
           ),
         ],
       ),
+      floatingActionButton: Obx(() {
+        if (!controller.isAdmin) {
+          return const SizedBox.shrink();
+        }
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 30),
+          child: AnimatedSlide(
+            duration: const Duration(milliseconds: 300),
+            offset: controller.isFabVisible.value
+                ? Offset.zero
+                : const Offset(2, 0), // geser ke kanan
+            child: FloatingActionButton(
+              onPressed: () {
+                // Function will be added later
+              },
+              backgroundColor: Colors.deepPurpleAccent,
+              child: const Icon(Icons.add, color: Colors.white),
+            ),
+          ),
+        );
+      }),
       body: RefreshIndicator(
         onRefresh: () async {
           controller.fetchData();
         },
-        child: ListView(
-          controller: controller.scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            // Search Bar
-            _buildSearchBar(),
-
-            // Button Filter Tahap Hafalan
-            buttonFilterTahapan(),
-
-            const SizedBox(height: 8),
-            // Student List
-            Obx(() {
-              if (controller.isLoading.value &&
-                  controller.searchQuery.value.isEmpty) {
-                return _buildLoadingIndicator();
-              } else if (controller.santriList.isEmpty) {
-                return _buildEmptyState();
-              } else if (controller.searchQuery.value.isNotEmpty &&
-                  controller.santriList.isEmpty) {
-                return _buildEmptyState();
+        child: NotificationListener<UserScrollNotification>(
+          onNotification: (notification) {
+            if (notification.direction == ScrollDirection.reverse) {
+              if (controller.isFabVisible.value) {
+                controller.isFabVisible.value = false;
               }
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                itemCount:
-                    controller.santriList.length +
-                    (controller.hasMore.value ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index >= controller.santriList.length) {
-                    return _buildLoadMoreIndicator();
-                  }
-                  final santri = controller.santriList[index];
-                  return _buildSantriCard(santri);
-                },
-              );
-            }),
-          ],
+            } else if (notification.direction == ScrollDirection.forward) {
+              if (!controller.isFabVisible.value) {
+                controller.isFabVisible.value = true;
+              }
+            }
+            return true;
+          },
+          child: ListView(
+            controller: controller.scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              // Search Bar
+              _buildSearchBar(),
+
+              // Button Filter Tahap Hafalan
+              buttonFilterTahapan(),
+
+              const SizedBox(height: 8),
+              // Student List
+              Obx(() {
+                if (controller.isLoading.value &&
+                    controller.searchQuery.value.isEmpty) {
+                  return _buildLoadingIndicator();
+                } else if (controller.santriList.isEmpty) {
+                  return _buildEmptyState();
+                } else if (controller.searchQuery.value.isNotEmpty &&
+                    controller.santriList.isEmpty) {
+                  return _buildEmptyState();
+                }
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
+                  itemCount:
+                      controller.santriList.length +
+                      (controller.hasMore.value ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index >= controller.santriList.length) {
+                      return _buildLoadMoreIndicator();
+                    }
+                    final santri = controller.santriList[index];
+                    if (controller.isAdmin) {
+                      return _buildSantriCardForAdmin(santri);
+                    } else {
+                      return _buildSantriCard(santri);
+                    }
+                  },
+                );
+              }),
+            ],
+          ),
         ),
       ),
     );
@@ -558,6 +598,301 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSantriCardForAdmin(Datum santri) {
+    return Card(
+      color: Colors.white,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 3,
+      shadowColor: Colors.grey.withValues(alpha: 0.1),
+      child: InkWell(
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          Get.toNamed('/detail-santri', arguments: santri.id.toString());
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Section with Profile and Basic Info
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Profile Picture
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey[200],
+                      border: Border.all(color: Colors.grey[300]!, width: 2),
+                    ),
+                    child: ClipOval(
+                      child:
+                          santri.fotoProfil != null ||
+                              santri.fotoProfil!.isNotEmpty ||
+                              santri.fotoProfil! != ''
+                          ? CachedNetworkImage(
+                              imageUrl: controller.getImageUrl(
+                                santri.fotoProfil!,
+                              ),
+                              fit: BoxFit.cover,
+                              width: 60,
+                              height: 60,
+                              placeholder: (context, url) => Icon(
+                                Icons.person,
+                                size: 30,
+                                color: Colors.grey[400],
+                              ),
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.person,
+                                size: 30,
+                                color: Colors.grey[400],
+                              ),
+                            )
+                          : Icon(
+                              Icons.person,
+                              size: 30,
+                              color: Colors.grey[400],
+                            ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+
+                  // Name, No Induk, and Badges
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Name
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  santri.nama ?? 'Nama tidak tersedia',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  santri.noInduk ?? 'No Induk tidak tersedia',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ],
+                            ),
+                            PopupMenuButton(
+                              itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  value: 'edit',
+                                  child: const Text('Edit'),
+                                  onTap: () {},
+                                ),
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: const Text('Hapus'),
+                                  onTap: () {
+                                    _showDeleteAccountDialog(context, santri);
+                                  },
+                                ),
+                              ],
+                              onSelected: (value) {},
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              popUpAnimationStyle: const AnimationStyle(
+                                curve: Curves.easeInOut,
+                                duration: Duration(milliseconds: 150),
+                              ),
+                              style: ButtonStyle(
+                                visualDensity: VisualDensity.compact,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Badges Row
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            // Level Badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _getTahapColor(
+                                  santri.tahapHafalan,
+                                ).withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _getTahapColor(
+                                    santri.tahapHafalan,
+                                  ).withValues(alpha: 0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Text(
+                                _getTahapLabel2(santri.tahapHafalan),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: _getTahapColor(santri.tahapHafalan),
+                                ),
+                              ),
+                            ),
+
+                            // Gender Badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: santri.jenisKelamin?.toLowerCase() == 'l'
+                                    ? Colors.blue.withValues(alpha: 0.1)
+                                    : Colors.pink.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color:
+                                      santri.jenisKelamin?.toLowerCase() == 'l'
+                                      ? Colors.blue.withValues(alpha: 0.2)
+                                      : Colors.pink.withValues(alpha: 0.2),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    santri.jenisKelamin?.toLowerCase() == 'l'
+                                        ? Icons.male
+                                        : Icons.female,
+                                    size: 14,
+                                    color:
+                                        santri.jenisKelamin?.toLowerCase() ==
+                                            'l'
+                                        ? Colors.blue
+                                        : Colors.pink,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    santri.jenisKelamin?.toLowerCase() == 'l'
+                                        ? 'Laki-laki'
+                                        : 'Perempuan',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color:
+                                          santri.jenisKelamin?.toLowerCase() ==
+                                              'l'
+                                          ? Colors.blue
+                                          : Colors.pink,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<dynamic> _showDeleteAccountDialog(BuildContext context, Datum santri) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            'Hapus Akun',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          ),
+          content: Text(
+            'Apakah anda yakin ingin menghapus akun ${santri.user?.email ?? 'ini'}?',
+            style: GoogleFonts.poppins(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: Text(
+                'Tidak',
+                style: GoogleFonts.poppins(color: Colors.grey[600]),
+              ),
+            ),
+            Obx(
+              () => ElevatedButton(
+                onPressed: controller.isLoadingDeleteAccount.value
+                    ? null
+                    : () {
+                        controller.deleteSantriAccount(santri.id!.toString());
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: controller.isLoadingDeleteAccount.value
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        'Ya',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                      ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1755,8 +2090,8 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
           () => Text(
             controller.searchQuery.value.isNotEmpty &&
                     controller.santriList.isEmpty
-                ? 'Santri tidak ditemukan di ${controller.getTahapanFilter(controller.tahapHafalan.value)}'
-                : 'Data santri akan muncul di sini',
+                ? 'Santri tidak ditemukan di ${_getTahapLabel(controller.tahapHafalan.value)}'
+                : 'Tarik ke bawah untuk refresh',
             style: TextStyle(color: Colors.grey[500], fontSize: 14),
           ),
         ),
