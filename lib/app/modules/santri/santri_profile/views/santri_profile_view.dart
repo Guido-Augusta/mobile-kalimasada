@@ -18,6 +18,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
   Widget build(BuildContext context) {
     return Obx(
       () => Scaffold(
+        backgroundColor: const Color(0xFFF1F5F9),
         appBar: controller.santriDetail.value == null
             ? AppBar(
                 title: const Text(
@@ -37,7 +38,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
                 ),
               )
             : null,
-        backgroundColor: const Color(0xFFF1F5F9),
         body: Obx(() {
           final santri = controller.santriDetail.value;
           // Data kosong
@@ -463,15 +463,10 @@ class SantriProfileView extends GetView<SantriProfileController> {
     );
   }
 
-  // Format the date to display in the text field
-  String formatDate(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-  }
-
   void _showEditProfileDialog() {
     // Initialize the date controller with the current date of birth
     controller.tanggalLahirC = TextEditingController(
-      text: formatDate(controller.santriDetail.value!.tanggalLahir!),
+      text: controller.formatDate(controller.santriDetail.value!.tanggalLahir!),
     );
 
     // Function to show date picker
@@ -498,8 +493,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
 
       if (picked != null &&
           picked != controller.santriDetail.value!.tanggalLahir) {
-        // controller.santriDetail.value!.tanggalLahir = picked;
-        controller.tanggalLahirC.text = formatDate(picked);
+        controller.tanggalLahirC.text = controller.formatDate(picked);
       }
     }
 

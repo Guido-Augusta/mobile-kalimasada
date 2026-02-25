@@ -704,7 +704,14 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                 PopupMenuItem(
                                   value: 'edit',
                                   child: const Text('Edit'),
-                                  onTap: () {},
+                                  onTap: () {
+                                    Get.toNamed(
+                                      '/edit-santri',
+                                      arguments: {
+                                        'santriId': santri.id.toString(),
+                                      },
+                                    );
+                                  },
                                 ),
                                 PopupMenuItem(
                                   value: 'delete',

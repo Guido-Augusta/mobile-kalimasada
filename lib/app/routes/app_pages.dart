@@ -11,6 +11,8 @@ import '../modules/detail_surah/bindings/detail_surah_binding.dart';
 import '../modules/detail_surah/views/detail_surah_view.dart';
 import '../modules/doa_khatam/bindings/doa_khatam_binding.dart';
 import '../modules/doa_khatam/views/doa_khatam_view.dart';
+import '../modules/edit-santri/bindings/edit_santri_binding.dart';
+import '../modules/edit-santri/views/edit_santri_view.dart';
 import '../modules/forgot_password/bindings/forgot_password_binding.dart';
 import '../modules/forgot_password/views/forgot_password_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -200,6 +202,11 @@ class AppPages {
       name: _Paths.ADMIN_HOME,
       page: () => const AdminHomeView(),
       binding: AdminHomeBinding(),
+    ),
+    GetPage(
+      name: _Paths.EDIT_SANTRI,
+      page: () => const EditSantriView(),
+      binding: EditSantriBinding(),
     ),
   ];
 }

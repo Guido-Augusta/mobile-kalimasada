@@ -19,7 +19,9 @@ class DetailSantriView extends GetView<DetailSantriController> {
     return Obx(
       () => Scaffold(
         backgroundColor: const Color(0xFFF1F5F9),
-        appBar: controller.santriDetail.value == null
+        appBar:
+            (controller.santriDetail.value == null ||
+                controller.isLoading.value)
             ? AppBar(
                 title: const Text(
                   'Detail Santri',
@@ -53,7 +55,9 @@ class DetailSantriView extends GetView<DetailSantriController> {
           // Main Content
           return _buildContent(santri);
         }),
-        bottomNavigationBar: controller.santriDetail.value != null
+        bottomNavigationBar:
+            (controller.santriDetail.value != null &&
+                !controller.isLoading.value)
             ? _buildBottomButtons()
             : null,
       ),
@@ -83,7 +87,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
               onPressed: () => Get.back(),
             ),
             actions: [
-              if (controller.isUstadz)
+              if (controller.isUstadz || controller.isAdmin)
                 IconButton(
                   icon: const Icon(Icons.edit_outlined, color: Colors.white),
                   onPressed: () {

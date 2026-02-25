@@ -83,4 +83,7 @@ class ApiUrl {
   // ADMIN
   // DELETE SANTRI
   static String deleteSantri(String santriId) => '$baseUrl/santri/$santriId';
+
+  // GET ALL ORTU
+  static String get ortuList => '$baseUrl/ortu';
 }

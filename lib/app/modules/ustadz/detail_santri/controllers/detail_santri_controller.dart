@@ -15,6 +15,7 @@ class DetailSantriController extends GetxController {
   String userRole = '';
 
   // Helper methods
+  bool get isAdmin => userRole == 'admin';
   bool get isUstadz => userRole == 'ustadz';
   bool get isSantri => userRole == 'santri';
   bool get isOrtu => userRole == 'ortu';
@@ -31,6 +32,7 @@ class DetailSantriController extends GetxController {
   var range = '1w'.obs;
   var selectedChartType = ChartType.hafalanBaru.obs;
 
+  DateTime? _lastNoChangeShown;
   DateTime? _lastErrorShown;
 
   @override
@@ -112,7 +114,17 @@ class DetailSantriController extends GetxController {
   }
 
   void updateTahapHafalan(String tahapHafalan) async {
+    if (tahapHafalan == santriDetail.value?.tahapHafalan) {
+      final now = DateTime.now();
+      if (_lastNoChangeShown == null ||
+          now.difference(_lastNoChangeShown!) > Duration(seconds: 3)) {
+        _lastNoChangeShown = now;
+        ToastUtils.showErrorToast('Tidak ada perubahan data');
+      }
+      return;
+    }
     isSaveLoading.value = true;
+
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     try {

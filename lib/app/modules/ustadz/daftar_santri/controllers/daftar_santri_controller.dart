@@ -102,7 +102,7 @@ class DaftarSantriController extends GetxController {
     });
   }
 
-  void fetchData() async {
+  Future<void> fetchData() async {
     try {
       isLoading.value = true;
       resetPagination();
