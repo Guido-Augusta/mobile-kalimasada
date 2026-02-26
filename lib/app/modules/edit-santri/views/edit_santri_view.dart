@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -116,7 +117,7 @@ class EditSantriView extends GetView<EditSantriController> {
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                     onPressed: () => Get.back(),
                   ),
-                  expandedHeight: 280,
+                  expandedHeight: 180,
                   pinned: false,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
@@ -135,82 +136,118 @@ class EditSantriView extends GetView<EditSantriController> {
                       child: SafeArea(
                         child: Column(
                           children: [
-                            // Profile Section
                             const SizedBox(height: 40),
                             Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Profile Picture
-                                  Skeletonizer(
-                                    enabled: controller.isLoading.value,
-                                    child: Container(
-                                      width: 130,
-                                      height: 130,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 4,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(
-                                              alpha: 0.2,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // Profile Picture
+                                    Skeletonizer(
+                                      enabled: controller.isLoading.value,
+                                      child: Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 4,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(
+                                                alpha: 0.2,
+                                              ),
+                                              blurRadius: 20,
+                                              offset: const Offset(0, 8),
                                             ),
-                                            blurRadius: 20,
-                                            offset: const Offset(0, 8),
-                                          ),
-                                        ],
-                                      ),
-                                      child: ClipOval(
-                                        child: CachedNetworkImage(
-                                          imageUrl: controller.getImageUrl(
-                                            controller.fotoProfil.value,
-                                          ),
-                                          fit: BoxFit.cover,
-                                          placeholder: (context, url) =>
-                                              Container(
-                                                color: Colors.grey[300],
-                                                child: const Icon(
-                                                  Icons.person,
-                                                  size: 40,
-                                                  color: Colors.grey,
+                                          ],
+                                        ),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            showImageViewer(
+                                              context,
+                                              CachedNetworkImageProvider(
+                                                controller.getImageUrl(
+                                                  controller.fotoProfil.value,
                                                 ),
                                               ),
-                                          errorWidget: (context, url, error) =>
-                                              Container(
-                                                color: Colors.grey[300],
-                                                child: const Icon(
-                                                  Icons.person,
-                                                  size: 40,
-                                                  color: Colors.grey,
-                                                ),
+                                              swipeDismissible: true,
+                                              useSafeArea: true,
+                                              doubleTapZoomable: true,
+                                              immersive: true,
+                                              barrierColor: Colors.transparent,
+                                            );
+                                          },
+                                          child: ClipOval(
+                                            child: Hero(
+                                              tag: 'foto-profil',
+                                              child: CachedNetworkImage(
+                                                imageUrl: controller
+                                                    .getImageUrl(
+                                                      controller
+                                                          .fotoProfil
+                                                          .value,
+                                                    ),
+                                                fit: BoxFit.cover,
+                                                placeholder: (context, url) =>
+                                                    Container(
+                                                      color: Colors.grey[300],
+                                                      child: const Icon(
+                                                        Icons.person,
+                                                        size: 40,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Container(
+                                                          color:
+                                                              Colors.grey[300],
+                                                          child: const Icon(
+                                                            Icons.person,
+                                                            size: 40,
+                                                            color: Colors.grey,
+                                                          ),
+                                                        ),
                                               ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
 
-                                  const SizedBox(height: 16),
-                                  Skeletonizer(
-                                    effect: ShimmerEffect(
-                                      baseColor: Colors.orangeAccent,
-                                      highlightColor: Colors.orange[300]!,
-                                    ),
-                                    enabled: controller.isLoading.value,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        _showEditPhotoProfileBottomSheet();
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orangeAccent,
-                                        foregroundColor: Colors.white,
+                                    const SizedBox(width: 16),
+                                    Flexible(
+                                      child: Skeletonizer(
+                                        effect: ShimmerEffect(
+                                          baseColor: Colors.orangeAccent,
+                                          highlightColor: Colors.orange[300]!,
+                                        ),
+                                        enabled: controller.isLoading.value,
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            _showEditPhotoProfileBottomSheet();
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                Colors.orangeAccent,
+                                            foregroundColor: Colors.white,
+                                          ),
+                                          child: Text(
+                                            'Upload Foto',
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
                                       ),
-                                      child: Text('Upload Foto'),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ],
