@@ -10,8 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-import '../../../data/models/daftar_ortu.dart';
-import '../../../data/models/santri.dart';
+import '../../../../data/models/daftar_ortu.dart';
+import '../../../../data/models/santri.dart';
 import '../controllers/edit_santri_controller.dart';
 
 class EditSantriView extends GetView<EditSantriController> {

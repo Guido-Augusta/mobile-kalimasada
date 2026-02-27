@@ -1,22 +1,22 @@
 import 'package:get/get.dart';
 
 import '../middleware/auth_middleware.dart';
-import '../modules/admin_home/bindings/admin_home_binding.dart';
-import '../modules/admin_home/views/admin_home_view.dart';
-import '../modules/change_password/bindings/change_password_binding.dart';
-import '../modules/change_password/views/change_password_view.dart';
-import '../modules/detail_ortu/bindings/detail_ortu_binding.dart';
-import '../modules/detail_ortu/views/detail_ortu_view.dart';
-import '../modules/detail_surah/bindings/detail_surah_binding.dart';
-import '../modules/detail_surah/views/detail_surah_view.dart';
-import '../modules/doa_khatam/bindings/doa_khatam_binding.dart';
-import '../modules/doa_khatam/views/doa_khatam_view.dart';
-import '../modules/edit-santri/bindings/edit_santri_binding.dart';
-import '../modules/edit-santri/views/edit_santri_view.dart';
-import '../modules/forgot_password/bindings/forgot_password_binding.dart';
-import '../modules/forgot_password/views/forgot_password_view.dart';
-import '../modules/login/bindings/login_binding.dart';
-import '../modules/login/views/login_view.dart';
+import '../modules/admin/admin_home/bindings/admin_home_binding.dart';
+import '../modules/admin/admin_home/views/admin_home_view.dart';
+import '../modules/auth/change_password/bindings/change_password_binding.dart';
+import '../modules/auth/change_password/views/change_password_view.dart';
+import '../modules/ortu/detail_ortu/bindings/detail_ortu_binding.dart';
+import '../modules/ortu/detail_ortu/views/detail_ortu_view.dart';
+import '../modules/quran/detail_surah/bindings/detail_surah_binding.dart';
+import '../modules/quran/detail_surah/views/detail_surah_view.dart';
+import '../modules/santri/doa_khatam/bindings/doa_khatam_binding.dart';
+import '../modules/santri/doa_khatam/views/doa_khatam_view.dart';
+import '../modules/admin/edit-santri/bindings/edit_santri_binding.dart';
+import '../modules/admin/edit-santri/views/edit_santri_view.dart';
+import '../modules/auth/forgot_password/bindings/forgot_password_binding.dart';
+import '../modules/auth/forgot_password/views/forgot_password_view.dart';
+import '../modules/auth/login/bindings/login_binding.dart';
+import '../modules/auth/login/views/login_view.dart';
 import '../modules/main/ortu_main/bindings/ortu_main_binding.dart';
 import '../modules/main/ortu_main/views/ortu_main_view.dart';
 import '../modules/main/santri_main/bindings/santri_main_binding.dart';
@@ -33,12 +33,14 @@ import '../modules/santri/santri_home/bindings/santri_home_binding.dart';
 import '../modules/santri/santri_home/views/santri_home_view.dart';
 import '../modules/santri/santri_profile/bindings/santri_profile_binding.dart';
 import '../modules/santri/santri_profile/views/santri_profile_view.dart';
-import '../modules/splash/bindings/splash_binding.dart';
-import '../modules/splash/views/splash_view.dart';
-import '../modules/summary_hafalan/bindings/summary_hafalan_binding.dart';
-import '../modules/summary_hafalan/views/summary_hafalan_view.dart';
-import '../modules/ustadz/alquran/bindings/alquran_binding.dart';
-import '../modules/ustadz/alquran/views/alquran_view.dart';
+import '../modules/auth/splash/bindings/splash_binding.dart';
+import '../modules/auth/splash/views/splash_view.dart';
+import '../modules/ustadz/summary_hafalan/bindings/summary_hafalan_binding.dart';
+import '../modules/ustadz/summary_hafalan/views/summary_hafalan_view.dart';
+import '../modules/admin/tambah_santri/bindings/tambah_santri_binding.dart';
+import '../modules/admin/tambah_santri/views/tambah_santri_view.dart';
+import '../modules/quran/alquran/bindings/alquran_binding.dart';
+import '../modules/quran/alquran/views/alquran_view.dart';
 import '../modules/ustadz/daftar_santri/bindings/daftar_santri_binding.dart';
 import '../modules/ustadz/daftar_santri/views/daftar_santri_view.dart';
 import '../modules/ustadz/detail_riwayat_hafalan/bindings/detail_riwayat_hafalan_binding.dart';
@@ -207,6 +209,11 @@ class AppPages {
       name: _Paths.EDIT_SANTRI,
       page: () => const EditSantriView(),
       binding: EditSantriBinding(),
+    ),
+    GetPage(
+      name: _Paths.TAMBAH_SANTRI,
+      page: () => const TambahSantriView(),
+      binding: TambahSantriBinding(),
     ),
   ];
 }

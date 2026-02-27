@@ -30,6 +30,7 @@ abstract class Routes {
   static const DOA_KHATAM = _Paths.DOA_KHATAM;
   static const ADMIN_HOME = _Paths.ADMIN_HOME;
   static const EDIT_SANTRI = _Paths.EDIT_SANTRI;
+  static const TAMBAH_SANTRI = _Paths.TAMBAH_SANTRI;
 }
 
 abstract class _Paths {
@@ -61,4 +62,5 @@ abstract class _Paths {
   static const DOA_KHATAM = '/doa-khatam';
   static const ADMIN_HOME = '/admin-home';
   static const EDIT_SANTRI = '/edit-santri';
+  static const TAMBAH_SANTRI = '/tambah-santri';
 }

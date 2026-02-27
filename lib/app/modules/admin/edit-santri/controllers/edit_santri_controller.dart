@@ -16,8 +16,8 @@ import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../data/models/santri.dart';
-import '../../../data/models/santri.dart' as s;
+import '../../../../data/models/santri.dart';
+import '../../../../data/models/santri.dart' as s;
 
 class EditSantriController extends GetxController {
   final String santriId = Get.arguments['santriId'];

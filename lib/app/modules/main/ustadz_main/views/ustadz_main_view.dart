@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
-import 'package:mobile_kalimasada/app/modules/ustadz/alquran/controllers/alquran_controller.dart';
-import 'package:mobile_kalimasada/app/modules/ustadz/alquran/views/alquran_view.dart';
+import 'package:mobile_kalimasada/app/modules/quran/alquran/controllers/alquran_controller.dart';
+import 'package:mobile_kalimasada/app/modules/quran/alquran/views/alquran_view.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_home/views/ustadz_home_view.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_home/controllers/ustadz_home_controller.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_profile/views/ustadz_profile_view.dart';
