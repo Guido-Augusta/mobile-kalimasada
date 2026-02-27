@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fullscreen_image_viewer/fullscreen_image_viewer.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -169,23 +169,47 @@ class EditSantriView extends GetView<EditSantriController> {
                                         ),
                                         child: GestureDetector(
                                           onTap: () {
-                                            showImageViewer(
-                                              context,
-                                              CachedNetworkImageProvider(
-                                                controller.getImageUrl(
-                                                  controller.fotoProfil.value,
+                                            FullscreenImageViewer.open(
+                                              context: context,
+                                              child: Hero(
+                                                tag: 'foto-profil',
+                                                child: CachedNetworkImage(
+                                                  imageUrl: controller
+                                                      .getImageUrl(
+                                                        controller
+                                                            .fotoProfil
+                                                            .value,
+                                                      ),
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (context, url) =>
+                                                      Container(
+                                                        color: Colors.grey[300],
+                                                        child: const Icon(
+                                                          Icons.person,
+                                                          size: 40,
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ),
+                                                  errorWidget:
+                                                      (
+                                                        context,
+                                                        url,
+                                                        error,
+                                                      ) => Container(
+                                                        color: Colors.grey[300],
+                                                        child: const Icon(
+                                                          Icons.person,
+                                                          size: 40,
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ),
                                                 ),
                                               ),
-                                              swipeDismissible: true,
-                                              useSafeArea: true,
-                                              doubleTapZoomable: true,
-                                              immersive: true,
-                                              barrierColor: Colors.transparent,
                                             );
                                           },
-                                          child: ClipOval(
-                                            child: Hero(
-                                              tag: 'foto-profil',
+                                          child: Hero(
+                                            tag: 'foto-profil',
+                                            child: ClipOval(
                                               child: CachedNetworkImage(
                                                 imageUrl: controller
                                                     .getImageUrl(
