@@ -102,7 +102,7 @@ class EditSantriView extends GetView<EditSantriController> {
             },
             child: CustomScrollView(
               slivers: [
-                // Custom App Bar with Gradient Background
+                // Custom App Bar
                 SliverAppBar(
                   centerTitle: true,
                   title: Text(
@@ -314,22 +314,15 @@ class EditSantriView extends GetView<EditSantriController> {
 
                             // Save Button
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                const Spacer(),
-                                SizedBox(
-                                  width:
-                                      (MediaQuery.of(context).size.width - 32) *
-                                      0.5,
-                                  child: SaveProfileButton(
-                                    controller: controller,
-                                    formKey: controller.profileFormKey,
-                                  ),
+                                SaveProfileButton(
+                                  controller: controller,
+                                  formKey: controller.profileFormKey,
                                 ),
                               ],
                             ),
-                            const SizedBox(
-                              height: 50,
-                            ), // Space for bottom buttons
+                            const SizedBox(height: 50),
                           ],
                         ),
                       ),
@@ -571,7 +564,6 @@ class EditSantriView extends GetView<EditSantriController> {
                 ),
               ),
             ),
-            // Inside the form's Column, add this after the alamat field
             const SizedBox(height: 16),
             Text(
               'Tanggal Lahir',
@@ -760,7 +752,7 @@ class EditSantriView extends GetView<EditSantriController> {
             // SearchField Ayah
             buildOrtuSearchField(
               title: 'Ayah',
-              isSearching: controller.isAyahSearching,
+              isSearching: controller.isSearching,
               tipe: 'ayah',
             ),
 
@@ -769,7 +761,7 @@ class EditSantriView extends GetView<EditSantriController> {
             // SearchField Ibu
             buildOrtuSearchField(
               title: 'Ibu',
-              isSearching: controller.isIbuSearching,
+              isSearching: controller.isSearching,
               tipe: 'ibu',
             ),
 
@@ -778,7 +770,7 @@ class EditSantriView extends GetView<EditSantriController> {
             // SearchField Wali
             buildOrtuSearchField(
               title: 'Wali',
-              isSearching: controller.isWaliSearching,
+              isSearching: controller.isSearching,
               tipe: 'wali',
             ),
           ],
@@ -877,7 +869,6 @@ class EditSantriView extends GetView<EditSantriController> {
     );
   }
 
-  // Tambahkan widget ini di dalam class EditSantriView
   Widget buildOrtuSearchField({
     required String title,
     required RxBool isSearching,
@@ -910,7 +901,6 @@ class EditSantriView extends GetView<EditSantriController> {
                 print('Selected Name: ${selectedItem.nama}');
               }
 
-              // Simpan ID ke controller jika diperlukan
               if (tipe == 'ayah') {
                 controller.selectedAyah.value = selectedItem;
               } else if (tipe == 'ibu') {

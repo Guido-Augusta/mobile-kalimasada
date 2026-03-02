@@ -124,7 +124,7 @@ class DaftarSantriController extends GetxController {
       };
 
       final uri = Uri.parse(
-        ApiUrl.santriList,
+        ApiUrl.santri,
       ).replace(queryParameters: queryParams);
 
       final response = await http.get(
@@ -199,7 +199,7 @@ class DaftarSantriController extends GetxController {
       };
 
       final uri = Uri.parse(
-        ApiUrl.santriList,
+        ApiUrl.santri,
       ).replace(queryParameters: queryParams);
 
       final response = await http.get(

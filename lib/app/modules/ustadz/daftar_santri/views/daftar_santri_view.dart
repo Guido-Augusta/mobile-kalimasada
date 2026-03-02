@@ -47,7 +47,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                 : const Offset(2, 0), // geser ke kanan
             child: FloatingActionButton(
               onPressed: () {
-                // Function will be added later
+                Get.toNamed('/tambah-santri');
               },
               backgroundColor: Colors.deepPurpleAccent,
               child: const Icon(Icons.add, color: Colors.white),
@@ -864,6 +864,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                 style: GoogleFonts.poppins(color: Colors.grey[600]),
               ),
             ),
+            const SizedBox(width: 4),
             Obx(
               () => ElevatedButton(
                 onPressed: controller.isLoadingDeleteAccount.value

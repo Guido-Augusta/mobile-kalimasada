@@ -49,10 +49,6 @@ class EditSantriController extends GetxController {
   var emailC = TextEditingController();
   var passwordC = TextEditingController();
 
-  var isAyahSearching = false.obs;
-  var isIbuSearching = false.obs;
-  var isWaliSearching = false.obs;
-
   var selectedAyah = Rxn<Datum>();
   var selectedIbu = Rxn<Datum>();
   var selectedWali = Rxn<Datum>();
@@ -150,6 +146,9 @@ class EditSantriController extends GetxController {
         ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
     } catch (e) {
+      if (kDebugMode) {
+        print('Error getting santri detail: $e');
+      }
       final now = DateTime.now();
       if (lastErrorShown == null ||
           now.difference(lastErrorShown!) > Duration(seconds: 3)) {
@@ -206,7 +205,7 @@ class EditSantriController extends GetxController {
     );
   }
 
-  // Tambahkan method untuk search orang tua
+  // Method untuk search orang tua
   Future<List<Datum>> loadOrtuByTipe(String tipe, String? query) async {
     try {
       isSearching.value = true;
@@ -303,6 +302,9 @@ class EditSantriController extends GetxController {
       String finalFileName = fileName;
       if (extension != '.jpg' && extension != '.jpeg' && extension != '.png') {
         finalFileName = '${path.basenameWithoutExtension(imagePath)}.jpg';
+      }
+      if (kDebugMode) {
+        print('final file name: $finalFileName');
       }
 
       // Determine content type

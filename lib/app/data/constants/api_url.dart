@@ -39,7 +39,7 @@ class ApiUrl {
   static String ortu(String ortuId) => '$baseUrl/ortu/$ortuId';
 
   // SANTRI
-  static String get santriList => '$baseUrl/santri';
+  static String get santri => '$baseUrl/santri';
 
   static String santriDetail(String santriId) => '$baseUrl/santri/$santriId';
 
