@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../middleware/auth_middleware.dart';
 import '../modules/admin/admin_home/bindings/admin_home_binding.dart';
 import '../modules/admin/admin_home/views/admin_home_view.dart';
+import '../modules/admin/daftar_ortu/bindings/daftar_ortu_binding.dart';
+import '../modules/admin/daftar_ortu/views/daftar_ortu_view.dart';
 import '../modules/admin/edit-santri/bindings/edit_santri_binding.dart';
 import '../modules/admin/edit-santri/views/edit_santri_view.dart';
 import '../modules/admin/tambah_santri/bindings/tambah_santri_binding.dart';
@@ -15,8 +17,6 @@ import '../modules/auth/login/bindings/login_binding.dart';
 import '../modules/auth/login/views/login_view.dart';
 import '../modules/auth/splash/bindings/splash_binding.dart';
 import '../modules/auth/splash/views/splash_view.dart';
-import '../modules/admin/daftar_ortu/bindings/daftar_ortu_binding.dart';
-import '../modules/admin/daftar_ortu/views/daftar_ortu_view.dart';
 import '../modules/main/ortu_main/bindings/ortu_main_binding.dart';
 import '../modules/main/ortu_main/views/ortu_main_view.dart';
 import '../modules/main/santri_main/bindings/santri_main_binding.dart';
@@ -41,6 +41,8 @@ import '../modules/santri/santri_home/bindings/santri_home_binding.dart';
 import '../modules/santri/santri_home/views/santri_home_view.dart';
 import '../modules/santri/santri_profile/bindings/santri_profile_binding.dart';
 import '../modules/santri/santri_profile/views/santri_profile_view.dart';
+import '../modules/admin/tambah_ortu/bindings/tambah_ortu_binding.dart';
+import '../modules/admin/tambah_ortu/views/tambah_ortu_view.dart';
 import '../modules/ustadz/daftar_santri/bindings/daftar_santri_binding.dart';
 import '../modules/ustadz/daftar_santri/views/daftar_santri_view.dart';
 import '../modules/ustadz/detail_riwayat_hafalan/bindings/detail_riwayat_hafalan_binding.dart';
@@ -221,6 +223,11 @@ class AppPages {
       name: _Paths.DAFTAR_ORTU,
       page: () => const DaftarOrtuView(),
       binding: DaftarOrtuBinding(),
+    ),
+    GetPage(
+      name: _Paths.TAMBAH_ORTU,
+      page: () => const TambahOrtuView(),
+      binding: TambahOrtuBinding(),
     ),
   ];
 }

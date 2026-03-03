@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fullscreen_image_viewer/fullscreen_image_viewer.dart';
@@ -11,12 +10,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-import '../../../../data/models/daftar_ortu.dart';
 import '../../../../utils/toast_utils.dart';
-import '../controllers/tambah_santri_controller.dart';
+import '../controllers/tambah_ortu_controller.dart';
 
-class TambahSantriView extends GetView<TambahSantriController> {
-  const TambahSantriView({super.key});
+class TambahOrtuView extends GetView<TambahOrtuController> {
+  const TambahOrtuView({super.key});
   @override
   Widget build(BuildContext context) {
     return Obx(() {
@@ -29,7 +27,7 @@ class TambahSantriView extends GetView<TambahSantriController> {
               SliverAppBar(
                 centerTitle: true,
                 title: Text(
-                  'Tambah Santri Baru',
+                  'Tambah Orang Tua Baru',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -550,14 +548,6 @@ class TambahSantriView extends GetView<TambahSantriController> {
                           _buildPersonalInfoSectionForm(),
                           const SizedBox(height: 24),
 
-                          // Parents Information
-                          _buildParentsSectionForm(),
-                          const SizedBox(height: 24),
-
-                          // Tahap Hafalan Information
-                          _buildTahapHafalanSectionForm(),
-                          const SizedBox(height: 24),
-
                           // Save Button
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -705,7 +695,7 @@ class TambahSantriView extends GetView<TambahSantriController> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Nomor Induk',
+              'Nomor HP',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
@@ -716,70 +706,13 @@ class TambahSantriView extends GetView<TambahSantriController> {
             TextFormField(
               keyboardType: TextInputType.phone,
               style: TextStyle(color: Colors.black),
-              controller: controller.noIndukC,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Nomor Induk tidak boleh kosong';
-                }
-                if (!value.isNumericOnly) {
-                  return 'Nomor Induk harus berupa angka';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                hintText: 'Masukkan Nomor Induk',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                fillColor: Colors.grey[50],
-                filled: true,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Text(
-                  'Nomor HP',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  '(Opsional)',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              keyboardType: TextInputType.phone,
-              style: TextStyle(color: Colors.black),
               controller: controller.noHpC,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (value) {
-                if (value!.isNotEmpty && !value.isNumericOnly) {
+                if (value!.isEmpty) {
+                  return 'Nomor HP tidak boleh kosong';
+                }
+                if (value.isNotEmpty && !value.isNumericOnly) {
                   return 'Nomor HP harus berupa angka';
                 }
                 return null;
@@ -808,65 +741,6 @@ class TambahSantriView extends GetView<TambahSantriController> {
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 12,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Tanggal Lahir',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: () {
-                controller.alamatFocusNode.unfocus();
-                controller.selectDate(Get.context!);
-              },
-              child: AbsorbPointer(
-                child: TextFormField(
-                  controller: controller.tanggalLahirC,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Tanggal lahir tidak boleh kosong';
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Pilih Tanggal Lahir',
-                    hintStyle: TextStyle(color: Colors.grey[500]),
-                    prefixIcon: Icon(
-                      Icons.calendar_today,
-                      color: Colors.deepPurple,
-                      size: 20,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.deepPurple),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[50],
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                  ),
                 ),
               ),
             ),
@@ -927,6 +801,62 @@ class TambahSantriView extends GetView<TambahSantriController> {
             ),
             const SizedBox(height: 16),
             Text(
+              'Tipe Orang Tua',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              style: TextStyle(
+                color: Colors.black87,
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+              ),
+              initialValue: controller.tipeC.text,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Tipe orang tua tidak boleh kosong';
+                }
+                return null;
+              },
+              decoration: InputDecoration(
+                fillColor: Colors.grey[50],
+                filled: true,
+                hintText: 'Pilih Tipe Orang Tua',
+                hintStyle: TextStyle(color: Colors.grey[500]),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey[300]!),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey[300]!),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.deepPurple),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              dropdownColor: Colors.white,
+              items: const [
+                DropdownMenuItem(value: 'Ayah', child: Text('Ayah')),
+                DropdownMenuItem(value: 'Ibu', child: Text('Ibu')),
+                DropdownMenuItem(value: 'Wali', child: Text('Wali')),
+              ],
+              onChanged: (value) {
+                controller.tipeC.text = value!;
+              },
+            ),
+            const SizedBox(height: 16),
+            Text(
               'Alamat',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
@@ -979,383 +909,6 @@ class TambahSantriView extends GetView<TambahSantriController> {
       ),
     );
   }
-
-  Widget _buildParentsSectionForm() {
-    return Skeletonizer(
-      enabled: controller.isLoading.value,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // SearchField Ayah
-            buildOrtuSearchField(
-              title: 'Ayah',
-              isSearching: controller.isSearching,
-              tipe: 'ayah',
-              formKey: controller.ayahDropdownKey,
-            ),
-
-            const SizedBox(height: 24),
-
-            // SearchField Ibu
-            buildOrtuSearchField(
-              title: 'Ibu',
-              isSearching: controller.isSearching,
-              tipe: 'ibu',
-              formKey: controller.ibuDropdownKey,
-            ),
-
-            const SizedBox(height: 24),
-
-            // SearchField Wali
-            buildOrtuSearchField(
-              title: 'Wali',
-              isSearching: controller.isSearching,
-              tipe: 'wali',
-              formKey: controller.waliDropdownKey,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTahapHafalanSectionForm() {
-    return Skeletonizer(
-      enabled: controller.isLoading.value,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Tahap Hafalan',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              style: TextStyle(
-                color: Colors.black87,
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
-              initialValue: controller.tahapHafalanC.text,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Tahap hafalan tidak boleh kosong';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                fillColor: Colors.grey[50],
-                filled: true,
-                hintText: 'Pilih Tahap Hafalan',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              dropdownColor: Colors.white,
-              items: const [
-                DropdownMenuItem(
-                  value: 'Level1',
-                  child: Text('Level 1 - Juz 30'),
-                ),
-                DropdownMenuItem(
-                  value: 'Level2',
-                  child: Text('Level 2 - Surah Pilihan'),
-                ),
-                DropdownMenuItem(
-                  value: 'Level3',
-                  child: Text('Level 3 - Juz 1-29'),
-                ),
-              ],
-              onChanged: (value) {
-                controller.tahapHafalanC.text = value!;
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildOrtuSearchField({
-    required String title,
-    required RxBool isSearching,
-    required String tipe,
-    required GlobalKey<DropdownSearchState<Datum>> formKey,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 8),
-
-        DropdownSearch<Datum>(
-          key: formKey,
-          mode: Mode.form,
-          compareFn: (item1, item2) {
-            return item1.id == item2.id;
-          },
-          items: (f, cs) {
-            return controller.loadOrtuByTipe(tipe, f);
-          },
-          itemAsString: (Datum u) => u.nama ?? '',
-          onChanged: (Datum? selectedItem) {
-            if (selectedItem != null) {
-              if (kDebugMode) {
-                print('Selected ID: ${selectedItem.id}');
-                print('Selected Name: ${selectedItem.nama}');
-              }
-
-              if (tipe == 'ayah') {
-                controller.selectedAyah.value = selectedItem;
-              } else if (tipe == 'ibu') {
-                controller.selectedIbu.value = selectedItem;
-              } else if (tipe == 'wali') {
-                controller.selectedWali.value = selectedItem;
-              }
-            }
-
-            if (selectedItem == null) {
-              if (tipe == 'ayah') {
-                controller.selectedAyah.value = null;
-              } else if (tipe == 'ibu') {
-                controller.selectedIbu.value = null;
-              } else if (tipe == 'wali') {
-                controller.selectedWali.value = null;
-              }
-            }
-          },
-          onBeforePopupOpening: (selectedItem) {
-            controller.alamatFocusNode.unfocus();
-            FocusScope.of(Get.context!).unfocus();
-            return Future.value(true);
-          },
-          decoratorProps: DropDownDecoratorProps(
-            decoration: InputDecoration(
-              hintText: 'Pilih $title...',
-              hintStyle: GoogleFonts.poppins(
-                color: Colors.grey[500],
-                fontSize: 14,
-              ),
-              prefixIcon: Icon(
-                Icons.search,
-                color: Colors.deepPurple,
-                size: 20,
-              ),
-              fillColor: Colors.grey[50],
-              filled: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.deepPurple),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.red),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-            ),
-          ),
-          popupProps: PopupProps.modalBottomSheet(
-            modalBottomSheetProps: ModalBottomSheetProps(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-              ),
-            ),
-            showSearchBox: true,
-            searchDelay: Duration(milliseconds: 500),
-            searchFieldProps: TextFieldProps(
-              decoration: InputDecoration(
-                hintText: 'Cari $title...',
-                hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
-                prefixIcon: Icon(Icons.search, color: Colors.deepPurple),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-            ),
-            emptyBuilder: (context, searchEntry) => Center(
-              child: Obx(
-                () => !controller.isSearching.value
-                    ? Padding(
-                        padding: const EdgeInsets.all(32),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.person_search,
-                              size: 48,
-                              color: Colors.grey[400],
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Data $title tidak ditemukan',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Coba dengan kata kunci yang berbeda',
-                              style: GoogleFonts.poppins(
-                                fontSize: 14,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : SizedBox.shrink(),
-              ),
-            ),
-            loadingBuilder: (context, searchEntry) => Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircularProgressIndicator(
-                      color: Colors.deepPurple,
-                      strokeWidth: 3,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Mencari $title...',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            title: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 160),
-              child: Container(
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-            ),
-            itemBuilder: (context, item, isDisabled, isSelected) {
-              return Obx(
-                () => !controller.isSearching.value
-                    ? ListTile(
-                        title: Text(
-                          item.nama ?? '',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      )
-                    : SizedBox.shrink(),
-              );
-            },
-          ),
-          validator: (value) {
-            if (!controller.isLoading.value &&
-                (controller.selectedAyah.value == null &&
-                    controller.selectedIbu.value == null &&
-                    controller.selectedWali.value == null)) {
-              return 'Minimal satu orang tua harus dipilih';
-            }
-            return null;
-          },
-          suffixProps: DropdownSuffixProps(
-            dropdownButtonProps: DropdownButtonProps(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-            ),
-            clearButtonProps: ClearButtonProps(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              isVisible: true,
-              icon: const Icon(Icons.clear_rounded, size: 22),
-              visualDensity: VisualDensity.compact,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 class SaveProfileButton extends StatelessWidget {
@@ -1365,7 +918,7 @@ class SaveProfileButton extends StatelessWidget {
     required this.profileFormKey,
   });
 
-  final TambahSantriController controller;
+  final TambahOrtuController controller;
   final GlobalKey<FormState> profileFormKey;
 
   @override
@@ -1380,52 +933,24 @@ class SaveProfileButton extends StatelessWidget {
         child: ElevatedButton(
           onPressed: !controller.isSaveProfileLoading.value
               ? () {
+                  controller.alamatFocusNode.unfocus();
+                  FocusScope.of(Get.context!).unfocus();
                   final profileValid =
                       profileFormKey.currentState?.validate() ?? false;
                   final emailPasswordValid =
                       controller.emailPasswordFormKey.currentState
                           ?.validate() ??
                       false;
-                  if (kDebugMode) {
-                    print(profileFormKey.currentState?.validate());
-
-                    print('Email: ${controller.emailC.text}');
-                    print('Password: ${controller.passwordC.text}');
-
-                    print('Nama: ${controller.namaC.text}');
-                    print('No Induk: ${controller.noIndukC.text}');
-                    print('No Hp: ${controller.noHpC.text}');
-                    print('Tanggal Lahir: ${controller.tanggalLahirC.text}');
-                    print('Jenis Kelamin: ${controller.jenisKelaminC.text}');
-                    print('Alamat: ${controller.alamatC.text}');
-                    print('Tahap Hafalan: ${controller.tahapHafalanC.text}');
-
-                    print('Ayah: ${controller.selectedAyah.value}');
-                    print('Ibu: ${controller.selectedIbu.value}');
-                    print('Wali: ${controller.selectedWali.value}');
-
-                    print(
-                      'Default Photo Profile: ${controller.defaultPhotoProfile.value}',
-                    );
-                    print(
-                      'Picked Image: ${controller.pickedImage.value?.path ?? 'No image selected'}',
-                    );
-                  }
                   if (profileValid && emailPasswordValid) {
-                    controller.addSantri(
+                    controller.addOrtu(
                       controller.pickedImage.value,
                       controller.emailC.text,
                       controller.passwordC.text,
                       controller.namaC.text,
-                      controller.noIndukC.text,
                       controller.noHpC.text,
                       controller.jenisKelaminC.text,
-                      controller.tanggalLahirC.text,
+                      controller.tipeC.text,
                       controller.alamatC.text,
-                      controller.selectedAyah.value,
-                      controller.selectedIbu.value,
-                      controller.selectedWali.value,
-                      controller.tahapHafalanC.text,
                     );
                   } else {
                     final now = DateTime.now();
@@ -1449,7 +974,7 @@ class SaveProfileButton extends StatelessWidget {
           ),
           child: controller.isSaveProfileLoading.value
               ? Text('Menyimpan...')
-              : Text('Daftarkan Santri'),
+              : Text('Daftarkan Orang Tua'),
         ),
       ),
     );

@@ -24,19 +24,21 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 30),
-        child: AnimatedSlide(
-          duration: const Duration(milliseconds: 300),
-          offset: controller.isFabVisible.value
-              ? Offset.zero
-              : const Offset(2, 0), // geser ke kanan
-          child: FloatingActionButton(
-            onPressed: () {
-              // Get.toNamed('/tambah-ortu');
-            },
-            backgroundColor: Colors.deepPurpleAccent,
-            child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: Obx(
+        () => Padding(
+          padding: const EdgeInsets.only(bottom: 30),
+          child: AnimatedSlide(
+            duration: const Duration(milliseconds: 300),
+            offset: controller.isFabVisible.value
+                ? Offset.zero
+                : const Offset(2, 0), // geser ke kanan
+            child: FloatingActionButton(
+              onPressed: () {
+                Get.toNamed('/tambah-ortu');
+              },
+              backgroundColor: Colors.deepPurpleAccent,
+              child: const Icon(Icons.add, color: Colors.white),
+            ),
           ),
         ),
       ),
