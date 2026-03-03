@@ -31,6 +31,7 @@ abstract class Routes {
   static const ADMIN_HOME = _Paths.ADMIN_HOME;
   static const EDIT_SANTRI = _Paths.EDIT_SANTRI;
   static const TAMBAH_SANTRI = _Paths.TAMBAH_SANTRI;
+  static const DAFTAR_ORTU = _Paths.DAFTAR_ORTU;
 }
 
 abstract class _Paths {
@@ -63,4 +64,5 @@ abstract class _Paths {
   static const ADMIN_HOME = '/admin-home';
   static const EDIT_SANTRI = '/edit-santri';
   static const TAMBAH_SANTRI = '/tambah-santri';
+  static const DAFTAR_ORTU = '/daftar-ortu';
 }

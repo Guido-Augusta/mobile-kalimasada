@@ -49,7 +49,7 @@ class DetailOrtuController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse(ApiUrl.ortu(ortuId)),
+        Uri.parse(ApiUrl.ortuDetail(ortuId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

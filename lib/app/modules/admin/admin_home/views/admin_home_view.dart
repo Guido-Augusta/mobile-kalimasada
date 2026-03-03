@@ -305,7 +305,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
           title: 'Daftar Orang Tua',
           subtitle: 'Kelola data Orang Tua',
           icon: Icons.family_restroom_rounded,
-          onTap: () => {},
+          onTap: () => Get.toNamed('/daftar-ortu'),
         ),
         const SizedBox(height: 15),
         _buildRegistrationCard(

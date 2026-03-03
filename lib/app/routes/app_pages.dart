@@ -3,44 +3,44 @@ import 'package:get/get.dart';
 import '../middleware/auth_middleware.dart';
 import '../modules/admin/admin_home/bindings/admin_home_binding.dart';
 import '../modules/admin/admin_home/views/admin_home_view.dart';
-import '../modules/auth/change_password/bindings/change_password_binding.dart';
-import '../modules/auth/change_password/views/change_password_view.dart';
-import '../modules/ortu/detail_ortu/bindings/detail_ortu_binding.dart';
-import '../modules/ortu/detail_ortu/views/detail_ortu_view.dart';
-import '../modules/quran/detail_surah/bindings/detail_surah_binding.dart';
-import '../modules/quran/detail_surah/views/detail_surah_view.dart';
-import '../modules/santri/doa_khatam/bindings/doa_khatam_binding.dart';
-import '../modules/santri/doa_khatam/views/doa_khatam_view.dart';
 import '../modules/admin/edit-santri/bindings/edit_santri_binding.dart';
 import '../modules/admin/edit-santri/views/edit_santri_view.dart';
+import '../modules/admin/tambah_santri/bindings/tambah_santri_binding.dart';
+import '../modules/admin/tambah_santri/views/tambah_santri_view.dart';
+import '../modules/auth/change_password/bindings/change_password_binding.dart';
+import '../modules/auth/change_password/views/change_password_view.dart';
 import '../modules/auth/forgot_password/bindings/forgot_password_binding.dart';
 import '../modules/auth/forgot_password/views/forgot_password_view.dart';
 import '../modules/auth/login/bindings/login_binding.dart';
 import '../modules/auth/login/views/login_view.dart';
+import '../modules/auth/splash/bindings/splash_binding.dart';
+import '../modules/auth/splash/views/splash_view.dart';
+import '../modules/admin/daftar_ortu/bindings/daftar_ortu_binding.dart';
+import '../modules/admin/daftar_ortu/views/daftar_ortu_view.dart';
 import '../modules/main/ortu_main/bindings/ortu_main_binding.dart';
 import '../modules/main/ortu_main/views/ortu_main_view.dart';
 import '../modules/main/santri_main/bindings/santri_main_binding.dart';
 import '../modules/main/santri_main/views/santri_main_view.dart';
 import '../modules/main/ustadz_main/bindings/ustadz_main_binding.dart';
 import '../modules/main/ustadz_main/views/ustadz_main_view.dart';
+import '../modules/ortu/detail_ortu/bindings/detail_ortu_binding.dart';
+import '../modules/ortu/detail_ortu/views/detail_ortu_view.dart';
 import '../modules/ortu/ortu_home/bindings/ortu_home_binding.dart';
 import '../modules/ortu/ortu_home/views/ortu_home_view.dart';
 import '../modules/ortu/ortu_profile/bindings/ortu_profile_binding.dart';
 import '../modules/ortu/ortu_profile/views/ortu_profile_view.dart';
+import '../modules/quran/alquran/bindings/alquran_binding.dart';
+import '../modules/quran/alquran/views/alquran_view.dart';
+import '../modules/quran/detail_surah/bindings/detail_surah_binding.dart';
+import '../modules/quran/detail_surah/views/detail_surah_view.dart';
 import '../modules/santri/detail_progres/bindings/detail_progres_binding.dart';
 import '../modules/santri/detail_progres/views/detail_progres_view.dart';
+import '../modules/santri/doa_khatam/bindings/doa_khatam_binding.dart';
+import '../modules/santri/doa_khatam/views/doa_khatam_view.dart';
 import '../modules/santri/santri_home/bindings/santri_home_binding.dart';
 import '../modules/santri/santri_home/views/santri_home_view.dart';
 import '../modules/santri/santri_profile/bindings/santri_profile_binding.dart';
 import '../modules/santri/santri_profile/views/santri_profile_view.dart';
-import '../modules/auth/splash/bindings/splash_binding.dart';
-import '../modules/auth/splash/views/splash_view.dart';
-import '../modules/ustadz/summary_hafalan/bindings/summary_hafalan_binding.dart';
-import '../modules/ustadz/summary_hafalan/views/summary_hafalan_view.dart';
-import '../modules/admin/tambah_santri/bindings/tambah_santri_binding.dart';
-import '../modules/admin/tambah_santri/views/tambah_santri_view.dart';
-import '../modules/quran/alquran/bindings/alquran_binding.dart';
-import '../modules/quran/alquran/views/alquran_view.dart';
 import '../modules/ustadz/daftar_santri/bindings/daftar_santri_binding.dart';
 import '../modules/ustadz/daftar_santri/views/daftar_santri_view.dart';
 import '../modules/ustadz/detail_riwayat_hafalan/bindings/detail_riwayat_hafalan_binding.dart';
@@ -53,6 +53,8 @@ import '../modules/ustadz/progres_hafalan/bindings/progres_hafalan_binding.dart'
 import '../modules/ustadz/progres_hafalan/views/progres_hafalan_view.dart';
 import '../modules/ustadz/riwayat_hafalan/bindings/riwayat_hafalan_binding.dart';
 import '../modules/ustadz/riwayat_hafalan/views/riwayat_hafalan_view.dart';
+import '../modules/ustadz/summary_hafalan/bindings/summary_hafalan_binding.dart';
+import '../modules/ustadz/summary_hafalan/views/summary_hafalan_view.dart';
 import '../modules/ustadz/ustadz_home/bindings/ustadz_home_binding.dart';
 import '../modules/ustadz/ustadz_home/views/ustadz_home_view.dart';
 import '../modules/ustadz/ustadz_profile/bindings/ustadz_profile_binding.dart';
@@ -214,6 +216,11 @@ class AppPages {
       name: _Paths.TAMBAH_SANTRI,
       page: () => const TambahSantriView(),
       binding: TambahSantriBinding(),
+    ),
+    GetPage(
+      name: _Paths.DAFTAR_ORTU,
+      page: () => const DaftarOrtuView(),
+      binding: DaftarOrtuBinding(),
     ),
   ];
 }

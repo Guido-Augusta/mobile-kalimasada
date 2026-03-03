@@ -44,7 +44,7 @@ class OrtuHomeController extends GetxController {
       final ortuId = prefs.getString('roleId');
 
       final response = await get(
-        Uri.parse(ApiUrl.ortu(ortuId!)),
+        Uri.parse(ApiUrl.ortuDetail(ortuId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

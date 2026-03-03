@@ -36,7 +36,8 @@ class ApiUrl {
   static String ustadz(String ustadzId) => '$baseUrl/ustadz/$ustadzId';
 
   // ORTU
-  static String ortu(String ortuId) => '$baseUrl/ortu/$ortuId';
+  static String get ortu => '$baseUrl/ortu';
+  static String ortuDetail(String ortuId) => '$baseUrl/ortu/$ortuId';
 
   // SANTRI
   static String get santri => '$baseUrl/santri';
@@ -83,6 +84,7 @@ class ApiUrl {
   // ADMIN
   // DELETE SANTRI
   static String deleteSantri(String santriId) => '$baseUrl/santri/$santriId';
+  static String deleteOrtu(String ortuId) => '$baseUrl/ortu/$ortuId';
 
   // GET ALL ORTU
   static String get ortuList => '$baseUrl/ortu';

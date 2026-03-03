@@ -225,7 +225,7 @@ class SplashController extends GetxController {
       final token = prefs.getString('token');
       final ortuId = prefs.getString('roleId');
       final response = await get(
-        Uri.parse(ApiUrl.ortu(ortuId!)),
+        Uri.parse(ApiUrl.ortuDetail(ortuId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

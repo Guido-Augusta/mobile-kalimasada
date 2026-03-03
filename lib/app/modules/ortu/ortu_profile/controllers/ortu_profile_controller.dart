@@ -54,7 +54,7 @@ class OrtuProfileController extends GetxController {
       final ortuId = prefs.getString('roleId');
 
       final response = await http.get(
-        Uri.parse(ApiUrl.ortu(ortuId!)),
+        Uri.parse(ApiUrl.ortuDetail(ortuId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -116,7 +116,7 @@ class OrtuProfileController extends GetxController {
 
       final request = http.MultipartRequest(
         'PUT',
-        Uri.parse(ApiUrl.ortu(ortuId!)),
+        Uri.parse(ApiUrl.ortuDetail(ortuId!)),
       );
 
       request.headers['Authorization'] = 'Bearer $token';
@@ -207,7 +207,7 @@ class OrtuProfileController extends GetxController {
 
       final response = await http
           .put(
-            Uri.parse(ApiUrl.ortu(ortuId!)),
+            Uri.parse(ApiUrl.ortuDetail(ortuId!)),
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',
