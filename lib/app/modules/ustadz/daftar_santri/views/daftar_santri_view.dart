@@ -97,10 +97,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 30),
                   itemCount:
                       controller.santriList.length +
                       (controller.hasMore.value ? 1 : 0),

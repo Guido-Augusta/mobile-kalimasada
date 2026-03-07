@@ -373,6 +373,7 @@ class EditSantriView extends GetView<EditSantriController> {
               leading: Icon(Icons.camera_alt_outlined),
               title: Text('Kamera'),
               onTap: () {
+                Get.back();
                 controller.pickImage(ImageSource.camera);
               },
             ),
@@ -381,6 +382,7 @@ class EditSantriView extends GetView<EditSantriController> {
               leading: Icon(Icons.photo_outlined),
               title: Text('Galeri'),
               onTap: () {
+                Get.back();
                 controller.pickImage(ImageSource.gallery);
               },
             ),

@@ -66,7 +66,6 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
               // Search Bar
               _buildSearchBar(),
 
-              const SizedBox(height: 8),
               // Student List
               Obx(() {
                 if (controller.isLoading.value &&
@@ -81,10 +80,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
                   itemCount:
                       controller.ortuList.length +
                       (controller.hasMore.value ? 1 : 0),
@@ -325,10 +321,10 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                                   value: 'edit',
                                   child: const Text('Edit'),
                                   onTap: () {
-                                    // Get.toNamed(
-                                    //   '/edit-ortu',
-                                    //   arguments: {'ortuId': ortu.id.toString()},
-                                    // );
+                                    Get.toNamed(
+                                      '/edit-ortu',
+                                      arguments: {'ortuId': ortu.id.toString()},
+                                    );
                                   },
                                 ),
                                 PopupMenuItem(

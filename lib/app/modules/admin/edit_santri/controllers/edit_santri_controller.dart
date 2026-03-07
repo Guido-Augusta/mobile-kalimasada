@@ -332,8 +332,10 @@ class EditSantriController extends GetxController {
         if (data['data']['fotoProfil'] != null) {
           fotoProfil.value = getImageUrl(data['data']['fotoProfil']);
         }
+        if (Get.isRegistered<DaftarSantriController>()) {
+          await Get.find<DaftarSantriController>().fetchData();
+        }
 
-        Get.back();
         ToastUtils.showSuccessToast('Foto profil berhasil diperbarui');
       } else {
         ToastUtils.showErrorToast('Gagal mengupload foto profil');
