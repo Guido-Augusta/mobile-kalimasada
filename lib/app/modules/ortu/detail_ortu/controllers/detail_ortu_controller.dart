@@ -10,12 +10,21 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../data/models/daftar_santri.dart';
+
 class DetailOrtuController extends GetxController {
-  final formKey = GlobalKey<FormState>();
+  String userRole = '';
+
+  bool get isAdmin => userRole == 'admin';
+  bool get isUstadz => userRole == 'ustadz';
+  bool get isSantri => userRole == 'santri';
+  bool get isOrtu => userRole == 'ortu';
 
   var isLoading = false.obs;
+  var isLoadingSantriList = false.obs;
   var isSaveLoading = false.obs;
   var ortuDetail = Rxn<Ortu>();
+  var santriList = <Datum>[].obs;
 
   var ortuId = Get.arguments['ortuId'];
 
@@ -35,6 +44,7 @@ class DetailOrtuController extends GetxController {
   void onInit() async {
     super.onInit();
     getOrtuDetail(ortuId!);
+    getSantriList(ortuId!);
   }
 
   String getImageUrl(String imageUrl) {
@@ -47,6 +57,7 @@ class DetailOrtuController extends GetxController {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+      userRole = prefs.getString('role') ?? '';
 
       final response = await http.get(
         Uri.parse(ApiUrl.ortuDetail(ortuId)),
@@ -79,6 +90,63 @@ class DetailOrtuController extends GetxController {
       }
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> getSantriList(String ortuId) async {
+    try {
+      isLoadingSantriList.value = true;
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        ToastUtils.showErrorToast('Anda tidak terautentikasi');
+        Get.offAllNamed('/login');
+        return;
+      }
+
+      final queryParams = {
+        'page': '1',
+        'limit': '10',
+        'ortuId': ortuId.toString(),
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.santri,
+      ).replace(queryParameters: queryParams);
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'x-platform': 'mobile',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        santriList.clear();
+        final data = jsonDecode(response.body);
+        final items = List<Datum>.from(
+          data['data'].map((x) => Datum.fromJson(x)),
+        );
+
+        santriList.value = items;
+      } else {
+        ToastUtils.showErrorToast('Gagal memuat data');
+      }
+    } catch (e) {
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
+    } finally {
+      isLoadingSantriList.value = false;
     }
   }
 }

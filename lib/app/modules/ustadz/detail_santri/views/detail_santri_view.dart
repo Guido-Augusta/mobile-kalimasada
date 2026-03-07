@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
+import '../../../ortu/detail_ortu/controllers/detail_ortu_controller.dart';
 import '../controllers/detail_santri_controller.dart';
 
 class DetailSantriView extends GetView<DetailSantriController> {
@@ -928,6 +929,20 @@ class DetailSantriView extends GetView<DetailSantriController> {
               value: controller.getOrangTuaByTipe(santri.orangTua, 'Ayah'),
               isParentInfo: true,
               ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Ayah'),
+              onTap: () {
+                if (Get.isRegistered<DetailOrtuController>()) {
+                  Get.delete<DetailOrtuController>();
+                }
+                Get.toNamed(
+                  '/detail-ortu',
+                  arguments: {
+                    'ortuId': controller.getOrangTuaIdByTipe(
+                      santri.orangTua,
+                      'Ayah',
+                    ),
+                  },
+                );
+              },
             ),
           ],
 
@@ -939,6 +954,20 @@ class DetailSantriView extends GetView<DetailSantriController> {
               value: controller.getOrangTuaByTipe(santri.orangTua, 'Ibu'),
               isParentInfo: true,
               ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Ibu'),
+              onTap: () {
+                if (Get.isRegistered<DetailOrtuController>()) {
+                  Get.delete<DetailOrtuController>();
+                }
+                Get.toNamed(
+                  '/detail-ortu',
+                  arguments: {
+                    'ortuId': controller.getOrangTuaIdByTipe(
+                      santri.orangTua,
+                      'Ibu',
+                    ),
+                  },
+                );
+              },
             ),
           ],
 
@@ -950,6 +979,20 @@ class DetailSantriView extends GetView<DetailSantriController> {
               value: controller.getOrangTuaByTipe(santri.orangTua, 'Wali'),
               isParentInfo: true,
               ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Wali'),
+              onTap: () {
+                if (Get.isRegistered<DetailOrtuController>()) {
+                  Get.delete<DetailOrtuController>();
+                }
+                Get.toNamed(
+                  '/detail-ortu',
+                  arguments: {
+                    'ortuId': controller.getOrangTuaIdByTipe(
+                      santri.orangTua,
+                      'Wali',
+                    ),
+                  },
+                );
+              },
             ),
           ],
         ],
@@ -1409,118 +1452,117 @@ class DetailSantriView extends GetView<DetailSantriController> {
     String? telepon,
     bool? isParentInfo,
     String? ortuId,
+    bool? isOverflow,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
             ),
-            child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
-          ),
 
-          const SizedBox(width: 12),
+            const SizedBox(width: 12),
 
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: isOverflow == true ? TextOverflow.ellipsis : null,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          if (isParentInfo == true) ...[
-            const SizedBox(width: 8),
-            IconButton(
-              onPressed: () {
-                Get.toNamed('/detail-ortu', arguments: {'ortuId': ortuId});
-              },
-              icon: const Icon(
+            if (isParentInfo == true) ...[
+              const SizedBox(width: 8),
+              const Icon(
                 Icons.keyboard_arrow_right_rounded,
                 color: Colors.deepPurpleAccent,
               ),
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-            ),
+            ],
+
+            if (telepon != null && telepon.isNotEmpty)
+              Row(
+                children: [
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: SvgPicture.asset(
+                      'assets/icons/whatsapp.svg',
+                      width: 20,
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFF25D366),
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    onPressed: () {
+                      String formattedNomor = telepon;
+                      if (telepon.startsWith('0')) {
+                        formattedNomor = '+62${telepon.substring(1)}';
+                      }
+
+                      final whatsappUrl = "https://wa.me/$formattedNomor";
+                      launchUrl(Uri.parse(whatsappUrl));
+                    },
+                    style: IconButton.styleFrom(
+                      backgroundColor: const Color(
+                        0xFF25D366,
+                      ).withValues(alpha: 0.1),
+                      shape: const CircleBorder(),
+                    ),
+                  ),
+
+                  const SizedBox(width: 4),
+
+                  IconButton(
+                    icon: const Icon(
+                      Icons.phone,
+                      size: 18,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onPressed: () {
+                      final phoneUrl = "tel:$telepon";
+                      launchUrl(Uri.parse(phoneUrl));
+                    },
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.deepPurpleAccent.withValues(
+                        alpha: 0.1,
+                      ),
+                      shape: const CircleBorder(),
+                    ),
+                  ),
+                ],
+              ),
           ],
-
-          if (telepon != null && telepon.isNotEmpty)
-            Row(
-              children: [
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: SvgPicture.asset(
-                    'assets/icons/whatsapp.svg',
-                    width: 20,
-                    colorFilter: const ColorFilter.mode(
-                      Color(0xFF25D366),
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  onPressed: () {
-                    String formattedNomor = telepon;
-                    if (telepon.startsWith('0')) {
-                      formattedNomor = '+62${telepon.substring(1)}';
-                    }
-
-                    final whatsappUrl = "https://wa.me/$formattedNomor";
-                    launchUrl(Uri.parse(whatsappUrl));
-                  },
-                  style: IconButton.styleFrom(
-                    backgroundColor: const Color(
-                      0xFF25D366,
-                    ).withValues(alpha: 0.1),
-                    shape: const CircleBorder(),
-                  ),
-                ),
-
-                const SizedBox(width: 4),
-
-                IconButton(
-                  icon: const Icon(
-                    Icons.phone,
-                    size: 18,
-                    color: Colors.deepPurpleAccent,
-                  ),
-                  onPressed: () {
-                    final phoneUrl = "tel:$telepon";
-                    launchUrl(Uri.parse(phoneUrl));
-                  },
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.deepPurpleAccent.withValues(
-                      alpha: 0.1,
-                    ),
-                    shape: const CircleBorder(),
-                  ),
-                ),
-              ],
-            ),
-        ],
+        ),
       ),
     );
   }

@@ -687,7 +687,6 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                 ),
-                                const SizedBox(height: 4),
                                 Text(
                                   santri.noInduk ?? 'No Induk tidak tersedia',
                                   style: const TextStyle(
@@ -737,7 +736,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                           ],
                         ),
 
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
 
                         // Badges Row
                         Wrap(
