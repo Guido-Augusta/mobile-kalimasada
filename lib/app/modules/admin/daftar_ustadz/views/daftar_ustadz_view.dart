@@ -5,18 +5,18 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../data/models/daftar_ortu.dart';
-import '../controllers/daftar_ortu_controller.dart';
+import '../../../../data/models/daftar_ustadz.dart';
+import '../controllers/daftar_ustadz_controller.dart';
 
-class DaftarOrtuView extends GetView<DaftarOrtuController> {
-  const DaftarOrtuView({super.key});
+class DaftarUstadzView extends GetView<DaftarUstadzController> {
+  const DaftarUstadzView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF1F5F9),
       appBar: AppBar(
         title: const Text(
-          'Daftar Orang Tua',
+          'Daftar Ustadz/ah',
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         centerTitle: true,
@@ -34,7 +34,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                 : const Offset(2, 0), // geser ke kanan
             child: FloatingActionButton(
               onPressed: () {
-                Get.toNamed('/tambah-ortu');
+                // Get.toNamed('/tambah-ustadz');
               },
               backgroundColor: Colors.deepPurpleAccent,
               child: const Icon(Icons.add, color: Colors.white),
@@ -71,10 +71,10 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                 if (controller.isLoading.value &&
                     controller.searchQuery.value.isEmpty) {
                   return _buildLoadingIndicator();
-                } else if (controller.ortuList.isEmpty) {
+                } else if (controller.ustadzList.isEmpty) {
                   return _buildEmptyState();
                 } else if (controller.searchQuery.value.isNotEmpty &&
-                    controller.ortuList.isEmpty) {
+                    controller.ustadzList.isEmpty) {
                   return _buildEmptyState();
                 }
                 return ListView.builder(
@@ -82,14 +82,14 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
                   itemCount:
-                      controller.ortuList.length +
+                      controller.ustadzList.length +
                       (controller.hasMore.value ? 1 : 0),
                   itemBuilder: (context, index) {
-                    if (index >= controller.ortuList.length) {
+                    if (index >= controller.ustadzList.length) {
                       return _buildLoadMoreIndicator();
                     }
-                    final ortu = controller.ortuList[index];
-                    return _buildOrtuCard(ortu);
+                    final ustadz = controller.ustadzList[index];
+                    return _buildUstadzCard(ustadz);
                   },
                 );
               }),
@@ -123,7 +123,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
               controller.searchQuery.value = value;
             },
             decoration: InputDecoration(
-              hintText: 'Cari orang tua...',
+              hintText: 'Cari ustadz/ah...',
               prefixIcon: const Icon(Icons.search, color: Colors.grey),
               suffixIcon: controller.searchQuery.value.isNotEmpty
                   ? IconButton(
@@ -154,7 +154,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
         Icon(Icons.people_outline, size: 80, color: Colors.grey[400]),
         const SizedBox(height: 16),
         Text(
-          'Tidak ada data orang tua',
+          'Tidak ada data santri',
           style: TextStyle(
             color: Colors.grey[600],
             fontSize: 18,
@@ -165,8 +165,8 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
         Obx(
           () => Text(
             controller.searchQuery.value.isNotEmpty &&
-                    controller.ortuList.isEmpty
-                ? 'Orang tua tidak ditemukan'
+                    controller.ustadzList.isEmpty
+                ? 'Ustadz/ah tidak ditemukan'
                 : 'Tarik ke bawah untuk refresh',
             style: TextStyle(color: Colors.grey[500], fontSize: 14),
           ),
@@ -205,7 +205,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
     );
   }
 
-  Widget _buildOrtuCard(Datum ortu) {
+  Widget _buildUstadzCard(Datum ustadz) {
     return Card(
       color: Colors.white,
       margin: const EdgeInsets.only(bottom: 12),
@@ -215,10 +215,10 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
       child: InkWell(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
-          Get.toNamed(
-            '/detail-ortu',
-            arguments: {'ortuId': ortu.id.toString()},
-          );
+          // Get.toNamed(
+          //   '/detail-ustadz',
+          //   arguments: {'ustadzId': ustadz.id.toString()},
+          // );
         },
         borderRadius: BorderRadius.circular(16),
         child: Padding(
@@ -240,12 +240,12 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                     ),
                     child: ClipOval(
                       child:
-                          ortu.fotoProfil != null ||
-                              ortu.fotoProfil!.isNotEmpty ||
-                              ortu.fotoProfil! != ''
+                          ustadz.fotoProfil != null ||
+                              ustadz.fotoProfil!.isNotEmpty ||
+                              ustadz.fotoProfil! != ''
                           ? CachedNetworkImage(
                               imageUrl: controller.getImageUrl(
-                                ortu.fotoProfil!,
+                                ustadz.fotoProfil!,
                               ),
                               fit: BoxFit.cover,
                               width: 60,
@@ -283,7 +283,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    ortu.nama ?? 'Nama tidak tersedia',
+                                    ustadz.nama ?? 'Nama tidak tersedia',
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -294,7 +294,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    ortu.user?.email ?? '-',
+                                    ustadz.user?.email ?? '-',
                                     style: const TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey,
@@ -304,7 +304,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    ortu.nomorHp ?? '-',
+                                    ustadz.nomorHp ?? '-',
                                     style: const TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey,
@@ -321,17 +321,19 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                                   value: 'edit',
                                   child: const Text('Edit'),
                                   onTap: () {
-                                    Get.toNamed(
-                                      '/edit-ortu',
-                                      arguments: {'ortuId': ortu.id.toString()},
-                                    );
+                                    // Get.toNamed(
+                                    //   '/edit-ustadz',
+                                    //   arguments: {
+                                    //     'ustadzId': ustadz.id.toString(),
+                                    //   },
+                                    // );
                                   },
                                 ),
                                 PopupMenuItem(
                                   value: 'delete',
                                   child: const Text('Hapus'),
                                   onTap: () {
-                                    _showDeleteAccountDialog(context, ortu);
+                                    _showDeleteAccountDialog(context, ustadz);
                                   },
                                 ),
                               ],
@@ -362,7 +364,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
     );
   }
 
-  Future<dynamic> _showDeleteAccountDialog(BuildContext context, Datum ortu) {
+  Future<dynamic> _showDeleteAccountDialog(BuildContext context, Datum ustadz) {
     return showDialog(
       context: context,
       builder: (context) {
@@ -376,7 +378,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
             style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
           ),
           content: Text(
-            'Apakah anda yakin ingin menghapus akun ${ortu.user?.email ?? 'ini'}?',
+            'Apakah anda yakin ingin menghapus akun ${ustadz.user?.email ?? 'ini'}?',
             style: GoogleFonts.poppins(),
           ),
           actions: [
@@ -395,7 +397,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                 onPressed: controller.isLoadingDeleteAccount.value
                     ? null
                     : () {
-                        controller.deleteOrtuAccount(ortu.id!.toString());
+                        controller.deleteUstadzAccount(ustadz.id!.toString());
                       },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,

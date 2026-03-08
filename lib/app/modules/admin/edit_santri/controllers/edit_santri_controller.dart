@@ -219,9 +219,7 @@ class EditSantriController extends GetxController {
         'search': query,
       };
 
-      final uri = Uri.parse(
-        ApiUrl.ortuList,
-      ).replace(queryParameters: queryParams);
+      final uri = Uri.parse(ApiUrl.ortu).replace(queryParameters: queryParams);
 
       final response = await http.get(
         uri,

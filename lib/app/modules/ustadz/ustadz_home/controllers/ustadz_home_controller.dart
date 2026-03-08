@@ -37,7 +37,7 @@ class UstadzHomeController extends GetxController {
       final ustadzId = prefs.getString('roleId');
 
       final response = await get(
-        Uri.parse(ApiUrl.ustadz(ustadzId!)),
+        Uri.parse(ApiUrl.ustadzDetail(ustadzId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

@@ -33,7 +33,8 @@ class ApiUrl {
   static String get resetPassword => '$baseUrl/auth/reset-password';
 
   // USTADZ
-  static String ustadz(String ustadzId) => '$baseUrl/ustadz/$ustadzId';
+  static String get ustadz => '$baseUrl/ustadz';
+  static String ustadzDetail(String ustadzId) => '$baseUrl/ustadz/$ustadzId';
 
   // ORTU
   static String get ortu => '$baseUrl/ortu';
@@ -82,10 +83,8 @@ class ApiUrl {
   static String get chart => '$baseUrl/chart';
 
   // ADMIN
-  // DELETE SANTRI
+  // DELETE USER
   static String deleteSantri(String santriId) => '$baseUrl/santri/$santriId';
   static String deleteOrtu(String ortuId) => '$baseUrl/ortu/$ortuId';
-
-  // GET ALL ORTU
-  static String get ortuList => '$baseUrl/ortu';
+  static String deleteUstadz(String ustadzId) => '$baseUrl/ustadz/$ustadzId';
 }

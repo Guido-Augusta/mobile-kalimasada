@@ -5,6 +5,8 @@ import '../modules/admin/admin_home/bindings/admin_home_binding.dart';
 import '../modules/admin/admin_home/views/admin_home_view.dart';
 import '../modules/admin/daftar_ortu/bindings/daftar_ortu_binding.dart';
 import '../modules/admin/daftar_ortu/views/daftar_ortu_view.dart';
+import '../modules/admin/edit_ortu/bindings/edit_ortu_binding.dart';
+import '../modules/admin/edit_ortu/views/edit_ortu_view.dart';
 import '../modules/admin/edit_santri/bindings/edit_santri_binding.dart';
 import '../modules/admin/edit_santri/views/edit_santri_view.dart';
 import '../modules/admin/tambah_ortu/bindings/tambah_ortu_binding.dart';
@@ -19,8 +21,8 @@ import '../modules/auth/login/bindings/login_binding.dart';
 import '../modules/auth/login/views/login_view.dart';
 import '../modules/auth/splash/bindings/splash_binding.dart';
 import '../modules/auth/splash/views/splash_view.dart';
-import '../modules/admin/edit_ortu/bindings/edit_ortu_binding.dart';
-import '../modules/admin/edit_ortu/views/edit_ortu_view.dart';
+import '../modules/admin/daftar_ustadz/bindings/daftar_ustadz_binding.dart';
+import '../modules/admin/daftar_ustadz/views/daftar_ustadz_view.dart';
 import '../modules/main/ortu_main/bindings/ortu_main_binding.dart';
 import '../modules/main/ortu_main/views/ortu_main_view.dart';
 import '../modules/main/santri_main/bindings/santri_main_binding.dart';
@@ -235,6 +237,11 @@ class AppPages {
       name: _Paths.EDIT_ORTU,
       page: () => const EditOrtuView(),
       binding: EditOrtuBinding(),
+    ),
+    GetPage(
+      name: _Paths.DAFTAR_USTADZ,
+      page: () => const DaftarUstadzView(),
+      binding: DaftarUstadzBinding(),
     ),
   ];
 }
