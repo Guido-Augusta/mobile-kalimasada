@@ -154,7 +154,7 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
         Icon(Icons.people_outline, size: 80, color: Colors.grey[400]),
         const SizedBox(height: 16),
         Text(
-          'Tidak ada data santri',
+          'Tidak ada data ustadz/ah',
           style: TextStyle(
             color: Colors.grey[600],
             fontSize: 18,
@@ -215,10 +215,10 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
       child: InkWell(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
-          // Get.toNamed(
-          //   '/detail-ustadz',
-          //   arguments: {'ustadzId': ustadz.id.toString()},
-          // );
+          Get.toNamed(
+            '/detail-ustadz',
+            arguments: {'ustadzId': ustadz.id.toString()},
+          );
         },
         borderRadius: BorderRadius.circular(16),
         child: Padding(
