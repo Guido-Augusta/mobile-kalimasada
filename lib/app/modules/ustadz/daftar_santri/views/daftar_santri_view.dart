@@ -473,42 +473,6 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                 ],
                               ),
                             ),
-
-                            // Points Badge
-                            if (santri.totalPoin != null)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.amber.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.amber.withValues(alpha: 0.2),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.star,
-                                      size: 14,
-                                      color: Colors.amber,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${santri.totalPoin} Poin',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.amber,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
                           ],
                         ),
                       ],
@@ -671,29 +635,31 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  santri.nama ?? 'Nama tidak tersedia',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    santri.nama ?? 'Nama tidak tersedia',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                                Text(
-                                  santri.noInduk ?? 'No Induk tidak tersedia',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
+                                  Text(
+                                    santri.noInduk ?? 'No Induk tidak tersedia',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             PopupMenuButton(
                               itemBuilder: (context) => [
@@ -802,18 +768,21 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                         : Colors.pink,
                                   ),
                                   const SizedBox(width: 4),
-                                  Text(
-                                    santri.jenisKelamin?.toLowerCase() == 'l'
-                                        ? 'Laki-laki'
-                                        : 'Perempuan',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color:
-                                          santri.jenisKelamin?.toLowerCase() ==
-                                              'l'
-                                          ? Colors.blue
-                                          : Colors.pink,
+                                  Flexible(
+                                    child: Text(
+                                      santri.jenisKelamin?.toLowerCase() == 'l'
+                                          ? 'Laki-laki'
+                                          : 'Perempuan',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color:
+                                            santri.jenisKelamin
+                                                    ?.toLowerCase() ==
+                                                'l'
+                                            ? Colors.blue
+                                            : Colors.pink,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -918,11 +887,11 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
   String _getTahapLabel(String? tahap) {
     switch (tahap?.toLowerCase()) {
       case 'level1':
-        return 'Level 1';
+        return 'Juz 30';
       case 'level2':
-        return 'Level 2';
+        return 'Surah Pilihan';
       case 'level3':
-        return 'Level 3';
+        return 'Juz 1-29';
       default:
         return 'Tahap ?';
     }
