@@ -36,6 +36,7 @@ abstract class Routes {
   static const EDIT_ORTU = _Paths.EDIT_ORTU;
   static const DAFTAR_USTADZ = _Paths.DAFTAR_USTADZ;
   static const DETAIL_USTADZ = _Paths.DETAIL_USTADZ;
+  static const TAMBAH_USTADZ = _Paths.TAMBAH_USTADZ;
 }
 
 abstract class _Paths {
@@ -73,4 +74,5 @@ abstract class _Paths {
   static const EDIT_ORTU = '/edit-ortu';
   static const DAFTAR_USTADZ = '/daftar-ustadz';
   static const DETAIL_USTADZ = '/detail-ustadz';
+  static const TAMBAH_USTADZ = '/tambah-ustadz';
 }

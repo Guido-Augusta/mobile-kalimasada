@@ -34,7 +34,8 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
                 : const Offset(2, 0), // geser ke kanan
             child: FloatingActionButton(
               onPressed: () {
-                // Get.toNamed('/tambah-ustadz');
+                FocusManager.instance.primaryFocus?.unfocus();
+                Get.toNamed('/tambah-ustadz');
               },
               backgroundColor: Colors.deepPurpleAccent,
               child: const Icon(Icons.add, color: Colors.white),

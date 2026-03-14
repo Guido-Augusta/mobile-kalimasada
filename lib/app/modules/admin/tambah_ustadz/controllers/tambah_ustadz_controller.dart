@@ -12,16 +12,16 @@ import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../data/constants/api_url.dart';
-import '../../../../data/models/ortu.dart';
+import '../../../../data/models/ustadz.dart';
 import '../../../../utils/toast_utils.dart';
-import '../../daftar_ortu/controllers/daftar_ortu_controller.dart';
+import '../../daftar_ustadz/controllers/daftar_ustadz_controller.dart';
 
-class TambahOrtuController extends GetxController {
+class TambahUstadzController extends GetxController {
   final RxBool isUploadingImage = false.obs;
   final RxBool isSaveProfileLoading = false.obs;
   final RxBool isSaveEmailPasswordLoading = false.obs;
 
-  var ortuDetail = Rxn<Ortu>();
+  var ustadzDetail = Rxn<Ustadz>();
 
   final ImagePicker imagePicker = ImagePicker();
   var pickedImage = Rxn<XFile>();
@@ -33,14 +33,14 @@ class TambahOrtuController extends GetxController {
   final GlobalKey<FormFieldState> passwordFieldKey =
       GlobalKey<FormFieldState>();
 
+  var emailC = TextEditingController();
+  var passwordC = TextEditingController();
+
   var namaC = TextEditingController();
   var noHpC = TextEditingController();
   var alamatC = TextEditingController();
   var jenisKelaminC = TextEditingController(text: 'L');
-  var tipeC = TextEditingController(text: 'Ayah');
-
-  var emailC = TextEditingController();
-  var passwordC = TextEditingController();
+  var waliKelasTahapC = ''.obs;
 
   DateTime? lastErrorShown;
 
@@ -52,7 +52,7 @@ class TambahOrtuController extends GetxController {
     noHpC.dispose();
     alamatC.dispose();
     jenisKelaminC.dispose();
-    tipeC.dispose();
+    waliKelasTahapC.value = '';
     super.onClose();
   }
 
@@ -125,35 +125,45 @@ class TambahOrtuController extends GetxController {
   void resetForm() {
     profileFormKey.currentState?.reset();
     pickedImage.value = null;
+    waliKelasTahapC.value = '';
+    emailC.clear();
+    passwordC.clear();
     namaC.clear();
     noHpC.clear();
     alamatC.clear();
-    emailC.clear();
-    passwordC.clear();
     jenisKelaminC.text = 'L';
-    tipeC.text = 'Ayah';
 
     profileFormKey = GlobalKey<FormState>();
     update();
   }
 
-  Future<void> addOrtu(
+  Future<void> addUstadz(
     XFile? fotoProfil,
     String? email,
     String? password,
     String? nama,
     String? noHp,
     String? jenisKelamin,
-    String? tipe,
     String? alamat,
+    String? waliKelasTahap,
   ) async {
+    if (kDebugMode) {
+      print(pickedImage.value?.path);
+      print(emailC.text);
+      print(passwordC.text);
+      print(namaC.text);
+      print(noHpC.text);
+      print(jenisKelaminC.text);
+      print(alamatC.text);
+      print(waliKelasTahapC.value);
+    }
     try {
       isSaveProfileLoading.value = true;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      final request = http.MultipartRequest('POST', Uri.parse(ApiUrl.ortu));
+      final request = http.MultipartRequest('POST', Uri.parse(ApiUrl.ustadz));
       request.headers['Authorization'] = 'Bearer $token';
       request.headers['x-platform'] = 'mobile';
 
@@ -162,8 +172,8 @@ class TambahOrtuController extends GetxController {
       request.fields['nama'] = nama!;
       request.fields['nomorHp'] = noHp!;
       request.fields['jenisKelamin'] = jenisKelamin!;
-      request.fields['tipe'] = tipe!;
       request.fields['alamat'] = alamat!;
+      request.fields['waliKelasTahap'] = waliKelasTahap!;
 
       if (fotoProfil != null) {
         // Read file and create multipart with proper content type
@@ -211,10 +221,12 @@ class TambahOrtuController extends GetxController {
           print(data);
         }
         resetForm();
-        if (Get.isRegistered<DaftarOrtuController>()) {
-          await Get.find<DaftarOrtuController>().fetchData();
+        if (Get.isRegistered<DaftarUstadzController>()) {
+          await Get.find<DaftarUstadzController>().fetchData();
         }
-        ToastUtils.showSuccessToast('$tipe berhasil ditambahkan');
+        ToastUtils.showSuccessToast(
+          '${jenisKelamin.toLowerCase() == 'l' ? 'Ustadz' : 'Ustadzah'} berhasil ditambahkan',
+        );
       } else if (response.statusCode == 400) {
         final parsed = jsonDecode(responseBody);
         final message = parsed['message'];
@@ -224,11 +236,13 @@ class TambahOrtuController extends GetxController {
           print(response.statusCode);
           print(responseBody);
         }
-        ToastUtils.showErrorToast('Gagal menambahkan data $tipe');
+        ToastUtils.showErrorToast(
+          'Gagal menambahkan ${jenisKelamin.toLowerCase() == 'l' ? 'ustadz' : 'ustadzah'}',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
-        print(e);
+        print('error: $e');
       }
       final now = DateTime.now();
       if (lastErrorShown == null ||

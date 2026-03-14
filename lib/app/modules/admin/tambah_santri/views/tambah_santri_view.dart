@@ -9,7 +9,6 @@ import 'package:fullscreen_image_viewer/fullscreen_image_viewer.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../data/models/daftar_ortu.dart';
 import '../../../../utils/toast_utils.dart';
@@ -69,93 +68,33 @@ class TambahSantriView extends GetView<TambahSantriController> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   // Profile Picture
-                                  Skeletonizer(
-                                    enabled: controller.isLoading.value,
-                                    child: Stack(
-                                      children: [
-                                        Container(
-                                          width: 100,
-                                          height: 100,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 4,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withValues(
-                                                  alpha: 0.2,
-                                                ),
-                                                blurRadius: 20,
-                                                offset: const Offset(0, 8),
-                                              ),
-                                            ],
+                                  Stack(
+                                    children: [
+                                      Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 4,
                                           ),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              FullscreenImageViewer.open(
-                                                context: context,
-                                                child: Hero(
-                                                  tag: 'foto-profil',
-                                                  child:
-                                                      controller
-                                                              .pickedImage
-                                                              .value !=
-                                                          null
-                                                      ? Image.file(
-                                                          File(
-                                                            controller
-                                                                .pickedImage
-                                                                .value!
-                                                                .path,
-                                                          ),
-                                                          fit: BoxFit.cover,
-                                                        )
-                                                      : CachedNetworkImage(
-                                                          imageUrl: controller
-                                                              .getImageUrl(
-                                                                controller
-                                                                    .defaultPhotoProfile
-                                                                    .value,
-                                                              ),
-                                                          fit: BoxFit.cover,
-                                                          placeholder:
-                                                              (
-                                                                context,
-                                                                url,
-                                                              ) => Container(
-                                                                color: Colors
-                                                                    .grey[300],
-                                                                child: const Icon(
-                                                                  Icons.person,
-                                                                  size: 40,
-                                                                  color: Colors
-                                                                      .grey,
-                                                                ),
-                                                              ),
-                                                          errorWidget:
-                                                              (
-                                                                context,
-                                                                url,
-                                                                error,
-                                                              ) => Container(
-                                                                color: Colors
-                                                                    .grey[300],
-                                                                child: const Icon(
-                                                                  Icons.person,
-                                                                  size: 40,
-                                                                  color: Colors
-                                                                      .grey,
-                                                                ),
-                                                              ),
-                                                        ),
-                                                ),
-                                              );
-                                            },
-                                            child: Hero(
-                                              tag: 'foto-profil',
-                                              child: ClipOval(
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(
+                                                alpha: 0.2,
+                                              ),
+                                              blurRadius: 20,
+                                              offset: const Offset(0, 8),
+                                            ),
+                                          ],
+                                        ),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            FullscreenImageViewer.open(
+                                              context: context,
+                                              child: Hero(
+                                                tag: 'foto-profil',
                                                 child:
                                                     controller
                                                             .pickedImage
@@ -209,57 +148,112 @@ class TambahSantriView extends GetView<TambahSantriController> {
                                                             ),
                                                       ),
                                               ),
+                                            );
+                                          },
+                                          child: Hero(
+                                            tag: 'foto-profil',
+                                            child: ClipOval(
+                                              child:
+                                                  controller
+                                                          .pickedImage
+                                                          .value !=
+                                                      null
+                                                  ? Image.file(
+                                                      File(
+                                                        controller
+                                                            .pickedImage
+                                                            .value!
+                                                            .path,
+                                                      ),
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : CachedNetworkImage(
+                                                      imageUrl: controller
+                                                          .getImageUrl(
+                                                            controller
+                                                                .defaultPhotoProfile
+                                                                .value,
+                                                          ),
+                                                      fit: BoxFit.cover,
+                                                      placeholder:
+                                                          (
+                                                            context,
+                                                            url,
+                                                          ) => Container(
+                                                            color: Colors
+                                                                .grey[300],
+                                                            child: const Icon(
+                                                              Icons.person,
+                                                              size: 40,
+                                                              color:
+                                                                  Colors.grey,
+                                                            ),
+                                                          ),
+                                                      errorWidget:
+                                                          (
+                                                            context,
+                                                            url,
+                                                            error,
+                                                          ) => Container(
+                                                            color: Colors
+                                                                .grey[300],
+                                                            child: const Icon(
+                                                              Icons.person,
+                                                              size: 40,
+                                                              color:
+                                                                  Colors.grey,
+                                                            ),
+                                                          ),
+                                                    ),
                                             ),
                                           ),
                                         ),
-                                        Obx(
-                                          () =>
-                                              controller.pickedImage.value !=
-                                                  null
-                                              ? Positioned(
-                                                  top: 0,
-                                                  right: 0,
-                                                  child: GestureDetector(
-                                                    onTap: () {
-                                                      controller.deleteImage();
-                                                    },
-                                                    child: Container(
-                                                      width: 32,
-                                                      height: 32,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.red,
-                                                        shape: BoxShape.circle,
-                                                        border: Border.all(
-                                                          color: Colors.white,
-                                                          width: 2,
-                                                        ),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors.black
-                                                                .withValues(
-                                                                  alpha: 0.2,
-                                                                ),
-                                                            blurRadius: 8,
-                                                            offset:
-                                                                const Offset(
-                                                                  0,
-                                                                  2,
-                                                                ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      child: const Icon(
-                                                        Icons.close,
+                                      ),
+                                      Obx(
+                                        () =>
+                                            controller.pickedImage.value != null
+                                            ? Positioned(
+                                                top: 0,
+                                                right: 0,
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    controller.deleteImage();
+                                                  },
+                                                  child: Container(
+                                                    width: 32,
+                                                    height: 32,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.red,
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
                                                         color: Colors.white,
-                                                        size: 18,
+                                                        width: 2,
                                                       ),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black
+                                                              .withValues(
+                                                                alpha: 0.2,
+                                                              ),
+                                                          blurRadius: 8,
+                                                          offset: const Offset(
+                                                            0,
+                                                            2,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: const Icon(
+                                                      Icons.close,
+                                                      color: Colors.white,
+                                                      size: 18,
                                                     ),
                                                   ),
-                                                )
-                                              : const SizedBox.shrink(),
-                                        ),
-                                      ],
-                                    ),
+                                                ),
+                                              )
+                                            : const SizedBox.shrink(),
+                                      ),
+                                    ],
                                   ),
 
                                   const SizedBox(width: 16),
@@ -268,42 +262,32 @@ class TambahSantriView extends GetView<TambahSantriController> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Skeletonizer(
-                                          effect: ShimmerEffect(
-                                            baseColor: Colors.orangeAccent,
-                                            highlightColor: Colors.orange[300]!,
-                                          ),
-                                          enabled: controller.isLoading.value,
-                                          child: ElevatedButton(
-                                            onPressed:
-                                                controller
-                                                    .isUploadingImage
-                                                    .value
-                                                ? null
-                                                : () {
-                                                    controller.alamatFocusNode
-                                                        .unfocus();
-                                                    FocusScope.of(
-                                                      Get.context!,
-                                                    ).unfocus();
-                                                    _showEditPhotoProfileBottomSheet();
-                                                  },
-                                            style: ElevatedButton.styleFrom(
-                                              disabledBackgroundColor:
-                                                  Colors.grey[400],
-                                              disabledForegroundColor:
-                                                  Colors.white,
-                                              backgroundColor:
-                                                  Colors.orangeAccent,
-                                              foregroundColor: Colors.white,
-                                            ),
-                                            child: Text(
+                                        ElevatedButton(
+                                          onPressed:
                                               controller.isUploadingImage.value
-                                                  ? 'Uploading...'
-                                                  : 'Upload Foto',
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                            ),
+                                              ? null
+                                              : () {
+                                                  FocusManager
+                                                      .instance
+                                                      .primaryFocus
+                                                      ?.unfocus();
+                                                  _showEditPhotoProfileBottomSheet();
+                                                },
+                                          style: ElevatedButton.styleFrom(
+                                            disabledBackgroundColor:
+                                                Colors.grey[400],
+                                            disabledForegroundColor:
+                                                Colors.white,
+                                            backgroundColor:
+                                                Colors.orangeAccent,
+                                            foregroundColor: Colors.white,
+                                          ),
+                                          child: Text(
+                                            controller.isUploadingImage.value
+                                                ? 'Uploading...'
+                                                : 'Upload Foto',
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
                                           ),
                                         ),
                                         // const SizedBox(height: 6),
@@ -333,244 +317,72 @@ class TambahSantriView extends GetView<TambahSantriController> {
                 padding: const EdgeInsets.all(16),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    Form(
-                      key: controller.profileFormKey,
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 16),
+                    GetBuilder<TambahSantriController>(
+                      builder: (context) {
+                        return Form(
+                          key: controller.profileFormKey,
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 16),
+                              // Email & Password
+                              _buildEmailPasswordForm(),
+                              const SizedBox(height: 24),
 
-                          // Email & Password
-                          Skeletonizer(
-                            enabled: controller.isLoading.value,
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.05),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
+                              // Personal Information
+                              _buildPersonalInfoSectionForm(),
+                              const SizedBox(height: 24),
+
+                              // Parents Information
+                              _buildParentsSectionForm(),
+                              const SizedBox(height: 24),
+
+                              // Tahap Hafalan Information
+                              _buildTahapHafalanSectionForm(),
+                              const SizedBox(height: 24),
+
+                              // Reset and Save Button
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                    fit: FlexFit.loose,
+                                    flex: 5,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        controller.resetForm();
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Reset Form',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    fit: FlexFit.loose,
+                                    flex: 7,
+                                    child: SaveProfileButton(
+                                      controller: controller,
+                                    ),
                                   ),
                                 ],
                               ),
-                              child: Form(
-                                key: controller.emailPasswordFormKey,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    const Text(
-                                      'Email',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    TextFormField(
-                                      validator: controller.validateEmail,
-                                      autovalidateMode:
-                                          AutovalidateMode.onUserInteraction,
-                                      keyboardType: TextInputType.emailAddress,
-                                      decoration: InputDecoration(
-                                        hintText: 'Masukkan email',
-                                        hintStyle: TextStyle(
-                                          color: Colors.grey[500],
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                            color: Colors.grey[300]!,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 12,
-                                            ),
-                                        fillColor: Colors.grey[50],
-                                        filled: true,
-                                        disabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.grey[300]!,
-                                          ),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.grey[300]!,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.deepPurpleAccent,
-                                          ),
-                                        ),
-                                        errorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ),
-                                      controller: controller.emailC,
-                                    ),
-                                    const SizedBox(height: 20),
-                                    const Text(
-                                      'Password',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                          child: TextFormField(
-                                            controller: controller.passwordC,
-                                            enabled: false,
-                                            readOnly: true,
-                                            obscureText: true,
-                                            decoration: InputDecoration(
-                                              hintText: 'Password baru',
-                                              hintStyle: TextStyle(
-                                                color: Colors.grey[500],
-                                              ),
-                                              border: InputBorder.none,
-                                              contentPadding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 16,
-                                                    vertical: 12,
-                                                  ),
-                                              fillColor: Colors.grey[50],
-                                              filled: true,
-                                              disabledBorder:
-                                                  OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          12,
-                                                        ),
-                                                    borderSide: BorderSide(
-                                                      color: Colors.grey[300]!,
-                                                    ),
-                                                  ),
-                                              enabledBorder: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                borderSide: BorderSide(
-                                                  color: Colors.grey[300]!,
-                                                ),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                borderSide: BorderSide(
-                                                  color:
-                                                      Colors.deepPurpleAccent,
-                                                ),
-                                              ),
-                                              errorBorder: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                borderSide: BorderSide(
-                                                  color: Colors.red,
-                                                ),
-                                              ),
-                                            ),
-                                            autovalidateMode:
-                                                AutovalidateMode.always,
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                return 'Generate password baru';
-                                              }
-                                              return null;
-                                            },
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-
-                                        // Button Generate
-                                        ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            minimumSize: const Size(100, 48),
-                                            backgroundColor: Colors.black,
-                                            foregroundColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            controller.passwordC.text =
-                                                controller.generatePassword();
-                                            if (kDebugMode) {
-                                              print(controller.passwordC.text);
-                                            }
-
-                                            final formState = controller
-                                                .emailPasswordFormKey
-                                                .currentState;
-                                            if (formState != null) {
-                                              formState.validate();
-                                            }
-                                          },
-                                          child: Text('Generate'),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-
-                          // Personal Information
-                          _buildPersonalInfoSectionForm(),
-                          const SizedBox(height: 24),
-
-                          // Parents Information
-                          _buildParentsSectionForm(),
-                          const SizedBox(height: 24),
-
-                          // Tahap Hafalan Information
-                          _buildTahapHafalanSectionForm(),
-                          const SizedBox(height: 24),
-
-                          // Save Button
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              SaveProfileButton(
-                                controller: controller,
-                                profileFormKey: controller.profileFormKey,
-                              ),
+                              const SizedBox(height: 50),
                             ],
                           ),
-                          const SizedBox(height: 50),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   ]),
                 ),
@@ -580,6 +392,153 @@ class TambahSantriView extends GetView<TambahSantriController> {
         }(),
       );
     });
+  }
+
+  Container _buildEmailPasswordForm() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Email',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextFormField(
+            validator: controller.validateEmail,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(
+              hintText: 'Masukkan email',
+              hintStyle: TextStyle(color: Colors.grey[500]),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              fillColor: Colors.grey[50],
+              filled: true,
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.deepPurpleAccent),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.red),
+              ),
+            ),
+            controller: controller.emailC,
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Password',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: controller.passwordC,
+                  key: controller.passwordFieldKey,
+                  enabled: false,
+                  readOnly: true,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: 'Password baru',
+                    hintStyle: TextStyle(color: Colors.grey[500]),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    fillColor: Colors.grey[50],
+                    filled: true,
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.deepPurpleAccent),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.red),
+                    ),
+                  ),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Generate password baru';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+
+              // Button Generate
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(100, 48),
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () {
+                  controller.passwordC.text = controller.generatePassword();
+                  if (kDebugMode) {
+                    print(controller.passwordC.text);
+                  }
+                  controller.passwordFieldKey.currentState?.validate();
+                },
+                child: Text('Generate'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   void _showEditPhotoProfileBottomSheet() {
@@ -638,364 +597,360 @@ class TambahSantriView extends GetView<TambahSantriController> {
   }
 
   Widget _buildPersonalInfoSectionForm() {
-    return Skeletonizer(
-      enabled: controller.isLoading.value,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Nama Lengkap',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: Colors.black87,
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Nama Lengkap',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
+          ),
+          const SizedBox(height: 8),
+          TextFormField(
+            style: TextStyle(color: Colors.black),
+            controller: controller.namaC,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Nama tidak boleh kosong';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              hintText: 'Masukkan Nama Lengkap',
+              hintStyle: TextStyle(color: Colors.grey[500]),
+              fillColor: Colors.grey[50],
+              filled: true,
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.deepPurple),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
               ),
             ),
-            const SizedBox(height: 8),
-            TextFormField(
-              style: TextStyle(color: Colors.black),
-              controller: controller.namaC,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Nama tidak boleh kosong';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                hintText: 'Masukkan Nama Lengkap',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                fillColor: Colors.grey[50],
-                filled: true,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Nomor Induk',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextFormField(
+            keyboardType: TextInputType.phone,
+            style: TextStyle(color: Colors.black),
+            controller: controller.noIndukC,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Nomor Induk tidak boleh kosong';
+              }
+              if (!value.isNumericOnly) {
+                return 'Nomor Induk harus berupa angka';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              hintText: 'Masukkan Nomor Induk',
+              hintStyle: TextStyle(color: Colors.grey[500]),
+              fillColor: Colors.grey[50],
+              filled: true,
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.deepPurple),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Nomor Induk',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              keyboardType: TextInputType.phone,
-              style: TextStyle(color: Colors.black),
-              controller: controller.noIndukC,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Nomor Induk tidak boleh kosong';
-                }
-                if (!value.isNumericOnly) {
-                  return 'Nomor Induk harus berupa angka';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                hintText: 'Masukkan Nomor Induk',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                fillColor: Colors.grey[50],
-                filled: true,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Text(
+                'Nomor HP',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: Colors.black87,
                 ),
               ),
+              const SizedBox(width: 8),
+              const Text(
+                '(Opsional)',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          TextFormField(
+            keyboardType: TextInputType.phone,
+            style: TextStyle(color: Colors.black),
+            controller: controller.noHpC,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value!.isNotEmpty && !value.isNumericOnly) {
+                return 'Nomor HP harus berupa angka';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              hintText: 'Masukkan Nomor HP',
+              hintStyle: TextStyle(color: Colors.grey[500]),
+              fillColor: Colors.grey[50],
+              filled: true,
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.deepPurple),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
             ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Text(
-                  'Nomor HP',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Colors.black87,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Tanggal Lahir',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              controller.selectDate(Get.context!);
+            },
+            child: AbsorbPointer(
+              child: TextFormField(
+                controller: controller.tanggalLahirC,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Tanggal lahir tidak boleh kosong';
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                  hintText: 'Pilih Tanggal Lahir',
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  prefixIcon: Icon(
+                    Icons.calendar_today,
+                    color: Colors.deepPurple,
+                    size: 20,
                   ),
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  '(Opsional)',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              keyboardType: TextInputType.phone,
-              style: TextStyle(color: Colors.black),
-              controller: controller.noHpC,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value!.isNotEmpty && !value.isNumericOnly) {
-                  return 'Nomor HP harus berupa angka';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                hintText: 'Masukkan Nomor HP',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                fillColor: Colors.grey[50],
-                filled: true,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Tanggal Lahir',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: () {
-                controller.alamatFocusNode.unfocus();
-                controller.selectDate(Get.context!);
-              },
-              child: AbsorbPointer(
-                child: TextFormField(
-                  controller: controller.tanggalLahirC,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Tanggal lahir tidak boleh kosong';
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Pilih Tanggal Lahir',
-                    hintStyle: TextStyle(color: Colors.grey[500]),
-                    prefixIcon: Icon(
-                      Icons.calendar_today,
-                      color: Colors.deepPurple,
-                      size: 20,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.deepPurple),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[50],
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.deepPurple),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.red),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Jenis Kelamin',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Jenis Kelamin',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+            ),
+            initialValue: controller.jenisKelaminC.text,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Jenis kelamin tidak boleh kosong';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              fillColor: Colors.grey[50],
+              filled: true,
+              hintText: 'Pilih Jenis Kelamin',
+              hintStyle: TextStyle(color: Colors.grey[500]),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.deepPurple),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              style: TextStyle(
-                color: Colors.black87,
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
-              initialValue: controller.jenisKelaminC.text,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Jenis kelamin tidak boleh kosong';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                fillColor: Colors.grey[50],
-                filled: true,
-                hintText: 'Pilih Jenis Kelamin',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              dropdownColor: Colors.white,
-              items: const [
-                DropdownMenuItem(value: 'P', child: Text('Perempuan')),
-                DropdownMenuItem(value: 'L', child: Text('Laki-laki')),
-              ],
-              onChanged: (value) {
-                controller.jenisKelaminC.text = value!;
-              },
+            dropdownColor: Colors.white,
+            items: const [
+              DropdownMenuItem(value: 'P', child: Text('Perempuan')),
+              DropdownMenuItem(value: 'L', child: Text('Laki-laki')),
+            ],
+            onChanged: (value) {
+              controller.jenisKelaminC.text = value!;
+            },
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Alamat',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: Colors.black87,
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Alamat',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
+          ),
+          const SizedBox(height: 8),
+          TextFormField(
+            maxLines: 5,
+            minLines: 3,
+            controller: controller.alamatC,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Alamat tidak boleh kosong';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              hintText: 'Masukkan Alamat',
+              hintStyle: TextStyle(color: Colors.grey[500]),
+              fillColor: Colors.grey[50],
+              filled: true,
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
               ),
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              maxLines: 5,
-              minLines: 3,
-              controller: controller.alamatC,
-              focusNode: controller.alamatFocusNode,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Alamat tidak boleh kosong';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                hintText: 'Masukkan Alamat',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                fillColor: Colors.grey[50],
-                filled: true,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.deepPurple),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildParentsSectionForm() {
-    return Skeletonizer(
-      enabled: controller.isLoading.value,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Form(
+        key: controller.ortuFormKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1034,91 +989,88 @@ class TambahSantriView extends GetView<TambahSantriController> {
   }
 
   Widget _buildTahapHafalanSectionForm() {
-    return Skeletonizer(
-      enabled: controller.isLoading.value,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Tahap Hafalan',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: Colors.black87,
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Tahap Hafalan',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
+          ),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+            ),
+            initialValue: controller.tahapHafalanC.text,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Tahap hafalan tidak boleh kosong';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              fillColor: Colors.grey[50],
+              filled: true,
+              hintText: 'Pilih Tahap Hafalan',
+              hintStyle: TextStyle(color: Colors.grey[500]),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.deepPurple),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              style: TextStyle(
-                color: Colors.black87,
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
+            dropdownColor: Colors.white,
+            items: const [
+              DropdownMenuItem(
+                value: 'Level1',
+                child: Text('Level 1 - Juz 30'),
               ),
-              initialValue: controller.tahapHafalanC.text,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Tahap hafalan tidak boleh kosong';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                fillColor: Colors.grey[50],
-                filled: true,
-                hintText: 'Pilih Tahap Hafalan',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
+              DropdownMenuItem(
+                value: 'Level2',
+                child: Text('Level 2 - Surah Pilihan'),
               ),
-              dropdownColor: Colors.white,
-              items: const [
-                DropdownMenuItem(
-                  value: 'Level1',
-                  child: Text('Level 1 - Juz 30'),
-                ),
-                DropdownMenuItem(
-                  value: 'Level2',
-                  child: Text('Level 2 - Surah Pilihan'),
-                ),
-                DropdownMenuItem(
-                  value: 'Level3',
-                  child: Text('Level 3 - Juz 1-29'),
-                ),
-              ],
-              onChanged: (value) {
-                controller.tahapHafalanC.text = value!;
-              },
-            ),
-          ],
-        ),
+              DropdownMenuItem(
+                value: 'Level3',
+                child: Text('Level 3 - Juz 1-29'),
+              ),
+            ],
+            onChanged: (value) {
+              controller.tahapHafalanC.text = value!;
+            },
+          ),
+        ],
       ),
     );
   }
@@ -1152,6 +1104,7 @@ class TambahSantriView extends GetView<TambahSantriController> {
             return controller.loadOrtuByTipe(tipe, f);
           },
           itemAsString: (Datum u) => u.nama ?? '',
+          autoValidateMode: AutovalidateMode.onUserInteraction,
           onChanged: (Datum? selectedItem) {
             if (selectedItem != null) {
               if (kDebugMode) {
@@ -1177,10 +1130,11 @@ class TambahSantriView extends GetView<TambahSantriController> {
                 controller.selectedWali.value = null;
               }
             }
+
+            controller.ortuFormKey.currentState?.validate();
           },
           onBeforePopupOpening: (selectedItem) {
-            controller.alamatFocusNode.unfocus();
-            FocusScope.of(Get.context!).unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
             return Future.value(true);
           },
           decoratorProps: DropDownDecoratorProps(
@@ -1331,10 +1285,9 @@ class TambahSantriView extends GetView<TambahSantriController> {
             },
           ),
           validator: (value) {
-            if (!controller.isLoading.value &&
-                (controller.selectedAyah.value == null &&
-                    controller.selectedIbu.value == null &&
-                    controller.selectedWali.value == null)) {
+            if (controller.selectedAyah.value == null &&
+                controller.selectedIbu.value == null &&
+                controller.selectedWali.value == null) {
               return 'Minimal satu orang tua harus dipilih';
             }
             return null;
@@ -1359,98 +1312,58 @@ class TambahSantriView extends GetView<TambahSantriController> {
 }
 
 class SaveProfileButton extends StatelessWidget {
-  const SaveProfileButton({
-    super.key,
-    required this.controller,
-    required this.profileFormKey,
-  });
+  const SaveProfileButton({super.key, required this.controller});
 
   final TambahSantriController controller;
-  final GlobalKey<FormState> profileFormKey;
 
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => Skeletonizer(
-        enabled: controller.isLoading.value,
-        effect: ShimmerEffect(
-          baseColor: Colors.black,
-          highlightColor: Colors.black54,
-        ),
-        child: ElevatedButton(
-          onPressed: !controller.isSaveProfileLoading.value
-              ? () {
-                  final profileValid =
-                      profileFormKey.currentState?.validate() ?? false;
-                  final emailPasswordValid =
-                      controller.emailPasswordFormKey.currentState
-                          ?.validate() ??
-                      false;
-                  if (kDebugMode) {
-                    print(profileFormKey.currentState?.validate());
+      () => ElevatedButton(
+        onPressed: !controller.isSaveProfileLoading.value
+            ? () {
+                bool isProfileValid =
+                    controller.profileFormKey.currentState?.validate() ?? false;
+                bool isOrtuValid =
+                    controller.ortuFormKey.currentState?.validate() ?? false;
 
-                    print('Email: ${controller.emailC.text}');
-                    print('Password: ${controller.passwordC.text}');
-
-                    print('Nama: ${controller.namaC.text}');
-                    print('No Induk: ${controller.noIndukC.text}');
-                    print('No Hp: ${controller.noHpC.text}');
-                    print('Tanggal Lahir: ${controller.tanggalLahirC.text}');
-                    print('Jenis Kelamin: ${controller.jenisKelaminC.text}');
-                    print('Alamat: ${controller.alamatC.text}');
-                    print('Tahap Hafalan: ${controller.tahapHafalanC.text}');
-
-                    print('Ayah: ${controller.selectedAyah.value}');
-                    print('Ibu: ${controller.selectedIbu.value}');
-                    print('Wali: ${controller.selectedWali.value}');
-
-                    print(
-                      'Default Photo Profile: ${controller.defaultPhotoProfile.value}',
-                    );
-                    print(
-                      'Picked Image: ${controller.pickedImage.value?.path ?? 'No image selected'}',
-                    );
-                  }
-                  if (profileValid && emailPasswordValid) {
-                    controller.addSantri(
-                      controller.pickedImage.value,
-                      controller.emailC.text,
-                      controller.passwordC.text,
-                      controller.namaC.text,
-                      controller.noIndukC.text,
-                      controller.noHpC.text,
-                      controller.jenisKelaminC.text,
-                      controller.tanggalLahirC.text,
-                      controller.alamatC.text,
-                      controller.selectedAyah.value,
-                      controller.selectedIbu.value,
-                      controller.selectedWali.value,
-                      controller.tahapHafalanC.text,
-                    );
-                  } else {
-                    final now = DateTime.now();
-                    if (controller.lastErrorShown == null ||
-                        now.difference(controller.lastErrorShown!) >
-                            Duration(seconds: 3)) {
-                      controller.lastErrorShown = now;
-                      ToastUtils.showErrorToast(
-                        'Pastikan data yang diisi valid',
-                      );
-                    }
+                if (isProfileValid && isOrtuValid) {
+                  controller.addSantri(
+                    controller.pickedImage.value,
+                    controller.emailC.text,
+                    controller.passwordC.text,
+                    controller.namaC.text,
+                    controller.noIndukC.text,
+                    controller.noHpC.text,
+                    controller.jenisKelaminC.text,
+                    controller.tanggalLahirC.text,
+                    controller.alamatC.text,
+                    controller.selectedAyah.value,
+                    controller.selectedIbu.value,
+                    controller.selectedWali.value,
+                    controller.tahapHafalanC.text,
+                  );
+                } else {
+                  final now = DateTime.now();
+                  if (controller.lastErrorShown == null ||
+                      now.difference(controller.lastErrorShown!) >
+                          Duration(seconds: 3)) {
+                    controller.lastErrorShown = now;
+                    ToastUtils.showErrorToast('Pastikan data yang diisi valid');
                   }
                 }
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+              }
+            : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: controller.isSaveProfileLoading.value
-              ? Text('Menyimpan...')
-              : Text('Daftarkan Santri'),
         ),
+        child: controller.isSaveProfileLoading.value
+            ? Text('Menyimpan...')
+            : Text('Daftarkan Santri'),
       ),
     );
   }

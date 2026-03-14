@@ -23,8 +23,6 @@ import '../modules/auth/login/bindings/login_binding.dart';
 import '../modules/auth/login/views/login_view.dart';
 import '../modules/auth/splash/bindings/splash_binding.dart';
 import '../modules/auth/splash/views/splash_view.dart';
-import '../modules/ustadz/detail_ustadz/bindings/detail_ustadz_binding.dart';
-import '../modules/ustadz/detail_ustadz/views/detail_ustadz_view.dart';
 import '../modules/main/ortu_main/bindings/ortu_main_binding.dart';
 import '../modules/main/ortu_main/views/ortu_main_view.dart';
 import '../modules/main/santri_main/bindings/santri_main_binding.dart';
@@ -49,12 +47,16 @@ import '../modules/santri/santri_home/bindings/santri_home_binding.dart';
 import '../modules/santri/santri_home/views/santri_home_view.dart';
 import '../modules/santri/santri_profile/bindings/santri_profile_binding.dart';
 import '../modules/santri/santri_profile/views/santri_profile_view.dart';
+import '../modules/admin/tambah_ustadz/bindings/tambah_ustadz_binding.dart';
+import '../modules/admin/tambah_ustadz/views/tambah_ustadz_view.dart';
 import '../modules/ustadz/daftar_santri/bindings/daftar_santri_binding.dart';
 import '../modules/ustadz/daftar_santri/views/daftar_santri_view.dart';
 import '../modules/ustadz/detail_riwayat_hafalan/bindings/detail_riwayat_hafalan_binding.dart';
 import '../modules/ustadz/detail_riwayat_hafalan/views/detail_riwayat_hafalan_view.dart';
 import '../modules/ustadz/detail_santri/bindings/detail_santri_binding.dart';
 import '../modules/ustadz/detail_santri/views/detail_santri_view.dart';
+import '../modules/ustadz/detail_ustadz/bindings/detail_ustadz_binding.dart';
+import '../modules/ustadz/detail_ustadz/views/detail_ustadz_view.dart';
 import '../modules/ustadz/peringkat/bindings/peringkat_binding.dart';
 import '../modules/ustadz/peringkat/views/peringkat_view.dart';
 import '../modules/ustadz/progres_hafalan/bindings/progres_hafalan_binding.dart';
@@ -249,6 +251,11 @@ class AppPages {
       name: _Paths.DETAIL_USTADZ,
       page: () => const DetailUstadzView(),
       binding: DetailUstadzBinding(),
+    ),
+    GetPage(
+      name: _Paths.TAMBAH_USTADZ,
+      page: () => const TambahUstadzView(),
+      binding: TambahUstadzBinding(),
     ),
   ];
 }

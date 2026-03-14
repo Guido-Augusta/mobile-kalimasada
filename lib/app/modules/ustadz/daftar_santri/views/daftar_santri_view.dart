@@ -481,7 +481,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                 ],
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
 
               // Action Buttons Section
               Row(
@@ -725,7 +725,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                                 ),
                               ),
                               child: Text(
-                                _getTahapLabel2(santri.tahapHafalan),
+                                _getTahapLabel(santri.tahapHafalan),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -907,6 +907,19 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
         return 'Level 3 - Juz 1-29';
       default:
         return 'Tahap ?';
+    }
+  }
+
+  String _getLevelLabel(String? tahap) {
+    switch (tahap?.toLowerCase()) {
+      case 'level1':
+        return 'Level 1';
+      case 'level2':
+        return 'Level 2';
+      case 'level3':
+        return 'Level 3';
+      default:
+        return 'Level ?';
     }
   }
 
@@ -2063,7 +2076,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
           () => Text(
             controller.searchQuery.value.isNotEmpty &&
                     controller.santriList.isEmpty
-                ? 'Santri tidak ditemukan di ${_getTahapLabel(controller.tahapHafalan.value)}'
+                ? 'Santri tidak ditemukan di ${_getLevelLabel(controller.tahapHafalan.value)}'
                 : 'Tarik ke bawah untuk refresh',
             style: TextStyle(color: Colors.grey[500], fontSize: 14),
           ),

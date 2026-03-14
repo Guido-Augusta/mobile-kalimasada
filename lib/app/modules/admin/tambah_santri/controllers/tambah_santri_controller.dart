@@ -16,9 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../data/constants/api_url.dart';
 import '../../../../data/models/daftar_ortu.dart';
 import '../../../../data/models/santri.dart';
+import '../../../ustadz/daftar_santri/controllers/daftar_santri_controller.dart';
 
 class TambahSantriController extends GetxController {
-  final RxBool isLoading = false.obs;
   final RxBool isUploadingImage = false.obs;
   final RxBool isSearching = false.obs;
   final RxBool isSaveProfileLoading = false.obs;
@@ -32,12 +32,12 @@ class TambahSantriController extends GetxController {
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
           .obs;
 
-  final profileFormKey = GlobalKey<FormState>();
-  final emailPasswordFormKey = GlobalKey<FormState>();
-  final ortuFormKey = GlobalKey<FormState>();
-  final ayahDropdownKey = GlobalKey<DropdownSearchState<Datum>>();
-  final ibuDropdownKey = GlobalKey<DropdownSearchState<Datum>>();
-  final waliDropdownKey = GlobalKey<DropdownSearchState<Datum>>();
+  GlobalKey<FormState> profileFormKey = GlobalKey<FormState>();
+  GlobalKey<FormState> ortuFormKey = GlobalKey<FormState>();
+  var passwordFieldKey = GlobalKey<FormFieldState>();
+  var ayahDropdownKey = GlobalKey<DropdownSearchState<Datum>>();
+  var ibuDropdownKey = GlobalKey<DropdownSearchState<Datum>>();
+  var waliDropdownKey = GlobalKey<DropdownSearchState<Datum>>();
 
   var namaC = TextEditingController();
   var noIndukC = TextEditingController();
@@ -46,8 +46,6 @@ class TambahSantriController extends GetxController {
   var jenisKelaminC = TextEditingController(text: 'L');
   var alamatC = TextEditingController();
   var tahapHafalanC = TextEditingController(text: 'Level1');
-
-  final alamatFocusNode = FocusNode();
 
   var emailC = TextEditingController();
   var passwordC = TextEditingController();
@@ -60,7 +58,15 @@ class TambahSantriController extends GetxController {
 
   @override
   void onClose() {
-    alamatFocusNode.dispose();
+    namaC.dispose();
+    noIndukC.dispose();
+    noHpC.dispose();
+    tanggalLahirC.dispose();
+    jenisKelaminC.dispose();
+    alamatC.dispose();
+    tahapHafalanC.dispose();
+    emailC.dispose();
+    passwordC.dispose();
     super.onClose();
   }
 
@@ -256,9 +262,9 @@ class TambahSantriController extends GetxController {
         listIdOrtu.add(selectedWali.id!);
       }
 
-      print(listIdOrtu);
-      print(jenisKelamin);
-      print(tanggalLahir);
+      if (kDebugMode) {
+        print(listIdOrtu);
+      }
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
@@ -323,15 +329,10 @@ class TambahSantriController extends GetxController {
         if (kDebugMode) {
           print(data);
         }
-        // Reset Form
-        emailPasswordFormKey.currentState?.reset();
-        profileFormKey.currentState?.reset();
-        ortuFormKey.currentState?.reset();
-        ayahDropdownKey.currentState?.clear();
-        ibuDropdownKey.currentState?.clear();
-        waliDropdownKey.currentState?.clear();
-        pickedImage.value = null;
-        Get.offNamed('/tambah-santri');
+        resetForm();
+        if (Get.isRegistered<DaftarSantriController>()) {
+          await Get.find<DaftarSantriController>().fetchData();
+        }
         ToastUtils.showSuccessToast('Santri berhasil ditambahkan');
       } else if (response.statusCode == 400) {
         final parsed = jsonDecode(responseBody);
@@ -356,5 +357,30 @@ class TambahSantriController extends GetxController {
     } finally {
       isSaveProfileLoading.value = false;
     }
+  }
+
+  void resetForm() {
+    pickedImage.value = null;
+    emailC.clear();
+    passwordC.clear();
+    namaC.clear();
+    noIndukC.clear();
+    noHpC.clear();
+    tanggalLahirC.clear();
+    alamatC.clear();
+    jenisKelaminC.text = 'L';
+    tahapHafalanC.text = 'Level1';
+
+    selectedAyah.value = null;
+    selectedIbu.value = null;
+    selectedWali.value = null;
+
+    ortuFormKey = GlobalKey<FormState>();
+    profileFormKey = GlobalKey<FormState>();
+    passwordFieldKey = GlobalKey<FormFieldState>();
+    ayahDropdownKey = GlobalKey<DropdownSearchState<Datum>>();
+    ibuDropdownKey = GlobalKey<DropdownSearchState<Datum>>();
+    waliDropdownKey = GlobalKey<DropdownSearchState<Datum>>();
+    update();
   }
 }
