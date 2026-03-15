@@ -2,7 +2,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
-import 'package:mobile_kalimasada/app/extentions/orang_tua_extention.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -891,110 +890,66 @@ class DetailSantriView extends GetView<DetailSantriController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (santri.orangTua.hasOrangTua)
-            Text(
-              santri.orangTua.sectionTitle,
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1F2937),
-              ),
+          Text(
+            'Informasi Orang Tua',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF1F2937),
             ),
-
-          if (santri.orangTua.hasWali)
-            Text(
-              santri.orangTua.sectionTitle,
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1F2937),
-              ),
-            ),
-
-          if (santri.orangTua.hasOrangTua && santri.orangTua.hasWali)
-            Text(
-              santri.orangTua.sectionTitle,
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1F2937),
-              ),
-            ),
-
-          if (santri.orangTua.hasAyah) ...[
-            const SizedBox(height: 16),
-            _buildInfoTile(
-              icon: Icons.person,
-              label: 'Ayah',
-              value: controller.getOrangTuaByTipe(santri.orangTua, 'Ayah'),
-              isParentInfo: true,
-              ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Ayah'),
-              onTap: () {
-                if (Get.isRegistered<DetailOrtuController>()) {
-                  Get.delete<DetailOrtuController>();
-                }
-                Get.toNamed(
-                  '/detail-ortu',
-                  arguments: {
-                    'ortuId': controller.getOrangTuaIdByTipe(
-                      santri.orangTua,
-                      'Ayah',
+          ),
+          const SizedBox(height: 16),
+          () {
+            if (santri.orangTua.isEmpty) {
+              return Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.grey[400], size: 20),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Belum ada data orang tua',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey[500],
+                      ),
                     ),
+                  ],
+                ),
+              );
+            }
+            return ListView.separated(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: santri.orangTua.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final orangTua = santri.orangTua[index];
+                return _buildInfoTile(
+                  icon: Icons.family_restroom_rounded,
+                  label: orangTua.tipe ?? '-',
+                  value: orangTua.nama ?? '-',
+                  isParentInfo: true,
+                  ortuId: orangTua.id.toString(),
+                  onTap: () {
+                    if (Get.isRegistered<DetailOrtuController>()) {
+                      Get.delete<DetailOrtuController>();
+                    }
+                    Get.toNamed(
+                      '/detail-ortu',
+                      arguments: {'ortuId': orangTua.id.toString()},
+                    );
                   },
                 );
               },
-            ),
-          ],
-
-          if (santri.orangTua.hasIbu) ...[
-            const SizedBox(height: 12),
-            _buildInfoTile(
-              icon: Icons.person,
-              label: 'Ibu',
-              value: controller.getOrangTuaByTipe(santri.orangTua, 'Ibu'),
-              isParentInfo: true,
-              ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Ibu'),
-              onTap: () {
-                if (Get.isRegistered<DetailOrtuController>()) {
-                  Get.delete<DetailOrtuController>();
-                }
-                Get.toNamed(
-                  '/detail-ortu',
-                  arguments: {
-                    'ortuId': controller.getOrangTuaIdByTipe(
-                      santri.orangTua,
-                      'Ibu',
-                    ),
-                  },
-                );
-              },
-            ),
-          ],
-
-          if (santri.orangTua.hasWali) ...[
-            const SizedBox(height: 12),
-            _buildInfoTile(
-              icon: Icons.person,
-              label: 'Wali',
-              value: controller.getOrangTuaByTipe(santri.orangTua, 'Wali'),
-              isParentInfo: true,
-              ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Wali'),
-              onTap: () {
-                if (Get.isRegistered<DetailOrtuController>()) {
-                  Get.delete<DetailOrtuController>();
-                }
-                Get.toNamed(
-                  '/detail-ortu',
-                  arguments: {
-                    'ortuId': controller.getOrangTuaIdByTipe(
-                      santri.orangTua,
-                      'Wali',
-                    ),
-                  },
-                );
-              },
-            ),
-          ],
+            );
+          }(),
         ],
       ),
     );
