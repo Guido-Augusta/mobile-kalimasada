@@ -354,7 +354,9 @@ class EditSantriController extends GetxController {
   Future<void> selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: santriDetail.value!.tanggalLahir!,
+      initialDate: tanggalLahirC.text.isNotEmpty
+          ? DateTime.parse(convertDisplayToApiFormat(tanggalLahirC.text))
+          : santriDetail.value!.tanggalLahir!,
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       builder: (BuildContext context, Widget? child) {
@@ -531,14 +533,14 @@ class EditSantriController extends GetxController {
 
   // Format the date to display in the text field
   String formatDateToDisplay(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
   String convertDisplayToApiFormat(String displayDate) {
     try {
-      final parts = displayDate.split('-');
+      final parts = displayDate.split('/');
       if (parts.length == 3) {
-        return '${parts[2]}-${parts[1]}-${parts[0]}'; // DD-MM-YYYY -> YYYY-MM-DD
+        return '${parts[2]}-${parts[1]}-${parts[0]}'; // DD/MM/YYYY -> YYYY-MM-DD
       }
       return displayDate;
     } catch (e) {

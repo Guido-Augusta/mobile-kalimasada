@@ -322,12 +322,12 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
                                   value: 'edit',
                                   child: const Text('Edit'),
                                   onTap: () {
-                                    // Get.toNamed(
-                                    //   '/edit-ustadz',
-                                    //   arguments: {
-                                    //     'ustadzId': ustadz.id.toString(),
-                                    //   },
-                                    // );
+                                    Get.toNamed(
+                                      '/edit-ustadz',
+                                      arguments: {
+                                        'ustadzId': ustadz.id.toString(),
+                                      },
+                                    );
                                   },
                                 ),
                                 PopupMenuItem(

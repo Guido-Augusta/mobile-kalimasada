@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:get/get.dart';
@@ -27,6 +28,15 @@ void main() async {
         title: "Application",
         initialRoute: AppPages.INITIAL,
         getPages: AppPages.routes,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('id', 'ID'),
+        ],
+        locale: const Locale('id', 'ID'),
       ),
     ),
   );

@@ -473,7 +473,13 @@ class SantriProfileView extends GetView<SantriProfileController> {
     Future<void> selectDate(BuildContext context) async {
       final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: controller.santriDetail.value!.tanggalLahir!,
+        initialDate: controller.tanggalLahirC.text.isNotEmpty
+            ? DateTime.parse(
+                controller.convertDisplayToApiFormat(
+                  controller.tanggalLahirC.text,
+                ),
+              )
+            : controller.santriDetail.value!.tanggalLahir!,
         firstDate: DateTime(1900),
         lastDate: DateTime.now(),
         builder: (BuildContext context, Widget? child) {
@@ -680,56 +686,46 @@ class SantriProfileView extends GetView<SantriProfileController> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        GestureDetector(
+                        TextFormField(
+                          controller: controller.tanggalLahirC,
                           onTap: () => selectDate(Get.context!),
-                          child: AbsorbPointer(
-                            child: TextFormField(
-                              controller: controller.tanggalLahirC,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Tanggal lahir tidak boleh kosong';
-                                }
-                                return null;
-                              },
-                              decoration: InputDecoration(
-                                hintText: 'Pilih Tanggal Lahir',
-                                hintStyle: TextStyle(color: Colors.grey[500]),
-                                prefixIcon: Icon(
-                                  Icons.calendar_today,
-                                  color: Colors.deepPurple,
-                                  size: 20,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey[300]!,
-                                  ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey[300]!,
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(
-                                    color: Colors.deepPurple,
-                                  ),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.red),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[50],
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                              ),
+                          readOnly: true,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Tanggal lahir tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Pilih Tanggal Lahir',
+                            hintStyle: TextStyle(color: Colors.grey[500]),
+                            prefixIcon: Icon(
+                              Icons.calendar_today,
+                              color: Colors.deepPurple,
+                              size: 20,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.deepPurple),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
                             ),
                           ),
                         ),
@@ -903,7 +899,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurpleAccent,
+                            backgroundColor: Colors.black,
                             padding: controller.isSaveLoading.value
                                 ? EdgeInsets.symmetric(vertical: 4)
                                 : EdgeInsets.symmetric(vertical: 12),

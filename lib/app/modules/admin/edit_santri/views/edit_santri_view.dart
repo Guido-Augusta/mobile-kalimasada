@@ -576,49 +576,46 @@ class EditSantriView extends GetView<EditSantriController> {
               ),
             ),
             const SizedBox(height: 8),
-            GestureDetector(
+            TextFormField(
+              controller: controller.tanggalLahirC,
+              readOnly: true,
               onTap: () => controller.selectDate(Get.context!),
-              child: AbsorbPointer(
-                child: TextFormField(
-                  controller: controller.tanggalLahirC,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Tanggal lahir tidak boleh kosong';
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Pilih Tanggal Lahir',
-                    hintStyle: TextStyle(color: Colors.grey[500]),
-                    prefixIcon: Icon(
-                      Icons.calendar_today,
-                      color: Colors.deepPurple,
-                      size: 20,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.deepPurple),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[50],
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                  ),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Tanggal lahir tidak boleh kosong';
+                }
+                return null;
+              },
+              decoration: InputDecoration(
+                hintText: 'Pilih Tanggal Lahir',
+                hintStyle: TextStyle(color: Colors.grey[500]),
+                prefixIcon: Icon(
+                  Icons.calendar_today,
+                  color: Colors.deepPurple,
+                  size: 20,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey[300]!),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey[300]!),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.deepPurple),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey[50],
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
                 ),
               ),
             ),

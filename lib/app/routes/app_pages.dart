@@ -11,10 +11,14 @@ import '../modules/admin/edit_ortu/bindings/edit_ortu_binding.dart';
 import '../modules/admin/edit_ortu/views/edit_ortu_view.dart';
 import '../modules/admin/edit_santri/bindings/edit_santri_binding.dart';
 import '../modules/admin/edit_santri/views/edit_santri_view.dart';
+import '../modules/admin/edit_ustadz/bindings/edit_ustadz_binding.dart';
+import '../modules/admin/edit_ustadz/views/edit_ustadz_view.dart';
 import '../modules/admin/tambah_ortu/bindings/tambah_ortu_binding.dart';
 import '../modules/admin/tambah_ortu/views/tambah_ortu_view.dart';
 import '../modules/admin/tambah_santri/bindings/tambah_santri_binding.dart';
 import '../modules/admin/tambah_santri/views/tambah_santri_view.dart';
+import '../modules/admin/tambah_ustadz/bindings/tambah_ustadz_binding.dart';
+import '../modules/admin/tambah_ustadz/views/tambah_ustadz_view.dart';
 import '../modules/auth/change_password/bindings/change_password_binding.dart';
 import '../modules/auth/change_password/views/change_password_view.dart';
 import '../modules/auth/forgot_password/bindings/forgot_password_binding.dart';
@@ -47,8 +51,6 @@ import '../modules/santri/santri_home/bindings/santri_home_binding.dart';
 import '../modules/santri/santri_home/views/santri_home_view.dart';
 import '../modules/santri/santri_profile/bindings/santri_profile_binding.dart';
 import '../modules/santri/santri_profile/views/santri_profile_view.dart';
-import '../modules/admin/tambah_ustadz/bindings/tambah_ustadz_binding.dart';
-import '../modules/admin/tambah_ustadz/views/tambah_ustadz_view.dart';
 import '../modules/ustadz/daftar_santri/bindings/daftar_santri_binding.dart';
 import '../modules/ustadz/daftar_santri/views/daftar_santri_view.dart';
 import '../modules/ustadz/detail_riwayat_hafalan/bindings/detail_riwayat_hafalan_binding.dart';
@@ -256,6 +258,11 @@ class AppPages {
       name: _Paths.TAMBAH_USTADZ,
       page: () => const TambahUstadzView(),
       binding: TambahUstadzBinding(),
+    ),
+    GetPage(
+      name: _Paths.EDIT_USTADZ,
+      page: () => const EditUstadzView(),
+      binding: EditUstadzBinding(),
     ),
   ];
 }
