@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../controllers/alquran_controller.dart';
-import 'package:mobile_kalimasada/app/data/models/surah.dart';
+import 'package:mobile_kalimasada/app/data/models/daftar_surah.dart';
 
 class AlquranView extends GetView<AlquranController> {
   const AlquranView({super.key});
@@ -183,7 +183,7 @@ class AlquranView extends GetView<AlquranController> {
     );
   }
 
-  Container surahCard(Surah surah) {
+  Container surahCard(Datum surah) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(

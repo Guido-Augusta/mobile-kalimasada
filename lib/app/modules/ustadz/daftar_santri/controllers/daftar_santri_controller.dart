@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart' as ds;
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart' as ph;
-import 'package:mobile_kalimasada/app/data/models/surah.dart' as s;
+import 'package:mobile_kalimasada/app/data/models/daftar_surah.dart' as s;
 import 'package:mobile_kalimasada/app/data/models/ayat_hafalan.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan.dart' as dh;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
@@ -39,9 +39,9 @@ class DaftarSantriController extends GetxController {
   var isLoadingMore = false.obs;
 
   var isLoadingSurah = false.obs;
-  var surahList = <s.Surah>[].obs;
-  var selectedSurahHafalan = Rxn<SearchFieldListItem<s.Surah>>();
-  var selectedSurahMurajaah = Rxn<SearchFieldListItem<s.Surah>>();
+  var surahList = <s.Datum>[].obs;
+  var selectedSurahHafalan = Rxn<SearchFieldListItem<s.Datum>>();
+  var selectedSurahMurajaah = Rxn<SearchFieldListItem<s.Datum>>();
   var detailHafalan = Rx<dh.DetailHafalan?>(null);
 
   var isLoadingAyat = false.obs;
@@ -251,10 +251,8 @@ class DaftarSantriController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final List<dynamic> surahsData = data['data'];
-        surahList.value = surahsData
-            .map((json) => s.Surah.fromJson(json))
-            .toList();
+        final daftarSurah = s.DaftarSurah.fromJson(data);
+        surahList.value = daftarSurah.data;
       } else {
         ToastUtils.showErrorToast('Gagal memuat data surah');
       }
@@ -267,7 +265,7 @@ class DaftarSantriController extends GetxController {
     }
   }
 
-  void onSurahSelected(s.Surah? newSurah) {
+  void onSurahSelected(s.Datum? newSurah) {
     ayatList.clear();
 
     if (newSurah != null) {

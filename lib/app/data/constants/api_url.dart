@@ -48,7 +48,7 @@ class ApiUrl {
   static String get santriRank => '$baseUrl/santri/peringkat';
 
   // ALQURAN
-  static String get surahList => '$baseUrl/alquran';
+  static String get surahList => '$baseUrl/alquran/surah';
 
   static String surahDetail(String surahId) =>
       '$baseUrl/alquran/surah/$surahId';
@@ -57,7 +57,7 @@ class ApiUrl {
   static String get saveSetoran => '$baseUrl/hafalan';
 
   static String progresHafalan(String santriId) =>
-      '$baseUrl/hafalan/$santriId/surah';
+      '$baseUrl/hafalan/$santriId?mode=surah';
 
   static String detailHafalanPerSurahTambah(String santriId, String surahId) =>
       '$baseUrl/hafalan/$santriId/surah/$surahId?mode=tambah';

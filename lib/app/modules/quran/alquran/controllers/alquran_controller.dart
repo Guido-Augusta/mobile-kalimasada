@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
-import 'package:mobile_kalimasada/app/data/models/surah.dart';
+import 'package:mobile_kalimasada/app/data/models/daftar_surah.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 
 class AlquranController extends GetxController {
-  var surahList = <Surah>[].obs;
-  var filteredSurahList = <Surah>[].obs;
+  var surahList = <Datum>[].obs;
+  var filteredSurahList = <Datum>[].obs;
   var searchQuery = ''.obs;
   var isLoadingSurah = false.obs;
-  var lastReadSurah = Rxn<Surah>();
+  var lastReadSurah = Rxn<Datum>();
   var searchController = TextEditingController();
 
   DateTime? _lastErrorShown;
@@ -39,10 +39,8 @@ class AlquranController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final List<dynamic> surahsData = data['data'];
-        surahList.value = surahsData
-            .map((json) => Surah.fromJson(json))
-            .toList();
+        final daftarSurah = DaftarSurah.fromJson(data);
+        surahList.value = daftarSurah.data;
         filteredSurahList.value = List.from(surahList);
       } else {
         ToastUtils.showErrorToast('Gagal memuat surah');

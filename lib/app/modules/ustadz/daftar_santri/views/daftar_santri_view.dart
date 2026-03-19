@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart';
-import 'package:mobile_kalimasada/app/data/models/surah.dart';
+import 'package:mobile_kalimasada/app/data/models/daftar_surah.dart' as s;
 import 'package:searchfield/searchfield.dart';
 import '../controllers/daftar_santri_controller.dart';
 
@@ -1174,8 +1174,8 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     return null;
                   },
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  suggestions: controller.surahList.map((Surah surah) {
-                    return SearchFieldListItem<Surah>(
+                  suggestions: controller.surahList.map((s.Datum surah) {
+                    return SearchFieldListItem<s.Datum>(
                       surah.namaLatin!,
                       value: surah.namaLatin,
                       item: surah,
@@ -1224,7 +1224,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                   selectedValue: controller.selectedSurahHafalan.value,
                   onSuggestionTap: (SearchFieldListItem x) {
                     controller.selectedSurahHafalan.value =
-                        x as SearchFieldListItem<Surah>;
+                        x as SearchFieldListItem<s.Datum>;
                     controller.onSurahSelected(x.item);
                   },
                   suggestionState: Suggestion.expand,
@@ -1688,8 +1688,8 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     return null;
                   },
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  suggestions: controller.surahList.map((Surah surah) {
-                    return SearchFieldListItem<Surah>(
+                  suggestions: controller.surahList.map((s.Datum surah) {
+                    return SearchFieldListItem<s.Datum>(
                       surah.namaLatin!,
                       value: surah.namaLatin,
                       item: surah,
@@ -1738,7 +1738,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                   selectedValue: controller.selectedSurahMurajaah.value,
                   onSuggestionTap: (SearchFieldListItem x) {
                     controller.selectedSurahMurajaah.value =
-                        x as SearchFieldListItem<Surah>;
+                        x as SearchFieldListItem<s.Datum>;
                     controller.onSurahSelected(x.item);
                   },
                   suggestionState: Suggestion.expand,

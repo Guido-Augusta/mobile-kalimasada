@@ -1,7 +1,30 @@
 // GET http://localhost:5000/api/alquran
 
-class Surah {
-  Surah({
+class DaftarSurah {
+  DaftarSurah({required this.data});
+
+  final List<Datum> data;
+
+  factory DaftarSurah.fromJson(Map<String, dynamic> json) {
+    return DaftarSurah(
+      data: json["data"] == null
+          ? []
+          : List<Datum>.from(json["data"]!.map((x) => Datum.fromJson(x))),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "data": data.map((x) => x.toJson()).toList(),
+  };
+
+  @override
+  String toString() {
+    return "$data, ";
+  }
+}
+
+class Datum {
+  Datum({
     required this.id,
     required this.nomor,
     required this.nama,
@@ -23,8 +46,8 @@ class Surah {
   final String? deskripsi;
   final String? audio;
 
-  factory Surah.fromJson(Map<String, dynamic> json) {
-    return Surah(
+  factory Datum.fromJson(Map<String, dynamic> json) {
+    return Datum(
       id: json["id"],
       nomor: json["nomor"],
       nama: json["nama"],
