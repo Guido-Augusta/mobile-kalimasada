@@ -136,21 +136,34 @@ class DetailSantriView extends GetView<DetailSantriController> {
                                 ],
                               ),
                               child: ClipOval(
-                                child: CachedNetworkImage(
-                                  imageUrl: controller.getImageUrl(
-                                    santri.fotoProfil!,
-                                  ),
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => Container(
-                                    color: Colors.grey[300],
-                                    child: const Icon(
-                                      Icons.person,
-                                      size: 40,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      Container(
+                                child:
+                                    santri.fotoProfil != null &&
+                                        santri.fotoProfil!.isNotEmpty
+                                    ? CachedNetworkImage(
+                                        imageUrl: controller.getImageUrl(
+                                          santri.fotoProfil!,
+                                        ),
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) =>
+                                            Container(
+                                              color: Colors.grey[300],
+                                              child: const Icon(
+                                                Icons.person,
+                                                size: 40,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                        errorWidget: (context, url, error) =>
+                                            Container(
+                                              color: Colors.grey[300],
+                                              child: const Icon(
+                                                Icons.person,
+                                                size: 40,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                      )
+                                    : Container(
                                         color: Colors.grey[300],
                                         child: const Icon(
                                           Icons.person,
@@ -158,7 +171,6 @@ class DetailSantriView extends GetView<DetailSantriController> {
                                           color: Colors.grey,
                                         ),
                                       ),
-                                ),
                               ),
                             ),
 

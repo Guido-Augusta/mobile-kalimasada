@@ -341,9 +341,8 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     ),
                     child: ClipOval(
                       child:
-                          santri.fotoProfil != null ||
-                              santri.fotoProfil!.isNotEmpty ||
-                              santri.fotoProfil! != ''
+                          santri.fotoProfil != null &&
+                              santri.fotoProfil!.isNotEmpty
                           ? CachedNetworkImage(
                               imageUrl: controller.getImageUrl(
                                 santri.fotoProfil!,
@@ -595,9 +594,8 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                     ),
                     child: ClipOval(
                       child:
-                          santri.fotoProfil != null ||
-                              santri.fotoProfil!.isNotEmpty ||
-                              santri.fotoProfil! != ''
+                          santri.fotoProfil != null &&
+                              santri.fotoProfil!.isNotEmpty
                           ? CachedNetworkImage(
                               imageUrl: controller.getImageUrl(
                                 santri.fotoProfil!,
