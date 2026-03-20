@@ -617,7 +617,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurpleAccent,
+                            backgroundColor: Colors.black,
                             padding: controller.isSaveLoading.value
                                 ? EdgeInsets.symmetric(vertical: 4)
                                 : EdgeInsets.symmetric(vertical: 12),
@@ -947,7 +947,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                   icon: Icons.family_restroom_rounded,
                   label: orangTua.tipe ?? '-',
                   value: orangTua.nama ?? '-',
-                  isParentInfo: true,
+                  isGoToDetail: true,
                   ortuId: orangTua.id.toString(),
                   onTap: () {
                     if (Get.isRegistered<DetailOrtuController>()) {
@@ -985,7 +985,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Informasi Wali Kelas',
+            'Penanggung Jawab Kelas',
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -996,16 +996,55 @@ class DetailSantriView extends GetView<DetailSantriController> {
           const SizedBox(height: 16),
 
           // Wali Kelas
-          _buildInfoTile(
-            icon: Icons.school,
-            label: 'Wali Kelas Santri',
-            value: santri.waliKelas.isNotEmpty
-                ? santri.waliKelas.first.nama!
-                : '-',
-            telepon: santri.waliKelas.isNotEmpty
-                ? santri.waliKelas.first.nomorHp
-                : '',
-          ),
+          if (santri.waliKelas.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.grey[400], size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Belum ada data wali kelas',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey[500],
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            ListView.separated(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: santri.waliKelas.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final waliKelas = santri.waliKelas[index];
+                return _buildInfoTile(
+                  icon: Icons.school,
+                  label: 'PJ Kelas',
+                  value: waliKelas.nama ?? '-',
+                  isGoToDetail: true,
+                  onTap: () {
+                    Get.toNamed(
+                      '/detail-ustadz',
+                      arguments: {'ustadzId': waliKelas.id.toString()},
+                    );
+                  },
+                );
+              },
+            ),
         ],
       ),
     );
@@ -1417,7 +1456,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
     required String label,
     required String value,
     String? telepon,
-    bool? isParentInfo,
+    bool? isGoToDetail,
     String? ortuId,
     bool? isOverflow,
     VoidCallback? onTap,
@@ -1469,7 +1508,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
               ),
             ),
 
-            if (isParentInfo == true) ...[
+            if (isGoToDetail == true) ...[
               const SizedBox(width: 8),
               const Icon(
                 Icons.keyboard_arrow_right_rounded,
