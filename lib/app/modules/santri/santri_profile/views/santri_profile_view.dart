@@ -7,9 +7,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
-import 'package:mobile_kalimasada/app/extentions/orang_tua_extention.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../ortu/detail_ortu/controllers/detail_ortu_controller.dart';
 import '../controllers/santri_profile_controller.dart';
 
 class SantriProfileView extends GetView<SantriProfileController> {
@@ -18,6 +18,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
   Widget build(BuildContext context) {
     return Obx(
       () => Scaffold(
+        backgroundColor: const Color(0xFFF1F5F9),
         appBar: controller.santriDetail.value == null
             ? AppBar(
                 title: const Text(
@@ -37,7 +38,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
                 ),
               )
             : null,
-        backgroundColor: const Color(0xFFF1F5F9),
         body: Obx(() {
           final santri = controller.santriDetail.value;
           // Data kosong
@@ -463,22 +463,23 @@ class SantriProfileView extends GetView<SantriProfileController> {
     );
   }
 
-  // Format the date to display in the text field
-  String formatDate(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-  }
-
   void _showEditProfileDialog() {
     // Initialize the date controller with the current date of birth
     controller.tanggalLahirC = TextEditingController(
-      text: formatDate(controller.santriDetail.value!.tanggalLahir!),
+      text: controller.formatDate(controller.santriDetail.value!.tanggalLahir!),
     );
 
     // Function to show date picker
     Future<void> selectDate(BuildContext context) async {
       final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: controller.santriDetail.value!.tanggalLahir!,
+        initialDate: controller.tanggalLahirC.text.isNotEmpty
+            ? DateTime.parse(
+                controller.convertDisplayToApiFormat(
+                  controller.tanggalLahirC.text,
+                ),
+              )
+            : controller.santriDetail.value!.tanggalLahir!,
         firstDate: DateTime(1900),
         lastDate: DateTime.now(),
         builder: (BuildContext context, Widget? child) {
@@ -498,8 +499,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
 
       if (picked != null &&
           picked != controller.santriDetail.value!.tanggalLahir) {
-        // controller.santriDetail.value!.tanggalLahir = picked;
-        controller.tanggalLahirC.text = formatDate(picked);
+        controller.tanggalLahirC.text = controller.formatDate(picked);
       }
     }
 
@@ -686,56 +686,46 @@ class SantriProfileView extends GetView<SantriProfileController> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        GestureDetector(
+                        TextFormField(
+                          controller: controller.tanggalLahirC,
                           onTap: () => selectDate(Get.context!),
-                          child: AbsorbPointer(
-                            child: TextFormField(
-                              controller: controller.tanggalLahirC,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Tanggal lahir tidak boleh kosong';
-                                }
-                                return null;
-                              },
-                              decoration: InputDecoration(
-                                hintText: 'Pilih Tanggal Lahir',
-                                hintStyle: TextStyle(color: Colors.grey[500]),
-                                prefixIcon: Icon(
-                                  Icons.calendar_today,
-                                  color: Colors.deepPurple,
-                                  size: 20,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey[300]!,
-                                  ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey[300]!,
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(
-                                    color: Colors.deepPurple,
-                                  ),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.red),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[50],
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                              ),
+                          readOnly: true,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Tanggal lahir tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Pilih Tanggal Lahir',
+                            hintStyle: TextStyle(color: Colors.grey[500]),
+                            prefixIcon: Icon(
+                              Icons.calendar_today,
+                              color: Colors.deepPurple,
+                              size: 20,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.deepPurple),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
                             ),
                           ),
                         ),
@@ -909,7 +899,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurpleAccent,
+                            backgroundColor: Colors.black,
                             padding: controller.isSaveLoading.value
                                 ? EdgeInsets.symmetric(vertical: 4)
                                 : EdgeInsets.symmetric(vertical: 12),
@@ -1238,68 +1228,66 @@ class SantriProfileView extends GetView<SantriProfileController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (santri.orangTua.hasOrangTua)
-            Text(
-              santri.orangTua.sectionTitle,
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1F2937),
-              ),
+          Text(
+            'Informasi Orang Tua',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF1F2937),
             ),
-
-          if (santri.orangTua.hasWali)
-            Text(
-              santri.orangTua.sectionTitle,
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1F2937),
-              ),
-            ),
-
-          if (santri.orangTua.hasOrangTua && santri.orangTua.hasWali)
-            Text(
-              santri.orangTua.sectionTitle,
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1F2937),
-              ),
-            ),
-
-          if (santri.orangTua.hasAyah) ...[
-            const SizedBox(height: 16),
-            _buildInfoTile(
-              icon: Icons.person,
-              label: 'Ayah',
-              value: controller.getOrangTuaByTipe(santri.orangTua, 'Ayah'),
-              isParentInfo: true,
-              ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Ayah'),
-            ),
-          ],
-
-          if (santri.orangTua.hasIbu) ...[
-            const SizedBox(height: 12),
-            _buildInfoTile(
-              icon: Icons.person,
-              label: 'Ibu',
-              value: controller.getOrangTuaByTipe(santri.orangTua, 'Ibu'),
-              isParentInfo: true,
-              ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Ibu'),
-            ),
-          ],
-
-          if (santri.orangTua.hasWali) ...[
-            const SizedBox(height: 12),
-            _buildInfoTile(
-              icon: Icons.person,
-              label: 'Wali',
-              value: controller.getOrangTuaByTipe(santri.orangTua, 'Wali'),
-              isParentInfo: true,
-              ortuId: controller.getOrangTuaIdByTipe(santri.orangTua, 'Wali'),
-            ),
-          ],
+          ),
+          const SizedBox(height: 16),
+          () {
+            if (santri.orangTua.isEmpty) {
+              return Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.grey[400], size: 20),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Belum ada data orang tua',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ListView.separated(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: santri.orangTua.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final orangTua = santri.orangTua[index];
+                return _buildInfoTile(
+                  icon: Icons.family_restroom_rounded,
+                  label: orangTua.tipe ?? '-',
+                  value: orangTua.nama ?? '-',
+                  isParentInfo: true,
+                  ortuId: orangTua.id.toString(),
+                  onTap: () {
+                    if (Get.isRegistered<DetailOrtuController>()) {
+                      Get.delete<DetailOrtuController>();
+                    }
+                    Get.toNamed(
+                      '/detail-ortu',
+                      arguments: {'ortuId': orangTua.id.toString()},
+                    );
+                  },
+                );
+              },
+            );
+          }(),
         ],
       ),
     );
@@ -1356,118 +1344,117 @@ class SantriProfileView extends GetView<SantriProfileController> {
     String? telepon,
     bool? isParentInfo,
     String? ortuId,
+    bool? isOverflow,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
             ),
-            child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
-          ),
 
-          const SizedBox(width: 12),
+            const SizedBox(width: 12),
 
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: isOverflow == true ? TextOverflow.ellipsis : null,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          if (isParentInfo == true) ...[
-            const SizedBox(width: 8),
-            IconButton(
-              onPressed: () {
-                Get.toNamed('/detail-ortu', arguments: {'ortuId': ortuId});
-              },
-              icon: const Icon(
+            if (isParentInfo == true) ...[
+              const SizedBox(width: 8),
+              const Icon(
                 Icons.keyboard_arrow_right_rounded,
                 color: Colors.deepPurpleAccent,
               ),
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-            ),
+            ],
+
+            if (telepon != null && telepon.isNotEmpty)
+              Row(
+                children: [
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: SvgPicture.asset(
+                      'assets/icons/whatsapp.svg',
+                      width: 20,
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFF25D366),
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    onPressed: () {
+                      String formattedNomor = telepon;
+                      if (telepon.startsWith('0')) {
+                        formattedNomor = '+62${telepon.substring(1)}';
+                      }
+
+                      final whatsappUrl = "https://wa.me/$formattedNomor";
+                      launchUrl(Uri.parse(whatsappUrl));
+                    },
+                    style: IconButton.styleFrom(
+                      backgroundColor: const Color(
+                        0xFF25D366,
+                      ).withValues(alpha: 0.1),
+                      shape: const CircleBorder(),
+                    ),
+                  ),
+
+                  const SizedBox(width: 4),
+
+                  IconButton(
+                    icon: const Icon(
+                      Icons.phone,
+                      size: 18,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onPressed: () {
+                      final phoneUrl = "tel:$telepon";
+                      launchUrl(Uri.parse(phoneUrl));
+                    },
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.deepPurpleAccent.withValues(
+                        alpha: 0.1,
+                      ),
+                      shape: const CircleBorder(),
+                    ),
+                  ),
+                ],
+              ),
           ],
-
-          if (telepon != null && telepon.isNotEmpty)
-            Row(
-              children: [
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: SvgPicture.asset(
-                    'assets/icons/whatsapp.svg',
-                    width: 20,
-                    colorFilter: const ColorFilter.mode(
-                      Color(0xFF25D366),
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  onPressed: () {
-                    String formattedNomor = telepon;
-                    if (telepon.startsWith('0')) {
-                      formattedNomor = '+62${telepon.substring(1)}';
-                    }
-
-                    final whatsappUrl = "https://wa.me/$formattedNomor";
-                    launchUrl(Uri.parse(whatsappUrl));
-                  },
-                  style: IconButton.styleFrom(
-                    backgroundColor: const Color(
-                      0xFF25D366,
-                    ).withValues(alpha: 0.1),
-                    shape: const CircleBorder(),
-                  ),
-                ),
-
-                const SizedBox(width: 4),
-
-                IconButton(
-                  icon: const Icon(
-                    Icons.phone,
-                    size: 18,
-                    color: Colors.deepPurpleAccent,
-                  ),
-                  onPressed: () {
-                    final phoneUrl = "tel:$telepon";
-                    launchUrl(Uri.parse(phoneUrl));
-                  },
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.deepPurpleAccent.withValues(
-                      alpha: 0.1,
-                    ),
-                    shape: const CircleBorder(),
-                  ),
-                ),
-              ],
-            ),
-        ],
+        ),
       ),
     );
   }

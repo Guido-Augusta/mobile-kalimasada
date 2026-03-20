@@ -256,7 +256,9 @@ class SantriProfileController extends GetxController {
               'nomorHp': noHp ?? santriDetail.value?.nomorHp,
               'alamat': alamat ?? santriDetail.value?.alamat,
               'jenisKelamin': jenisKelamin ?? santriDetail.value?.jenisKelamin,
-              'tanggalLahir': tanggalLahir,
+              'tanggalLahir': convertDisplayToApiFormat(
+                tanggalLahir ?? formatDate(santriDetail.value!.tanggalLahir!),
+              ),
             }),
           )
           .timeout(const Duration(seconds: 30));
@@ -330,6 +332,18 @@ class SantriProfileController extends GetxController {
 
   // Format the date to display in the text field
   String formatDate(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  String convertDisplayToApiFormat(String displayDate) {
+    try {
+      final parts = displayDate.split('/');
+      if (parts.length == 3) {
+        return '${parts[2]}-${parts[1]}-${parts[0]}'; // DD/MM/YYYY -> YYYY-MM-DD
+      }
+      return displayDate;
+    } catch (e) {
+      return displayDate;
+    }
   }
 }

@@ -400,9 +400,8 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                           ),
                           child: ClipOval(
                             child:
-                                child.fotoProfil != null ||
-                                    child.fotoProfil!.isNotEmpty ||
-                                    child.fotoProfil! != ''
+                                child.fotoProfil != null &&
+                                    child.fotoProfil!.isNotEmpty
                                 ? CachedNetworkImage(
                                     imageUrl: controller.getImageUrl(
                                       child.fotoProfil!,
@@ -543,46 +542,6 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                                       ],
                                     ),
                                   ),
-
-                                  // Points Badge
-                                  if (child.totalPoin != null)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.amber.withValues(
-                                          alpha: 0.1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: Colors.amber.withValues(
-                                            alpha: 0.2,
-                                          ),
-                                          width: 1,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(
-                                            Icons.star,
-                                            size: 14,
-                                            color: Colors.amber,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '${child.totalPoin} Poin',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.amber,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
                                 ],
                               ),
                             ],
@@ -792,11 +751,11 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
   String _getTahapLabel(String? tahap) {
     switch (tahap?.toLowerCase()) {
       case 'level1':
-        return 'Level 1';
+        return 'Juz 30';
       case 'level2':
-        return 'Level 2';
+        return 'Surah Pilihan';
       case 'level3':
-        return 'Level 3';
+        return 'Juz 1-29';
       default:
         return 'Tahap ?';
     }

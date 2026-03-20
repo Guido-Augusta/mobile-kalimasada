@@ -711,7 +711,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurpleAccent,
+                            backgroundColor: Colors.black,
                             padding: controller.isSaveLoading.value
                                 ? EdgeInsets.symmetric(vertical: 4)
                                 : EdgeInsets.symmetric(vertical: 12),

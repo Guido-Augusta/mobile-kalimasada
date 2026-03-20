@@ -33,20 +33,22 @@ class ApiUrl {
   static String get resetPassword => '$baseUrl/auth/reset-password';
 
   // USTADZ
-  static String ustadz(String ustadzId) => '$baseUrl/ustadz/$ustadzId';
+  static String get ustadz => '$baseUrl/ustadz';
+  static String ustadzDetail(String ustadzId) => '$baseUrl/ustadz/$ustadzId';
 
   // ORTU
-  static String ortu(String ortuId) => '$baseUrl/ortu/$ortuId';
+  static String get ortu => '$baseUrl/ortu';
+  static String ortuDetail(String ortuId) => '$baseUrl/ortu/$ortuId';
 
   // SANTRI
-  static String get santriList => '$baseUrl/santri';
+  static String get santri => '$baseUrl/santri';
 
   static String santriDetail(String santriId) => '$baseUrl/santri/$santriId';
 
   static String get santriRank => '$baseUrl/santri/peringkat';
 
   // ALQURAN
-  static String get surahList => '$baseUrl/alquran';
+  static String get surahList => '$baseUrl/alquran/surah';
 
   static String surahDetail(String surahId) =>
       '$baseUrl/alquran/surah/$surahId';
@@ -55,7 +57,7 @@ class ApiUrl {
   static String get saveSetoran => '$baseUrl/hafalan';
 
   static String progresHafalan(String santriId) =>
-      '$baseUrl/hafalan/$santriId/surah';
+      '$baseUrl/hafalan/$santriId?mode=surah';
 
   static String detailHafalanPerSurahTambah(String santriId, String surahId) =>
       '$baseUrl/hafalan/$santriId/surah/$surahId?mode=tambah';
@@ -79,4 +81,10 @@ class ApiUrl {
 
   // CHART
   static String get chart => '$baseUrl/chart';
+
+  // ADMIN
+  // DELETE USER
+  static String deleteSantri(String santriId) => '$baseUrl/santri/$santriId';
+  static String deleteOrtu(String ortuId) => '$baseUrl/ortu/$ortuId';
+  static String deleteUstadz(String ustadzId) => '$baseUrl/ustadz/$ustadzId';
 }

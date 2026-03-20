@@ -28,6 +28,16 @@ abstract class Routes {
   static const SUMMARY_HAFALAN = _Paths.SUMMARY_HAFALAN;
   static const DETAIL_ORTU = _Paths.DETAIL_ORTU;
   static const DOA_KHATAM = _Paths.DOA_KHATAM;
+  static const ADMIN_HOME = _Paths.ADMIN_HOME;
+  static const EDIT_SANTRI = _Paths.EDIT_SANTRI;
+  static const TAMBAH_SANTRI = _Paths.TAMBAH_SANTRI;
+  static const DAFTAR_ORTU = _Paths.DAFTAR_ORTU;
+  static const TAMBAH_ORTU = _Paths.TAMBAH_ORTU;
+  static const EDIT_ORTU = _Paths.EDIT_ORTU;
+  static const DAFTAR_USTADZ = _Paths.DAFTAR_USTADZ;
+  static const DETAIL_USTADZ = _Paths.DETAIL_USTADZ;
+  static const TAMBAH_USTADZ = _Paths.TAMBAH_USTADZ;
+  static const EDIT_USTADZ = _Paths.EDIT_USTADZ;
 }
 
 abstract class _Paths {
@@ -57,4 +67,14 @@ abstract class _Paths {
   static const SUMMARY_HAFALAN = '/summary-hafalan';
   static const DETAIL_ORTU = '/detail-ortu';
   static const DOA_KHATAM = '/doa-khatam';
+  static const ADMIN_HOME = '/admin-home';
+  static const EDIT_SANTRI = '/edit-santri';
+  static const TAMBAH_SANTRI = '/tambah-santri';
+  static const DAFTAR_ORTU = '/daftar-ortu';
+  static const TAMBAH_ORTU = '/tambah-ortu';
+  static const EDIT_ORTU = '/edit-ortu';
+  static const DAFTAR_USTADZ = '/daftar-ustadz';
+  static const DETAIL_USTADZ = '/detail-ustadz';
+  static const TAMBAH_USTADZ = '/tambah-ustadz';
+  static const EDIT_USTADZ = '/edit-ustadz';
 }

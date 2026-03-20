@@ -37,7 +37,7 @@ class UstadzHomeController extends GetxController {
       final ustadzId = prefs.getString('roleId');
 
       final response = await get(
-        Uri.parse(ApiUrl.ustadz(ustadzId!)),
+        Uri.parse(ApiUrl.ustadzDetail(ustadzId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -69,7 +69,7 @@ class UstadzHomeController extends GetxController {
     }
   }
 
-  Future<void> logout() async {
+  void logout() async {
     isLoadingLogout.value = true;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');

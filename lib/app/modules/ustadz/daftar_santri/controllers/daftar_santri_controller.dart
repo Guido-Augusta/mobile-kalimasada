@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart' as ds;
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart' as ph;
-import 'package:mobile_kalimasada/app/data/models/surah.dart' as s;
+import 'package:mobile_kalimasada/app/data/models/daftar_surah.dart' as s;
 import 'package:mobile_kalimasada/app/data/models/ayat_hafalan.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan.dart' as dh;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
@@ -14,9 +14,13 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class DaftarSantriController extends GetxController {
+  var userRole = ''.obs;
+  bool get isAdmin => userRole.value == 'admin';
+
   final isLoading = false.obs;
   final isSaveLoading = false.obs;
   final isLoadingProgresHafalan = false.obs;
+  final isLoadingDeleteAccount = false.obs;
 
   var searchQuery = ''.obs;
   var searchController = TextEditingController();
@@ -35,9 +39,9 @@ class DaftarSantriController extends GetxController {
   var isLoadingMore = false.obs;
 
   var isLoadingSurah = false.obs;
-  var surahList = <s.Surah>[].obs;
-  var selectedSurahHafalan = Rxn<SearchFieldListItem<s.Surah>>();
-  var selectedSurahMurajaah = Rxn<SearchFieldListItem<s.Surah>>();
+  var surahList = <s.Datum>[].obs;
+  var selectedSurahHafalan = Rxn<SearchFieldListItem<s.Datum>>();
+  var selectedSurahMurajaah = Rxn<SearchFieldListItem<s.Datum>>();
   var detailHafalan = Rx<dh.DetailHafalan?>(null);
 
   var isLoadingAyat = false.obs;
@@ -55,15 +59,16 @@ class DaftarSantriController extends GetxController {
   final formKeyMurajaah = GlobalKey<FormState>();
 
   final scrollController = ScrollController();
+  RxBool isFabVisible = true.obs;
 
   DateTime? _lastErrorShown;
 
   @override
   void onInit() {
     super.onInit();
-
+    getUserRole();
     fetchData();
-    _setupScrollController();
+    setupScrollController();
 
     debounce(searchQuery, (callback) {
       fetchData();
@@ -76,12 +81,17 @@ class DaftarSantriController extends GetxController {
     super.onClose();
   }
 
-  void _resetPagination() {
+  Future<void> getUserRole() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    userRole.value = prefs.getString('role') ?? '';
+  }
+
+  void resetPagination() {
     currentPage = 1;
     hasMore.value = true;
   }
 
-  void _setupScrollController() {
+  void setupScrollController() {
     scrollController.addListener(() {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
@@ -92,10 +102,10 @@ class DaftarSantriController extends GetxController {
     });
   }
 
-  void fetchData() async {
+  Future<void> fetchData() async {
     try {
       isLoading.value = true;
-      _resetPagination();
+      resetPagination();
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
@@ -114,7 +124,7 @@ class DaftarSantriController extends GetxController {
       };
 
       final uri = Uri.parse(
-        ApiUrl.santriList,
+        ApiUrl.santri,
       ).replace(queryParameters: queryParams);
 
       final response = await http.get(
@@ -189,7 +199,7 @@ class DaftarSantriController extends GetxController {
       };
 
       final uri = Uri.parse(
-        ApiUrl.santriList,
+        ApiUrl.santri,
       ).replace(queryParameters: queryParams);
 
       final response = await http.get(
@@ -241,10 +251,8 @@ class DaftarSantriController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final List<dynamic> surahsData = data['data'];
-        surahList.value = surahsData
-            .map((json) => s.Surah.fromJson(json))
-            .toList();
+        final daftarSurah = s.DaftarSurah.fromJson(data);
+        surahList.value = daftarSurah.data;
       } else {
         ToastUtils.showErrorToast('Gagal memuat data surah');
       }
@@ -257,7 +265,7 @@ class DaftarSantriController extends GetxController {
     }
   }
 
-  void onSurahSelected(s.Surah? newSurah) {
+  void onSurahSelected(s.Datum? newSurah) {
     ayatList.clear();
 
     if (newSurah != null) {
@@ -425,7 +433,7 @@ class DaftarSantriController extends GetxController {
         }
 
         // Lanjutkan dengan save logic
-        await _submitHafalan(santriId, ustadzId!, ayatIds);
+        await submitHafalan(santriId, ustadzId!, ayatIds);
       } else {
         ToastUtils.showErrorToast('Gagal memuat data ayat');
       }
@@ -442,7 +450,7 @@ class DaftarSantriController extends GetxController {
   }
 
   // Helper method untuk submit hafalan
-  Future<void> _submitHafalan(
+  Future<void> submitHafalan(
     String santriId,
     String ustadzId,
     List ayatIds,
@@ -504,7 +512,6 @@ class DaftarSantriController extends GetxController {
     }
   }
 
-  // Di controller, ubah method saveMurajaah
   void saveMurajaah(String santriId) async {
     isSaveLoading.value = true;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -573,7 +580,7 @@ class DaftarSantriController extends GetxController {
         }
 
         // Lanjutkan dengan save logic
-        await _submitMurajaah(santriId, ustadzId!, ayatIds);
+        await submitMurajaah(santriId, ustadzId!, ayatIds);
       } else {
         ToastUtils.showErrorToast('Gagal memuat data ayat');
       }
@@ -590,7 +597,7 @@ class DaftarSantriController extends GetxController {
   }
 
   // Helper method untuk submit
-  Future<void> _submitMurajaah(
+  Future<void> submitMurajaah(
     String santriId,
     String ustadzId,
     List ayatIds,
@@ -652,32 +659,54 @@ class DaftarSantriController extends GetxController {
     }
   }
 
+  void deleteSantriAccount(String santriId) async {
+    isLoadingDeleteAccount.value = true;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    try {
+      final response = await http
+          .delete(
+            Uri.parse(ApiUrl.deleteSantri(santriId)),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+              'x-platform': 'mobile',
+            },
+          )
+          .timeout(const Duration(seconds: 30));
+      var data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print(response.statusCode);
+        print(data);
+      }
+      if (response.statusCode == 200) {
+        fetchData();
+        Get.back();
+        ToastUtils.showSuccessToast('Santri berhasil dihapus');
+      } else {
+        final now = DateTime.now();
+        if (_lastErrorShown == null ||
+            now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+          _lastErrorShown = now;
+          ToastUtils.showErrorToast('Gagal menghapus santri');
+        }
+      }
+    } catch (e) {
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
+    } finally {
+      isLoadingDeleteAccount.value = false;
+    }
+  }
+
   String getImageUrl(String imageUrl) {
     String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
     return newImageUrl;
-  }
-
-  String getTahapanSantri(String tahapan) {
-    if (tahapan == 'Level1') {
-      return 'Level 1';
-    } else if (tahapan == 'Level2') {
-      return 'Level 2';
-    } else if (tahapan == 'Level3') {
-      return 'Level 3';
-    } else {
-      return 'Belum ada tahapan';
-    }
-  }
-
-  String getTahapanFilter(String tahapan) {
-    if (tahapan == 'level1') {
-      return 'level 1';
-    } else if (tahapan == 'level2') {
-      return 'level 2';
-    } else if (tahapan == 'level3') {
-      return 'level 3';
-    } else {
-      return 'Tidak ada tahapan';
-    }
   }
 }

@@ -49,7 +49,7 @@ class UstadzProfileController extends GetxController {
       final ustadzId = prefs.getString('roleId');
 
       final response = await http.get(
-        Uri.parse(ApiUrl.ustadz(ustadzId!)),
+        Uri.parse(ApiUrl.ustadzDetail(ustadzId!)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -111,7 +111,7 @@ class UstadzProfileController extends GetxController {
 
       final response = await http
           .put(
-            Uri.parse(ApiUrl.ustadz(ustadzId!)),
+            Uri.parse(ApiUrl.ustadzDetail(ustadzId!)),
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',
@@ -181,7 +181,7 @@ class UstadzProfileController extends GetxController {
 
       final request = http.MultipartRequest(
         'PUT',
-        Uri.parse(ApiUrl.ustadz(ustadzId!)),
+        Uri.parse(ApiUrl.ustadzDetail(ustadzId!)),
       );
 
       request.headers['Authorization'] = 'Bearer $token';

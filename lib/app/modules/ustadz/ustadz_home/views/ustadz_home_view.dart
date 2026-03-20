@@ -414,81 +414,73 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
           onTap: () {
             Get.toNamed('/daftar-santri');
           },
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.deepPurpleAccent.withValues(alpha: 0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
             child: Row(
               children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurple.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    Icons.person_outline_rounded,
+                    color: Colors.orangeAccent,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          'Kelola Data',
-                          style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
                       Text(
                         'Daftar Santri',
                         style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.deepPurple,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Text(
-                        'Lihat dan kelola data santri',
+                        'Kelola data santri',
                         style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 13,
                           fontWeight: FontWeight.w400,
+                          color: Colors.black.withValues(alpha: 0.9),
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 20),
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.deepPurple.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
-                    Icons.person_outline_rounded,
-                    color: Colors.white,
-                    size: 40,
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: Colors.deepPurpleAccent,
+                    size: 18,
                   ),
                 ),
               ],
@@ -518,6 +510,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                     ],
                   ),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
                         padding: const EdgeInsets.all(16),
@@ -531,7 +524,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                           size: 32,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 6),
                       Text(
                         'Riwayat',
                         style: GoogleFonts.poppins(
@@ -548,6 +541,9 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                           color: Colors.grey[600],
                           fontWeight: FontWeight.w400,
                         ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ],
                   ),
@@ -575,6 +571,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                     ],
                   ),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
                         padding: const EdgeInsets.all(16),
@@ -588,7 +585,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                           size: 32,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 6),
                       Text(
                         'Peringkat',
                         style: GoogleFonts.poppins(
@@ -605,6 +602,9 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                           color: Colors.grey[600],
                           fontWeight: FontWeight.w400,
                         ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ],
                   ),

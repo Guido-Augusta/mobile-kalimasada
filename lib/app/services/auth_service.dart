@@ -21,4 +21,9 @@ class AuthService {
     final role = await getCurrentRole();
     return role == 'ortu';
   }
+
+  static Future<bool> isAdmin() async {
+    final role = await getCurrentRole();
+    return role == 'admin';
+  }
 }
