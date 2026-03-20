@@ -1,13 +1,13 @@
-// GET http://localhost:5000/api/hafalan/:idSantri/surah
+// GET http://localhost:5000/api/hafalan/:idSantri/juz
 
-class ProgresHafalan {
-  ProgresHafalan({required this.santri, required this.data});
+class ProgresHafalanJuz {
+  ProgresHafalanJuz({required this.santri, required this.data});
 
   final Santri? santri;
   final List<Datum> data;
 
-  factory ProgresHafalan.fromJson(Map<String, dynamic> json) {
-    return ProgresHafalan(
+  factory ProgresHafalanJuz.fromJson(Map<String, dynamic> json) {
+    return ProgresHafalanJuz(
       santri: json["santri"] == null ? null : Santri.fromJson(json["santri"]),
       data: json["data"] == null
           ? []
@@ -28,44 +28,86 @@ class ProgresHafalan {
 
 class Datum {
   Datum({
-    required this.id,
-    required this.nomor,
-    required this.nama,
-    required this.namaLatin,
-    required this.totalAyat,
+    required this.juz,
+    required this.mulaiDari,
     required this.progress,
+    required this.totalAyat,
   });
 
-  final int? id;
-  final int? nomor;
-  final String? nama;
-  final String? namaLatin;
-  final int? totalAyat;
+  final int? juz;
+  final MulaiDari? mulaiDari;
   final String? progress;
+  final int? totalAyat;
 
   factory Datum.fromJson(Map<String, dynamic> json) {
     return Datum(
-      id: json["id"],
-      nomor: json["nomor"],
-      nama: json["nama"],
-      namaLatin: json["namaLatin"],
-      totalAyat: json["totalAyat"],
+      juz: json["juz"],
+      mulaiDari: json["mulai_dari"] == null
+          ? null
+          : MulaiDari.fromJson(json["mulai_dari"]),
       progress: json["progress"],
+      totalAyat: json["totalAyat"],
     );
   }
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "nomor": nomor,
-    "nama": nama,
-    "namaLatin": namaLatin,
-    "totalAyat": totalAyat,
+    "juz": juz,
+    "mulai_dari": mulaiDari?.toJson(),
     "progress": progress,
+    "totalAyat": totalAyat,
   };
 
   @override
   String toString() {
-    return "$id, $nomor, $nama, $namaLatin, $totalAyat, $progress, ";
+    return "$juz, $mulaiDari, $progress, $totalAyat, ";
+  }
+}
+
+class MulaiDari {
+  MulaiDari({required this.surah, required this.ayat});
+
+  final Surah? surah;
+  final int? ayat;
+
+  factory MulaiDari.fromJson(Map<String, dynamic> json) {
+    return MulaiDari(
+      surah: json["surah"] == null ? null : Surah.fromJson(json["surah"]),
+      ayat: json["ayat"],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {"surah": surah?.toJson(), "ayat": ayat};
+
+  @override
+  String toString() {
+    return "$surah, $ayat, ";
+  }
+}
+
+class Surah {
+  Surah({required this.nomor, required this.nama, required this.namaLatin});
+
+  final int? nomor;
+  final String? nama;
+  final String? namaLatin;
+
+  factory Surah.fromJson(Map<String, dynamic> json) {
+    return Surah(
+      nomor: json["nomor"],
+      nama: json["nama"],
+      namaLatin: json["nama_latin"],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "nomor": nomor,
+    "nama": nama,
+    "nama_latin": namaLatin,
+  };
+
+  @override
+  String toString() {
+    return "$nomor, $nama, $namaLatin, ";
   }
 }
 

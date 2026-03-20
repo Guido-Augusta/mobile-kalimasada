@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart' as ds;
-import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart' as ph;
+import 'package:mobile_kalimasada/app/data/models/progres_hafalan_surah.dart'
+    as ph;
 import 'package:mobile_kalimasada/app/data/models/daftar_surah.dart' as s;
 import 'package:mobile_kalimasada/app/data/models/ayat_hafalan.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan.dart' as dh;
@@ -303,7 +304,7 @@ class DaftarSantriController extends GetxController {
 
       final response = await http
           .get(
-            Uri.parse(ApiUrl.progresHafalan(santriId)),
+            Uri.parse(ApiUrl.progresHafalanSurah(santriId)),
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',

@@ -50,14 +50,21 @@ class ApiUrl {
   // ALQURAN
   static String get surahList => '$baseUrl/alquran/surah';
 
+  static String get juzList => '$baseUrl/alquran/juz';
+
   static String surahDetail(String surahId) =>
       '$baseUrl/alquran/surah/$surahId';
+
+  static String juzDetail(String juzId) => '$baseUrl/alquran/juz/$juzId';
 
   // HAFALAN
   static String get saveSetoran => '$baseUrl/hafalan';
 
-  static String progresHafalan(String santriId) =>
+  static String progresHafalanSurah(String santriId) =>
       '$baseUrl/hafalan/$santriId?mode=surah';
+
+  static String progresHafalanJuz(String santriId) =>
+      '$baseUrl/hafalan/$santriId?mode=juz';
 
   static String detailHafalanPerSurahTambah(String santriId, String surahId) =>
       '$baseUrl/hafalan/$santriId/surah/$surahId?mode=tambah';

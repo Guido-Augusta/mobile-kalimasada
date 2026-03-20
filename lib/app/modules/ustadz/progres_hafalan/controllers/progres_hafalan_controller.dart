@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
-import 'package:mobile_kalimasada/app/data/models/progres_hafalan.dart';
+import 'package:mobile_kalimasada/app/data/models/progres_hafalan_juz.dart'
+    as juz_model;
+import 'package:mobile_kalimasada/app/data/models/progres_hafalan_surah.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,6 +18,12 @@ class ProgresHafalanController extends GetxController {
   var santriData = Rxn<Santri>();
   var progresHafalan = <Datum>[].obs;
   var filteredSurahList = <Datum>[].obs;
+
+  var progresHafalanJuz = <juz_model.Datum>[].obs;
+  var filteredJuzList = <juz_model.Datum>[].obs;
+
+  // 'surah' or 'juz'
+  var filterMode = 'surah'.obs;
 
   var searchController = TextEditingController();
   var searchQuery = ''.obs;
@@ -33,6 +41,7 @@ class ProgresHafalanController extends GetxController {
     userRole.value = prefs.getString('role') ?? '';
     santriId = Get.arguments['santriId'];
     getProgresHafalan(santriId);
+    getProgresHafalanJuz(santriId);
   }
 
   Future<void> getProgresHafalan(String santriId) async {
@@ -42,7 +51,7 @@ class ProgresHafalanController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse(ApiUrl.progresHafalan(santriId)),
+        Uri.parse(ApiUrl.progresHafalanSurah(santriId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -74,6 +83,47 @@ class ProgresHafalanController extends GetxController {
     }
   }
 
+  Future<void> getProgresHafalanJuz(String santriId) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await http.get(
+        Uri.parse(ApiUrl.progresHafalanJuz(santriId)),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'x-platform': 'mobile',
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        progresHafalanJuz.value = List<juz_model.Datum>.from(
+          data['data'].map((x) => juz_model.Datum.fromJson(x)),
+        );
+      } else {
+        ToastUtils.showErrorToast('Gagal memuat data juz');
+      }
+    } catch (e) {
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
+    }
+  }
+
+  void switchFilterMode(String mode) {
+    filterMode.value = mode;
+    searchQuery.value = '';
+    searchController.clear();
+    filteredSurahList.value = [];
+    filteredJuzList.value = [];
+  }
+
   void searchSurah(String query) {
     if (query.isEmpty) {
       filteredSurahList.value = List<Datum>.from(progresHafalan);
@@ -91,6 +141,20 @@ class ProgresHafalanController extends GetxController {
     }).toList();
 
     filteredSurahList.value = filteredList;
+  }
+
+  void searchJuz(String query) {
+    if (query.isEmpty) {
+      filteredJuzList.value = List<juz_model.Datum>.from(progresHafalanJuz);
+      return;
+    }
+
+    final filteredList = progresHafalanJuz.where((element) {
+      final juz = element.juz?.toString() ?? '';
+      return juz == query.trim();
+    }).toList();
+
+    filteredJuzList.value = filteredList;
   }
 
   String getLabelTahapan(String tahapan) {
