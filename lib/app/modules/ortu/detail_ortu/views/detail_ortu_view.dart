@@ -82,7 +82,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
               onPressed: () => Get.back(),
             ),
 
-            expandedHeight: 280,
+            expandedHeight: 250,
             pinned: false,
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -166,42 +166,6 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.center,
-                              ),
-                            ),
-
-                            const SizedBox(height: 8),
-
-                            // Badges Row
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.3),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      ortu.user?.email ??
-                                          'Email tidak tersedia',
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
                               ),
                             ),
                           ],
@@ -339,6 +303,14 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
           ),
 
           const SizedBox(height: 16),
+
+          _buildInfoTile(
+            icon: Icons.email_rounded,
+            label: 'email',
+            value: ortu.user?.email ?? '-',
+          ),
+
+          const SizedBox(height: 12),
 
           _buildInfoTile(
             icon: Icons.phone,
