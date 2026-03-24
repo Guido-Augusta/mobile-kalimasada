@@ -7,11 +7,14 @@ import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan_juz.dart'
     as juz_model;
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan_surah.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
 class ProgresHafalanController extends GetxController {
   var userRole = ''.obs;
+  var currentUserRole = ''.obs; // cached, untuk hindari FutureBuilder di view
   var isLoading = false.obs;
 
   late String santriId;
@@ -30,6 +33,8 @@ class ProgresHafalanController extends GetxController {
 
   RxBool isFabVisible = true.obs;
 
+  final listSurahC = ListController();
+  final listJuzC = ListController();
   final scrollC = ScrollController();
 
   DateTime? _lastErrorShown;
@@ -39,6 +44,7 @@ class ProgresHafalanController extends GetxController {
     super.onInit();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     userRole.value = prefs.getString('role') ?? '';
+    currentUserRole.value = await AuthService.getCurrentRole() ?? '';
     santriId = Get.arguments['santriId'];
     getProgresHafalan(santriId);
     getProgresHafalanJuz(santriId);
