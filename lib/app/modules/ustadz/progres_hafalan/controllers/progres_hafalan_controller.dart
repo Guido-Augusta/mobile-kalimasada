@@ -19,7 +19,7 @@ class ProgresHafalanController extends GetxController {
 
   late String santriId;
   var santriData = Rxn<Santri>();
-  var progresHafalan = <Datum>[].obs;
+  var progresHafalanSurah = <Datum>[].obs;
   var filteredSurahList = <Datum>[].obs;
 
   var progresHafalanJuz = <juz_model.Datum>[].obs;
@@ -46,11 +46,11 @@ class ProgresHafalanController extends GetxController {
     userRole.value = prefs.getString('role') ?? '';
     currentUserRole.value = await AuthService.getCurrentRole() ?? '';
     santriId = Get.arguments['santriId'];
-    getProgresHafalan(santriId);
+    getProgresHafalanSurah(santriId);
     getProgresHafalanJuz(santriId);
   }
 
-  Future<void> getProgresHafalan(String santriId) async {
+  Future<void> getProgresHafalanSurah(String santriId) async {
     try {
       isLoading.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -67,7 +67,7 @@ class ProgresHafalanController extends GetxController {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         santriData.value = Santri.fromJson(data['santri']);
-        progresHafalan.value = List<Datum>.from(
+        progresHafalanSurah.value = List<Datum>.from(
           data['data'].map((x) => Datum.fromJson(x)),
         );
       } else {
@@ -132,11 +132,11 @@ class ProgresHafalanController extends GetxController {
 
   void searchSurah(String query) {
     if (query.isEmpty) {
-      filteredSurahList.value = List<Datum>.from(progresHafalan);
+      filteredSurahList.value = List<Datum>.from(progresHafalanSurah);
       return;
     }
 
-    final filteredList = progresHafalan.where((element) {
+    final filteredList = progresHafalanSurah.where((element) {
       final nama = element.nama?.toLowerCase() ?? '';
       final namaLatin = element.namaLatin?.toLowerCase() ?? '';
       final nomor = element.nomor?.toString() ?? '';

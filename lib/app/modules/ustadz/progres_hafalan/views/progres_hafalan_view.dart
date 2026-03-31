@@ -63,7 +63,13 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                 onPressed: () {
                   if (controller.filterMode.value == 'surah') {
                     controller.listSurahC.animateToItem(
-                      index: 113,
+                      index: () {
+                        if (controller.searchQuery.value.isEmpty) {
+                          return controller.progresHafalanSurah.length - 1;
+                        } else {
+                          return controller.filteredSurahList.length - 1;
+                        }
+                      }(),
                       scrollController: controller.scrollC,
                       alignment: 0,
                       duration: (estimatedDistance) =>
@@ -102,7 +108,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
 
       body: RefreshIndicator(
         onRefresh: () async {
-          await controller.getProgresHafalan(controller.santriId);
+          await controller.getProgresHafalanSurah(controller.santriId);
         },
         child: NotificationListener<UserScrollNotification>(
           onNotification: (notification) {
@@ -163,7 +169,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
 
                 // Empty data state
                 if ((controller.filterMode.value == 'surah' &&
-                        controller.progresHafalan.isEmpty) ||
+                        controller.progresHafalanSurah.isEmpty) ||
                     (controller.filterMode.value == 'juz' &&
                         controller.progresHafalanJuz.isEmpty)) {
                   return SliverFillRemaining(
@@ -240,7 +246,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                 // Surah mode
                 if (controller.filterMode.value == 'surah') {
                   final surahList = controller.searchQuery.value.isEmpty
-                      ? controller.progresHafalan
+                      ? controller.progresHafalanSurah
                       : controller.filteredSurahList;
                   return SliverPadding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
@@ -760,7 +766,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
         Get.toNamed(
-          '/detail-progres',
+          '/detail-hafalan-surah',
           arguments: {
             'santriId': controller.santriData.value?.id,
             'juzId': juz.juz.toString(),
@@ -911,7 +917,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
         Get.toNamed(
-          '/detail-progres',
+          '/detail-hafalan-surah',
           arguments: {
             'santriId': controller.santriData.value?.id,
             'santriName': controller.santriData.value?.nama,

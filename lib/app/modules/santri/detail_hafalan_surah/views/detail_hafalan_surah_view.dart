@@ -9,17 +9,17 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan.dart';
-import '../controllers/detail_progres_controller.dart';
+import '../controllers/detail_hafalan_surah_controller.dart';
 
-class DetailProgresView extends GetView<DetailProgresController> {
-  const DetailProgresView({super.key});
+class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
+  const DetailHafalanSurahView({super.key});
 
-  static DetailProgresController? _cached;
+  static DetailHafalanSurahController? _cached;
 
   @override
-  DetailProgresController get controller {
-    if (Get.isRegistered<DetailProgresController>()) {
-      _cached = Get.find<DetailProgresController>();
+  DetailHafalanSurahController get controller {
+    if (Get.isRegistered<DetailHafalanSurahController>()) {
+      _cached = Get.find<DetailHafalanSurahController>();
       return _cached!;
     }
     return _cached!;
@@ -1006,7 +1006,7 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
 
     setState(() => _errorMessage = null);
 
-    final controller = Get.find<DetailProgresController>();
+    final controller = Get.find<DetailHafalanSurahController>();
 
     final success = await controller.saveSetoranByAyat(
       int.parse(controller.santriId),
@@ -1271,7 +1271,7 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            Get.find<DetailProgresController>().santriName,
+                            Get.find<DetailHafalanSurahController>().santriName,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
@@ -1303,7 +1303,7 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
-                                  'Surah ${Get.find<DetailProgresController>().surahInfo.value?.namaLatin ?? ''}',
+                                  'Surah ${Get.find<DetailHafalanSurahController>().surahInfo.value?.namaLatin ?? ''}',
                                   style: TextStyle(
                                     color: Colors.blueGrey[600],
                                     fontSize: 11,
@@ -1407,7 +1407,7 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
                 width: double.infinity,
                 height: 48,
                 child: Obx(() {
-                  final controller = Get.find<DetailProgresController>();
+                  final controller = Get.find<DetailHafalanSurahController>();
                   final isLoading = controller.isSaveLoading.value;
 
                   return ElevatedButton(

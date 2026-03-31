@@ -386,7 +386,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                 onTap: () {
                   FocusManager.instance.primaryFocus?.unfocus();
                   Get.toNamed(
-                    '/detail-progres',
+                    '/detail-hafalan-surah',
                     arguments: {
                       'santriId': summaryHafalan.id,
                       'surahId': summaryHafalan.terakhirHafalan?.surahId,

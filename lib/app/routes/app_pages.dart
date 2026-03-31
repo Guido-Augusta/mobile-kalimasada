@@ -43,8 +43,8 @@ import '../modules/quran/alquran/bindings/alquran_binding.dart';
 import '../modules/quran/alquran/views/alquran_view.dart';
 import '../modules/quran/detail_surah/bindings/detail_surah_binding.dart';
 import '../modules/quran/detail_surah/views/detail_surah_view.dart';
-import '../modules/santri/detail_progres/bindings/detail_progres_binding.dart';
-import '../modules/santri/detail_progres/views/detail_progres_view.dart';
+import '../modules/santri/detail_hafalan_surah/bindings/detail_hafalan_surah_binding.dart';
+import '../modules/santri/detail_hafalan_surah/views/detail_hafalan_surah_view.dart';
 import '../modules/santri/doa_khatam/bindings/doa_khatam_binding.dart';
 import '../modules/santri/doa_khatam/views/doa_khatam_view.dart';
 import '../modules/santri/santri_home/bindings/santri_home_binding.dart';
@@ -175,9 +175,9 @@ class AppPages {
       binding: SantriProfileBinding(),
     ),
     GetPage(
-      name: _Paths.DETAIL_PROGRES,
-      page: () => const DetailProgresView(),
-      binding: DetailProgresBinding(),
+      name: _Paths.DETAIL_HAFALAN_SURAH,
+      page: () => const DetailHafalanSurahView(),
+      binding: DetailHafalanSurahBinding(),
     ),
     GetPage(
       name: _Paths.DETAIL_SURAH,

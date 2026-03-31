@@ -12,7 +12,7 @@ import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
-class DetailProgresController extends GetxController {
+class DetailHafalanSurahController extends GetxController {
   RxBool isSurahInfoLoading = false.obs;
 
   // Loading states per mode
