@@ -322,8 +322,8 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
+        gradient: LinearGradient(
+          colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -914,6 +914,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
           '/detail-progres',
           arguments: {
             'santriId': controller.santriData.value?.id,
+            'santriName': controller.santriData.value?.nama,
             'surahId': surah.id,
           },
         );

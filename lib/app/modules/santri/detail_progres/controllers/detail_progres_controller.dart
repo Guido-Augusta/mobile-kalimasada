@@ -14,10 +14,23 @@ import 'package:super_sliver_list/super_sliver_list.dart';
 
 class DetailProgresController extends GetxController {
   RxBool isSurahInfoLoading = false.obs;
-  RxBool isDetailProgresLoading = false.obs;
+
+  // Loading states per mode
+  RxBool isLoadingTambah = false.obs;
+  RxBool isLoadingMurajaah = false.obs;
+  RxBool isLoadingTahsin = false.obs;
+
+  RxBool isSaveLoading = false.obs;
+
   final santriId = Get.arguments['santriId'].toString();
+  final santriName = Get.arguments['santriName'].toString();
   final surahId = Get.arguments['surahId'].toString();
-  var detailProgres = Rxn<DetailHafalan>();
+
+  // Data per mode
+  var detailTambah = Rxn<DetailHafalan>();
+  var detailMurajaah = Rxn<DetailHafalan>();
+  var detailTahsin = Rxn<DetailHafalan>();
+
   var surahInfo = Rxn<DetailSurah>();
 
   AudioPlayer audioPlayer = AudioPlayer();
@@ -26,7 +39,34 @@ class DetailProgresController extends GetxController {
 
   final listC = ListController();
   final scrollC = ScrollController();
-  RxInt lastCheckedAyat = 0.obs;
+
+  // Last checked per mode
+  RxInt lastCheckedTambah = 0.obs;
+  RxInt lastCheckedMurajaah = 0.obs;
+  RxInt lastCheckedTahsin = 0.obs;
+
+  // 0 = Hafalan, 1 = Murajaah, 2 = Tahsin
+  RxInt selectedTab = 0.obs;
+
+  bool get isCurrentLoading {
+    if (selectedTab.value == 0) return isLoadingTambah.value;
+    if (selectedTab.value == 1) return isLoadingMurajaah.value;
+    return isLoadingTahsin.value;
+  }
+
+  DetailHafalan? get currentDetail {
+    if (selectedTab.value == 0) return detailTambah.value;
+    if (selectedTab.value == 1) return detailMurajaah.value;
+    return detailTahsin.value;
+  }
+
+  int get currentLastChecked {
+    if (selectedTab.value == 0) return lastCheckedTambah.value;
+    if (selectedTab.value == 1) return lastCheckedMurajaah.value;
+    return lastCheckedTahsin.value;
+  }
+
+  DateTime? _lastErrorShown;
 
   @override
   void onInit() {
@@ -40,17 +80,33 @@ class DetailProgresController extends GetxController {
     audioPlayer.dispose();
   }
 
-  void getLastCheckedIndex(List<Ayat> ayat) {
-    for (int i = 0; i < ayat.length; i++) {
-      if (ayat[i].checked == true) {
-        lastCheckedAyat.value = i;
-      }
+  void changeTab(int index) {
+    selectedTab.value = index;
+    // reset scroll to top on tab change
+    if (scrollC.hasClients) {
+      scrollC.jumpTo(0);
+    }
+    // Lazy load
+    if (index == 1 && detailMurajaah.value == null) {
+      getDetailMurajaah();
+    } else if (index == 2 && detailTahsin.value == null) {
+      getDetailTahsin();
     }
   }
 
-  void getDetailProgres() async {
+  int _getLastCheckedIndex(List<Ayat> ayat) {
+    int lastIdx = 0;
+    for (int i = 0; i < ayat.length; i++) {
+      if (ayat[i].checked == true) {
+        lastIdx = i;
+      }
+    }
+    return lastIdx;
+  }
+
+  Future<void> getDetailTambah() async {
     try {
-      isDetailProgresLoading.value = true;
+      isLoadingTambah.value = true;
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
@@ -65,17 +121,79 @@ class DetailProgresController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        detailProgres.value = DetailHafalan.fromJson(data);
-        getLastCheckedIndex(detailProgres.value!.ayat);
+        detailTambah.value = DetailHafalan.fromJson(data);
+        lastCheckedTambah.value = _getLastCheckedIndex(
+          detailTambah.value!.ayat,
+        );
       } else {
-        ToastUtils.showErrorToast('Gagal memuat ayat');
+        ToastUtils.showErrorToast('Gagal memuat ayat hafalan');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      ToastUtils.showErrorToast('Periksa koneksi internet Anda');
     } finally {
-      isDetailProgresLoading.value = false;
+      isLoadingTambah.value = false;
+    }
+  }
+
+  Future<void> getDetailMurajaah() async {
+    try {
+      isLoadingMurajaah.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await http.get(
+        Uri.parse(ApiUrl.detailHafalanPerSurahMurajaah(santriId, surahId)),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'x-platform': 'mobile',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        detailMurajaah.value = DetailHafalan.fromJson(data);
+        lastCheckedMurajaah.value = _getLastCheckedIndex(
+          detailMurajaah.value!.ayat,
+        );
+      } else {
+        ToastUtils.showErrorToast('Gagal memuat ayat murajaah');
+      }
+    } catch (e) {
+      ToastUtils.showErrorToast('Periksa koneksi internet Anda');
+    } finally {
+      isLoadingMurajaah.value = false;
+    }
+  }
+
+  Future<void> getDetailTahsin() async {
+    try {
+      isLoadingTahsin.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await http.get(
+        Uri.parse(ApiUrl.detailHafalanPerSurahTahsin(santriId, surahId)),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'x-platform': 'mobile',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        detailTahsin.value = DetailHafalan.fromJson(data);
+        lastCheckedTahsin.value = _getLastCheckedIndex(
+          detailTahsin.value!.ayat,
+        );
+      } else {
+        ToastUtils.showErrorToast('Gagal memuat ayat tahsin');
+      }
+    } catch (e) {
+      ToastUtils.showErrorToast('Periksa koneksi internet Anda');
+    } finally {
+      isLoadingTahsin.value = false;
     }
   }
 
@@ -91,7 +209,7 @@ class DetailProgresController extends GetxController {
           .timeout(Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        getDetailProgres();
+        getDetailTambah();
 
         final data = json.decode(response.body);
         surahInfo.value = DetailSurah.fromJson(data);
@@ -127,6 +245,98 @@ class DetailProgresController extends GetxController {
       );
     } finally {
       isSurahInfoLoading.value = false;
+    }
+  }
+
+  Future<bool> saveSetoranByAyat(
+    int santriId,
+    int surahId,
+    int ayatMulai,
+    int ayatAkhir,
+    String? kualitas,
+    String keterangan,
+    String? catatan,
+  ) async {
+    try {
+      isSaveLoading.value = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final detail = currentDetail;
+      if (detail == null) {
+        ToastUtils.showErrorToast('Data ayat belum tersedia');
+        return false;
+      }
+
+      List<int> ayatIds = [];
+      for (final a in detail.ayat) {
+        if (a.nomorAyat != null &&
+            a.nomorAyat! >= ayatMulai &&
+            a.nomorAyat! <= ayatAkhir) {
+          if (a.id != null) ayatIds.add(a.id!);
+        }
+      }
+
+      if (ayatIds.isEmpty) {
+        ToastUtils.showErrorToast('Ayat ID tidak valid');
+        return false;
+      }
+      String status = selectedTab.value == 0
+          ? 'TambahHafalan'
+          : selectedTab.value == 1
+          ? 'Murajaah'
+          : 'Tahsin';
+      print(status);
+
+      if (kualitas == 'Sangat Baik') {
+        kualitas = 'SangatBaik';
+      }
+
+      final response = await http.post(
+        Uri.parse(ApiUrl.saveSetoranByAyat),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'x-platform': 'mobile',
+        },
+        body: jsonEncode({
+          'santriId': santriId,
+          'surahId': surahId,
+          'ayatIds': ayatIds,
+          'status': status,
+          'kualitas': kualitas ?? 'Baik', // Kurang, Cukup, Baik, SangatBaik
+          'keterangan': keterangan, // Lanjut, Mengulang
+          'catatan': catatan ?? '',
+        }),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ToastUtils.showSuccessToast('Setoran berhasil disimpan');
+        if (selectedTab.value == 0) {
+          getDetailTambah();
+        } else if (selectedTab.value == 1) {
+          getDetailMurajaah();
+        } else if (selectedTab.value == 2) {
+          getDetailTahsin();
+        }
+        return true;
+      } else {
+        ToastUtils.showErrorToast('Gagal menyimpan setoran');
+        return false;
+      }
+    } catch (e) {
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
+      return false;
+    } finally {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        isSaveLoading.value = false;
+      });
     }
   }
 }

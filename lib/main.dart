@@ -33,9 +33,7 @@ void main() async {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [
-          Locale('id', 'ID'),
-        ],
+        supportedLocales: const [Locale('id', 'ID')],
         locale: const Locale('id', 'ID'),
       ),
     ),

@@ -60,6 +60,10 @@ class ApiUrl {
   // HAFALAN
   static String get saveSetoran => '$baseUrl/hafalan';
 
+  static String get saveSetoranByAyat => '$baseUrl/hafalan/ayat';
+
+  static String get saveSetoranByHalaman => '$baseUrl/hafalan/halaman';
+
   static String progresHafalanSurah(String santriId) =>
       '$baseUrl/hafalan/$santriId?mode=surah';
 
@@ -73,6 +77,9 @@ class ApiUrl {
     String santriId,
     String surahId,
   ) => '$baseUrl/hafalan/$santriId/surah/$surahId?mode=murajaah';
+
+  static String detailHafalanPerSurahTahsin(String santriId, String surahId) =>
+      '$baseUrl/hafalan/$santriId/surah/$surahId?mode=tahsin';
 
   // RIWAYAT HAFALAN
   static String get deleteRiwayatHafalan => '$baseUrl/hafalan/riwayat/';

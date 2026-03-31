@@ -46,6 +46,8 @@ class Ayat {
     required this.terjemah,
     required this.juz,
     required this.checked,
+    required this.kualitas,
+    required this.keterangan,
   });
 
   final int? id;
@@ -55,6 +57,8 @@ class Ayat {
   final String? terjemah;
   final int? juz;
   final bool? checked;
+  final String? kualitas;
+  final String? keterangan;
 
   factory Ayat.fromJson(Map<String, dynamic> json) {
     return Ayat(
@@ -65,6 +69,8 @@ class Ayat {
       terjemah: json["terjemah"],
       juz: json["juz"],
       checked: json["checked"],
+      kualitas: json["kualitas"],
+      keterangan: json["keterangan"],
     );
   }
 
@@ -76,11 +82,13 @@ class Ayat {
     "terjemah": terjemah,
     "juz": juz,
     "checked": checked,
+    "kualitas": kualitas,
+    "keterangan": keterangan,
   };
 
   @override
   String toString() {
-    return "$id, $nomorAyat, $arab, $latin, $terjemah, $juz, $checked, ";
+    return "$id, $nomorAyat, $arab, $latin, $terjemah, $juz, $checked, $kualitas, $keterangan, ";
   }
 }
 
