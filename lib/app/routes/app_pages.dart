@@ -27,6 +27,8 @@ import '../modules/auth/login/bindings/login_binding.dart';
 import '../modules/auth/login/views/login_view.dart';
 import '../modules/auth/splash/bindings/splash_binding.dart';
 import '../modules/auth/splash/views/splash_view.dart';
+import '../modules/santri/detail_hafalan_juz/bindings/detail_hafalan_juz_binding.dart';
+import '../modules/santri/detail_hafalan_juz/views/detail_hafalan_juz_view.dart';
 import '../modules/main/ortu_main/bindings/ortu_main_binding.dart';
 import '../modules/main/ortu_main/views/ortu_main_view.dart';
 import '../modules/main/santri_main/bindings/santri_main_binding.dart';
@@ -263,6 +265,11 @@ class AppPages {
       name: _Paths.EDIT_USTADZ,
       page: () => const EditUstadzView(),
       binding: EditUstadzBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAIL_HAFALAN_JUZ,
+      page: () => const DetailHafalanJuzView(),
+      binding: DetailHafalanJuzBinding(),
     ),
   ];
 }

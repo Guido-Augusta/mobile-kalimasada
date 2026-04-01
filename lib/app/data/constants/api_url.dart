@@ -81,6 +81,15 @@ class ApiUrl {
   static String detailHafalanPerSurahTahsin(String santriId, String surahId) =>
       '$baseUrl/hafalan/$santriId/surah/$surahId?mode=tahsin';
 
+  static String detailHafalanPerJuzTambah(String santriId, String juzId) =>
+      '$baseUrl/hafalan/$santriId/juz/$juzId?mode=tambah';
+
+  static String detailHafalanPerJuzMurajaah(String santriId, String juzId) =>
+      '$baseUrl/hafalan/$santriId/juz/$juzId?mode=murajaah';
+
+  static String detailHafalanPerJuzTahsin(String santriId, String juzId) =>
+      '$baseUrl/hafalan/$santriId/juz/$juzId?mode=tahsin';
+
   // RIWAYAT HAFALAN
   static String get deleteRiwayatHafalan => '$baseUrl/hafalan/riwayat/';
 

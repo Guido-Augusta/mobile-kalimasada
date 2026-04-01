@@ -157,7 +157,7 @@ class ProgresHafalanController extends GetxController {
 
     final filteredList = progresHafalanJuz.where((element) {
       final juz = element.juz?.toString() ?? '';
-      return juz == query.trim();
+      return juz.contains(query.toLowerCase());
     }).toList();
 
     filteredJuzList.value = filteredList;

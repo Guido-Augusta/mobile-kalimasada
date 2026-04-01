@@ -7,7 +7,8 @@ import 'package:mobile_kalimasada/app/data/models/progres_hafalan_surah.dart'
     as ph;
 import 'package:mobile_kalimasada/app/data/models/daftar_surah.dart' as s;
 import 'package:mobile_kalimasada/app/data/models/ayat_hafalan.dart';
-import 'package:mobile_kalimasada/app/data/models/detail_hafalan.dart' as dh;
+import 'package:mobile_kalimasada/app/data/models/detail_hafalan_surah.dart'
+    as dh;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:shared_preferences/shared_preferences.dart';

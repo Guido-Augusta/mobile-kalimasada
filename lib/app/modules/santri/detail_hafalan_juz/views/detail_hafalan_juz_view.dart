@@ -1,41 +1,55 @@
-import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:rxdart/rxdart.dart' as rx;
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
-import 'package:mobile_kalimasada/app/data/models/detail_hafalan_surah.dart';
-import '../controllers/detail_hafalan_surah_controller.dart';
+import 'package:mobile_kalimasada/app/data/models/detail_hafalan_juz.dart';
+import '../controllers/detail_hafalan_juz_controller.dart';
 
-class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
-  const DetailHafalanSurahView({super.key});
+class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
+  const DetailHafalanJuzView({super.key});
 
-  static DetailHafalanSurahController? _cached;
+  static DetailHafalanJuzController? _cached;
 
   @override
-  DetailHafalanSurahController get controller {
-    if (Get.isRegistered<DetailHafalanSurahController>()) {
-      _cached = Get.find<DetailHafalanSurahController>();
+  DetailHafalanJuzController get controller {
+    if (Get.isRegistered<DetailHafalanJuzController>()) {
+      _cached = Get.find<DetailHafalanJuzController>();
       return _cached!;
     }
     return _cached!;
   }
 
-  Stream<PositionData> get positionDataStream =>
-      rx.Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
-        controller.audioPlayer.positionStream,
-        controller.audioPlayer.bufferedPositionStream,
-        controller.audioPlayer.durationStream,
-        (position, bufferedPosition, duration) => PositionData(
-          position: position,
-          bufferedPosition: bufferedPosition,
-          duration: duration ?? Duration.zero,
-        ),
-      );
+  int _getTotalItemsCount() {
+    final detail = controller.currentDetail;
+    if (detail == null) return 0;
+    int count = 0;
+    for (var s in detail.surah) {
+      count += 1; // untuk header surah
+      count += s.ayat.length;
+    }
+    return count;
+  }
+
+  Widget _buildItemByIndex(int index) {
+    final detail = controller.currentDetail;
+    if (detail == null) return const SizedBox.shrink();
+
+    int currentIdx = 0;
+    for (var s in detail.surah) {
+      if (index == currentIdx) {
+        return _buildSurahSubHeader(s.surah);
+      }
+      currentIdx++;
+      if (index < currentIdx + s.ayat.length) {
+        return _buildAyatCard(s.ayat[index - currentIdx]);
+      }
+      currentIdx += s.ayat.length;
+    }
+    return const SizedBox.shrink();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,28 +64,21 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
         ),
         centerTitle: true,
       ),
-
-      // ── 3 Action Buttons (bottom bar) ────────────────────────────────────────
       bottomNavigationBar: Obx(() {
-        if (controller.isSurahInfoLoading.value ||
-            controller.isCurrentLoading) {
+        if (controller.isJuzInfoLoading.value || controller.isCurrentLoading) {
           return const SizedBox.shrink();
         }
-        if (controller.currentDetail == null &&
-            controller.surahInfo.value == null) {
+        if (controller.currentDetail == null) {
           return const SizedBox.shrink();
         }
         return _buildActionBar(context);
       }),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: Obx(() {
-        if (controller.isSurahInfoLoading.value ||
-            controller.isCurrentLoading) {
+        if (controller.isJuzInfoLoading.value || controller.isCurrentLoading) {
           return const SizedBox.shrink();
         }
-        if (controller.surahInfo.value == null &&
-            controller.currentDetail == null) {
+        if (controller.currentDetail == null) {
           return const SizedBox.shrink();
         }
         return AnimatedSlide(
@@ -129,10 +136,9 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
           ),
         );
       }),
-
       body: Obx(() {
         // Loading state
-        if (controller.isSurahInfoLoading.value) {
+        if (controller.isJuzInfoLoading.value) {
           return const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -149,8 +155,7 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
         }
 
         // Error state
-        if (controller.currentDetail == null &&
-            controller.surahInfo.value == null) {
+        if (controller.currentDetail == null && !controller.isCurrentLoading) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -198,8 +203,17 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
           child: CustomScrollView(
             controller: controller.scrollC,
             slivers: [
-              // ── Surah Info Header Card ───────────────────────────────────────
-              SliverToBoxAdapter(child: _buildSurahHeaderCard(context)),
+              // ── Juz Info Header Card ─────────────────────────────────────────
+              SliverToBoxAdapter(
+                child: Skeletonizer(
+                  enabled: controller.isCurrentLoading,
+                  effect: ShimmerEffect(
+                    baseColor: Colors.white.withValues(alpha: 0.2),
+                    highlightColor: Colors.white.withValues(alpha: 0.4),
+                  ),
+                  child: _buildJuzHeaderCard(context),
+                ),
+              ),
 
               // ── Tab Bar Mode ───────────────────────────────────────────────
               SliverPersistentHeader(
@@ -215,9 +229,9 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                 ),
               ),
 
-              // ── Ayat List ────────────────────────────────────────────────────
+              // ── List Surah & Ayat ───────────────────────────────────────────
               if (controller.isCurrentLoading &&
-                  (controller.currentDetail?.ayat.isEmpty ?? true))
+                  (controller.currentDetail?.surah.isEmpty ?? true))
                 SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return Skeletonizer(
@@ -230,16 +244,22 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                           latin: 'Bismillaahir Rahmaanir Raheem',
                           terjemah:
                               'Dengan nama Allah Yang Maha Pengasih lagi Maha Penyayang.',
-                          juz: 30,
+                          halaman: 1,
                           checked: false,
                           kualitas: 'Baik',
                           keterangan: 'Lanjut',
+                          surah: AyatSurah(
+                            id: 1,
+                            nomor: 1,
+                            nama: 'Al-Fatihah',
+                            namaLatin: 'Al-Fatihah',
+                          ),
                         ),
                       ),
                     );
                   }, childCount: 5),
                 )
-              else if (controller.currentDetail?.ayat.isEmpty ?? true)
+              else if (controller.currentDetail?.surah.isEmpty ?? true)
                 SliverFillRemaining(
                   child: Center(
                     child: Column(
@@ -278,12 +298,11 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                 SuperSliverList(
                   listController: controller.listC,
                   delegate: SliverChildBuilderDelegate((context, index) {
-                    final ayat = controller.currentDetail?.ayat[index];
                     return Skeletonizer(
                       enabled: controller.isCurrentLoading,
-                      child: _buildAyatCard(ayat),
+                      child: _buildItemByIndex(index),
                     );
-                  }, childCount: controller.currentDetail?.ayat.length ?? 0),
+                  }, childCount: _getTotalItemsCount()),
                 ),
 
               const SliverToBoxAdapter(child: SizedBox(height: 24)),
@@ -294,10 +313,11 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
     );
   }
 
-  // ── Surah Header Card ───────────────────────────────────────────────────────
+  Widget _buildJuzHeaderCard(BuildContext context) {
+    final detail = controller.currentDetail;
+    final String juzNumber = detail?.juz?.toString() ?? controller.juzId;
+    final int totalSurah = detail?.totalSurah ?? 0;
 
-  Widget _buildSurahHeaderCard(BuildContext context) {
-    final surah = controller.surahInfo.value;
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       decoration: BoxDecoration(
@@ -344,137 +364,49 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
           ),
 
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-            child: Column(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // ── Top row: surah name info ─────────────────────────────────
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            surah?.namaLatin ?? '-',
-                            style: GoogleFonts.poppins(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            surah?.arti ?? '',
-                            style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              color: Colors.white.withValues(alpha: 0.8),
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Badge info
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        '${surah?.tempatTurun?.toUpperCase() ?? ''} · ${surah?.jumlahAyat ?? 0} Ayat',
-                        style: const TextStyle(
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Juz $juzNumber',
+                        style: GoogleFonts.poppins(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
                           color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 4),
+                      Text(
+                        'Total $totalSurah Surah',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withValues(alpha: 0.8),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-
-                const SizedBox(height: 12),
-
-                // Divider
-                Divider(color: Colors.white.withValues(alpha: 0.2), height: 1),
-
-                const SizedBox(height: 12),
-
-                // ── Audio Player ─────────────────────────────────────────────
-                Row(
-                  children: [
-                    // Play/Pause
-                    StreamBuilder<PlayerState>(
-                      stream: controller.audioPlayer.playerStateStream,
-                      builder: (context, snapshot) {
-                        final playerState = snapshot.data;
-                        final processingState = playerState?.processingState;
-                        final playing = playerState?.playing;
-
-                        IconData iconData;
-                        VoidCallback? onTap;
-
-                        if (!(playing ?? false)) {
-                          iconData = Icons.play_circle_filled_rounded;
-                          onTap = controller.audioPlayer.play;
-                        } else if (processingState !=
-                            ProcessingState.completed) {
-                          iconData = Icons.pause_circle_filled_rounded;
-                          onTap = controller.audioPlayer.pause;
-                        } else {
-                          iconData = Icons.play_circle_filled_rounded;
-                          onTap = () {
-                            controller.audioPlayer.seek(Duration.zero);
-                            controller.audioPlayer.play();
-                          };
-                        }
-
-                        return GestureDetector(
-                          onTap: onTap,
-                          child: Icon(iconData, size: 44, color: Colors.white),
-                        );
-                      },
-                    ),
-
-                    const SizedBox(width: 10),
-
-                    // Progress bar
-                    Expanded(
-                      child: StreamBuilder<PositionData>(
-                        stream: positionDataStream,
-                        builder: (context, snapshot) {
-                          final positionData = snapshot.data;
-                          return ProgressBar(
-                            barHeight: 5,
-                            baseBarColor: Colors.white.withValues(alpha: 0.3),
-                            progressBarColor: Colors.white,
-                            thumbColor: Colors.white,
-                            bufferedBarColor: Colors.white.withValues(
-                              alpha: 0.5,
-                            ),
-                            timeLabelTextStyle: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              fontWeight: FontWeight.w500,
-                              fontSize: 11,
-                            ),
-                            progress: positionData?.position ?? Duration.zero,
-                            buffered:
-                                positionData?.bufferedPosition ?? Duration.zero,
-                            total: positionData?.duration ?? Duration.zero,
-                            onSeek: controller.audioPlayer.seek,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.menu_book_rounded,
+                    color: Colors.white,
+                    size: 36,
+                  ),
                 ),
               ],
             ),
@@ -483,8 +415,6 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
       ),
     );
   }
-
-  // ── Tab Bar ─────────────────────────────────────────────────────────────────
 
   Widget _buildTabBar() {
     return Container(
@@ -548,16 +478,15 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
     );
   }
 
-  // ── Progress Summary Bar ────────────────────────────────────────────────────
-
   Widget _buildProgressSummaryBar() {
-    final ayatList = controller.currentDetail?.ayat ?? [];
-    final totalAyat = ayatList.length;
-    final checkedAyat = ayatList
-        .where(
-          (a) => a.checked == true && a.keterangan?.toLowerCase() == 'lanjut',
-        )
-        .length;
+    final detail = controller.currentDetail;
+    final totalAyat = detail == null
+        ? 0
+        : controller.getAyatCount(detail.surah);
+    final checkedAyat = detail == null
+        ? 0
+        : controller.getCheckedAyatCount(detail.surah);
+
     final progressPct = totalAyat > 0 ? checkedAyat / totalAyat : 0.0;
     final pctStr = (progressPct * 100).toStringAsFixed(0);
 
@@ -636,7 +565,52 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
     );
   }
 
-  // ── Ayat Card ───────────────────────────────────────────────────────────────
+  Widget _buildSurahSubHeader(AyatSurah? surah) {
+    if (surah == null) return const SizedBox.shrink();
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.deepPurpleAccent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: Colors.deepPurpleAccent.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              '${surah.nomor ?? 0}',
+              style: TextStyle(
+                color: Colors.deepPurpleAccent[700],
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              surah.namaLatin ?? '',
+              style: GoogleFonts.poppins(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: Colors.deepPurpleAccent[700],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildAyatCard(Ayat? ayat) {
     final isChecked = ayat?.checked == true;
@@ -681,7 +655,7 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Nomor Ayat + Checked badge ──────────────────────────────────
+            // ── Nomor Ayat + Halaman + Checked badge ─────────────────────────
             Row(
               children: [
                 Container(
@@ -693,7 +667,7 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    '${ayat?.nomorAyat}',
+                    '${ayat?.nomorAyat ?? 0}',
                     style: TextStyle(
                       color: Colors.deepPurpleAccent[700],
                       fontSize: 13,
@@ -701,6 +675,16 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                     ),
                   ),
                 ),
+                const SizedBox(width: 8),
+                if (ayat?.halaman != null)
+                  Text(
+                    'Hal. ${ayat!.halaman}',
+                    style: TextStyle(
+                      color: Colors.grey[500],
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 const Spacer(),
                 if (controller.selectedTab.value == 0 &&
                     ayat?.kualitas != null &&
@@ -754,7 +738,6 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
               ],
             ),
 
-            // ── Arabic Text ─────────────────────────────────────────────────
             if (ayat?.arab != null && (ayat?.arab ?? '').isNotEmpty) ...[
               const SizedBox(height: 10),
               Align(
@@ -768,7 +751,6 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
               ),
             ],
 
-            // ── Latin Text ──────────────────────────────────────────────────
             if (ayat?.latin != null && (ayat?.latin ?? '').isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
@@ -782,7 +764,6 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
               ),
             ],
 
-            // ── Translation ─────────────────────────────────────────────────
             if (ayat?.terjemah != null &&
                 (ayat?.terjemah ?? '').isNotEmpty) ...[
               const SizedBox(height: 8),
@@ -808,8 +789,6 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
       ),
     );
   }
-
-  // ── Bottom Action Bar ───────────────────────────────────────────────────────
 
   Widget _buildActionBar(BuildContext context) {
     final int tabIndex = controller.selectedTab.value;
@@ -847,54 +826,6 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
       ),
       child: Row(
         children: [
-          // Tombol Play/Pause
-          Container(
-            height: 48,
-            width: 48,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(12),
-              child: StreamBuilder<PlayerState>(
-                stream: controller.audioPlayer.playerStateStream,
-                builder: (context, snapshot) {
-                  final playerState = snapshot.data;
-                  final processingState = playerState?.processingState;
-                  final playing = playerState?.playing;
-
-                  IconData iconData;
-                  VoidCallback? onTap;
-
-                  if (!(playing ?? false)) {
-                    iconData = Icons.play_arrow_rounded;
-                    onTap = controller.audioPlayer.play;
-                  } else if (processingState != ProcessingState.completed) {
-                    iconData = Icons.pause_rounded;
-                    onTap = controller.audioPlayer.pause;
-                  } else {
-                    iconData = Icons.play_arrow_rounded;
-                    onTap = () {
-                      controller.audioPlayer.seek(Duration.zero);
-                      controller.audioPlayer.play();
-                    };
-                  }
-
-                  return InkWell(
-                    onTap: onTap,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Center(
-                      child: Icon(iconData, color: color, size: 28),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Tombol Tambah Progress
           Expanded(
             child: Material(
               color: color,
@@ -924,16 +855,11 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
     );
   }
 
-  // ── Bottom Sheet Form ───────────────────────────────────────────────────────
-
   void _showAddProgressBottomSheet(BuildContext context, int modeIndex) {
     controller.isFabVisible.value = false;
     showModalBottomSheet(
       context: context,
-      builder: (_) => _AddProgressBottomSheet(
-        modeIndex: modeIndex,
-        totalAyat: controller.surahInfo.value?.jumlahAyat ?? 0,
-      ),
+      builder: (_) => _AddProgressBottomSheet(modeIndex: modeIndex),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -941,16 +867,10 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
   }
 }
 
-// ── _AddProgressBottomSheet ───────────────────────────────────────────────────
-
 class _AddProgressBottomSheet extends StatefulWidget {
   final int modeIndex;
-  final int totalAyat;
 
-  const _AddProgressBottomSheet({
-    required this.modeIndex,
-    required this.totalAyat,
-  });
+  const _AddProgressBottomSheet({required this.modeIndex});
 
   @override
   State<_AddProgressBottomSheet> createState() =>
@@ -959,8 +879,8 @@ class _AddProgressBottomSheet extends StatefulWidget {
 
 class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
   final _formKey = GlobalKey<FormState>();
-  final _ayatMulaiC = TextEditingController();
-  final _ayatSelesaiC = TextEditingController();
+  final _halamanMulaiC = TextEditingController();
+  final _halamanSelesaiC = TextEditingController();
   final _catatanC = TextEditingController();
 
   String? _selectedKualitas;
@@ -969,8 +889,8 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
 
   @override
   void dispose() {
-    _ayatMulaiC.dispose();
-    _ayatSelesaiC.dispose();
+    _halamanMulaiC.dispose();
+    _halamanSelesaiC.dispose();
     _catatanC.dispose();
     super.dispose();
   }
@@ -978,24 +898,45 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
   void _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final am = int.tryParse(_ayatMulaiC.text);
-    final as = int.tryParse(_ayatSelesaiC.text);
+    final hm = int.tryParse(_halamanMulaiC.text);
+    final hs = int.tryParse(_halamanSelesaiC.text);
 
-    if (am == null || as == null) return;
+    if (hm == null || hs == null) return;
 
-    if (am > as) {
+    if (hm > hs) {
       setState(
         () => _errorMessage =
-            'Ayat mulai tidak boleh lebih besar dari ayat selesai',
+            'Halaman mulai tidak boleh lebih dari halaman selesai',
       );
       return;
     }
-    if (am < 1 || as > widget.totalAyat) {
-      setState(
-        () => _errorMessage = 'Ayat harus di antara 1 dan ${widget.totalAyat}',
-      );
-      return;
+
+    final controller = Get.find<DetailHafalanJuzController>();
+    final detail = controller.currentDetail;
+
+    if (detail != null && detail.surah.isNotEmpty) {
+      int minHal = 9999;
+      int maxHal = 0;
+
+      for (var s in detail.surah) {
+        for (var a in s.ayat) {
+          if (a.halaman != null) {
+            if (a.halaman! < minHal) minHal = a.halaman!;
+            if (a.halaman! > maxHal) maxHal = a.halaman!;
+          }
+        }
+      }
+
+      if (minHal <= maxHal) {
+        if (hm < minHal || hs > maxHal) {
+          setState(
+            () => _errorMessage = 'Halaman harus di antara $minHal dan $maxHal',
+          );
+          return;
+        }
+      }
     }
+
     if (widget.modeIndex == 0 && _selectedKualitas == null) {
       setState(() => _errorMessage = 'Silakan pilih kualitas');
       return;
@@ -1007,13 +948,11 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
 
     setState(() => _errorMessage = null);
 
-    final controller = Get.find<DetailHafalanSurahController>();
-
-    final success = await controller.saveSetoranByAyat(
+    final success = await controller.saveSetoranByHalaman(
       int.parse(controller.santriId),
-      int.parse(controller.surahId),
-      am,
-      as,
+      int.parse(controller.juzId),
+      hm,
+      hs,
       widget.modeIndex == 0 ? _selectedKualitas : null,
       _selectedKeterangan!,
       _catatanC.text,
@@ -1021,6 +960,8 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
 
     if (success) {
       Get.back(); // tutup modal
+    } else {
+      setState(() => _errorMessage = 'Halaman tidak valid di juz ini');
     }
   }
 
@@ -1198,6 +1139,7 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
     final label = labels[widget.modeIndex];
 
     Color themeColor = Colors.deepPurpleAccent;
+    final controller = Get.find<DetailHafalanJuzController>();
 
     return Container(
       constraints: BoxConstraints(
@@ -1272,7 +1214,7 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            Get.find<DetailHafalanSurahController>().santriName,
+                            controller.santriName,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
@@ -1304,7 +1246,7 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
-                                  'Surah ${Get.find<DetailHafalanSurahController>().surahInfo.value?.namaLatin ?? ''}',
+                                  'Juz ${controller.juzId}',
                                   style: TextStyle(
                                     color: Colors.blueGrey[600],
                                     fontSize: 11,
@@ -1357,16 +1299,16 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
                 children: [
                   Expanded(
                     child: _buildTextField(
-                      controller: _ayatMulaiC,
-                      label: 'Ayat Mulai',
+                      controller: _halamanMulaiC,
+                      label: 'Halaman Mulai',
                       keyboardType: TextInputType.number,
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: _buildTextField(
-                      controller: _ayatSelesaiC,
-                      label: 'Ayat Selesai',
+                      controller: _halamanSelesaiC,
+                      label: 'Halaman Selesai',
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -1408,7 +1350,6 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
                 width: double.infinity,
                 height: 48,
                 child: Obx(() {
-                  final controller = Get.find<DetailHafalanSurahController>();
                   final isLoading = controller.isSaveLoading.value;
 
                   return ElevatedButton(
@@ -1447,8 +1388,6 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
   }
 }
 
-// ── _StickyTabBarDelegate ───────────────────────────────────────────────────
-
 class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   _StickyTabBarDelegate({required this.child});
 
@@ -1473,18 +1412,4 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(_StickyTabBarDelegate oldDelegate) {
     return oldDelegate.child != child;
   }
-}
-
-// ── PositionData ──────────────────────────────────────────────────────────────
-
-class PositionData {
-  const PositionData({
-    required this.position,
-    required this.bufferedPosition,
-    required this.duration,
-  });
-
-  final Duration position;
-  final Duration bufferedPosition;
-  final Duration duration;
 }

@@ -766,10 +766,11 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
         Get.toNamed(
-          '/detail-hafalan-surah',
+          '/detail-hafalan-juz',
           arguments: {
             'santriId': controller.santriData.value?.id,
             'juzId': juz.juz.toString(),
+            'santriName': controller.santriData.value?.nama,
           },
         );
       },

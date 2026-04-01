@@ -1,19 +1,15 @@
-// detail_progres_controller.dart
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:just_audio/just_audio.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
-import 'package:mobile_kalimasada/app/data/models/detail_hafalan_surah.dart';
-import 'package:mobile_kalimasada/app/data/models/detail_surah.dart' hide Ayat;
+import 'package:mobile_kalimasada/app/data/models/detail_hafalan_juz.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
+import 'package:flutter/material.dart';
 
-class DetailHafalanSurahController extends GetxController {
-  RxBool isSurahInfoLoading = false.obs;
+class DetailHafalanJuzController extends GetxController {
+  RxBool isJuzInfoLoading = false.obs;
 
   // Loading states per mode
   RxBool isLoadingTambah = false.obs;
@@ -22,18 +18,16 @@ class DetailHafalanSurahController extends GetxController {
 
   RxBool isSaveLoading = false.obs;
 
-  final santriId = Get.arguments['santriId'].toString();
-  final santriName = Get.arguments['santriName'].toString();
-  final surahId = Get.arguments['surahId'].toString();
+  late String santriId;
+  late String juzId;
+  // We don't have santriName from arguments possibly if it only passed juzId and santriId,
+  // let's grab it or default to something
+  String santriName = 'Santri';
 
   // Data per mode
-  var detailTambah = Rxn<DetailHafalan>();
-  var detailMurajaah = Rxn<DetailHafalan>();
-  var detailTahsin = Rxn<DetailHafalan>();
-
-  var surahInfo = Rxn<DetailSurah>();
-
-  AudioPlayer audioPlayer = AudioPlayer();
+  var detailTambah = Rxn<DetailHafalanJuz>();
+  var detailMurajaah = Rxn<DetailHafalanJuz>();
+  var detailTahsin = Rxn<DetailHafalanJuz>();
 
   RxBool isFabVisible = true.obs;
 
@@ -54,7 +48,7 @@ class DetailHafalanSurahController extends GetxController {
     return isLoadingTahsin.value;
   }
 
-  DetailHafalan? get currentDetail {
+  DetailHafalanJuz? get currentDetail {
     if (selectedTab.value == 0) return detailTambah.value;
     if (selectedTab.value == 1) return detailMurajaah.value;
     return detailTahsin.value;
@@ -71,13 +65,15 @@ class DetailHafalanSurahController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getSurahInfo();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-    audioPlayer.dispose();
+    final args = Get.arguments;
+    if (args != null) {
+      santriId = args['santriId'].toString();
+      juzId = args['juzId'].toString();
+      if (args.containsKey('santriName')) {
+        santriName = args['santriName'].toString();
+      }
+    }
+    getDetailTambah();
   }
 
   void changeTab(int index) {
@@ -94,14 +90,39 @@ class DetailHafalanSurahController extends GetxController {
     }
   }
 
-  int _getLastCheckedIndex(List<Ayat> ayat) {
+  int _getLastCheckedIndex(List<SurahElement> surahs) {
     int lastIdx = 0;
-    for (int i = 0; i < ayat.length; i++) {
-      if (ayat[i].checked == true) {
-        lastIdx = i;
+    int indexCounter = 0;
+    for (int s = 0; s < surahs.length; s++) {
+      indexCounter++; // for the surah header
+      for (int a = 0; a < surahs[s].ayat.length; a++) {
+        if (surahs[s].ayat[a].checked == true) {
+          lastIdx = indexCounter;
+        }
+        indexCounter++;
       }
     }
     return lastIdx;
+  }
+
+  int getAyatCount(List<SurahElement> surahs) {
+    int count = 0;
+    for (var s in surahs) {
+      count += s.ayat.length;
+    }
+    return count;
+  }
+
+  int getCheckedAyatCount(List<SurahElement> surahs) {
+    int count = 0;
+    for (var s in surahs) {
+      count += s.ayat
+          .where(
+            (a) => a.checked == true && a.keterangan?.toLowerCase() == 'lanjut',
+          )
+          .length;
+    }
+    return count;
   }
 
   Future<void> getDetailTambah() async {
@@ -111,7 +132,7 @@ class DetailHafalanSurahController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse(ApiUrl.detailHafalanPerSurahTambah(santriId, surahId)),
+        Uri.parse(ApiUrl.detailHafalanPerJuzTambah(santriId, juzId)),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -121,12 +142,12 @@ class DetailHafalanSurahController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        detailTambah.value = DetailHafalan.fromJson(data);
+        detailTambah.value = DetailHafalanJuz.fromJson(data);
         lastCheckedTambah.value = _getLastCheckedIndex(
-          detailTambah.value!.ayat,
+          detailTambah.value!.surah,
         );
       } else {
-        ToastUtils.showErrorToast('Gagal memuat ayat hafalan');
+        ToastUtils.showErrorToast('Gagal memuat hafalan juz');
       }
     } catch (e) {
       ToastUtils.showErrorToast('Periksa koneksi internet Anda');
@@ -142,7 +163,7 @@ class DetailHafalanSurahController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse(ApiUrl.detailHafalanPerSurahMurajaah(santriId, surahId)),
+        Uri.parse(ApiUrl.detailHafalanPerJuzMurajaah(santriId, juzId)),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -152,12 +173,12 @@ class DetailHafalanSurahController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        detailMurajaah.value = DetailHafalan.fromJson(data);
+        detailMurajaah.value = DetailHafalanJuz.fromJson(data);
         lastCheckedMurajaah.value = _getLastCheckedIndex(
-          detailMurajaah.value!.ayat,
+          detailMurajaah.value!.surah,
         );
       } else {
-        ToastUtils.showErrorToast('Gagal memuat ayat murajaah');
+        ToastUtils.showErrorToast('Gagal memuat murajaah juz');
       }
     } catch (e) {
       ToastUtils.showErrorToast('Periksa koneksi internet Anda');
@@ -173,7 +194,7 @@ class DetailHafalanSurahController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse(ApiUrl.detailHafalanPerSurahTahsin(santriId, surahId)),
+        Uri.parse(ApiUrl.detailHafalanPerJuzTahsin(santriId, juzId)),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -183,12 +204,12 @@ class DetailHafalanSurahController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        detailTahsin.value = DetailHafalan.fromJson(data);
+        detailTahsin.value = DetailHafalanJuz.fromJson(data);
         lastCheckedTahsin.value = _getLastCheckedIndex(
-          detailTahsin.value!.ayat,
+          detailTahsin.value!.surah,
         );
       } else {
-        ToastUtils.showErrorToast('Gagal memuat ayat tahsin');
+        ToastUtils.showErrorToast('Gagal memuat tahsin juz');
       }
     } catch (e) {
       ToastUtils.showErrorToast('Periksa koneksi internet Anda');
@@ -197,62 +218,11 @@ class DetailHafalanSurahController extends GetxController {
     }
   }
 
-  void getSurahInfo() async {
-    try {
-      isSurahInfoLoading.value = true;
-
-      final response = await http
-          .get(
-            Uri.parse(ApiUrl.surahDetail(surahId)),
-            headers: {'Content-Type': 'application/json'},
-          )
-          .timeout(Duration(seconds: 15));
-
-      if (response.statusCode == 200) {
-        getDetailTambah();
-
-        final data = json.decode(response.body);
-        surahInfo.value = DetailSurah.fromJson(data);
-
-        // Set audio source when surah info is loaded
-        if (surahInfo.value?.audio != null &&
-            surahInfo.value!.audio!.isNotEmpty) {
-          String audioUrl = surahInfo.value!.audio!
-              .replaceAll('localhost', '10.0.2.2')
-              .replaceAll('127.0.0.1', '10.0.2.2');
-
-          try {
-            await audioPlayer.setUrl(audioUrl);
-            if (kDebugMode) {
-              print('Audio loaded successfully');
-            }
-          } catch (e) {
-            if (kDebugMode) {
-              print('Audio loading error: $e');
-            }
-            ToastUtils.showErrorToast('Gagal memuat audio');
-          }
-        }
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat surah');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
-    } finally {
-      isSurahInfoLoading.value = false;
-    }
-  }
-
-  Future<bool> saveSetoranByAyat(
+  Future<bool> saveSetoranByHalaman(
     int santriId,
-    int surahId,
-    int ayatMulai,
-    int ayatAkhir,
+    int juzId,
+    int halamanMulai,
+    int halamanSelesai,
     String? kualitas,
     String keterangan,
     String? catatan,
@@ -268,32 +238,18 @@ class DetailHafalanSurahController extends GetxController {
         return false;
       }
 
-      List<int> ayatIds = [];
-      for (final a in detail.ayat) {
-        if (a.nomorAyat != null &&
-            a.nomorAyat! >= ayatMulai &&
-            a.nomorAyat! <= ayatAkhir) {
-          if (a.id != null) ayatIds.add(a.id!);
-        }
-      }
-
-      if (ayatIds.isEmpty) {
-        ToastUtils.showErrorToast('Ayat ID tidak valid');
-        return false;
-      }
       String status = selectedTab.value == 0
           ? 'TambahHafalan'
           : selectedTab.value == 1
           ? 'Murajaah'
           : 'Tahsin';
-      print(status);
 
       if (kualitas == 'Sangat Baik') {
         kualitas = 'SangatBaik';
       }
 
       final response = await http.post(
-        Uri.parse(ApiUrl.saveSetoranByAyat),
+        Uri.parse(ApiUrl.saveSetoranByHalaman),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -301,14 +257,16 @@ class DetailHafalanSurahController extends GetxController {
         },
         body: jsonEncode({
           'santriId': santriId,
-          'surahId': surahId,
-          'ayatIds': ayatIds,
+          'juzId': juzId,
+          'halamanAwal': halamanMulai,
+          'halamanAkhir': halamanSelesai,
           'status': status,
-          'kualitas': kualitas ?? 'Baik', // Kurang, Cukup, Baik, SangatBaik
-          'keterangan': keterangan, // Lanjut, Mengulang
+          'kualitas': kualitas ?? 'Baik',
+          'keterangan': keterangan,
           'catatan': catatan ?? '',
         }),
       );
+
       if (response.statusCode == 200) {
         ToastUtils.showSuccessToast('Setoran berhasil disimpan');
         if (selectedTab.value == 0) {
