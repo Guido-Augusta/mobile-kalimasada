@@ -99,6 +99,9 @@ class ApiUrl {
   static String detailRiwayatHafalan(String santriId, String surahId) =>
       '$baseUrl/hafalan/riwayat/detail/$santriId/surah/$surahId';
 
+  static String detailRiwayatHafalanJuz(String santriId, String juzId) =>
+      '$baseUrl/hafalan/riwayat/detail/$santriId/juz/$juzId';
+
   // SUMMARY HAFALAN
   static String get summaryHafalan => '$baseUrl/hafalan/all-santri/latest';
 

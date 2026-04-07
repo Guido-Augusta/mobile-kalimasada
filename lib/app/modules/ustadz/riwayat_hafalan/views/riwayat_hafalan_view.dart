@@ -25,11 +25,6 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         elevation: 0,
         backgroundColor: const Color(0xFFF1F5F9),
         surfaceTintColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: Colors.black87),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(color: Colors.grey[200], height: 1),
-        ),
       ),
       body: Obx(() {
         return RefreshIndicator(
@@ -284,12 +279,12 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
   SliverToBoxAdapter _buildHeader() {
     return SliverToBoxAdapter(
       child: Container(
-        margin: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 8),
+        margin: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           gradient: LinearGradient(
-            colors: [Colors.deepPurple[700]!, Colors.deepPurpleAccent],
+            colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -317,16 +312,16 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                     ),
                   ),
                   child: const CircleAvatar(
-                    radius: 22,
+                    radius: 20,
                     backgroundColor: Colors.white24,
                     child: Icon(
                       Icons.person_rounded,
-                      size: 28,
+                      size: 26,
                       color: Colors.white,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,9 +370,9 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
@@ -522,7 +517,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                         isAyatMode
                             ? Icons.auto_stories_rounded
                             : Icons.menu_book_rounded,
-                        color: Colors.deepPurple[500],
+                        color: Colors.deepPurpleAccent,
                         size: 24,
                       ),
                     ),

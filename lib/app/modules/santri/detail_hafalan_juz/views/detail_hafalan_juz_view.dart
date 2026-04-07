@@ -613,8 +613,6 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
   }
 
   Widget _buildAyatCard(Ayat? ayat) {
-    final isChecked = ayat?.checked == true;
-
     Color borderColor = Colors.grey[200]!;
     Color kualitasBgColor = Colors.blue[50]!;
     Color kualitasTextColor = Colors.blue[700]!;
@@ -641,7 +639,7 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor, width: isChecked ? 1.5 : 1),
+        border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),

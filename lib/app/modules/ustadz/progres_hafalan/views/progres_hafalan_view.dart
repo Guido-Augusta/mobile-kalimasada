@@ -109,6 +109,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       body: RefreshIndicator(
         onRefresh: () async {
           await controller.getProgresHafalanSurah(controller.santriId);
+          await controller.getProgresHafalanJuz(controller.santriId);
         },
         child: NotificationListener<UserScrollNotification>(
           onNotification: (notification) {

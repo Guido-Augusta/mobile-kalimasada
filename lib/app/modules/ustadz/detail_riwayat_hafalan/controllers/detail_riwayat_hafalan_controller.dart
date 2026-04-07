@@ -3,18 +3,25 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
-import 'package:mobile_kalimasada/app/data/models/detail_riwayat_hafalan.dart';
+import 'package:mobile_kalimasada/app/data/models/detail_riwayat_ayat.dart';
+import 'package:mobile_kalimasada/app/data/models/detail_riwayat_halaman.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailRiwayatHafalanController extends GetxController {
   final isLoading = false.obs;
+  
   final santriId = Get.arguments['santriId'];
-  final surahId = Get.arguments['surahId'];
   final tanggalRiwayat = Get.arguments['tanggalRiwayat'];
   final status = Get.arguments['status'];
+  
+  final surahId = Get.arguments['surahId'];
+  final juzId = Get.arguments['juzId'];
 
-  var detailRiwayatHafalan = Rxn<DetailRiwayatHafalan>();
+  bool get isAyatMode => surahId != null;
+
+  var detailRiwayatAyat = Rxn<DetailRiwayatAyat>();
+  var detailRiwayatHalaman = Rxn<DetailRiwayatHalaman>();
 
   @override
   void onInit() {
@@ -28,14 +35,11 @@ class DetailRiwayatHafalanController extends GetxController {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      // Konversi semua arguments ke string untuk memastikan tipe data yang benar
       final santriIdStr = santriId?.toString() ?? '';
-      final surahIdStr = surahId?.toString() ?? '';
       final tanggalRiwayatStr = tanggalRiwayat?.toString().split(' ')[0] ?? '';
       final statusStr = status?.toString() ?? '';
 
       if (santriIdStr.isEmpty ||
-          surahIdStr.isEmpty ||
           tanggalRiwayatStr.isEmpty ||
           statusStr.isEmpty) {
         ToastUtils.showErrorToast('Data tidak lengkap');
@@ -44,10 +48,19 @@ class DetailRiwayatHafalanController extends GetxController {
       }
 
       final queryParams = {'tanggal': tanggalRiwayatStr, 'status': statusStr};
+      Uri uri;
 
-      final uri = Uri.parse(
-        ApiUrl.detailRiwayatHafalan(santriIdStr, surahIdStr),
-      ).replace(queryParameters: queryParams);
+      if (isAyatMode) {
+        final surahIdStr = surahId?.toString() ?? '';
+        uri = Uri.parse(
+          ApiUrl.detailRiwayatHafalan(santriIdStr, surahIdStr),
+        ).replace(queryParameters: queryParams);
+      } else {
+        final jIdStr = juzId?.toString() ?? '';
+        uri = Uri.parse(
+          ApiUrl.detailRiwayatHafalanJuz(santriIdStr, jIdStr),
+        ).replace(queryParameters: queryParams);
+      }
 
       final response = await http.get(
         uri,
@@ -60,8 +73,11 @@ class DetailRiwayatHafalanController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final riwayat = DetailRiwayatHafalan.fromJson(data);
-        detailRiwayatHafalan.value = riwayat;
+        if (isAyatMode) {
+          detailRiwayatAyat.value = DetailRiwayatAyat.fromJson(data);
+        } else {
+          detailRiwayatHalaman.value = DetailRiwayatHalaman.fromJson(data);
+        }
       } else {
         ToastUtils.showErrorToast('Gagal memuat detail riwayat hafalan');
       }

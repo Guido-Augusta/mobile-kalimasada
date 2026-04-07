@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import '../controllers/detail_riwayat_hafalan_controller.dart';
-import 'package:mobile_kalimasada/app/data/models/detail_riwayat_hafalan.dart';
 
 class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
   const DetailRiwayatHafalanView({super.key});
@@ -43,8 +42,12 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
           );
         }
 
-        final detail = controller.detailRiwayatHafalan.value;
-        if (detail == null) {
+        final isAyatMode = controller.isAyatMode;
+        final hasData = isAyatMode
+            ? controller.detailRiwayatAyat.value != null
+            : controller.detailRiwayatHalaman.value != null;
+
+        if (!hasData) {
           return LayoutBuilder(
             builder: (context, constraints) => RefreshIndicator(
               onRefresh: () async => controller.getDetailRiwayatHafalan(),
@@ -91,75 +94,154 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
           );
         }
 
+        final dynamic detailData = isAyatMode
+            ? controller.detailRiwayatAyat.value!.data
+            : controller.detailRiwayatHalaman.value!.data;
+
         return CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             // Header Card
-            _buildHeaderCard(detail),
+            _buildHeaderCard(detailData, isAyatMode),
 
             // Detail Information
             SliverToBoxAdapter(
-              child: Container(
+              child: Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
-                child: Card(
-                  color: Colors.white,
-                  elevation: 1,
-                  shadowColor: Colors.black.withValues(alpha: 0.05),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.grey[200]!, width: 1),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildDetailItem(
-                          Icons.calendar_today_rounded,
-                          'Tanggal',
-                          detail.data?.tanggal != null
-                              ? DateFormat(
-                                  'dd MMM yyyy',
-                                  'id_ID',
-                                ).format(detail.data!.tanggal!)
-                              : '-',
-                        ),
+                color: Colors.white,
+                elevation: 1,
+                shadowColor: Colors.black.withValues(alpha: 0.05),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey[200]!, width: 1),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDetailItem(
+                        Icons.person_rounded,
+                        'Ustadz',
+                        detailData.ustadz?.nama ?? '-',
+                      ),
+
+                      if (detailData.status?.toLowerCase() ==
+                          'tambahhafalan') ...[
                         const SizedBox(height: 12),
                         _buildDetailItem(
-                          Icons.person_rounded,
-                          'Ustadz',
-                          detail.data?.ustadz?.nama ?? '-',
+                          Icons.star_rounded,
+                          'Total Poin',
+                          detailData.totalPoin?.toString() ?? '-',
                         ),
-
-                        if (detail.data!.status!.toLowerCase() !=
-                            'murajaah') ...[
-                          const SizedBox(height: 12),
-                          _buildDetailItem(
-                            Icons.star_rounded,
-                            'Total Poin',
-                            detail.data?.totalPoin.toString() ?? '-',
-                          ),
-                        ],
-
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: () =>
-                                _showCatatanDialog(detail.data!.catatan!),
-                            icon: const Icon(Icons.note_alt_outlined),
-                            label: const Text('Lihat Catatan'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orangeAccent,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
+                      ],
+                      const SizedBox(height: 12),
+                      if (!isAyatMode &&
+                          detailData.surah != null &&
+                          (detailData.surah as List).isNotEmpty) ...[
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFF6B46C1,
+                                ).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
+                              child: const Icon(
+                                Icons.menu_book_rounded,
+                                size: 16,
+                                color: Color(0xFF6B46C1),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Daftar Surah',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  TextField(
+                                    controller: TextEditingController(
+                                      text: (detailData.surah as List)
+                                          .map((s) => s.namaLatin ?? '')
+                                          .join(', '),
+                                    ),
+                                    maxLines: null,
+                                    readOnly: true,
+                                    decoration: InputDecoration(
+                                      isDense: true,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: Colors.transparent,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.grey[50],
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 10,
+                                          ),
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey[800],
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () =>
+                              _showCatatanDialog(detailData.catatan ?? ''),
+                          icon: const Icon(Icons.note_alt_outlined),
+                          label: const Text('Lihat Catatan'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orangeAccent,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -170,7 +252,7 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
               child: Container(
                 margin: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                 child: Text(
-                  'Daftar Ayat',
+                  'Rincian Ayat',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -181,7 +263,7 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
             ),
 
             // Ayat List
-            if (detail.data?.daftarAyat.isEmpty ?? true)
+            if (detailData.daftarAyat == null || detailData.daftarAyat.isEmpty)
               SliverFillRemaining(
                 child: Center(
                   child: Column(
@@ -215,126 +297,237 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
             else
               SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
-                  final ayat = detail.data?.daftarAyat[index];
-                  return Container(
+                  final ayat = detailData.daftarAyat[index];
+
+                  bool showSurahDivider = false;
+                  if (!isAyatMode && ayat.surah != null) {
+                    if (index == 0) {
+                      showSurahDivider = true;
+                    } else {
+                      final prevAyat = detailData.daftarAyat[index - 1];
+                      if (ayat.surah!.id != prevAyat.surah?.id) {
+                        showSurahDivider = true;
+                      }
+                    }
+                  }
+
+                  Widget ayatCard = Card(
                     margin: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 4,
+                      vertical: 8,
                     ),
-                    child: Card(
-                      color: Colors.white,
-                      elevation: 1,
-                      shadowColor: Colors.black.withValues(alpha: 0.05),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.green[200]!, width: 1.5),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                // Ayat Number
-                                Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    color: Colors.deepPurpleAccent.withValues(
-                                      alpha: 0.1,
+                    color: Colors.white,
+                    elevation: 1,
+                    shadowColor: Colors.black.withValues(alpha: 0.05),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey[200]!, width: 1),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Ayat Number and Surah
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      color: Colors.deepPurpleAccent.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '${ayat?.nomorAyat}',
-                                      style: TextStyle(
-                                        color: Colors.deepPurpleAccent[700],
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
+                                    child: Center(
+                                      child: Text(
+                                        '${ayat.nomorAyat}',
+                                        style: TextStyle(
+                                          color: Colors.deepPurpleAccent[700],
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green[300],
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: const Icon(
-                                    Icons.check,
-                                    size: 16,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-
-                            // Arabic Text
-                            if (ayat?.arab != null && ayat!.arab!.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                    ayat.arab!,
-                                    style: GoogleFonts.amiri(
-                                      fontSize: 24,
-                                      height: 2.5,
+                                  if (!isAyatMode && ayat.surah != null) ...[
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      ayat.surah!.namaLatin ?? '-',
+                                      style: TextStyle(
+                                        color: Colors.grey[700],
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                    textAlign: TextAlign.right,
+                                  ],
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  if (ayat.kualitas != null &&
+                                      (ayat.kualitas as String).isNotEmpty)
+                                    _buildKualitasBadge(ayat.kualitas!),
+                                  if (ayat.keterangan != null &&
+                                      (ayat.keterangan as String)
+                                          .isNotEmpty) ...[
+                                    const SizedBox(width: 6),
+                                    _buildKeteranganBadge(ayat.keterangan!),
+                                  ],
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Arabic Text
+                          if (ayat.arab != null && ayat.arab!.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  ayat.arab!,
+                                  style: GoogleFonts.amiri(
+                                    fontSize: 24,
+                                    height: 2.5,
                                   ),
+                                  textAlign: TextAlign.right,
+                                  textDirection: TextDirection.rtl,
                                 ),
                               ),
+                            ),
 
-                            // Latin Text
-                            if (ayat?.latin != null && ayat!.latin!.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
+                          // Latin Text
+                          if (ayat.latin != null && ayat.latin!.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Text(
+                                ayat.latin!,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                  fontStyle: FontStyle.italic,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+
+                          // Translation
+                          if (ayat.terjemah != null &&
+                              ayat.terjemah!.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.deepPurpleAccent.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                                 child: Text(
-                                  ayat.latin!,
+                                  ayat.terjemah!,
                                   style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[700],
-                                    fontStyle: FontStyle.italic,
+                                    fontSize: 13,
+                                    color: Colors.grey[600],
                                     height: 1.4,
                                   ),
                                 ),
                               ),
-
-                            // Translation
-                            if (ayat?.terjemah != null &&
-                                ayat!.terjemah!.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.deepPurpleAccent.withValues(
-                                      alpha: 0.1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    ayat.terjemah!,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey[600],
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
+                            ),
+                        ],
                       ),
                     ),
                   );
-                }, childCount: detail.data?.daftarAyat.length ?? 0),
+
+                  if (showSurahDivider) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (index > 0) const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 8,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Divider(
+                                  color: Colors.deepPurple[100],
+                                  thickness: 1,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.deepPurple[50],
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: Colors.deepPurple[100]!,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          color: Colors.deepPurpleAccent
+                                              .withValues(alpha: 0.2),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          '${ayat.surah!.id}',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.deepPurple[700],
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        ayat.surah!.namaLatin ?? '-',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.deepPurple[700],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Divider(
+                                  color: Colors.deepPurple[100],
+                                  thickness: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        ayatCard,
+                      ],
+                    );
+                  }
+
+                  return ayatCard;
+                }, childCount: detailData.daftarAyat.length),
               ),
 
             // Bottom padding
@@ -345,12 +538,30 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
     );
   }
 
-  SliverToBoxAdapter _buildHeaderCard(DetailRiwayatHafalan detail) {
+  SliverToBoxAdapter _buildHeaderCard(dynamic detailData, bool isAyatMode) {
+    String titleValue = '-';
+
+    if (isAyatMode) {
+      titleValue = detailData.surah?.namaLatin ?? '-';
+    } else {
+      titleValue = 'Juz ${detailData.juz ?? '-'}';
+    }
+
+    String infoTitle1 = isAyatMode ? 'Ayat' : 'Halaman';
+    String infoValue1 = '-';
+    if (isAyatMode && detailData.rangeAyat != null) {
+      infoValue1 =
+          'Ayat ${detailData.rangeAyat!.awal} - ${detailData.rangeAyat!.akhir}';
+    } else if (!isAyatMode && detailData.rangeHalaman != null) {
+      infoValue1 =
+          'Hal. ${detailData.rangeHalaman!.awal} - ${detailData.rangeHalaman!.akhir}';
+    }
+
     return SliverToBoxAdapter(
       child: Container(
         width: double.infinity,
         margin: const EdgeInsets.all(16),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
@@ -360,7 +571,7 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF6B46C1).withValues(alpha: 0.2),
+              color: Colors.deepPurple.withValues(alpha: 0.2),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -370,59 +581,87 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.book_rounded,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: 16),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      Text(
-                        'Surah',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          fontSize: 14,
+                      Container(
+                        width: 45,
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          isAyatMode
+                              ? Icons.auto_stories_rounded
+                              : Icons.menu_book_rounded,
+                          color: Colors.white,
+                          size: 22,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 8,
-                        children: [
-                          Text(
-                            detail.data?.surah?.namaLatin ?? '-',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(width: 4),
-                          if (detail.data?.surah?.nama != null)
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (isAyatMode)
+                              Text(
+                                'Surah',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.8),
+                                  fontSize: 13,
+                                ),
+                              ),
                             Text(
-                              detail.data?.surah?.nama ?? '-',
-                              style: GoogleFonts.amiri(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 20,
+                              titleValue,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: isAyatMode ? 16 : 18,
+                                fontWeight: FontWeight.bold,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                        ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.calendar_today_rounded,
+                        color: Colors.white,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        detailData.tanggal != null
+                            ? DateFormat(
+                                'dd MMM yyyy',
+                                'id_ID',
+                              ).format(detailData.tanggal!)
+                            : '-',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
@@ -432,14 +671,11 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
             const SizedBox(height: 16),
             Row(
               children: [
-                _buildInfoCard(
-                  'Jumlah Ayat',
-                  '${detail.data?.daftarAyat.length} Ayat',
-                ),
+                _buildInfoCard(infoTitle1, infoValue1, flex: 2),
                 const SizedBox(width: 12),
                 _buildInfoCard(
                   'Status',
-                  _getStatusText(detail.data?.status),
+                  _getStatusText(detailData.status),
                   flex: 3,
                 ),
               ],
@@ -450,11 +686,74 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
     );
   }
 
+  Widget _buildKualitasBadge(String kualitas) {
+    Color kualitasBgColor = Colors.blue[50]!;
+    Color kualitasTextColor = Colors.blue[700]!;
+
+    final k = kualitas.toLowerCase().replaceAll(' ', '');
+    if (k == 'kurang') {
+      kualitasBgColor = Colors.red[50]!;
+      kualitasTextColor = Colors.red[700]!;
+    } else if (k == 'cukup') {
+      kualitasBgColor = Colors.orange[50]!;
+      kualitasTextColor = Colors.orange[700]!;
+    } else if (k == 'baik') {
+      kualitasBgColor = Colors.teal[50]!;
+      kualitasTextColor = Colors.teal[700]!;
+    } else if (k == 'sangatbaik') {
+      kualitasBgColor = Colors.blue[50]!;
+      kualitasTextColor = Colors.blue[700]!;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: kualitasBgColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        kualitas,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          color: kualitasTextColor,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildKeteranganBadge(String keterangan) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: keterangan.toLowerCase() == 'lanjut'
+            ? Colors.green[50]
+            : Colors.orange[50],
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: keterangan.toLowerCase() == 'lanjut'
+              ? Colors.green[200]!
+              : Colors.orange[200]!,
+        ),
+      ),
+      child: Text(
+        keterangan,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          color: keterangan.toLowerCase() == 'lanjut'
+              ? Colors.green[700]
+              : Colors.orange[700],
+        ),
+      ),
+    );
+  }
+
   Widget _buildInfoCard(String title, String value, {int flex = 2}) {
     return Expanded(
       flex: flex,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12),
@@ -562,7 +861,7 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
         backgroundColor: Colors.white,
         title: const Row(
           children: [
-            Icon(Icons.note_alt_rounded, color: Colors.deepPurple, size: 24),
+            Icon(Icons.note_alt_outlined, color: Colors.deepPurple, size: 24),
             SizedBox(width: 8),
             Text(
               'Catatan Hafalan',
@@ -581,7 +880,6 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
             controller: TextEditingController(text: catatan),
             maxLines: null,
             readOnly: true,
-            // enabled: false,
             decoration: InputDecoration(
               hintText: 'Tidak ada catatan',
               hintStyle: TextStyle(
@@ -604,9 +902,11 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
               fillColor: Colors.grey[50],
               contentPadding: const EdgeInsets.all(16),
             ),
-            style: TextStyle(fontSize: 16, height: 1.5),
+            style: const TextStyle(fontSize: 16, height: 1.5),
           ),
         ),
+        contentPadding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
