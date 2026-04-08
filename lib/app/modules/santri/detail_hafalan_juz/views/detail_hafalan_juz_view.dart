@@ -6,6 +6,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan_juz.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import '../controllers/detail_hafalan_juz_controller.dart';
 
 class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
@@ -65,6 +66,9 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
         centerTitle: true,
       ),
       bottomNavigationBar: Obx(() {
+        if (!AuthService.to.isUstadz) {
+          return const SizedBox.shrink();
+        }
         if (controller.isJuzInfoLoading.value || controller.isCurrentLoading) {
           return const SizedBox.shrink();
         }
@@ -364,7 +368,7 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
           ),
 
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -375,7 +379,7 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
                       Text(
                         'Juz $juzNumber',
                         style: GoogleFonts.poppins(
-                          fontSize: 26,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -386,7 +390,7 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
                       Text(
                         'Total $totalSurah Surah',
                         style: GoogleFonts.poppins(
-                          fontSize: 14,
+                          fontSize: 13,
                           fontWeight: FontWeight.w500,
                           color: Colors.white.withValues(alpha: 0.8),
                         ),

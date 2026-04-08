@@ -9,6 +9,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan_surah.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import '../controllers/detail_hafalan_surah_controller.dart';
 
 class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
@@ -53,6 +54,9 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
 
       // ── 3 Action Buttons (bottom bar) ────────────────────────────────────────
       bottomNavigationBar: Obx(() {
+        if (!AuthService.to.isUstadz) {
+          return const SizedBox.shrink();
+        }
         if (controller.isSurahInfoLoading.value ||
             controller.isCurrentLoading) {
           return const SizedBox.shrink();
@@ -99,6 +103,42 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                 ),
               ),
               const SizedBox(height: 8),
+              if (!AuthService.to.isUstadz) ...[
+                StreamBuilder<PlayerState>(
+                  stream: controller.audioPlayer.playerStateStream,
+                  builder: (context, snapshot) {
+                    final playerState = snapshot.data;
+                    final processingState = playerState?.processingState;
+                    final playing = playerState?.playing;
+
+                    IconData iconData;
+                    VoidCallback? onTap;
+
+                    if (!(playing ?? false)) {
+                      iconData = Icons.play_arrow_rounded;
+                      onTap = controller.audioPlayer.play;
+                    } else if (processingState != ProcessingState.completed) {
+                      iconData = Icons.pause_rounded;
+                      onTap = controller.audioPlayer.pause;
+                    } else {
+                      iconData = Icons.play_arrow_rounded;
+                      onTap = () {
+                        controller.audioPlayer.seek(Duration.zero);
+                        controller.audioPlayer.play();
+                      };
+                    }
+
+                    return FloatingActionButton(
+                      heroTag: 'play_pause',
+                      backgroundColor: Colors.deepPurpleAccent,
+                      mini: true,
+                      onPressed: onTap,
+                      child: Icon(iconData, color: Colors.white),
+                    );
+                  },
+                ),
+                const SizedBox(height: 8),
+              ],
               FloatingActionButton(
                 heroTag: 'down',
                 backgroundColor: Colors.deepPurpleAccent,
@@ -358,7 +398,7 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                           Text(
                             surah?.namaLatin ?? '-',
                             style: GoogleFonts.poppins(
-                              fontSize: 20,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
