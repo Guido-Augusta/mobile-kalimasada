@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 
 enum ChangePasswordStep { oldPassword, newPassword }
 
@@ -38,14 +38,10 @@ class ChangePasswordController extends GetxController {
   void changePasswordStep1(String oldPassword) async {
     try {
       isValidating.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      final token = AuthService.to.token.value;
 
-      if (token == null) {
-        prefs.remove('token');
-        prefs.remove('role');
-        prefs.remove('userId');
-        prefs.remove('roleId');
+      if (token.isEmpty) {
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showErrorToast(
           'Token tidak ditemukan\nSilakan login kembali',
@@ -86,14 +82,10 @@ class ChangePasswordController extends GetxController {
   void changePasswordStep2(String newPassword) async {
     try {
       isValidating.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      final token = AuthService.to.token.value;
 
-      if (token == null) {
-        prefs.remove('token');
-        prefs.remove('role');
-        prefs.remove('userId');
-        prefs.remove('roleId');
+      if (token.isEmpty) {
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showErrorToast(
           'Token tidak ditemukan\nSilakan login kembali',
@@ -134,11 +126,10 @@ class ChangePasswordController extends GetxController {
   }
 
   Future<void> logout() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
+    final userId = AuthService.to.userId.value;
     try {
       final response = await http.post(
-        Uri.parse(ApiUrl.logout(userId!)),
+        Uri.parse(ApiUrl.logout(userId)),
         headers: {'Content-Type': 'application/json'},
       );
       var data = jsonDecode(response.body);
@@ -146,10 +137,7 @@ class ChangePasswordController extends GetxController {
         print(data);
       }
       if (response.statusCode == 200) {
-        await prefs.remove('token');
-        await prefs.remove('role');
-        await prefs.remove('userId');
-        await prefs.remove('roleId');
+        await AuthService.to.logout();
       } else {
         ToastUtils.showErrorToast('Gagal logout');
       }

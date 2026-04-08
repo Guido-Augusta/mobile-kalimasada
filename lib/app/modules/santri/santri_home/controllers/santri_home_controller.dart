@@ -8,7 +8,7 @@ import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 
 enum ChartType { hafalanBaru, murajaah }
 
@@ -48,12 +48,11 @@ class SantriHomeController extends GetxController {
     try {
       isLoading.value = true;
       isLoadingChart.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final santriId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final santriId = AuthService.to.roleId.value;
 
       final response = await get(
-        Uri.parse(ApiUrl.santriDetail(santriId!)),
+        Uri.parse(ApiUrl.santriDetail(santriId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -90,9 +89,8 @@ class SantriHomeController extends GetxController {
   void getChart() async {
     try {
       isLoadingChart.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final santriId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final santriId = AuthService.to.roleId.value;
 
       final queryParams = {'range': range.value, 'santriId': santriId};
 
@@ -127,11 +125,10 @@ class SantriHomeController extends GetxController {
   void logout() async {
     try {
       isLoadingLogout.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('userId');
+      final userId = AuthService.to.userId.value;
       final response = await http
           .post(
-            Uri.parse(ApiUrl.logout(userId!)),
+            Uri.parse(ApiUrl.logout(userId)),
             headers: {'Content-Type': 'application/json'},
           )
           .timeout(const Duration(seconds: 30));
@@ -140,10 +137,7 @@ class SantriHomeController extends GetxController {
         print(data);
       }
       if (response.statusCode == 200) {
-        await prefs.remove('token');
-        await prefs.remove('role');
-        await prefs.remove('userId');
-        await prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {

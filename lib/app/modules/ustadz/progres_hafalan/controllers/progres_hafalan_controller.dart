@@ -9,7 +9,6 @@ import 'package:mobile_kalimasada/app/data/models/progres_hafalan_juz.dart'
 import 'package:mobile_kalimasada/app/data/models/progres_hafalan_surah.dart';
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 class ProgresHafalanController extends GetxController {
@@ -42,9 +41,8 @@ class ProgresHafalanController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    userRole.value = prefs.getString('role') ?? '';
-    currentUserRole.value = await AuthService.getCurrentRole() ?? '';
+    userRole.value = AuthService.to.roleString;
+    currentUserRole.value = AuthService.to.roleString;
     santriId = Get.arguments['santriId'];
     getProgresHafalanSurah(santriId);
     getProgresHafalanJuz(santriId);
@@ -53,8 +51,7 @@ class ProgresHafalanController extends GetxController {
   Future<void> getProgresHafalanSurah(String santriId) async {
     try {
       isLoading.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      final token = AuthService.to.token.value;
 
       final response = await http.get(
         Uri.parse(ApiUrl.progresHafalanSurah(santriId)),
@@ -91,8 +88,7 @@ class ProgresHafalanController extends GetxController {
 
   Future<void> getProgresHafalanJuz(String santriId) async {
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      final token = AuthService.to.token.value;
 
       final response = await http.get(
         Uri.parse(ApiUrl.progresHafalanJuz(santriId)),

@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 
 class AdminHomeController extends GetxController {
   var isLoadingLogout = false.obs;
@@ -13,11 +13,10 @@ class AdminHomeController extends GetxController {
 
   void logout() async {
     isLoadingLogout.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
+    final userId = AuthService.to.userId.value;
     try {
       final response = await post(
-        Uri.parse(ApiUrl.logout(userId!)),
+        Uri.parse(ApiUrl.logout(userId)),
         headers: {'Content-Type': 'application/json'},
       ).timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
@@ -26,10 +25,7 @@ class AdminHomeController extends GetxController {
         print(data);
       }
       if (response.statusCode == 200) {
-        await prefs.remove('token');
-        await prefs.remove('role');
-        await prefs.remove('userId');
-        await prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {

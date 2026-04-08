@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 
 class LoginController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -52,11 +52,12 @@ class LoginController extends GetxController {
       }
 
       if (response.statusCode == 200) {
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', data['token'].toString());
-        await prefs.setString('role', data['user']['role'].toString());
-        await prefs.setString('userId', data['user']['id'].toString());
-        await prefs.setString('roleId', data['user']['roleId'].toString());
+        await AuthService.to.login(
+          newToken: data['token'].toString(),
+          newRole: data['user']['role'].toString(),
+          newUserId: data['user']['id'].toString(),
+          newRoleId: data['user']['roleId'].toString(),
+        );
 
         // Navigate to home or another page
         if (data['user']['role'] == 'santri') {

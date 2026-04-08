@@ -8,7 +8,7 @@ import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart' as o;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 
 class OrtuHomeController extends GetxController {
   var isLoading = true.obs;
@@ -39,12 +39,11 @@ class OrtuHomeController extends GetxController {
   Future<void> getOrtu() async {
     try {
       isLoading.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final ortuId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final ortuId = AuthService.to.roleId.value;
 
       final response = await get(
-        Uri.parse(ApiUrl.ortuDetail(ortuId!)),
+        Uri.parse(ApiUrl.ortuDetail(ortuId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -99,8 +98,7 @@ class OrtuHomeController extends GetxController {
 
   Future<void> getChildren(String santriId) async {
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      final token = AuthService.to.token.value;
       final response = await get(
         Uri.parse(ApiUrl.santriDetail(santriId)),
         headers: {
@@ -126,11 +124,10 @@ class OrtuHomeController extends GetxController {
   void logout() async {
     try {
       isLoadingLogout.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('userId');
+      final userId = AuthService.to.userId.value;
       final response = await http
           .post(
-            Uri.parse(ApiUrl.logout(userId!)),
+            Uri.parse(ApiUrl.logout(userId)),
             headers: {'Content-Type': 'application/json'},
           )
           .timeout(const Duration(seconds: 30));
@@ -139,10 +136,7 @@ class OrtuHomeController extends GetxController {
         print(data);
       }
       if (response.statusCode == 200) {
-        await prefs.remove('token');
-        await prefs.remove('role');
-        await prefs.remove('userId');
-        await prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {
