@@ -9,7 +9,7 @@ import 'package:mobile_kalimasada/app/modules/ustadz/daftar_santri/controllers/d
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum ChartType { hafalanBaru, murajaah }
+enum ChartType { tambahHafalan, murajaah, tahsin }
 
 class DetailSantriController extends GetxController {
   String userRole = '';
@@ -30,7 +30,8 @@ class DetailSantriController extends GetxController {
   var isLoadingChart = false.obs;
   var chart = Rxn<c.Chart>();
   var range = '1w'.obs;
-  var selectedChartType = ChartType.hafalanBaru.obs;
+  var selectedChartType = ChartType.tambahHafalan.obs;
+  var selectedChartMode = 'ayat'.obs;
 
   DateTime? _lastNoChangeShown;
   DateTime? _lastErrorShown;
@@ -166,6 +167,7 @@ class DetailSantriController extends GetxController {
       final queryParams = {
         'range': range.value,
         'santriId': santriId.toString(),
+        'mode': selectedChartMode.value,
       };
 
       final uri = Uri.parse(ApiUrl.chart).replace(queryParameters: queryParams);

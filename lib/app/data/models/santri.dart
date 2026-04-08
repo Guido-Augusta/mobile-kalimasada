@@ -35,7 +35,7 @@ class Santri {
   final DateTime? poinUpdatedAt;
   final User? user;
   final List<OrangTua> orangTua;
-  final List<WaliKela> waliKelas;
+  final List<WaliKelas> waliKelas;
 
   factory Santri.fromJson(Map<String, dynamic> json) {
     return Santri(
@@ -61,8 +61,8 @@ class Santri {
             ),
       waliKelas: json["waliKelas"] == null
           ? []
-          : List<WaliKela>.from(
-              json["waliKelas"]!.map((x) => WaliKela.fromJson(x)),
+          : List<WaliKelas>.from(
+              json["waliKelas"]!.map((x) => WaliKelas.fromJson(x)),
             ),
     );
   }
@@ -155,8 +155,8 @@ class User {
   }
 }
 
-class WaliKela {
-  WaliKela({
+class WaliKelas {
+  WaliKelas({
     required this.id,
     required this.nama,
     required this.nomorHp,
@@ -168,8 +168,8 @@ class WaliKela {
   final String? nomorHp;
   final String? waliKelasTahap;
 
-  factory WaliKela.fromJson(Map<String, dynamic> json) {
-    return WaliKela(
+  factory WaliKelas.fromJson(Map<String, dynamic> json) {
+    return WaliKelas(
       id: json["id"],
       nama: json["nama"],
       nomorHp: json["nomorHp"],

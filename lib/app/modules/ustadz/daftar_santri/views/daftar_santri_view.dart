@@ -172,7 +172,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
         children: [
           Obx(
             () => Expanded(
-              child: InkWell(
+              child: GestureDetector(
                 onTap: () {
                   controller.changeTahapHafalan('level1');
                 },
@@ -216,7 +216,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
           const SizedBox(width: 10),
           Obx(
             () => Expanded(
-              child: InkWell(
+              child: GestureDetector(
                 onTap: () {
                   controller.changeTahapHafalan('level2');
                 },
@@ -260,7 +260,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
           const SizedBox(width: 10),
           Obx(
             () => Expanded(
-              child: InkWell(
+              child: GestureDetector(
                 onTap: () {
                   controller.changeTahapHafalan('level3');
                 },
@@ -320,7 +320,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
         },
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -484,78 +484,62 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
               Row(
                 children: [
                   Expanded(
-                    child: InkWell(
-                      onTap: () {
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.history),
+                      label: Text(
+                        'Riwayat',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange[50],
+                        foregroundColor: Colors.orange,
+                        shadowColor: Colors.transparent,
+                        side: const BorderSide(color: Colors.orange),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
                         Get.toNamed(
                           '/riwayat-hafalan',
                           arguments: {'santriId': santri.id.toString()},
                         );
                       },
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.history_rounded,
-                              size: 18,
-                              color: Colors.deepOrangeAccent,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Riwayat',
-                              style: GoogleFonts.poppins(
-                                color: Colors.deepOrangeAccent,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
+
                   const SizedBox(width: 12),
+
                   Expanded(
-                    child: InkWell(
-                      onTap: () {
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.book_rounded),
+                      label: Text(
+                        'Hafalan',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green[50],
+                        foregroundColor: const Color(0xFF10B981),
+                        shadowColor: Colors.transparent,
+                        side: const BorderSide(color: Color(0xFF10B981)),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
                         Get.toNamed(
                           '/progres-hafalan',
                           arguments: {'santriId': santri.id.toString()},
                         );
                       },
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.green[400]!.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.menu_book_rounded,
-                              size: 18,
-                              color: Colors.green[600],
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Hafalan',
-                              style: GoogleFonts.poppins(
-                                color: Colors.green[600],
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
                 ],
