@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
 import 'package:skeletonizer/skeletonizer.dart';
 
+import '../../../../routes/app_pages.dart';
 import '../controllers/santri_home_controller.dart';
 
 class SantriHomeView extends GetView<SantriHomeController> {
@@ -414,209 +415,159 @@ class SantriHomeView extends GetView<SantriHomeController> {
         InkWell(
           onTap: () {
             Get.toNamed(
-              '/progres-hafalan',
+              Routes.PROGRES_HAFALAN,
               arguments: {'santriId': controller.santri.value?.id.toString()},
             );
           },
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.deepPurpleAccent.withValues(alpha: 0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
             child: Row(
               children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurple.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    Icons.menu_book_rounded,
+                    color: Colors.deepPurple,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          'Data Hafalan',
-                          style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
                       Text(
                         'Progres Hafalan',
                         style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.deepPurple[800],
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Text(
-                        'Lihat data progres hafalan',
+                        'Lihat progres hafalan',
                         style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 13,
                           fontWeight: FontWeight.w400,
+                          color: Colors.black.withValues(alpha: 0.9),
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 20),
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.deepPurple.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.book, color: Colors.white, size: 40),
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: Colors.deepPurpleAccent,
+                    size: 18,
+                  ),
                 ),
               ],
             ),
           ),
         ),
         const SizedBox(height: 15),
-        Row(
-          children: [
-            Expanded(
-              child: InkWell(
-                onTap: () {
-                  Get.toNamed('/alquran');
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
+        InkWell(
+          onTap: () {
+            Get.toNamed(
+              Routes.RIWAYAT_HAFALAN,
+              arguments: {'santriId': controller.santri.value?.id.toString()},
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+                    color: Colors.orange.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(14),
                   ),
+                  child: Icon(Icons.history, color: Colors.orange, size: 32),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurple.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Icon(
-                          Icons.menu_book_rounded,
-                          color: Colors.deepPurple,
-                          size: 32,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
                       Text(
-                        'Al-Qur\'an',
+                        'Riwayat Hafalan',
                         style: GoogleFonts.poppins(
                           fontSize: 16,
-                          color: Colors.deepPurple[800],
                           fontWeight: FontWeight.w600,
+                          color: Colors.deepPurple[800],
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Daftar Surah',
+                        'Lihat riwayat hafalan',
                         style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey[600],
+                          fontSize: 13,
                           fontWeight: FontWeight.w400,
+                          color: Colors.black.withValues(alpha: 0.9),
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ],
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 15),
-            Expanded(
-              child: InkWell(
-                onTap: () {
-                  Get.toNamed(
-                    '/riwayat-hafalan',
-                    arguments: {
-                      'santriId': controller.santri.value?.id.toString(),
-                    },
-                  );
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
+                Container(
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+                    color: Colors.deepPurple.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Icon(
-                          Icons.history,
-                          color: Colors.orange,
-                          size: 32,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Riwayat',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          color: Colors.deepPurple[800],
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Setoran',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: Colors.deepPurpleAccent,
+                    size: 18,
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ],
     );

@@ -452,7 +452,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.deepPurple,
+                          color: Colors.deepPurple[800],
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
