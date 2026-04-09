@@ -10,7 +10,7 @@ import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
 
-enum ChartType { hafalanBaru, murajaah }
+enum ChartType { tambahHafalan, murajaah, tahsin }
 
 class SantriHomeController extends GetxController {
   var isLoading = true.obs;
@@ -24,7 +24,8 @@ class SantriHomeController extends GetxController {
   var chart = Rxn<c.Chart>();
   var range = '1w'.obs;
 
-  var selectedChartType = ChartType.hafalanBaru.obs;
+  var selectedChartType = ChartType.tambahHafalan.obs;
+  var selectedChartMode = 'ayat'.obs;
 
   DateTime? _lastErrorShown;
 
@@ -92,7 +93,11 @@ class SantriHomeController extends GetxController {
       final token = AuthService.to.token.value;
       final santriId = AuthService.to.roleId.value;
 
-      final queryParams = {'range': range.value, 'santriId': santriId};
+      final queryParams = {
+        'range': range.value,
+        'santriId': santriId.toString(),
+        'mode': selectedChartMode.value,
+      };
 
       final uri = Uri.parse(ApiUrl.chart).replace(queryParameters: queryParams);
 

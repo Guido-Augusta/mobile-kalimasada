@@ -52,20 +52,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
       children: [
         Obx(
           () => Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.deepPurpleAccent.withValues(alpha: 0.3),
-                width: 3,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
+            decoration: BoxDecoration(shape: BoxShape.circle),
             child: CircleAvatar(
               radius: 28,
               backgroundColor: Colors.grey[200],
@@ -84,7 +71,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
             ),
           ),
         ),
-        const SizedBox(width: 15),
+        const SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,9 +100,9 @@ class SantriHomeView extends GetView<SantriHomeController> {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: GoogleFonts.poppins(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple[800],
+                      // color: Colors.deepPurple[800],
                     ),
                   ),
                 ),
@@ -211,7 +198,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
   Widget _buildWelcomeCard(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
@@ -243,15 +230,6 @@ class SantriHomeView extends GetView<SantriHomeController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Selamat Datang',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
                       'Dashboard Santri',
                       style: GoogleFonts.poppins(
                         fontSize: 20,
@@ -262,11 +240,11 @@ class SantriHomeView extends GetView<SantriHomeController> {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                        horizontal: 12,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
@@ -408,7 +386,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
           style: GoogleFonts.poppins(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: Colors.deepPurple[800],
+            // color: Colors.deepPurple[800],
           ),
         ),
         const SizedBox(height: 14),
@@ -444,7 +422,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
                   child: Icon(
                     Icons.menu_book_rounded,
                     color: Colors.deepPurple,
-                    size: 32,
+                    size: 24,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -522,7 +500,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
                     color: Colors.orange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: Icon(Icons.history, color: Colors.orange, size: 32),
+                  child: Icon(Icons.history, color: Colors.orange, size: 24),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -584,7 +562,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
           style: GoogleFonts.poppins(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: Colors.deepPurple[800],
+            // color: Colors.deepPurple[800],
           ),
         ),
         Container(
@@ -604,6 +582,11 @@ class SantriHomeView extends GetView<SantriHomeController> {
                     Icons.keyboard_arrow_down_rounded,
                     size: 20,
                     color: Colors.grey,
+                  ),
+                  isDense: true,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
                   ),
                   dropdownColor: Colors.white,
                   items: [
@@ -646,61 +629,97 @@ class SantriHomeView extends GetView<SantriHomeController> {
       children: [
         _buildChartHeader(),
         const SizedBox(height: 16),
-        _buildChartTypeSelector(),
+        _buildChartFilters(),
         const SizedBox(height: 16),
         _buildChart(),
       ],
     );
   }
 
-  Widget _buildChartTypeSelector() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Obx(
-        () => Row(
-          children: [
-            Expanded(
-              child: _buildChartTypeButton(
-                'Tambah Hafalan',
-                ChartType.hafalanBaru,
-              ),
+  Widget _buildChartFilters() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 5,
+          child: Obx(
+            () => _buildDropdown(
+              value: controller.selectedChartMode.value,
+              items: const [
+                DropdownMenuItem(value: 'ayat', child: Text('Ayat')),
+                DropdownMenuItem(value: 'halaman', child: Text('Halaman')),
+              ],
+              onChanged: (val) {
+                controller.selectedChartMode.value = val!;
+                controller.getChart();
+              },
             ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _buildChartTypeButton('Murajaah', ChartType.murajaah),
-            ),
-          ],
+          ),
         ),
-      ),
+        const SizedBox(width: 12),
+        Expanded(
+          flex: 6,
+          child: Obx(
+            () => _buildDropdown(
+              value: controller.selectedChartType.value.name,
+              items: const [
+                DropdownMenuItem(
+                  value: 'tambahHafalan',
+                  child: Text('Tambah Hafalan'),
+                ),
+                DropdownMenuItem(value: 'murajaah', child: Text('Murajaah')),
+                DropdownMenuItem(value: 'tahsin', child: Text('Tahsin')),
+              ],
+              onChanged: (val) {
+                switch (val) {
+                  case 'tambahHafalan':
+                    controller.selectedChartType.value =
+                        ChartType.tambahHafalan;
+                    break;
+                  case 'murajaah':
+                    controller.selectedChartType.value = ChartType.murajaah;
+                    break;
+                  case 'tahsin':
+                    controller.selectedChartType.value = ChartType.tahsin;
+                    break;
+                }
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildChartTypeButton(String text, ChartType type) {
-    final isSelected = controller.selectedChartType.value == type;
-    return ElevatedButton(
-      onPressed: () {
-        controller.selectedChartType.value = type;
-      },
-      style: ElevatedButton.styleFrom(
-        splashFactory: NoSplash.splashFactory,
-        shadowColor: Colors.transparent,
-        backgroundColor: isSelected
-            ? const Color(0xFF6B46C1)
-            : Colors.transparent,
-        foregroundColor: isSelected ? Colors.white : Colors.grey[600],
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        padding: const EdgeInsets.symmetric(vertical: 10),
+  Widget _buildDropdown({
+    required String value,
+    required List<DropdownMenuItem<String>> items,
+    required Function(String?) onChanged,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[300]!),
       ),
-      child: Text(
-        text,
-        style: GoogleFonts.poppins(
-          fontSize: 14,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          dropdownColor: Colors.white,
+          value: value,
+          isExpanded: true,
+          icon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.deepPurple,
+            size: 20,
+          ),
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          isDense: true,
+          items: items,
+          onChanged: onChanged,
         ),
       ),
     );
@@ -777,8 +796,13 @@ class SantriHomeView extends GetView<SantriHomeController> {
                         final day = date?.day.toString().padLeft(2, '0') ?? '';
                         final month =
                             date?.month.toString().padLeft(2, '0') ?? '';
+                        final year = date?.year.toString().substring(2) ?? '';
+                        final modeLabel =
+                            controller.selectedChartMode.value == 'ayat'
+                            ? 'Ayat'
+                            : 'Halaman';
                         return BarTooltipItem(
-                          '${rod.toY.toInt()} Ayat\n$day/$month',
+                          '${rod.toY.toInt()} $modeLabel\n$day/$month/$year',
                           GoogleFonts.poppins(
                             color: Colors.deepPurple,
                             fontSize: 10,
@@ -826,13 +850,17 @@ class SantriHomeView extends GetView<SantriHomeController> {
         barRods: [
           BarChartRodData(
             toY:
-                (chartType == ChartType.hafalanBaru
+                (chartType == ChartType.tambahHafalan
                         ? (data[index].tambahHafalan ?? 0)
-                        : (data[index].murajaah ?? 0))
+                        : chartType == ChartType.murajaah
+                        ? (data[index].murajaah ?? 0)
+                        : (data[index].tahsin ?? 0))
                     .toDouble(),
-            color: chartType == ChartType.hafalanBaru
+            color: chartType == ChartType.tambahHafalan
                 ? const Color(0xFF10B981)
-                : Colors.orangeAccent,
+                : chartType == ChartType.murajaah
+                ? Colors.orangeAccent
+                : Colors.blueAccent[700]!,
             width: controller.range.value == '1w'
                 ? 12
                 : controller.range.value == '1m'
@@ -853,13 +881,17 @@ class SantriHomeView extends GetView<SantriHomeController> {
 
     int maxY = 5; // Default minimum value
     for (var item in data) {
-      if (chartType == ChartType.hafalanBaru) {
+      if (chartType == ChartType.tambahHafalan) {
         if (item.tambahHafalan != null && item.tambahHafalan! > maxY) {
           maxY = item.tambahHafalan!;
         }
-      } else {
+      } else if (chartType == ChartType.murajaah) {
         if (item.murajaah != null && item.murajaah! > maxY) {
           maxY = item.murajaah!;
+        }
+      } else {
+        if (item.tahsin != null && item.tahsin! > maxY) {
+          maxY = item.tahsin!;
         }
       }
     }
@@ -936,12 +968,14 @@ class SantriHomeView extends GetView<SantriHomeController> {
   }
 
   Widget _buildLegend() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 28,
+      runSpacing: 8,
       children: [
-        _buildLegendItem('Tambah Hafalan', const Color(0xFF10B981)),
-        const SizedBox(width: 16),
+        _buildLegendItem('Hafalan', const Color(0xFF10B981)),
         _buildLegendItem('Murajaah', Colors.orangeAccent),
+        _buildLegendItem('Tahsin', Colors.blueAccent[700]!),
       ],
     );
   }
