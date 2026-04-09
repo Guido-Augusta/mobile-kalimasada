@@ -87,9 +87,9 @@ class SantriHomeController extends GetxController {
     }
   }
 
-  void getChart() async {
+  void getChart({bool isRefresh = true}) async {
     try {
-      isLoadingChart.value = true;
+      isLoadingChart.value = isRefresh;
       final token = AuthService.to.token.value;
       final santriId = AuthService.to.roleId.value;
 

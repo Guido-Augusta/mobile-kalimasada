@@ -551,6 +551,19 @@ class SantriHomeView extends GetView<SantriHomeController> {
     );
   }
 
+  Widget _buildChartSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildChartHeader(),
+        const SizedBox(height: 16),
+        _buildChartFilters(),
+        const SizedBox(height: 16),
+        _buildChart(),
+      ],
+    );
+  }
+
   Widget _buildChartHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -597,7 +610,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
                   onChanged: (String? newValue) {
                     if (newValue != null) {
                       controller.range.value = newValue;
-                      controller.getChart();
+                      controller.getChart(isRefresh: false);
                     }
                   },
                 ),
@@ -623,19 +636,6 @@ class SantriHomeView extends GetView<SantriHomeController> {
     );
   }
 
-  Widget _buildChartSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildChartHeader(),
-        const SizedBox(height: 16),
-        _buildChartFilters(),
-        const SizedBox(height: 16),
-        _buildChart(),
-      ],
-    );
-  }
-
   Widget _buildChartFilters() {
     return Row(
       children: [
@@ -650,7 +650,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
               ],
               onChanged: (val) {
                 controller.selectedChartMode.value = val!;
-                controller.getChart();
+                controller.getChart(isRefresh: false);
               },
             ),
           ),
