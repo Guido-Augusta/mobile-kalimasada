@@ -220,13 +220,9 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      controller.ortu.value?.tipe != 'wali'
-                          ? 'Dashboard Orang Tua'
-                          : 'Dashboard Wali',
+                      'Dashboard Orang Tua',
                       style: GoogleFonts.poppins(
-                        fontSize: controller.ortu.value?.tipe != 'wali'
-                            ? 18
-                            : 20,
+                        fontSize: 18,
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
                         height: 1.2,

@@ -18,7 +18,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
         appBar: controller.ortuDetail.value == null
             ? AppBar(
                 title: const Text(
-                  'Profil',
+                  'Profil Orang Tua',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -69,7 +69,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Data orang tua/wali tidak ditemukan',
+                        'Data orang tua tidak ditemukan',
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -100,12 +100,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                 SliverAppBar(
                   centerTitle: true,
                   title: Text(
-                    controller.ortuDetail.value?.tipe?.toLowerCase() ==
-                                'ayah' ||
-                            controller.ortuDetail.value?.tipe?.toLowerCase() ==
-                                'ibu'
-                        ? 'Profil Orang Tua'
-                        : 'Profil Wali',
+                    'Profil Orang Tua',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -189,7 +184,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                       ),
                     ),
                   ],
-                  expandedHeight: 280,
+                  expandedHeight: 230,
                   pinned: false,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
@@ -218,8 +213,8 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                                   Stack(
                                     children: [
                                       Container(
-                                        width: 120,
-                                        height: 120,
+                                        width: 110,
+                                        height: 110,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           border: Border.all(
@@ -302,53 +297,13 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                                     child: Text(
                                       ortu.nama ?? 'Nama tidak tersedia',
                                       style: GoogleFonts.poppins(
-                                        fontSize: 22,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       textAlign: TextAlign.center,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 8),
-
-                                  // Badges Row
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
-                                    ),
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.3,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            ortu.user?.email ??
-                                                'Email tidak tersedia',
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
                                     ),
                                   ),
                                 ],
@@ -366,11 +321,11 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                   padding: const EdgeInsets.all(16),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      // Action Cards
-                      _buildActionSection(ortu),
-                      const SizedBox(height: 16),
                       // Personal Information
                       _buildPersonalInfoSection(ortu),
+                      const SizedBox(height: 16),
+                      // Action Cards
+                      _buildActionSection(ortu),
                       const SizedBox(height: 50), // Space for bottom buttons
                     ]),
                   ),
@@ -447,7 +402,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(Get.context!).size.height * 0.65,
+            maxHeight: MediaQuery.of(Get.context!).size.height * 0.6,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -456,8 +411,8 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 20,
+                  horizontal: 16,
+                  vertical: 16,
                 ),
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
@@ -478,14 +433,13 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                         fontSize: 18,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Text(
                       'Pastikan data Anda benar',
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -752,149 +706,71 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
   }
 
   Widget _buildActionSection(Ortu ortu) {
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+        Row(
+          children: [
+            // Ubah Password
+            Expanded(
+              child: _buildActionButton(
+                label: 'Ubah Password',
+                backgroundColor: Colors.white,
+                foregroundColor: const Color(0xFF6B46C1),
+                borderColor: const Color(0xFF6B46C1),
+                onTap: () => Get.toNamed('/change-password'),
+              ),
             ),
-            child: Column(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.people_alt_rounded,
-                    color: Colors.deepPurpleAccent,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  '${ortu.santri.length}',
-                  style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurpleAccent,
-                  ),
-                ),
-                Text(
-                  'Total Santri',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+            const SizedBox(width: 12),
+            // Edit Profil
+            Expanded(
+              child: _buildActionButton(
+                label: 'Edit Profil',
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+                onTap: () {
+                  controller.namaC.text = controller.ortuDetail.value!.nama!;
+                  controller.noHpC.text = controller.ortuDetail.value!.nomorHp!;
+                  controller.alamatC.text =
+                      controller.ortuDetail.value!.alamat!;
+                  _showEditProfileDialog();
+                },
+              ),
             ),
-          ),
-        ),
-
-        const SizedBox(width: 16),
-
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Edit Profile Button
-                const SizedBox(height: 2),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      controller.namaC.text =
-                          controller.ortuDetail.value!.nama!;
-                      controller.noHpC.text =
-                          controller.ortuDetail.value!.nomorHp!;
-                      controller.alamatC.text =
-                          controller.ortuDetail.value!.alamat!;
-                      _showEditProfileDialog();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orangeAccent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 0,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'Edit Profil',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Change Password Button
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Get.toNamed('/change-password');
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF6B46C1),
-                      side: const BorderSide(color: Color(0xFF6B46C1)),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 0,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      'Ubah Password',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 2),
-              ],
-            ),
-          ),
+          ],
         ),
       ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required String label,
+    required Color backgroundColor,
+    required Color foregroundColor,
+    Color? borderColor,
+    required VoidCallback onTap,
+  }) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        // minimumSize: Size(double.infinity, 40),
+        shadowColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: borderColor != null
+              ? BorderSide(color: borderColor, width: 1.5)
+              : BorderSide.none,
+        ),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.poppins(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: foregroundColor,
+        ),
+      ),
     );
   }
 
@@ -918,7 +794,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
           Text(
             'Informasi Pribadi',
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -926,21 +802,28 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
           const SizedBox(height: 16),
 
           _buildInfoTile(
-            icon: Icons.phone,
-            label: 'No. Telepon',
-            value: ortu.nomorHp ?? 'Tidak ada data',
-            telepon: ortu.nomorHp,
+            icon: Icons.email,
+            label: 'Email',
+            value: ortu.user?.email ?? '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
+
+          _buildInfoTile(
+            icon: Icons.phone,
+            label: 'No. Telepon',
+            value: ortu.nomorHp ?? '-',
+          ),
+
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.person,
             label: 'Peran',
-            value: ortu.tipe ?? 'Tidak ada data',
+            value: ortu.tipe ?? '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: ortu.jenisKelamin?.toLowerCase() == 'l'
@@ -952,12 +835,12 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                 : 'Perempuan',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.location_on,
             label: 'Alamat',
-            value: ortu.alamat ?? 'Tidak ada data',
+            value: ortu.alamat ?? '-',
           ),
         ],
       ),
@@ -968,52 +851,73 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
     required IconData icon,
     required String label,
     required String value,
-    String? telepon,
+    bool? isAccountAction,
+    bool? isGoToDetail,
+    bool? isOverflow,
+    Color? iconColor,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
-          ),
-
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        color: Colors.transparent,
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: (iconColor ?? Colors.deepPurpleAccent).withValues(
+                  alpha: 0.1,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: iconColor ?? Colors.deepPurpleAccent,
+                size: 20,
+              ),
             ),
-          ),
-        ],
+
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: isOverflow == true ? TextOverflow.ellipsis : null,
+                  ),
+                ],
+              ),
+            ),
+
+            if (isAccountAction == true || isGoToDetail == true) ...[
+              const SizedBox(width: 8),
+              Center(
+                child: Icon(
+                  Icons.keyboard_arrow_right_rounded,
+                  color: iconColor ?? Colors.deepPurpleAccent,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
