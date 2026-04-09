@@ -45,40 +45,24 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
     return Row(
       children: [
         Obx(
-          () => Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.deepPurpleAccent.withValues(alpha: 0.3),
-                width: 3,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+          () => CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.grey[200],
+            backgroundImage: CachedNetworkImageProvider(
+              controller.getImageUrl(controller.fotoProfil.value),
             ),
-            child: CircleAvatar(
-              radius: 28,
-              backgroundColor: Colors.grey[200],
-              backgroundImage: CachedNetworkImageProvider(
-                controller.getImageUrl(controller.fotoProfil.value),
-              ),
-              onBackgroundImageError: (_, _) {
-                controller.fotoProfil.value =
-                    'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg';
-              },
-              child:
-                  controller.fotoProfil.value.isEmpty ||
-                      controller.fotoProfil.value == ''
-                  ? Icon(Icons.person, size: 28, color: Colors.deepPurpleAccent)
-                  : null,
-            ),
+            onBackgroundImageError: (_, _) {
+              controller.fotoProfil.value =
+                  'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg';
+            },
+            child:
+                controller.fotoProfil.value.isEmpty ||
+                    controller.fotoProfil.value == ''
+                ? Icon(Icons.person, size: 28, color: Colors.deepPurpleAccent)
+                : null,
           ),
         ),
-        const SizedBox(width: 15),
+        const SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,9 +91,8 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: GoogleFonts.poppins(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple[800],
                     ),
                   ),
                 ),
@@ -205,7 +188,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
   Widget _buildWelcomeCard(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
@@ -237,15 +220,6 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Selamat Datang',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
                       controller.ortu.value?.tipe != 'wali'
                           ? 'Dashboard Orang Tua'
                           : 'Dashboard Wali',
@@ -260,11 +234,11 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                        horizontal: 12,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
@@ -305,11 +279,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
   Widget _buildChildrenListHeader() {
     return Text(
       'Daftar Anak',
-      style: GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: Colors.deepPurple,
-      ),
+      style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
     );
   }
 
@@ -378,25 +348,20 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
               },
               borderRadius: BorderRadius.circular(16),
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header Section with Profile and Basic Info
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Profile Picture
                         Container(
-                          width: 60,
-                          height: 60,
+                          width: 56,
+                          height: 56,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.grey[200],
-                            border: Border.all(
-                              color: Colors.grey[300]!,
-                              width: 2,
-                            ),
                           ),
                           child: ClipOval(
                             child:
@@ -428,7 +393,6 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                           ),
                         ),
                         const SizedBox(width: 12),
-
                         // Name and Badges
                         Expanded(
                           child: Column(
@@ -445,8 +409,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              const SizedBox(height: 8),
-
+                              const SizedBox(height: 6),
                               // Badges Row
                               Wrap(
                                 spacing: 6,
@@ -481,7 +444,6 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                                       ),
                                     ),
                                   ),
-
                                   // Gender Badge
                                   Container(
                                     padding: const EdgeInsets.symmetric(
@@ -550,83 +512,70 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                       ],
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
 
                     // Action Buttons Section
                     Row(
                       children: [
                         Expanded(
                           child: ElevatedButton.icon(
+                            icon: const Icon(Icons.history),
+                            label: Text(
+                              'Riwayat',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange[50],
+                              foregroundColor: Colors.orange,
+                              shadowColor: Colors.transparent,
+                              side: const BorderSide(color: Colors.orange),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
                             onPressed: () {
                               Get.toNamed(
                                 '/riwayat-hafalan',
                                 arguments: {'santriId': child.id.toString()},
                               );
                             },
-                            icon: const Icon(
-                              Icons.history,
-                              size: 18,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              'Riwayat',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.book_rounded),
+                            label: Text(
+                              'Hafalan',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orangeAccent,
-                              foregroundColor: Colors.white,
-                              elevation: 2,
-                              shadowColor: Colors.orangeAccent.withValues(
-                                alpha: 0.3,
-                              ),
+                              backgroundColor: Colors.green[50],
+                              foregroundColor: const Color(0xFF10B981),
+                              shadowColor: Colors.transparent,
+                              side: const BorderSide(color: Color(0xFF10B981)),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        // Hafalan Button
-                        Expanded(
-                          child: ElevatedButton.icon(
                             onPressed: () {
                               Get.toNamed(
                                 '/progres-hafalan',
                                 arguments: {'santriId': child.id.toString()},
                               );
                             },
-                            icon: const Icon(
-                              Icons.book_rounded,
-                              size: 18,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              'Hafalan',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF10B981),
-                              foregroundColor: Colors.white,
-                              elevation: 2,
-                              shadowColor: Colors.green.withValues(alpha: 0.3),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                            ),
                           ),
                         ),
-
-                        // Murajaah Button
                       ],
                     ),
                   ],

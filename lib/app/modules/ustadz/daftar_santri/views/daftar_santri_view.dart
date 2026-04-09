@@ -324,18 +324,16 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Section with Profile and Basic Info
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Profile Picture
                   Container(
-                    width: 60,
-                    height: 60,
+                    width: 56,
+                    height: 56,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.grey[200],
-                      border: Border.all(color: Colors.grey[300]!, width: 2),
                     ),
                     child: ClipOval(
                       child:

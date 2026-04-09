@@ -51,24 +51,21 @@ class SantriHomeView extends GetView<SantriHomeController> {
     return Row(
       children: [
         Obx(
-          () => Container(
-            decoration: BoxDecoration(shape: BoxShape.circle),
-            child: CircleAvatar(
-              radius: 28,
-              backgroundColor: Colors.grey[200],
-              backgroundImage: CachedNetworkImageProvider(
-                controller.getImageUrl(controller.fotoProfil.value),
-              ),
-              onBackgroundImageError: (_, _) {
-                controller.fotoProfil.value =
-                    'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg';
-              },
-              child:
-                  controller.fotoProfil.value.isEmpty ||
-                      controller.fotoProfil.value == ''
-                  ? Icon(Icons.person, size: 28, color: Colors.deepPurpleAccent)
-                  : null,
+          () => CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.grey[200],
+            backgroundImage: CachedNetworkImageProvider(
+              controller.getImageUrl(controller.fotoProfil.value),
             ),
+            onBackgroundImageError: (_, _) {
+              controller.fotoProfil.value =
+                  'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg';
+            },
+            child:
+                controller.fotoProfil.value.isEmpty ||
+                    controller.fotoProfil.value == ''
+                ? Icon(Icons.person, size: 28, color: Colors.deepPurpleAccent)
+                : null,
           ),
         ),
         const SizedBox(width: 10),
@@ -102,7 +99,6 @@ class SantriHomeView extends GetView<SantriHomeController> {
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      // color: Colors.deepPurple[800],
                     ),
                   ),
                 ),
@@ -383,11 +379,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
       children: [
         Text(
           'Fitur Utama',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            // color: Colors.deepPurple[800],
-          ),
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 14),
         InkWell(
