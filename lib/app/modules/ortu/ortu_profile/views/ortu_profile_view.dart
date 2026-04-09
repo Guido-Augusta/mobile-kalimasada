@@ -715,8 +715,8 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
               child: _buildActionButton(
                 label: 'Ubah Password',
                 backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF6B46C1),
-                borderColor: const Color(0xFF6B46C1),
+                foregroundColor: Colors.deepPurple,
+                borderColor: Colors.deepPurple,
                 onTap: () => Get.toNamed('/change-password'),
               ),
             ),
@@ -725,13 +725,12 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
             Expanded(
               child: _buildActionButton(
                 label: 'Edit Profil',
-                backgroundColor: Colors.orange,
+                backgroundColor: Colors.orangeAccent,
                 foregroundColor: Colors.white,
                 onTap: () {
-                  controller.namaC.text = controller.ortuDetail.value!.nama!;
-                  controller.noHpC.text = controller.ortuDetail.value!.nomorHp!;
-                  controller.alamatC.text =
-                      controller.ortuDetail.value!.alamat!;
+                  controller.namaC.text = ortu.nama!;
+                  controller.noHpC.text = ortu.nomorHp!;
+                  controller.alamatC.text = ortu.alamat!;
                   _showEditProfileDialog();
                 },
               ),
@@ -754,7 +753,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
       style: ElevatedButton.styleFrom(
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
-        // minimumSize: Size(double.infinity, 40),
+        minimumSize: Size(double.infinity, 44),
         shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
@@ -851,8 +850,6 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
     required IconData icon,
     required String label,
     required String value,
-    bool? isAccountAction,
-    bool? isGoToDetail,
     bool? isOverflow,
     Color? iconColor,
     VoidCallback? onTap,
@@ -906,16 +903,6 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                 ],
               ),
             ),
-
-            if (isAccountAction == true || isGoToDetail == true) ...[
-              const SizedBox(width: 8),
-              Center(
-                child: Icon(
-                  Icons.keyboard_arrow_right_rounded,
-                  color: iconColor ?? Colors.deepPurpleAccent,
-                ),
-              ),
-            ],
           ],
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -116,7 +117,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                       onPressed: () => showLogoutDialog(context),
                     ),
                   ],
-                  expandedHeight: 280,
+                  expandedHeight: 230,
                   pinned: false,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
@@ -145,8 +146,8 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                                   Stack(
                                     children: [
                                       Container(
-                                        width: 120,
-                                        height: 120,
+                                        width: 110,
+                                        height: 110,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           border: Border.all(
@@ -229,53 +230,13 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                                     child: Text(
                                       ustadz.nama ?? 'Nama tidak tersedia',
                                       style: GoogleFonts.poppins(
-                                        fontSize: 22,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       textAlign: TextAlign.center,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 8),
-
-                                  // Badges Row
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
-                                    ),
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.3,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            ustadz.user?.email ??
-                                                'Email tidak tersedia',
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
                                     ),
                                   ),
                                 ],
@@ -377,76 +338,70 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
   }
 
   Widget _buildActionSection(Ustadz ustadz) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Change Password Button
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () {
-                Get.toNamed('/change-password');
-              },
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF6B46C1),
-                side: const BorderSide(color: Color(0xFF6B46C1)),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Ubah Password',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+    return Column(
+      children: [
+        Row(
+          children: [
+            // Ubah Password
+            Expanded(
+              child: _buildActionButton(
+                label: 'Ubah Password',
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.deepPurple,
+                borderColor: Colors.deepPurple,
+                onTap: () => Get.toNamed('/change-password'),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          // Edit Profile Button
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                controller.namaC.text = controller.ustadzData.value!.nama!;
-                controller.noHpC.text = controller.ustadzData.value!.nomorHp!;
-                controller.alamatC.text = controller.ustadzData.value!.alamat!;
-                controller.jenisKelaminC.text =
-                    controller.ustadzData.value!.jenisKelamin!;
-                _showEditProfileDialog();
-              },
-              style: ElevatedButton.styleFrom(
+            const SizedBox(width: 12),
+            // Edit Profil
+            Expanded(
+              child: _buildActionButton(
+                label: 'Edit Profil',
                 backgroundColor: Colors.orangeAccent,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Edit Profil',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+                onTap: () {
+                  controller.namaC.text = ustadz.nama!;
+                  controller.noHpC.text = ustadz.nomorHp!;
+                  controller.alamatC.text = ustadz.alamat!;
+                  controller.jenisKelaminC.text = ustadz.jenisKelamin!;
+                  _showEditProfileDialog();
+                },
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required String label,
+    required Color backgroundColor,
+    required Color foregroundColor,
+    Color? borderColor,
+    required VoidCallback onTap,
+  }) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        minimumSize: Size(double.infinity, 44),
+        shadowColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: borderColor != null
+              ? BorderSide(color: borderColor, width: 1.5)
+              : BorderSide.none,
+        ),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.poppins(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: foregroundColor,
+        ),
       ),
     );
   }
@@ -471,7 +426,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
           Text(
             'Informasi Pribadi',
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -479,13 +434,20 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
           const SizedBox(height: 16),
 
           _buildInfoTile(
-            icon: Icons.phone,
-            label: 'No. Telepon',
-            value: ustadz.nomorHp ?? 'Tidak ada data',
-            telepon: ustadz.nomorHp,
+            icon: Icons.email,
+            label: 'Email',
+            value: ustadz.user?.email ?? '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
+
+          _buildInfoTile(
+            icon: Icons.phone,
+            label: 'No. Telepon',
+            value: ustadz.nomorHp ?? '-',
+          ),
+
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: ustadz.jenisKelamin?.toLowerCase() == 'l'
@@ -497,21 +459,21 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                 : 'Perempuan',
           ),
 
-          if (ustadz.waliKelasTahap != null) const SizedBox(height: 12),
-
-          if (ustadz.waliKelasTahap != null)
+          if (ustadz.waliKelasTahap != null) ...[
+            Divider(color: Colors.grey[200], height: 16),
             _buildInfoTile(
-              icon: Icons.person,
-              label: 'Wali Kelas Tahap',
+              icon: FontAwesomeIcons.school,
+              label: 'Penanggung Jawab Kelas',
               value: _getTahapLabel(ustadz.waliKelasTahap ?? ''),
             ),
+          ],
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.location_on,
             label: 'Alamat',
-            value: ustadz.alamat ?? 'Tidak ada data',
+            value: ustadz.alamat ?? '-',
           ),
         ],
       ),
@@ -522,52 +484,61 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
     required IconData icon,
     required String label,
     required String value,
-    String? telepon,
+    bool? isOverflow,
+    Color? iconColor,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
-          ),
-
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        color: Colors.transparent,
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: (iconColor ?? Colors.deepPurpleAccent).withValues(
+                  alpha: 0.1,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: iconColor ?? Colors.deepPurpleAccent,
+                size: 20,
+              ),
             ),
-          ),
-        ],
+
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: isOverflow == true ? TextOverflow.ellipsis : null,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1003,11 +974,11 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
   String _getTahapLabel(String tahap) {
     switch (tahap) {
       case 'Level1':
-        return 'Level 1';
+        return 'Level 1 - Juz 30';
       case 'Level2':
-        return 'Level 2';
+        return 'Level 2 - Surah Pilihan';
       case 'Level3':
-        return 'Level 3';
+        return 'Level 3 - Juz 1-29';
       default:
         return 'Tahap tidak ditemukan';
     }
