@@ -731,12 +731,12 @@ class DetailSantriView extends GetView<DetailSantriController> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                        color: Colors.orange.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: const Icon(
                         Icons.stars_rounded,
-                        color: Colors.deepPurpleAccent,
+                        color: Colors.orange,
                         size: 24,
                       ),
                     ),
@@ -1593,8 +1593,6 @@ class DetailSantriView extends GetView<DetailSantriController> {
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

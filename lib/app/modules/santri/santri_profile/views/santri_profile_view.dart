@@ -1,13 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../ortu/detail_ortu/controllers/detail_ortu_controller.dart';
 import '../controllers/santri_profile_controller.dart';
@@ -112,82 +109,11 @@ class SantriProfileView extends GetView<SantriProfileController> {
                   ),
                   actions: [
                     IconButton(
-                      icon: const Icon(
-                        Icons.logout_rounded,
-                        color: Colors.redAccent,
-                      ),
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            title: Text(
-                              'Logout',
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            content: Text(
-                              'Apakah anda yakin ingin logout?',
-                              style: GoogleFonts.poppins(),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Get.back();
-                                },
-                                child: Text(
-                                  'Tidak',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ),
-                              Obx(
-                                () => ElevatedButton(
-                                  onPressed: controller.isLoadingLogout.value
-                                      ? null
-                                      : () {
-                                          controller.logout();
-                                        },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 8,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: controller.isLoadingLogout.value
-                                      ? const SizedBox(
-                                          width: 16,
-                                          height: 16,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 1,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : Text(
-                                          'Ya',
-                                          style: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
+                      icon: const Icon(Icons.menu_rounded, color: Colors.white),
+                      onPressed: () => _showSettingsBottomSheet(context),
                     ),
                   ],
-                  expandedHeight: 280,
+                  expandedHeight: 230,
                   pinned: false,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
@@ -216,8 +142,8 @@ class SantriProfileView extends GetView<SantriProfileController> {
                                   Stack(
                                     children: [
                                       Container(
-                                        width: 120,
-                                        height: 120,
+                                        width: 110,
+                                        height: 110,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           border: Border.all(
@@ -300,67 +226,13 @@ class SantriProfileView extends GetView<SantriProfileController> {
                                     child: Text(
                                       santri.nama ?? 'Nama tidak tersedia',
                                       style: GoogleFonts.poppins(
-                                        fontSize: 22,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       textAlign: TextAlign.center,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 8),
-
-                                  // Tahap Badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
-                                    ),
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.3,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize
-                                          .min, // Pastikan row hanya mengambil lebar seperlunya
-                                      children: [
-                                        Container(
-                                          width: 8,
-                                          height: 8,
-                                          decoration: BoxDecoration(
-                                            color: _getTahapColor(
-                                              santri.tahapHafalan!,
-                                            ),
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Flexible(
-                                          // Gunakan Flexible untuk mencegah overflow teks
-                                          child: Text(
-                                            getTahapLabel(santri.tahapHafalan),
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 12,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                          ),
-                                        ),
-                                      ],
                                     ),
                                   ),
                                 ],
@@ -378,20 +250,20 @@ class SantriProfileView extends GetView<SantriProfileController> {
                   padding: const EdgeInsets.all(16),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      // Stats Cards
-                      _buildStatsCards(santri),
+                      // Stats Card
+                      _buildStatsCard(santri),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 18),
 
                       // Personal Information
                       _buildPersonalInfoSection(santri),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 18),
 
                       // Parents Information
                       _buildParentsInfoSection(santri),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 18),
 
                       // Wali Kelas Information
                       _buildWaliKelasSection(santri),
@@ -464,12 +336,10 @@ class SantriProfileView extends GetView<SantriProfileController> {
   }
 
   void _showEditProfileDialog() {
-    // Initialize the date controller with the current date of birth
     controller.tanggalLahirC = TextEditingController(
       text: controller.formatDate(controller.santriDetail.value!.tanggalLahir!),
     );
 
-    // Function to show date picker
     Future<void> selectDate(BuildContext context) async {
       final DateTime? picked = await showDatePicker(
         context: context,
@@ -520,8 +390,8 @@ class SantriProfileView extends GetView<SantriProfileController> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 20,
+                  horizontal: 16,
+                  vertical: 16,
                 ),
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
@@ -542,13 +412,12 @@ class SantriProfileView extends GetView<SantriProfileController> {
                         fontSize: 18,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Text(
-                      'Pastikan data yang Anda benar',
+                      'Pastikan data Anda benar',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
-                        fontWeight: FontWeight.w500,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -560,7 +429,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
+                    horizontal: 16,
                     vertical: 20,
                   ),
                   child: Form(
@@ -852,7 +721,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
                   vertical: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
                   borderRadius: const BorderRadius.vertical(
                     bottom: Radius.circular(16),
                   ),
@@ -966,156 +834,301 @@ class SantriProfileView extends GetView<SantriProfileController> {
     }
   }
 
-  Widget _buildStatsCards(Santri santri) {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+  Widget _buildStatsCard(dynamic santri) {
+    final tahapColor = _getTahapColor(santri.tahapHafalan ?? '');
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Tahap Hafalan
+          Expanded(
+            flex: 5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurpleAccent.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.menu_book_rounded,
+                        size: 16,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Tahap Hafalan',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                // Badge Tahap Hafalan
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: tahapColor.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: tahapColor.withValues(alpha: 0.6),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          color: tahapColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: tahapColor.withValues(alpha: 0.6),
+                              blurRadius: 4,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 7),
+                      Flexible(
+                        child: Text(
+                          getTahapLabel(santri.tahapHafalan),
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: tahapColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
+          ),
+
+          Container(
+            margin: const EdgeInsets.only(left: 4, right: 12),
+            width: 1,
+            height: 70,
+            color: Colors.grey[200],
+          ),
+
+          // Total Poin
+          Expanded(
+            flex: 3,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.star,
-                    color: Colors.deepPurpleAccent,
-                    size: 24,
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.star_rounded,
+                        size: 16,
+                        color: Colors.orange,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Total Poin',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 6),
                 Text(
                   '${santri.totalPoin ?? 0}',
                   style: GoogleFonts.poppins(
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.deepPurpleAccent,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  'Total Poin',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-        ),
+        ],
+      ),
+    );
+  }
 
-        const SizedBox(width: 16),
-
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Edit Profile Button
-                const SizedBox(height: 2),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      controller.namaC.text =
-                          controller.santriDetail.value!.nama!;
-                      controller.noHpC.text =
-                          controller.santriDetail.value!.nomorHp!;
-                      controller.alamatC.text =
-                          controller.santriDetail.value!.alamat!;
-                      controller.jenisKelaminC.text =
-                          controller.santriDetail.value!.jenisKelamin!;
-                      _showEditProfileDialog();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orangeAccent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 6,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'Edit Profil',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Change Password Button
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Get.toNamed('/change-password');
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF6B46C1),
-                      side: const BorderSide(color: Color(0xFF6B46C1)),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 6,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      'Ubah Password',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 2),
-              ],
-            ),
+  void _showSettingsBottomSheet(BuildContext context) {
+    Get.bottomSheet(
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
         ),
-      ],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Pengaturan Akun',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildInfoTile(
+              icon: Icons.edit_note_rounded,
+              label: 'Profil',
+              value: 'Edit Informasi Profil',
+              isAccountAction: true,
+              onTap: () {
+                Get.back(); // close bottom sheet
+                controller.namaC.text = controller.santriDetail.value!.nama!;
+                controller.noHpC.text = controller.santriDetail.value!.nomorHp!;
+                controller.alamatC.text =
+                    controller.santriDetail.value!.alamat!;
+                controller.jenisKelaminC.text =
+                    controller.santriDetail.value!.jenisKelamin!;
+                _showEditProfileDialog();
+              },
+            ),
+            Divider(color: Colors.grey[200], height: 16),
+            _buildInfoTile(
+              icon: Icons.lock_reset_rounded,
+              label: 'Keamanan',
+              value: 'Ubah Password Akun',
+              isAccountAction: true,
+              onTap: () {
+                Get.back(); // close bottom sheet
+                Get.toNamed('/change-password');
+              },
+            ),
+            Divider(color: Colors.grey[200], height: 16),
+            _buildInfoTile(
+              icon: Icons.logout_rounded,
+              label: 'Sesi',
+              value: 'Keluar dari Aplikasi',
+              isAccountAction: true,
+              iconColor: Colors.redAccent,
+              onTap: () {
+                Get.back(); // close bottom sheet
+                _showLogoutDialog(context);
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            'Logout',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          ),
+          content: Text(
+            'Apakah anda yakin ingin logout?',
+            style: GoogleFonts.poppins(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text(
+                'Tidak',
+                style: GoogleFonts.poppins(color: Colors.grey[600]),
+              ),
+            ),
+            Obx(
+              () => ElevatedButton(
+                onPressed: controller.isLoadingLogout.value
+                    ? null
+                    : () => controller.logout(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: controller.isLoadingLogout.value
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        'Ya',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                      ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1139,7 +1152,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
           Text(
             'Informasi Pribadi',
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1152,7 +1165,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
             value: santri.noInduk ?? '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.email,
@@ -1160,7 +1173,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
             value: santri.user?.email ?? '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.calendar_today_rounded,
@@ -1173,7 +1186,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                 : '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.phone,
@@ -1183,7 +1196,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                 : santri.nomorHp!,
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: santri.jenisKelamin!.toLowerCase() == 'l'
@@ -1199,7 +1212,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                 : '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.location_on,
@@ -1231,7 +1244,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
           Text(
             'Informasi Orang Tua',
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF1F2937),
             ),
@@ -1266,15 +1279,15 @@ class SantriProfileView extends GetView<SantriProfileController> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: santri.orangTua.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              separatorBuilder: (context, index) =>
+                  Divider(color: Colors.grey[200], height: 16),
               itemBuilder: (context, index) {
                 final orangTua = santri.orangTua[index];
                 return _buildInfoTile(
                   icon: Icons.family_restroom_rounded,
                   label: orangTua.tipe ?? '-',
                   value: orangTua.nama ?? '-',
-                  isParentInfo: true,
-                  ortuId: orangTua.id.toString(),
+                  isGoToDetail: true,
                   onTap: () {
                     if (Get.isRegistered<DetailOrtuController>()) {
                       Get.delete<DetailOrtuController>();
@@ -1311,27 +1324,66 @@ class SantriProfileView extends GetView<SantriProfileController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Informasi Wali Kelas',
+            'Penanggung Jawab Kelas',
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1F2937),
             ),
           ),
 
           const SizedBox(height: 16),
 
           // Wali Kelas
-          _buildInfoTile(
-            icon: Icons.school,
-            label: 'Wali Kelas Santri',
-            value: santri.waliKelas.isNotEmpty
-                ? santri.waliKelas.first.nama!
-                : '-',
-            telepon: santri.waliKelas.isNotEmpty
-                ? santri.waliKelas.first.nomorHp
-                : '',
-          ),
+          if (santri.waliKelas.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.grey[400], size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Belum ada data wali kelas',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey[500],
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            ListView.separated(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: santri.waliKelas.length,
+              separatorBuilder: (context, index) =>
+                  Divider(color: Colors.grey[200], height: 16),
+              itemBuilder: (context, index) {
+                final waliKelas = santri.waliKelas[index];
+                return _buildInfoTile(
+                  icon: Icons.school,
+                  label: 'PJ Kelas',
+                  value: waliKelas.nama ?? '-',
+                  isGoToDetail: true,
+                  onTap: () {
+                    Get.toNamed(
+                      '/detail-ustadz',
+                      arguments: {'ustadzId': waliKelas.id.toString()},
+                    );
+                  },
+                );
+              },
+            ),
         ],
       ),
     );
@@ -1341,30 +1393,33 @@ class SantriProfileView extends GetView<SantriProfileController> {
     required IconData icon,
     required String label,
     required String value,
-    String? telepon,
-    bool? isParentInfo,
-    String? ortuId,
+    bool? isAccountAction,
+    bool? isGoToDetail,
     bool? isOverflow,
+    Color? iconColor,
     VoidCallback? onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
-          borderRadius: BorderRadius.circular(12),
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        color: Colors.transparent,
         child: Row(
           children: [
             Container(
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                color: (iconColor ?? Colors.deepPurpleAccent).withValues(
+                  alpha: 0.1,
+                ),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
+              child: Icon(
+                icon,
+                color: iconColor ?? Colors.deepPurpleAccent,
+                size: 20,
+              ),
             ),
 
             const SizedBox(width: 12),
@@ -1394,65 +1449,15 @@ class SantriProfileView extends GetView<SantriProfileController> {
               ),
             ),
 
-            if (isParentInfo == true) ...[
+            if (isAccountAction == true || isGoToDetail == true) ...[
               const SizedBox(width: 8),
-              const Icon(
-                Icons.keyboard_arrow_right_rounded,
-                color: Colors.deepPurpleAccent,
+              Center(
+                child: Icon(
+                  Icons.keyboard_arrow_right_rounded,
+                  color: iconColor ?? Colors.deepPurpleAccent,
+                ),
               ),
             ],
-
-            if (telepon != null && telepon.isNotEmpty)
-              Row(
-                children: [
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: SvgPicture.asset(
-                      'assets/icons/whatsapp.svg',
-                      width: 20,
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFF25D366),
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    onPressed: () {
-                      String formattedNomor = telepon;
-                      if (telepon.startsWith('0')) {
-                        formattedNomor = '+62${telepon.substring(1)}';
-                      }
-
-                      final whatsappUrl = "https://wa.me/$formattedNomor";
-                      launchUrl(Uri.parse(whatsappUrl));
-                    },
-                    style: IconButton.styleFrom(
-                      backgroundColor: const Color(
-                        0xFF25D366,
-                      ).withValues(alpha: 0.1),
-                      shape: const CircleBorder(),
-                    ),
-                  ),
-
-                  const SizedBox(width: 4),
-
-                  IconButton(
-                    icon: const Icon(
-                      Icons.phone,
-                      size: 18,
-                      color: Colors.deepPurpleAccent,
-                    ),
-                    onPressed: () {
-                      final phoneUrl = "tel:$telepon";
-                      launchUrl(Uri.parse(phoneUrl));
-                    },
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.deepPurpleAccent.withValues(
-                        alpha: 0.1,
-                      ),
-                      shape: const CircleBorder(),
-                    ),
-                  ),
-                ],
-              ),
           ],
         ),
       ),
