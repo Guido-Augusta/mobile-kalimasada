@@ -45,37 +45,21 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
     return Row(
       children: [
         Obx(
-          () => Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.deepPurpleAccent.withValues(alpha: 0.3),
-                width: 3,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+          () => CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.grey[200],
+            backgroundImage: CachedNetworkImageProvider(
+              controller.getImageUrl(controller.fotoProfil.value),
             ),
-            child: CircleAvatar(
-              radius: 28,
-              backgroundColor: Colors.grey[200],
-              backgroundImage: CachedNetworkImageProvider(
-                controller.getImageUrl(controller.fotoProfil.value),
-              ),
-              onBackgroundImageError: (_, _) {
-                controller.fotoProfil.value =
-                    'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg';
-              },
-              child:
-                  controller.fotoProfil.value.isEmpty ||
-                      controller.fotoProfil.value == ''
-                  ? Icon(Icons.person, size: 28, color: Colors.deepPurpleAccent)
-                  : null,
-            ),
+            onBackgroundImageError: (_, _) {
+              controller.fotoProfil.value =
+                  'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg';
+            },
+            child:
+                controller.fotoProfil.value.isEmpty ||
+                    controller.fotoProfil.value == ''
+                ? Icon(Icons.person, size: 28, color: Colors.deepPurpleAccent)
+                : null,
           ),
         ),
         const SizedBox(width: 15),
@@ -107,9 +91,8 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: GoogleFonts.poppins(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple[800],
                     ),
                   ),
                 ),
@@ -205,7 +188,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
   Widget _buildWelcomeCard(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
@@ -236,15 +219,6 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Selamat Datang',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
                     Obx(
                       () => Text(
                         'Dashboard ${controller.ustadz.value?.jenisKelamin == 'L' ? 'Ustadz' : 'Ustadzah'}',
@@ -260,11 +234,11 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                         maxLines: 1,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                        horizontal: 12,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
@@ -403,11 +377,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
       children: [
         Text(
           'Fitur Utama',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.deepPurple[800],
-          ),
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 15),
         InkWell(
@@ -487,7 +457,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
             ),
           ),
         ),
-        const SizedBox(height: 15),
+        const SizedBox(height: 14),
         Row(
           children: [
             Expanded(
@@ -497,7 +467,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -513,7 +483,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.deepPurple.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
@@ -521,7 +491,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                         child: const Icon(
                           Icons.history,
                           color: Colors.deepPurple,
-                          size: 32,
+                          size: 26,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -550,7 +520,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                 ),
               ),
             ),
-            const SizedBox(width: 15),
+            const SizedBox(width: 14),
             Expanded(
               child: InkWell(
                 onTap: () {
@@ -558,7 +528,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -574,7 +544,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.orange.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
@@ -582,7 +552,7 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                         child: const Icon(
                           Icons.leaderboard_outlined,
                           color: Colors.orange,
-                          size: 32,
+                          size: 26,
                         ),
                       ),
                       const SizedBox(height: 6),

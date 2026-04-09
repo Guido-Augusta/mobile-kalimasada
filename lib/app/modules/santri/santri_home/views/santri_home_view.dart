@@ -462,7 +462,7 @@ class SantriHomeView extends GetView<SantriHomeController> {
             ),
           ),
         ),
-        const SizedBox(height: 15),
+        const SizedBox(height: 14),
         InkWell(
           onTap: () {
             Get.toNamed(
