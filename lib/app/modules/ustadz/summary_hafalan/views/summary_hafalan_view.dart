@@ -3,16 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:mobile_kalimasada/app/data/models/summary_hafalan.dart';
+import 'package:mobile_kalimasada/app/data/models/summary_hafalan_juz.dart'
+    as juz_model;
+import 'package:mobile_kalimasada/app/data/models/summary_hafalan_surah.dart'
+    as surah_model;
 
 import '../controllers/summary_hafalan_controller.dart';
 
 class SummaryHafalanView extends GetView<SummaryHafalanController> {
   const SummaryHafalanView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF1F5F9),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         title: const Text(
           'Riwayat Terakhir',
@@ -20,238 +24,75 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
         ),
         centerTitle: true,
         backgroundColor: const Color(0xFFF1F5F9),
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline_rounded),
             onPressed: () {
-              // dialog informasi level
+              FocusManager.instance.primaryFocus?.unfocus();
               showLevelInfoDialog(context);
             },
           ),
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () async {
-          controller.getSummaryHafalan();
-        },
+        onRefresh: () async => controller.getSummaryHafalan(),
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: controller.scrollController,
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Search Bar
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey[200]!,
-                            spreadRadius: 2,
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Obx(
-                        () => TextField(
-                          controller: controller.searchController,
-                          onChanged: (value) {
-                            controller.searchQuery.value = value;
-                          },
-                          decoration: InputDecoration(
-                            hintText: 'Cari santri...',
-                            prefixIcon: const Icon(
-                              Icons.search,
-                              color: Colors.grey,
-                            ),
-                            suffixIcon: controller.searchQuery.value.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(
-                                      Icons.clear_rounded,
-                                      color: Colors.grey,
-                                    ),
-                                    onPressed: () {
-                                      controller.searchQuery.value = '';
-                                      controller.searchController.clear();
-                                    },
-                                  )
-                                : null,
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                              horizontal: 20,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    // ── Row 1: Search + Filter button ──────────────────
+                    _buildSearchAndFilterRow(context),
+                    const SizedBox(height: 10),
 
-                    // Filter Section
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          flex: 4,
-                          child: Container(
-                            padding: const EdgeInsets.only(left: 10, right: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: Obx(
-                              () => DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  isExpanded: true,
-                                  value: controller.status.value,
-                                  icon: const Icon(
-                                    Icons.keyboard_arrow_down_rounded,
-                                    size: 20,
-                                    color: Colors.grey,
-                                  ),
-                                  dropdownColor: Colors.white,
-                                  items: [
-                                    _buildDropdownItem(
-                                      'tambahHafalan',
-                                      'Tambah Hafalan',
-                                    ),
-                                    _buildDropdownItem('murajaah', 'Murajaah'),
-                                  ],
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      controller.status.value = newValue;
-                                      controller.summaryHafalanList.clear();
-                                      controller.getSummaryHafalan();
-                                    }
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          flex: 3,
-                          child: Container(
-                            padding: const EdgeInsets.only(left: 10, right: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: Obx(
-                              () => DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  isExpanded: true,
-                                  value: controller.level.value,
-                                  icon: const Icon(
-                                    Icons.keyboard_arrow_down_rounded,
-                                    size: 20,
-                                    color: Colors.grey,
-                                  ),
-                                  dropdownColor: Colors.white,
-                                  items: [
-                                    _buildDropdownItem('level1', 'Level 1'),
-                                    _buildDropdownItem('level2', 'Level 2'),
-                                    _buildDropdownItem('level3', 'Level 3'),
-                                  ],
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      controller.level.value = newValue;
-                                      controller.summaryHafalanList.clear();
-                                      controller.getSummaryHafalan();
-                                    }
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-                    Obx(
-                      () => Row(
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: Text(
-                                'Daftar Santri',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                            ),
-                          ),
+                    // ── Row 2: Level filter chips (langsung, tidak modal) ──
+                    Obx(() => _buildLevelFilterRow()),
+                    const SizedBox(height: 14),
 
-                          // Filter asc/desc
-                          if (controller.status.value == 'tambahHafalan')
-                            InkWell(
-                              onTap: () {
-                                controller.updateFilterBy();
-                              },
-                              splashColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              child: Container(
-                                margin: const EdgeInsets.only(left: 16),
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: Colors.grey.shade300,
-                                  ),
-                                ),
-                                child: Obx(
-                                  () => Transform.flip(
-                                    flipY: controller.filterBy.value == 'asc',
-                                    child: Icon(
-                                      Icons.sort_rounded,
-                                      size: 20,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    // ── Active badge chips (status & mode, non-default) ──
+                    Obx(() => _buildActiveFilterChips()),
+
+                    // ── Content ──────────────────────────────────────────
                     Obx(() {
-                      if (controller.isLoading.value &&
-                          controller.searchQuery.value.isEmpty) {
+                      if (controller.isLoading.value) {
                         return _buildLoadingIndicator();
                       }
-                      if (controller.summaryHafalanList.isEmpty) {
-                        return _buildEmptyState();
-                      }
+                      final isSurahMode = controller.mode.value == 'surah';
+                      final isEmpty = isSurahMode
+                          ? controller.summaryHafalanSurahList.isEmpty
+                          : controller.summaryHafalanJuzList.isEmpty;
+
+                      if (isEmpty) return _buildEmptyState();
+
+                      final itemCount = isSurahMode
+                          ? controller.summaryHafalanSurahList.length
+                          : controller.summaryHafalanJuzList.length;
+
                       return ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount:
-                            controller.summaryHafalanList.length +
-                            (controller.hasMore.value ? 1 : 0),
+                            itemCount + (controller.hasMore.value ? 1 : 0),
                         itemBuilder: (context, index) {
-                          if (index >= controller.summaryHafalanList.length) {
+                          if (index >= itemCount) {
                             return _buildLoadMoreIndicator();
                           }
-                          final summaryHafalan =
-                              controller.summaryHafalanList[index];
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 12),
-                            child: _buildSummaryHafalanCard(summaryHafalan),
+                            child: isSurahMode
+                                ? _buildSurahCard(
+                                    controller.summaryHafalanSurahList[index],
+                                  )
+                                : _buildJuzCard(
+                                    controller.summaryHafalanJuzList[index],
+                                  ),
                           );
                         },
                       );
@@ -266,375 +107,664 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
     );
   }
 
-  DropdownMenuItem<String> _buildDropdownItem(String value, String text) {
-    return DropdownMenuItem<String>(
-      value: value,
-      child: Text(
-        text,
-        style: GoogleFonts.poppins(
-          fontSize: 14,
-          color: Colors.grey[600],
-          fontWeight: FontWeight.w400,
+  // ══════════════════════════════════════════════════════════════════
+  // ROW 1 — SEARCH + FILTER BUTTON
+  // ══════════════════════════════════════════════════════════════════
+
+  Widget _buildSearchAndFilterRow(BuildContext context) {
+    return Row(
+      children: [
+        // Search bar
+        Expanded(
+          child: Container(
+            height: 46,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey[200]!,
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Obx(
+              () => TextField(
+                controller: controller.searchController,
+                onChanged: (v) => controller.searchQuery.value = v,
+                style: GoogleFonts.poppins(fontSize: 13),
+                decoration: InputDecoration(
+                  hintText: 'Cari santri...',
+                  hintStyle: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: Colors.grey[400],
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: Colors.grey[400],
+                    size: 20,
+                  ),
+                  suffixIcon: controller.searchQuery.value.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.clear_rounded,
+                            color: Colors.grey[400],
+                            size: 18,
+                          ),
+                          onPressed: () {
+                            controller.searchQuery.value = '';
+                            controller.searchController.clear();
+                          },
+                        )
+                      : null,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ),
         ),
-        overflow: TextOverflow.ellipsis,
-        maxLines: 1,
+        const SizedBox(width: 10),
+
+        // Filter button (badge count: status + mode non-default)
+        Obx(() {
+          final count = _activeFilterCount();
+          return GestureDetector(
+            onTap: () => _showFilterBottomSheet(context),
+            child: Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: count > 0 ? Colors.deepPurpleAccent : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: count > 0
+                        ? Colors.deepPurpleAccent.withValues(alpha: 0.3)
+                        : Colors.grey[200]!,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(
+                    Icons.tune_rounded,
+                    size: 22,
+                    color: count > 0 ? Colors.white : Colors.grey[600],
+                  ),
+                  if (count > 0)
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Container(
+                        width: 14,
+                        height: 14,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '$count',
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurpleAccent[700],
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // ROW 2 — LEVEL FILTER (langsung, tidak di modal)
+  // ══════════════════════════════════════════════════════════════════
+
+  Widget _buildLevelFilterRow() {
+    return Row(
+      children: [
+        _buildLevelChip('Level 1', 'level1', const Color(0xFF10B981)),
+        const SizedBox(width: 8),
+        _buildLevelChip('Level 2', 'level2', const Color(0xFFF59E0B)),
+        const SizedBox(width: 8),
+        _buildLevelChip('Level 3', 'level3', const Color(0xFFEF4444)),
+      ],
+    );
+  }
+
+  Widget _buildLevelChip(String label, String value, Color color) {
+    final isActive = controller.level.value == value;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          if (controller.level.value == value) return;
+          controller.level.value = value;
+          controller.clearList();
+          controller.getSummaryHafalan();
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          height: 36,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isActive
+                ? Colors.deepPurple.withValues(alpha: 0.12)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isActive
+                  ? Colors.deepPurple.withValues(alpha: 0.5)
+                  : Colors.grey.shade200,
+              width: isActive ? 1.5 : 1,
+            ),
+          ),
+          child: Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+              color: isActive ? Colors.deepPurple : Colors.grey[500],
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildSummaryHafalanCard(Datum summaryHafalan) {
-    final isMurajaah = controller.status.value == 'murajaah';
-    final hasLastHafalan = summaryHafalan.terakhirHafalan != null;
-    final surahName =
-        summaryHafalan.terakhirHafalan?.surah ?? 'Belum ada hafalan';
-    final ayatDetail = summaryHafalan.terakhirHafalan?.ayatDetail ?? '-';
-    final tanggal = hasLastHafalan
-        ? DateFormat(
-            'dd MMM yyyy',
-            'id_ID',
-          ).format(summaryHafalan.terakhirHafalan!.tanggal!)
-        : '';
+  // ══════════════════════════════════════════════════════════════════
+  // ACTIVE FILTER CHIPS (status & mode jika non-default)
+  // ══════════════════════════════════════════════════════════════════
 
-    return InkWell(
-      onTap: () {
-        FocusManager.instance.primaryFocus?.unfocus();
-        Get.toNamed('/detail-santri', arguments: summaryHafalan.id.toString());
-      },
-      borderRadius: BorderRadius.circular(16),
-      hoverColor: Colors.transparent,
-      splashColor: Colors.transparent,
-      highlightColor: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+  Widget _buildActiveFilterChips() {
+    final statusDefault = controller.status.value == 'tambahHafalan';
+    final modeDefault = controller.mode.value == 'surah';
+
+    if (statusDefault && modeDefault) return const SizedBox(height: 4);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Wrap(
+        spacing: 6,
+        runSpacing: 6,
+        children: [
+          if (!statusDefault)
+            _buildFilterChipBadge(
+              _statusLabel(controller.status.value),
+              _statusColor(controller.status.value),
+              () {
+                controller.status.value = 'tambahHafalan';
+                controller.filterBy.value = 'desc';
+                controller.clearList();
+                controller.getSummaryHafalan();
+              },
             ),
-          ],
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with name and date
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Name and ID
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        summaryHafalan.nama ?? 'Nama Santri',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[800],
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        summaryHafalan.noInduk ?? '-',
-                        style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w400,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
+          if (!modeDefault)
+            _buildFilterChipBadge('Mode: Halaman', Colors.deepPurple[400]!, () {
+              controller.switchMode('surah');
+            }),
+        ],
+      ),
+    );
+  }
 
-                // Date badge
-                if (hasLastHafalan)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurple[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.deepPurple[100]!),
-                    ),
-                    child: Text(
-                      tanggal,
-                      style: GoogleFonts.poppins(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                  ),
-              ],
+  Widget _buildFilterChipBadge(
+    String label,
+    Color color,
+    VoidCallback onRemove,
+  ) {
+    return Container(
+      padding: const EdgeInsets.only(left: 10, right: 4, top: 4, bottom: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: color,
             ),
+          ),
+          const SizedBox(width: 4),
+          InkWell(
+            onTap: onRemove,
+            borderRadius: BorderRadius.circular(10),
+            child: Icon(Icons.close_rounded, size: 14, color: color),
+          ),
+        ],
+      ),
+    );
+  }
 
-            const SizedBox(height: 16),
+  // ══════════════════════════════════════════════════════════════════
+  // FILTER BOTTOM SHEET (Status + Mode + Sort)
+  // ══════════════════════════════════════════════════════════════════
 
-            // Last hafalan info
-            if (hasLastHafalan)
-              InkWell(
-                onTap: () {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  Get.toNamed(
-                    '/detail-hafalan-surah',
-                    arguments: {
-                      'santriId': summaryHafalan.id,
-                      'surahId': summaryHafalan.terakhirHafalan?.surahId,
-                    },
-                  );
-                },
+  void _showFilterBottomSheet(BuildContext context) {
+    final tempStatus = controller.status.value.obs;
+    final tempMode = controller.mode.value.obs;
+    final tempSort = controller.filterBy.value.obs;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 28,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle
+              Center(
                 child: Container(
-                  padding: const EdgeInsets.all(12),
+                  width: 36,
+                  height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[200]!, width: 1),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      // Surah icon
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurple[50],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          Icons.menu_book_rounded,
-                          color: Colors.deepPurple[600],
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-
-                      // Surah info
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              surahName,
-                              style: GoogleFonts.poppins(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[800],
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Ayat $ayatDetail',
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(width: 4),
-
-                      // Status badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isMurajaah
-                              ? Colors.orange[50]
-                              : Colors.green[50],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isMurajaah
-                                ? Colors.orange[100]!
-                                : Colors.green[100]!,
-                          ),
-                        ),
-                        child: Text(
-                          isMurajaah ? 'Murajaah' : 'Hafalan',
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: isMurajaah
-                                ? Colors.orange[800]
-                                : Colors.green[800],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[200]!, width: 1),
-                ),
-                child: Center(
-                  child: Text(
-                    'Belum ada riwayat ${isMurajaah ? 'murajaah' : 'hafalan'}',
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
 
-            const SizedBox(height: 12),
+              // Title
+              Row(
+                children: [
+                  const Icon(
+                    Icons.tune_rounded,
+                    color: Colors.deepPurpleAccent,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Filter',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
 
-            // Action buttons
-            Row(
+              // ── Status ───────────────────────────────────────────────
+              _buildSheetSectionLabel('Status'),
+              const SizedBox(height: 8),
+              Obx(
+                () => Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildSheetChip(
+                      label: 'Hafalan',
+                      value: 'tambahHafalan',
+                      selected: tempStatus.value,
+                      color: const Color(0xFF10B981),
+                      onTap: (v) => tempStatus.value = v,
+                    ),
+                    _buildSheetChip(
+                      label: 'Murajaah',
+                      value: 'murajaah',
+                      selected: tempStatus.value,
+                      color: Colors.orangeAccent[700]!,
+                      onTap: (v) => tempStatus.value = v,
+                    ),
+                    _buildSheetChip(
+                      label: 'Tahsin',
+                      value: 'tahsin',
+                      selected: tempStatus.value,
+                      color: Colors.blueAccent[700]!,
+                      onTap: (v) => tempStatus.value = v,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ── Mode ─────────────────────────────────────────────────
+              _buildSheetSectionLabel('Mode Tampilan'),
+              const SizedBox(height: 8),
+              Obx(
+                () => Wrap(
+                  spacing: 8,
+                  children: [
+                    _buildSheetChip(
+                      label: 'Ayat',
+                      value: 'surah',
+                      selected: tempMode.value,
+                      color: Colors.deepPurple,
+                      onTap: (v) => tempMode.value = v,
+                    ),
+                    _buildSheetChip(
+                      label: 'Halaman',
+                      value: 'juz',
+                      selected: tempMode.value,
+                      color: Colors.deepPurple,
+                      onTap: (v) => tempMode.value = v,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ── Sort — hanya muncul jika status = tambahHafalan ──────
+              Obx(() {
+                if (tempStatus.value != 'tambahHafalan') {
+                  return const SizedBox.shrink();
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSheetSectionLabel('Urutan'),
+                    const SizedBox(height: 8),
+                    Obx(
+                      () => Wrap(
+                        spacing: 8,
+                        children: [
+                          _buildSheetChip(
+                            label: 'Terbanyak',
+                            value: 'desc',
+                            selected: tempSort.value,
+                            color: Colors.deepPurple,
+                            onTap: (v) => tempSort.value = v,
+                          ),
+                          _buildSheetChip(
+                            label: 'Tersedikit',
+                            value: 'asc',
+                            selected: tempSort.value,
+                            color: Colors.deepPurple,
+                            onTap: (v) => tempSort.value = v,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                );
+              }),
+
+              // ── Buttons ──────────────────────────────────────────────
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        tempStatus.value = 'tambahHafalan';
+                        tempMode.value = 'surah';
+                        tempSort.value = 'desc';
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: BorderSide(color: Colors.grey[300]!),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Reset',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        bool changed = false;
+
+                        if (controller.status.value != tempStatus.value) {
+                          controller.status.value = tempStatus.value;
+                          changed = true;
+                        }
+                        if (controller.filterBy.value != tempSort.value) {
+                          controller.filterBy.value = tempSort.value;
+                          changed = true;
+                        }
+                        // mode via switchMode agar clearList juga dipanggil
+                        if (controller.mode.value != tempMode.value) {
+                          controller.mode.value = tempMode.value;
+                          changed = true;
+                        }
+                        // jika status bukan tambahHafalan, reset sort ke desc
+                        if (tempStatus.value != 'tambahHafalan') {
+                          controller.filterBy.value = 'desc';
+                        }
+
+                        if (changed) {
+                          controller.clearList();
+                          controller.getSummaryHafalan();
+                        }
+                        Navigator.pop(ctx);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurpleAccent,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Terapkan',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSheetSectionLabel(String label) {
+    return Text(
+      label,
+      style: GoogleFonts.poppins(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: Colors.grey[500],
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+
+  Widget _buildSheetChip({
+    required String label,
+    required String value,
+    required String selected,
+    required Color color,
+    required void Function(String) onTap,
+  }) {
+    final isActive = selected == value;
+    return GestureDetector(
+      onTap: () => onTap(value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? color.withValues(alpha: 0.12) : Colors.grey[100],
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isActive ? color.withValues(alpha: 0.5) : Colors.grey[200]!,
+            width: isActive ? 1.5 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+            color: isActive ? color : Colors.grey[600],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // SURAH CARD
+  // ══════════════════════════════════════════════════════════════════
+
+  Widget _buildSurahCard(surah_model.Datum item) {
+    final terakhir = item.terakhirHafalan;
+    final hasData = terakhir != null;
+    final status = controller.status.value;
+
+    final tanggal = hasData && terakhir.tanggal != null
+        ? DateFormat('dd MMM yyyy', 'id_ID').format(terakhir.tanggal!)
+        : null;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildCardHeader(item.id, item.nama, item.noInduk, tanggal),
+          Divider(height: 1, color: Colors.grey[100]),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+            child: hasData
+                ? GestureDetector(
+                    onTap: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      Get.toNamed(
+                        '/detail-hafalan-surah',
+                        arguments: {
+                          'santriId': item.id,
+                          'surahId': terakhir.surahId,
+                        },
+                      );
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: Row(
+                      children: [
+                        _buildInfoIcon(Icons.auto_stories_rounded),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                terakhir.surah ?? '-',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[800],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if ((terakhir.ayatDetail ?? '').isNotEmpty)
+                                Text(
+                                  'Ayat ${terakhir.ayatDetail}',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    color: Colors.grey[500],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                            ],
+                          ),
+                        ),
+                        _buildStatusBadge(status),
+                      ],
+                    ),
+                  )
+                : _buildNoDataText(status),
+          ),
+          Divider(height: 1, color: Colors.grey[100]),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+            child: Row(
               children: [
-                // Detail Button
                 Expanded(
-                  flex: 5,
-                  child: ElevatedButton.icon(
-                    onPressed: hasLastHafalan
+                  child: _buildActionButton(
+                    label: 'Detail Riwayat',
+                    icon: Icons.history_rounded,
+                    color: Colors.orange,
+                    enabled: hasData,
+                    onTap: hasData
                         ? () {
                             FocusManager.instance.primaryFocus?.unfocus();
                             Get.toNamed(
                               '/detail-riwayat-hafalan',
                               arguments: {
-                                'santriId': summaryHafalan.id,
-                                'surahId':
-                                    summaryHafalan.terakhirHafalan?.surahId,
-                                'tanggalRiwayat':
-                                    summaryHafalan.terakhirHafalan?.tanggal,
-                                'status':
-                                    summaryHafalan.terakhirHafalan?.status,
+                                'santriId': item.id,
+                                'surahId': terakhir.surahId,
+                                'tanggalRiwayat': terakhir.tanggal,
+                                'status': terakhir.status,
                               },
                             );
                           }
-                        : () {},
-                    icon: Icon(
-                      Icons.visibility_outlined,
-                      size: 18,
-                      color: hasLastHafalan ? Colors.white : Colors.grey[400],
-                    ),
-                    label: Text(
-                      'Lihat Detail',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: hasLastHafalan ? Colors.white : Colors.grey[400],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: hasLastHafalan
-                          ? Colors.deepPurpleAccent.withValues(alpha: 0.8)
-                          : Colors.grey[200],
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      elevation: 0,
-                    ),
+                        : null,
                   ),
                 ),
-
-                const SizedBox(width: 12),
-
-                // Hafalan Button
+                const SizedBox(width: 8),
                 Expanded(
-                  flex: 4,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
+                  child: _buildActionButton(
+                    label: 'Hafalan',
+                    icon: Icons.book_rounded,
+                    color: const Color(0xFF10B981),
+                    enabled: true,
+                    onTap: () {
                       FocusManager.instance.primaryFocus?.unfocus();
                       Get.toNamed(
                         '/progres-hafalan',
-                        arguments: {'santriId': summaryHafalan.id.toString()},
+                        arguments: {'santriId': item.id.toString()},
                       );
                     },
-                    icon: Icon(
-                      Icons.book_outlined,
-                      size: 18,
-                      color: Colors.white,
-                    ),
-                    label: Text(
-                      'Hafalan',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.withValues(alpha: 0.8),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      elevation: 0,
-                    ),
                   ),
                 ),
               ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.people_outline, size: 80, color: Colors.grey[400]),
-          const SizedBox(height: 16),
-          Text(
-            'Tidak ada data santri',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Obx(
-            () => Text(
-              controller.searchQuery.value.isNotEmpty &&
-                      controller.summaryHafalanList.isEmpty
-                  ? 'Santri tidak ditemukan di ${controller.getTahapanLabel(controller.level.value)}'
-                  : 'Data santri akan muncul di sini',
-              style: TextStyle(color: Colors.grey[500], fontSize: 14),
             ),
           ),
         ],
@@ -642,9 +772,375 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
     );
   }
 
-  Widget _buildLoadMoreIndicator() {
+  // ══════════════════════════════════════════════════════════════════
+  // JUZ CARD
+  // ══════════════════════════════════════════════════════════════════
+
+  Widget _buildJuzCard(juz_model.Datum item) {
+    final terakhir = item.terakhirHafalan;
+    final hasData = terakhir != null;
+    final status = controller.status.value;
+
+    final tanggal = hasData && terakhir.tanggal != null
+        ? DateFormat('dd MMM yyyy', 'id_ID').format(terakhir.tanggal!)
+        : null;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildCardHeader(item.id, item.nama, item.noInduk, tanggal),
+          Divider(height: 1, color: Colors.grey[100]),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+            child: hasData
+                ? GestureDetector(
+                    onTap: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      Get.toNamed(
+                        '/detail-hafalan-juz',
+                        arguments: {
+                          'santriId': item.id,
+                          'juzId': terakhir.juz,
+                          'santriName': item.nama,
+                        },
+                      );
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: Row(
+                      children: [
+                        _buildInfoIcon(Icons.menu_book_rounded),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Juz ${terakhir.juz ?? '-'}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[800],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if ((terakhir.halamanDetail ?? '').isNotEmpty)
+                                Text(
+                                  'Hal. ${terakhir.halamanDetail}',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    color: Colors.grey[500],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                            ],
+                          ),
+                        ),
+                        _buildStatusBadge(status),
+                      ],
+                    ),
+                  )
+                : _buildNoDataText(status),
+          ),
+          Divider(height: 1, color: Colors.grey[100]),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildActionButton(
+                    label: 'Detail Riwayat',
+                    icon: Icons.history_rounded,
+                    color: Colors.orange,
+                    enabled: hasData,
+                    onTap: hasData
+                        ? () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            Get.toNamed(
+                              '/detail-riwayat-hafalan',
+                              arguments: {
+                                'santriId': item.id,
+                                'juzId': terakhir.juz,
+                                'tanggalRiwayat': terakhir.tanggal,
+                                'status': terakhir.status,
+                              },
+                            );
+                          }
+                        : null,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildActionButton(
+                    label: 'Hafalan',
+                    icon: Icons.menu_book_rounded,
+                    color: Color(0xFF10B981),
+                    enabled: true,
+                    onTap: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      Get.toNamed(
+                        '/progres-hafalan',
+                        arguments: {'santriId': item.id.toString()},
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // SHARED CARD COMPONENTS
+  // ══════════════════════════════════════════════════════════════════
+
+  Widget _buildCardHeader(
+    int? santriId,
+    String? nama,
+    String? noInduk,
+    String? tanggal,
+  ) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+      child: GestureDetector(
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          Get.toNamed('/detail-santri', arguments: santriId.toString());
+        },
+        behavior: HitTestBehavior.opaque,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildAvatar(),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    nama ?? 'Nama Santri',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    noInduk ?? '-',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[500],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            if (tanggal != null) _buildDateBadge(tanggal),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAvatar() {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: Colors.deepPurple.withValues(alpha: 0.1),
+        shape: BoxShape.circle,
+      ),
+      alignment: Alignment.center,
+      child: Icon(Icons.person, size: 22, color: Colors.deepPurple),
+    );
+  }
+
+  Widget _buildDateBadge(String tanggal) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.grey[600]!.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        tanggal,
+        style: GoogleFonts.poppins(
+          fontSize: 10,
+          fontWeight: FontWeight.w500,
+          color: Colors.grey[600],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoIcon(IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.deepPurple.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(icon, size: 18, color: Colors.deepPurple),
+    );
+  }
+
+  Widget _buildStatusBadge(String status) {
+    final color = _statusColor(status);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        _statusLabel(status),
+        style: GoogleFonts.poppins(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNoDataText(String status) {
+    return Text(
+      'Belum ada riwayat ${_statusLabel(status).toLowerCase()}',
+      style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[500]),
+    );
+  }
+
+  Widget _buildActionButton({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required bool enabled,
+    VoidCallback? onTap,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: enabled ? onTap : null,
+      icon: Icon(icon, size: 16),
+      label: Text(
+        label,
+        style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: enabled
+            ? color.withValues(alpha: 0.1)
+            : Colors.grey[100],
+        foregroundColor: enabled ? color : Colors.grey[400],
+        disabledBackgroundColor: Colors.grey[100],
+        disabledForegroundColor: Colors.grey[400],
+        shadowColor: Colors.transparent,
+        elevation: 0,
+        side: BorderSide(
+          color: enabled ? color.withValues(alpha: 0.5) : Colors.grey[200]!,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        minimumSize: const Size(double.infinity, 42),
+      ),
+    );
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // STATUS & LEVEL HELPERS
+  // ══════════════════════════════════════════════════════════════════
+
+  Color _statusColor(String status) {
+    switch (status) {
+      case 'murajaah':
+        return Colors.orangeAccent[700]!;
+      case 'tahsin':
+        return Colors.blueAccent[700]!;
+      default:
+        return const Color(0xFF10B981);
+    }
+  }
+
+  String _statusLabel(String status) {
+    switch (status) {
+      case 'murajaah':
+        return 'Murajaah';
+      case 'tahsin':
+        return 'Tahsin';
+      default:
+        return 'Hafalan';
+    }
+  }
+
+  /// Badge count: status + mode (level tidak dihitung karena selalu visible)
+  int _activeFilterCount() {
+    int count = 0;
+    if (controller.status.value != 'tambahHafalan') count++;
+    if (controller.mode.value != 'surah') count++;
+    return count;
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // EMPTY / LOADING
+  // ══════════════════════════════════════════════════════════════════
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              'Tidak ada data santri',
+              style: GoogleFonts.poppins(
+                color: Colors.grey[600],
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Obx(
+              () => Text(
+                controller.searchQuery.value.isNotEmpty
+                    ? 'Santri tidak ditemukan'
+                    : 'Data santri akan muncul di sini',
+                style: GoogleFonts.poppins(
+                  color: Colors.grey[500],
+                  fontSize: 13,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadMoreIndicator() {
+    return const Padding(
+      padding: EdgeInsets.all(16),
       child: Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
@@ -654,113 +1150,174 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
   }
 
   Widget _buildLoadingIndicator() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Memuat data...',
-            style: TextStyle(color: Colors.grey, fontSize: 16),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void showLevelInfoDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Informasi Level Hafalan',
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF6B46C1),
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildLevelInfo(
-                context,
-                title: 'Level 1',
-                description: 'Juz 30',
-                color: const Color(0xFF10B981), // Green
-              ),
-              const SizedBox(height: 12),
-              _buildLevelInfo(
-                context,
-                title: 'Level 2',
-                description: 'Surah Pilihan',
-                color: const Color(0xFFF59E0B), // Amber
-              ),
-              const SizedBox(height: 12),
-              _buildLevelInfo(
-                context,
-                title: 'Level 3',
-                description: 'Juz 1-29',
-                color: const Color(0xFFEF4444), // Red
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6B46C1),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  child: Text(
-                    'Mengerti',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 40),
+      child: Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
         ),
       ),
     );
   }
 
-  Widget _buildLevelInfo(
-    BuildContext context, {
+  // ══════════════════════════════════════════════════════════════════
+  // LEVEL INFO DIALOG
+  // ══════════════════════════════════════════════════════════════════
+
+  void showLevelInfoDialog(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, anim1, anim2) => const SizedBox(),
+      transitionBuilder: (context, anim1, anim2, child) {
+        return Transform.scale(
+          scale: anim1.value,
+          child: Opacity(
+            opacity: anim1.value,
+            child: Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              elevation: 0,
+              backgroundColor: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header Icon
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.verified_user_rounded,
+                        color: Colors.deepPurpleAccent,
+                        size: 32,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Target Tahap Hafalan',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Setiap level memiliki target hafalan yang harus dicapai santri',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Level Cards
+                    _buildLevelInfo(
+                      title: 'Level 1',
+                      description: 'Fokus pada Juz 30 (Juz Amma)',
+                      color: Colors.green.withValues(alpha: 0.8),
+                      icon: '1',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildLevelInfo(
+                      title: 'Level 2',
+                      description: 'Fokus pada Surah-surah Pilihan',
+                      color: Colors.orange.withValues(alpha: 0.8),
+                      icon: '2',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildLevelInfo(
+                      title: 'Level 3',
+                      description: 'Fokus pada Juz 1 - Juz 29',
+                      color: Colors.red.withValues(alpha: 0.8),
+                      icon: '3',
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Close Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepPurpleAccent,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: Text(
+                          'Tutup',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLevelInfo({
     required String title,
     required String description,
     required Color color,
+    required String icon,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+        color: color.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: color.withValues(alpha: 0.15), width: 1.5),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Index Badge
           Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            child: const Icon(Icons.check, color: Colors.white, size: 16),
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                icon,
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
+              ),
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -768,16 +1325,17 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                 Text(
                   title,
                   style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    color: color,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.grey[800],
                   ),
                 ),
-                const SizedBox(height: 4),
                 Text(
                   description,
                   style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey[700],
+                    fontSize: 11,
+                    color: Colors.grey[600],
+                    height: 1.4,
                   ),
                 ),
               ],

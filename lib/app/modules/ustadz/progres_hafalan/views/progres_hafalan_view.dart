@@ -770,7 +770,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
           '/detail-hafalan-juz',
           arguments: {
             'santriId': controller.santriData.value?.id,
-            'juzId': juz.juz.toString(),
+            'juzId': juz.juz,
             'santriName': controller.santriData.value?.nama,
           },
         );
@@ -922,8 +922,8 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
           '/detail-hafalan-surah',
           arguments: {
             'santriId': controller.santriData.value?.id,
-            'santriName': controller.santriData.value?.nama,
             'surahId': surah.id,
+            'santriName': controller.santriData.value?.nama,
           },
         );
       },
