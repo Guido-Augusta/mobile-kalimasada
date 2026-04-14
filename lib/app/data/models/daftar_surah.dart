@@ -1,4 +1,4 @@
-// GET http://localhost:5000/api/alquran
+// GET http://localhost:5000/api/alquran/surah
 
 class DaftarSurah {
   DaftarSurah({required this.data});
