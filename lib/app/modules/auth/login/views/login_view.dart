@@ -18,6 +18,7 @@ class LoginView extends GetView<LoginController> {
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
         ),
       ),
       body: SafeArea(

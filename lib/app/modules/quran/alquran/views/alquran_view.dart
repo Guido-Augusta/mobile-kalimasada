@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_surah.dart';
@@ -10,29 +11,36 @@ class AlquranView extends GetView<AlquranController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          controller.refreshData();
-        },
-        child: Obx(
-          () => CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: [
-              _buildHeader(context),
-              _buildTabSelector(),
-              // _buildSearchInfo(),
-              if (controller.isLoadingSurah.value ||
-                  controller.isLoadingJuz.value)
-                _buildLoading()
-              else if (controller.totalCount == 0)
-                _buildEmpty()
-              else if (controller.selectedTab.value == 0)
-                _buildSurahList()
-              else
-                _buildJuzList(),
-            ],
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF8FAFC),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            controller.refreshData();
+          },
+          child: Obx(
+            () => CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                _buildHeader(context),
+                _buildTabSelector(),
+                // _buildSearchInfo(),
+                if (controller.isLoadingSurah.value ||
+                    controller.isLoadingJuz.value)
+                  _buildLoading()
+                else if (controller.totalCount == 0)
+                  _buildEmpty()
+                else if (controller.selectedTab.value == 0)
+                  _buildSurahList()
+                else
+                  _buildJuzList(),
+              ],
+            ),
           ),
         ),
       ),
@@ -276,7 +284,6 @@ class AlquranView extends GetView<AlquranController> {
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -363,7 +370,6 @@ class AlquranView extends GetView<AlquranController> {
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 4),
