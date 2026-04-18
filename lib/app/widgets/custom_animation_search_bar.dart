@@ -12,6 +12,7 @@ class CustomAnimationSearchBar extends StatefulWidget {
   final Color? cursorColor;
   final IconData? backIcon;
   final int? maxValue;
+  final bool showSearchIcon;
 
   const CustomAnimationSearchBar({
     super.key,
@@ -23,6 +24,7 @@ class CustomAnimationSearchBar extends StatefulWidget {
     this.cursorColor,
     this.backIcon,
     this.maxValue,
+    this.showSearchIcon = true,
   });
 
   @override
@@ -131,23 +133,30 @@ class _CustomAnimationSearchBarState extends State<CustomAnimationSearchBar> {
                           widget.onChanged(text);
                         },
                       )
-                    : Text(
-                        widget.centerTitle,
-                        key: const ValueKey('titleText'),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                    : Center(
+                        child: Text(
+                          widget.centerTitle,
+                          key: const ValueKey('titleText'),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
               ),
             ),
 
-            // Search Icon
+            // Search Icon / Balancing space
             if (!_isSearching)
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: () => setState(() => _isSearching = true),
-              ),
+              widget.showSearchIcon
+                  ? IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () => setState(() => _isSearching = true),
+                    )
+                  : const SizedBox(
+                      width: 48,
+                    ), // Lebar standar IconButton untuk menyeimbangkan layout
           ],
         ),
       ),

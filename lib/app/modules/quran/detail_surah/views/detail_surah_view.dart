@@ -9,6 +9,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:mobile_kalimasada/app/widgets/custom_animation_search_bar.dart';
 import 'package:mobile_kalimasada/app/utils/quran_utils.dart';
 import 'package:rxdart/rxdart.dart' as rx;
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 import '../controllers/detail_surah_controller.dart';
@@ -56,12 +57,12 @@ class DetailSurahView extends GetView<DetailSurahController> {
                     curve: (estimatedDistance) => Curves.fastLinearToSlowEaseIn,
                   );
                 },
-                centerTitle:
-                    controller.detailSurah.value?.namaLatin ?? 'Detail Surah',
+                centerTitle: 'Detail Surah',
                 hintText:
                     'Cari ayat (1-${controller.detailSurah.value?.jumlahAyat})...',
                 keyboardType: TextInputType.number,
                 maxValue: controller.detailSurah.value?.jumlahAyat,
+                showSearchIcon: !controller.isLoading.value,
               ),
             ),
           ),
@@ -164,19 +165,7 @@ class DetailSurahView extends GetView<DetailSurahController> {
         }),
         body: Obx(() {
           if (controller.isLoading.value) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(color: Colors.deepPurpleAccent),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Memuat data...',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                  ),
-                ],
-              ),
-            );
+            return _buildSkeleton();
           }
 
           if (controller.detailSurah.value == null) {
@@ -567,6 +556,189 @@ class DetailSurahView extends GetView<DetailSurahController> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ── Skeleton Loading ─────────────────────────────────────────────────────────
+
+  Widget _buildSkeleton() {
+    return Skeletonizer(
+      enabled: true,
+      child: CustomScrollView(
+        slivers: [
+          // ── Skeleton Header Card ────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Skeletonizer(
+              effect: ShimmerEffect(
+                baseColor: Colors.white.withValues(alpha: 0.2),
+                highlightColor: Colors.white.withValues(alpha: 0.4),
+              ),
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                  child: Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Bone.text(
+                                  words: 2,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Bone.text(
+                                  words: 2,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    color: Colors.white.withValues(alpha: 0.8),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Bone(
+                            width: 110,
+                            height: 28,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Divider(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        height: 1,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Bone.circle(size: 44),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                Bone(
+                                  height: 5,
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Bone.text(
+                                      words: 1,
+                                      style: const TextStyle(fontSize: 11),
+                                    ),
+                                    Bone.text(
+                                      words: 1,
+                                      style: const TextStyle(fontSize: 11),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // ── Skeleton Ayat Cards ──────────────────────────────────────────────
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => _buildSkeletonAyatCard(index + 1),
+              childCount: 5,
+            ),
+          ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonAyatCard(int nomor) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Card(
+        color: Colors.white,
+        elevation: 1,
+        shadowColor: Colors.black.withValues(alpha: 0.05),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: Colors.grey[200]!, width: 1),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Nomor ayat badge
+              Bone(
+                width: 32,
+                height: 32,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              const SizedBox(height: 12),
+
+              // Arabic text placeholder
+              Align(
+                alignment: Alignment.centerRight,
+                child: Bone.multiText(
+                  lines: 2,
+                  style: GoogleFonts.amiri(fontSize: 22, height: 2.2),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Latin text placeholder
+              Bone.multiText(
+                lines: 1,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Translation placeholder
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Bone.multiText(
+                  lines: 2,
+                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
