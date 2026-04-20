@@ -5,25 +5,33 @@ import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 
 class CustomAnimationSearchBar extends StatefulWidget {
   final TextEditingController controller;
-  final Function(String) onChanged;
+  final Function(String)? onChanged;
+  final Function(String)? onSubmitted;
   final String hintText;
   final String centerTitle;
   final TextInputType keyboardType;
   final Color? cursorColor;
   final IconData? backIcon;
+  final int? minValue;
   final int? maxValue;
+  final String? minValueErrorMessage;
+  final String? maxValueErrorMessage;
   final bool showSearchIcon;
 
   const CustomAnimationSearchBar({
     super.key,
     required this.controller,
-    required this.onChanged,
+    this.onChanged,
+    this.onSubmitted,
     this.hintText = 'Search...',
     this.centerTitle = 'Title',
     this.keyboardType = TextInputType.text,
     this.cursorColor,
     this.backIcon,
+    this.minValue,
     this.maxValue,
+    this.minValueErrorMessage,
+    this.maxValueErrorMessage,
     this.showSearchIcon = true,
   });
 
@@ -83,6 +91,9 @@ class _CustomAnimationSearchBarState extends State<CustomAnimationSearchBar> {
                         controller: widget.controller,
                         autofocus: true,
                         keyboardType: widget.keyboardType,
+                        textInputAction: widget.onSubmitted != null
+                            ? TextInputAction.done
+                            : null,
                         cursorColor: widget.cursorColor ?? Colors.deepPurple,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
@@ -110,28 +121,61 @@ class _CustomAnimationSearchBarState extends State<CustomAnimationSearchBar> {
                             horizontal: 10,
                           ),
                         ),
-                        onChanged: (text) {
-                          if (text.isEmpty) return;
-
-                          final val = int.tryParse(text);
-                          final max = widget.maxValue;
-
-                          if (val == null || val < 1) {
-                            _showThrottledToast('Masukkan angka yang valid!');
-                            widget.controller.clear();
-                            return;
-                          }
-
-                          if (max != null && val > max) {
-                            _showThrottledToast(
-                              'Melebihi jumlah ayat (maks. $max)',
-                            );
-                            widget.controller.clear();
-                            return;
-                          }
-
-                          widget.onChanged(text);
-                        },
+                        onChanged: widget.onSubmitted != null
+                            ? null
+                            : (text) {
+                                if (text.isEmpty) return;
+                                final val = int.tryParse(text);
+                                final max = widget.maxValue;
+                                if (val == null || val < 1) {
+                                  _showThrottledToast(
+                                    'Masukkan angka yang valid!',
+                                  );
+                                  widget.controller.clear();
+                                  return;
+                                }
+                                if (max != null && val > max) {
+                                  _showThrottledToast(
+                                    widget.maxValueErrorMessage ??
+                                        'Melebihi jumlah ayat (maks. $max)',
+                                  );
+                                  widget.controller.clear();
+                                  return;
+                                }
+                                widget.onChanged?.call(text);
+                              },
+                        onSubmitted: widget.onSubmitted != null
+                            ? (text) {
+                                if (text.isEmpty) return;
+                                final val = int.tryParse(text);
+                                if (val == null || val < 1) {
+                                  _showThrottledToast(
+                                    'Masukkan angka yang valid!',
+                                  );
+                                  widget.controller.clear();
+                                  return;
+                                }
+                                final min = widget.minValue;
+                                if (min != null && val < min) {
+                                  _showThrottledToast(
+                                    widget.minValueErrorMessage ??
+                                        'Nilai minimum adalah $min',
+                                  );
+                                  widget.controller.clear();
+                                  return;
+                                }
+                                final max = widget.maxValue;
+                                if (max != null && val > max) {
+                                  _showThrottledToast(
+                                    widget.maxValueErrorMessage ??
+                                        'Melebihi batas (maks. $max)',
+                                  );
+                                  widget.controller.clear();
+                                  return;
+                                }
+                                widget.onSubmitted?.call(text);
+                              }
+                            : null,
                       )
                     : Center(
                         child: Text(

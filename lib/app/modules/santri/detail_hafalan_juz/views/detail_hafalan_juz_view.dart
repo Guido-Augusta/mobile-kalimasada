@@ -210,7 +210,7 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
               // ── Juz Info Header Card ─────────────────────────────────────────
               SliverToBoxAdapter(
                 child: Skeletonizer(
-                  enabled: controller.isCurrentLoading,
+                  enabled: controller.isLoadingTambah.value,
                   effect: ShimmerEffect(
                     baseColor: Colors.white.withValues(alpha: 0.2),
                     highlightColor: Colors.white.withValues(alpha: 0.4),
@@ -318,7 +318,7 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
   }
 
   Widget _buildJuzHeaderCard(BuildContext context) {
-    final detail = controller.currentDetail;
+    final detail = controller.detailTambah.value;
     final String juzNumber = detail?.juz?.toString() ?? controller.juzId;
     final int totalSurah = detail?.totalSurah ?? 0;
 
@@ -609,6 +609,14 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
                 fontWeight: FontWeight.w600,
                 color: Colors.deepPurpleAccent[700],
               ),
+            ),
+          ),
+          Text(
+            surah.nama ?? '',
+            style: GoogleFonts.amiri(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.deepPurpleAccent[700],
             ),
           ),
         ],

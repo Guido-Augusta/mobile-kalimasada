@@ -27,8 +27,8 @@ import '../modules/auth/login/bindings/login_binding.dart';
 import '../modules/auth/login/views/login_view.dart';
 import '../modules/auth/splash/bindings/splash_binding.dart';
 import '../modules/auth/splash/views/splash_view.dart';
-import '../modules/santri/detail_hafalan_juz/bindings/detail_hafalan_juz_binding.dart';
-import '../modules/santri/detail_hafalan_juz/views/detail_hafalan_juz_view.dart';
+import '../modules/quran/detail_juz/bindings/detail_juz_binding.dart';
+import '../modules/quran/detail_juz/views/detail_juz_view.dart';
 import '../modules/main/ortu_main/bindings/ortu_main_binding.dart';
 import '../modules/main/ortu_main/views/ortu_main_view.dart';
 import '../modules/main/santri_main/bindings/santri_main_binding.dart';
@@ -45,6 +45,8 @@ import '../modules/quran/alquran/bindings/alquran_binding.dart';
 import '../modules/quran/alquran/views/alquran_view.dart';
 import '../modules/quran/detail_surah/bindings/detail_surah_binding.dart';
 import '../modules/quran/detail_surah/views/detail_surah_view.dart';
+import '../modules/santri/detail_hafalan_juz/bindings/detail_hafalan_juz_binding.dart';
+import '../modules/santri/detail_hafalan_juz/views/detail_hafalan_juz_view.dart';
 import '../modules/santri/detail_hafalan_surah/bindings/detail_hafalan_surah_binding.dart';
 import '../modules/santri/detail_hafalan_surah/views/detail_hafalan_surah_view.dart';
 import '../modules/santri/doa_khatam/bindings/doa_khatam_binding.dart';
@@ -286,6 +288,11 @@ class AppPages {
       page: () => const DetailHafalanJuzView(),
       binding: DetailHafalanJuzBinding(),
       middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.DETAIL_JUZ,
+      page: () => const DetailJuzView(),
+      binding: DetailJuzBinding(),
     ),
   ];
 }

@@ -398,7 +398,7 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                           Text(
                             surah?.namaLatin ?? '-',
                             style: GoogleFonts.poppins(
-                              fontSize: 18,
+                              fontSize: 17,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),

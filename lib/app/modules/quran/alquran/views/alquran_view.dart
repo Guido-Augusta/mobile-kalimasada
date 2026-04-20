@@ -335,7 +335,7 @@ class AlquranView extends GetView<AlquranController> {
           borderRadius: BorderRadius.circular(20),
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
-            // Get.toNamed('/detail-juz', arguments: juz.juz);
+            Get.toNamed('/detail-juz', arguments: juz.juz);
           },
           child: Padding(
             padding: const EdgeInsets.all(16),
