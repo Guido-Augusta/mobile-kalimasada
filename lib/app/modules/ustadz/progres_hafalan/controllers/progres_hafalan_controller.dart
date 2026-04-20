@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -53,14 +54,16 @@ class ProgresHafalanController extends GetxController {
       isLoading.value = true;
       final token = AuthService.to.token.value;
 
-      final response = await http.get(
-        Uri.parse(ApiUrl.progresHafalanSurah(santriId)),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(ApiUrl.progresHafalanSurah(santriId)),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+              'x-platform': 'mobile',
+            },
+          )
+          .timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         santriData.value = Santri.fromJson(data['santri']);
@@ -68,8 +71,10 @@ class ProgresHafalanController extends GetxController {
           data['data'].map((x) => Datum.fromJson(x)),
         );
       } else {
-        ToastUtils.showErrorToast('Gagal memuat ayat');
+        ToastUtils.showErrorToast('Gagal memuat data progres hafalan');
       }
+    } on TimeoutException catch (_) {
+      ToastUtils.showErrorToast('Koneksi lambat, waktu habis');
     } catch (e) {
       final now = DateTime.now();
       if (_lastErrorShown == null ||
@@ -90,22 +95,26 @@ class ProgresHafalanController extends GetxController {
     try {
       final token = AuthService.to.token.value;
 
-      final response = await http.get(
-        Uri.parse(ApiUrl.progresHafalanJuz(santriId)),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(ApiUrl.progresHafalanJuz(santriId)),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+              'x-platform': 'mobile',
+            },
+          )
+          .timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         progresHafalanJuz.value = List<juz_model.Datum>.from(
           data['data'].map((x) => juz_model.Datum.fromJson(x)),
         );
       } else {
-        ToastUtils.showErrorToast('Gagal memuat data juz');
+        ToastUtils.showErrorToast('Gagal memuat data progres hafalan');
       }
+    } on TimeoutException catch (_) {
+      ToastUtils.showErrorToast('Koneksi lambat, waktu habis');
     } catch (e) {
       final now = DateTime.now();
       if (_lastErrorShown == null ||

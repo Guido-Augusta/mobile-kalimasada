@@ -28,7 +28,12 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: Obx(() {
-        if (controller.isLoading.value) {
+        final isSurahMode = controller.filterMode.value == 'surah';
+        final isEmpty = isSurahMode
+            ? controller.progresHafalanSurah.isEmpty
+            : controller.progresHafalanJuz.isEmpty;
+
+        if (controller.isLoading.value || isEmpty) {
           return const SizedBox.shrink();
         }
         return AnimatedSlide(
@@ -128,14 +133,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
             controller: controller.scrollC,
             slivers: [
               // Student Info Card
-              Obx(
-                () => SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                    child: buildSantriInfoCard(),
-                  ),
-                ),
-              ),
+              Obx(() => _buildHeader()),
 
               // Search Bar + Toggle (combined)
               SliverToBoxAdapter(
@@ -199,7 +197,8 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                             'Tidak ada data',
                             style: GoogleFonts.poppins(
                               fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[700],
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -216,32 +215,16 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                   );
                 }
 
-                // No search result — surah
-                if (controller.filterMode.value == 'surah' &&
-                    controller.searchQuery.value.isNotEmpty &&
-                    controller.filteredSurahList.isEmpty) {
-                  return SliverFillRemaining(
-                    child: Center(
-                      child: Text(
-                        'Tidak ada hasil pencarian',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                      ),
-                    ),
-                  );
-                }
+                // No search result
+                final isSearching = controller.searchQuery.value.isNotEmpty;
+                final isNoSearchResult =
+                    isSearching &&
+                    (controller.filterMode.value == 'surah'
+                        ? controller.filteredSurahList.isEmpty
+                        : controller.filteredJuzList.isEmpty);
 
-                // No search result — juz
-                if (controller.filterMode.value == 'juz' &&
-                    controller.searchQuery.value.isNotEmpty &&
-                    controller.filteredJuzList.isEmpty) {
-                  return SliverFillRemaining(
-                    child: Center(
-                      child: Text(
-                        'Tidak ada hasil pencarian',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                      ),
-                    ),
-                  );
+                if (isNoSearchResult) {
+                  return _buildNoSearchResult();
                 }
 
                 // Surah mode
@@ -299,292 +282,175 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
 
   // ── Santri Info Card ────────────────────────────────────────────────────────
 
-  Widget buildSantriInfoCard() {
+  // ── Santri Header ───────────────────────────────────────────────────────────
+
+  SliverToBoxAdapter _buildHeader() {
     final bool isLoading =
         controller.isLoading.value || controller.santriData.value == null;
     final santri = controller.santriData.value;
 
-    String getInitials(String? name) {
-      if (name == null || name.isEmpty) return '?';
-      final parts = name.trim().split(' ');
-      if (parts.length >= 2) {
-        return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-      }
-      return parts[0][0].toUpperCase();
-    }
-
-    Color tahapColor(String? tahap) {
-      switch ((tahap ?? '').toLowerCase()) {
-        case 'level1':
-          return const Color(0xFF10B981);
-        case 'level2':
-          return const Color(0xFFF59E0B);
-        case 'level3':
-          return const Color(0xFFEF4444);
-        default:
-          return Colors.white54;
-      }
-    }
-
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF6B46C1).withValues(alpha: 0.4),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF7C3AED).withValues(alpha: 0.35),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -24,
-            top: -24,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.07),
-              ),
-            ),
-          ),
-          Positioned(
-            right: 30,
-            bottom: -30,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.05),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Avatar + Nama + No Induk
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Skeletonizer(
-                      enabled: isLoading,
-                      effect: ShimmerEffect(
-                        baseColor: Colors.white.withValues(alpha: 0.2),
-                        highlightColor: Colors.white.withValues(alpha: 0.4),
-                      ),
-                      child: Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.18),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.35),
-                            width: 2,
-                          ),
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.3),
+                      width: 2,
+                    ),
+                  ),
+                  child: const CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.white24,
+                    child: Icon(
+                      Icons.person_rounded,
+                      size: 26,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Skeletonizer(
+                        enabled: isLoading,
+                        effect: ShimmerEffect(
+                          baseColor: Colors.white.withValues(alpha: 0.2),
+                          highlightColor: Colors.white.withValues(alpha: 0.4),
                         ),
-                        alignment: Alignment.center,
                         child: Text(
-                          getInitials(santri?.nama),
-                          style: const TextStyle(
+                          santri?.nama ?? 'Nama Santri',
+                          style: GoogleFonts.poppins(
                             color: Colors.white,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
+                            height: 1.2,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Skeletonizer(
-                            enabled: isLoading,
-                            effect: ShimmerEffect(
-                              baseColor: Colors.white.withValues(alpha: 0.2),
-                              highlightColor: Colors.white.withValues(
-                                alpha: 0.4,
-                              ),
-                            ),
-                            child: Text(
-                              isLoading
-                                  ? 'Nama Lengkap Santri'
-                                  : (santri?.nama ?? '-'),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.2,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Skeletonizer(
-                            enabled: isLoading,
-                            effect: ShimmerEffect(
-                              baseColor: Colors.white.withValues(alpha: 0.2),
-                              highlightColor: Colors.white.withValues(
-                                alpha: 0.4,
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.badge_outlined,
-                                  size: 13,
-                                  color: Colors.white.withValues(alpha: 0.7),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  isLoading
-                                      ? 'Nomor Induk'
-                                      : (santri?.noInduk ?? '-'),
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.8),
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                Divider(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  thickness: 1,
-                  height: 1,
-                ),
-
-                const SizedBox(height: 16),
-
-                // Total Poin & Tahap
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 4,
-                      child: Skeletonizer(
+                      const SizedBox(height: 4),
+                      Skeletonizer(
                         enabled: isLoading,
                         effect: ShimmerEffect(
                           baseColor: Colors.white.withValues(alpha: 0.2),
                           highlightColor: Colors.white.withValues(alpha: 0.4),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Total Poin',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.7),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              isLoading
-                                  ? '------'
-                                  : '${santri?.totalPoin ?? 0}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          santri?.noInduk ?? 'Nomor Induk',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
-
-                    Container(
-                      height: 40,
-                      width: 1,
-                      color: Colors.white.withValues(alpha: 0.2),
-                      margin: const EdgeInsets.symmetric(horizontal: 12),
-                    ),
-
-                    Expanded(
-                      flex: 5,
-                      child: Skeletonizer(
-                        enabled: isLoading,
-                        effect: ShimmerEffect(
-                          baseColor: Colors.white.withValues(alpha: 0.2),
-                          highlightColor: Colors.white.withValues(alpha: 0.4),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Tahap',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.7),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: tahapColor(
-                                  santri?.tahapHafalan,
-                                ).withValues(alpha: 0.25),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                  color: tahapColor(
-                                    santri?.tahapHafalan,
-                                  ).withValues(alpha: 0.6),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Text(
-                                isLoading
-                                    ? '------------------'
-                                    : getTahapanLabel(
-                                        santri?.tahapHafalan ?? '-',
-                                      ),
-                                style: TextStyle(
-                                  color: isLoading
-                                      ? Colors.white
-                                      : tahapColor(santri?.tahapHafalan),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+              ),
+              child: IntrinsicHeight(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildHeaderStat(
+                      title: 'Total Poin',
+                      value: '${santri?.totalPoin ?? 0}',
+                      flex: 4,
+                    ),
+                    VerticalDivider(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      thickness: 1,
+                    ),
+                    _buildHeaderStat(
+                      title: 'Tahap Hafalan',
+                      value: getTahapanLabel(santri?.tahapHafalan ?? '-'),
+                      flex: 7,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderStat({
+    required String title,
+    required String value,
+    int? flex,
+  }) {
+    final bool isLoading =
+        controller.isLoading.value || controller.santriData.value == null;
+    return Expanded(
+      flex: flex ?? 1,
+      child: Column(
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.poppins(
+              color: Colors.white.withValues(alpha: 0.8),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Skeletonizer(
+            enabled: isLoading,
+            effect: ShimmerEffect(
+              baseColor: Colors.white.withValues(alpha: 0.2),
+              highlightColor: Colors.white.withValues(alpha: 0.4),
+            ),
+            child: Text(
+              value,
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
           ),
         ],
@@ -1119,5 +985,44 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       }
       return const SizedBox.shrink();
     });
+  }
+
+  Widget _buildNoSearchResult() {
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.manage_search_rounded,
+                size: 48,
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Tidak ada hasil pencarian',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Coba cari dengan kata kunci lain',
+              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
