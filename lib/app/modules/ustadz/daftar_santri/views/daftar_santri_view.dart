@@ -492,7 +492,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange[50],
+                        backgroundColor: Colors.orange.withValues(alpha: 0.1),
                         foregroundColor: Colors.orange,
                         shadowColor: Colors.transparent,
                         side: const BorderSide(color: Colors.orange),

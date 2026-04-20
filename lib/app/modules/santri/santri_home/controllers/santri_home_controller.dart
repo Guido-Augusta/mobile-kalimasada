@@ -15,6 +15,7 @@ enum ChartType { tambahHafalan, murajaah, tahsin }
 class SantriHomeController extends GetxController {
   var isLoading = true.obs;
   var isLoadingChart = true.obs;
+  var isChartError = false.obs;
   var isLoadingLogout = false.obs;
   var fotoProfil =
       'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
@@ -90,6 +91,7 @@ class SantriHomeController extends GetxController {
   void getChart({bool isRefresh = true}) async {
     try {
       isLoadingChart.value = isRefresh;
+      isChartError.value = false;
       final token = AuthService.to.token.value;
       final santriId = AuthService.to.roleId.value;
 
@@ -117,12 +119,19 @@ class SantriHomeController extends GetxController {
       if (response.statusCode == 200) {
         chart.value = c.Chart.fromJson(data);
       } else {
+        isChartError.value = true;
         ToastUtils.showErrorToast('Gagal mendapatkan data chart');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      isChartError.value = true;
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     }
     isLoadingChart.value = false;
   }

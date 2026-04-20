@@ -17,7 +17,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         title: Text(
           'Riwayat Hafalan',
           style: GoogleFonts.poppins(
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
           ),

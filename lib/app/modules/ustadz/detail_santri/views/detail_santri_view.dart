@@ -56,6 +56,20 @@ class DetailSantriView extends GetView<DetailSantriController> {
     return Obx(
       () => Scaffold(
         backgroundColor: const Color(0xFFF1F5F9),
+        appBar:
+            (!controller.isLoading.value &&
+                controller.santriDetail.value == null)
+            ? AppBar(
+                title: const Text(
+                  'Detail Santri',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
+                centerTitle: true,
+                foregroundColor: Colors.black,
+                backgroundColor: Color(0xFFF1F5F9),
+                elevation: 0,
+              )
+            : null,
         body: Obx(() {
           final santri = controller.santriDetail.value;
 
@@ -1290,6 +1304,84 @@ class DetailSantriView extends GetView<DetailSantriController> {
         ],
       ),
       child: Obx(() {
+        // Loading state
+        if (controller.isLoadingChart.value) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 92),
+              child: CircularProgressIndicator(color: Colors.deepPurpleAccent),
+            ),
+          );
+        }
+
+        // Error state
+        if (controller.isChartError.value) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.signal_wifi_connected_no_internet_4_rounded,
+                      size: 36,
+                      color: Colors.red[300],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Gagal memuat grafik',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Periksa koneksi internet Anda',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 36,
+                    child: ElevatedButton.icon(
+                      onPressed: () => controller.getChart(),
+                      icon: const Icon(Icons.refresh_rounded, size: 18),
+                      label: Text(
+                        'Coba Lagi',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurpleAccent,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Empty data state
         if (controller.chart.value == null ||
             controller.chart.value!.data.isEmpty) {
           return Center(
@@ -1690,7 +1782,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange[50],
+                  backgroundColor: Colors.orange.withValues(alpha: 0.1),
                   foregroundColor: Colors.orange,
                   shadowColor: Colors.transparent,
                   side: const BorderSide(color: Colors.orange),
