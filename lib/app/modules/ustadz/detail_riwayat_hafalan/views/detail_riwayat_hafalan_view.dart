@@ -81,8 +81,16 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
                           'Data tidak ditemukan',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Tarik ke bawah untuk refresh',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.grey[500],
                           ),
                         ),
                       ],
@@ -671,12 +679,12 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
             const SizedBox(height: 16),
             Row(
               children: [
-                _buildInfoCard(infoTitle1, infoValue1, flex: 2),
+                _buildInfoCard(infoTitle1, infoValue1, flex: 7),
                 const SizedBox(width: 12),
                 _buildInfoCard(
                   'Status',
                   _getStatusText(detailData.status),
-                  flex: 3,
+                  flex: 8,
                 ),
               ],
             ),

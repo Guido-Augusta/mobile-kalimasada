@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import '../../../../services/auth_service.dart';
 import '../controllers/riwayat_hafalan_controller.dart';
 
 class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
@@ -36,12 +37,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             controller: controller.scrollController,
-            slivers: [
-              _buildHeader(),
-              _buildFilter(),
-              _buildTotalSetoran(),
-              _buildRiwayatList(),
-            ],
+            slivers: [_buildHeader(), _buildFilter(), _buildRiwayatList()],
           ),
         );
       }),
@@ -69,7 +65,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
 
   SliverList _buildRiwayatListData() {
     return SliverList.separated(
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      separatorBuilder: (context, index) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final isAyatMode = controller.filterMode.value == 'ayat';
         final items = isAyatMode
@@ -81,7 +77,9 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
             padding: EdgeInsets.all(16.0),
             child: Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B46C1)),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Colors.deepPurpleAccent,
+                ),
               ),
             ),
           );
@@ -116,10 +114,10 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                 color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.book_outlined,
                 size: 48,
-                color: Colors.deepPurpleAccent,
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 16),
@@ -128,7 +126,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: Colors.grey[700],
               ),
             ),
             const SizedBox(height: 8),
@@ -149,7 +147,9 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B46C1)),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Colors.deepPurpleAccent,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -166,42 +166,10 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
     );
   }
 
-  SliverToBoxAdapter _buildTotalSetoran() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: Skeletonizer(
-            enabled:
-                controller.isInitialLoading.value ||
-                controller.profilSantri.value == null,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: Text(
-                'Total: ${controller.totalSetoran.value} Setoran',
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.deepPurple[700],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   SliverToBoxAdapter _buildFilter() {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         child: Row(
           children: [
             Expanded(
@@ -508,7 +476,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(11),
                       decoration: BoxDecoration(
                         color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
@@ -518,10 +486,10 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                             ? Icons.auto_stories_rounded
                             : Icons.menu_book_rounded,
                         color: Colors.deepPurpleAccent,
-                        size: 24,
+                        size: 22,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -529,7 +497,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                           Text(
                             title,
                             style: GoogleFonts.poppins(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
                             ),
@@ -578,9 +546,9 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                     ),
                   ],
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(vertical: 10),
-                  child: Divider(height: 1, color: Color(0xFFF1F5F9)),
+                  child: Divider(height: 1, color: Colors.grey[200]),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -608,7 +576,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                         ],
                       ),
                     ),
-                    if (controller.userRole == 'ustadz')
+                    if (AuthService.to.isUstadz)
                       Padding(
                         padding: const EdgeInsets.only(left: 8),
                         child: InkWell(

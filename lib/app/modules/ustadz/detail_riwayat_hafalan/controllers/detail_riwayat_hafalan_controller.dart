@@ -10,11 +10,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailRiwayatHafalanController extends GetxController {
   final isLoading = false.obs;
-  
+
   final santriId = Get.arguments['santriId'];
   final tanggalRiwayat = Get.arguments['tanggalRiwayat'];
   final status = Get.arguments['status'];
-  
+
   final surahId = Get.arguments['surahId'];
   final juzId = Get.arguments['juzId'];
 
@@ -22,6 +22,8 @@ class DetailRiwayatHafalanController extends GetxController {
 
   var detailRiwayatAyat = Rxn<DetailRiwayatAyat>();
   var detailRiwayatHalaman = Rxn<DetailRiwayatHalaman>();
+
+  DateTime? _lastErrorShown;
 
   @override
   void onInit() {
@@ -82,9 +84,14 @@ class DetailRiwayatHafalanController extends GetxController {
         ToastUtils.showErrorToast('Gagal memuat detail riwayat hafalan');
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > const Duration(seconds: 3)) {
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+        _lastErrorShown = now;
+      }
     } finally {
       isLoading.value = false;
     }

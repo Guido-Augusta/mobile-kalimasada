@@ -12,7 +12,6 @@ import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RiwayatHafalanController extends GetxController {
-  String? userRole;
   final santriId = Get.arguments['santriId'];
 
   var filterStatus = 'TambahHafalan'.obs; // TambahHafalan, Murajaah, Tahsin
@@ -24,7 +23,7 @@ class RiwayatHafalanController extends GetxController {
   var riwayatAyatData = <model_ayat.Datum>[].obs;
   var riwayatHalamanData = <model_halaman.Datum>[].obs;
 
-  final int _perPage = 5;
+  final int _perPage = 15;
   var currentPage = 1;
   var hasMore = true.obs;
 
@@ -39,8 +38,6 @@ class RiwayatHafalanController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    userRole = prefs.getString('role');
     _loadInitialData();
     _setupScrollController();
   }
