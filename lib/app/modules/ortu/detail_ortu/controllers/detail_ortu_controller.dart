@@ -8,18 +8,11 @@ import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../data/models/daftar_santri.dart';
+import '../../../../services/auth_service.dart';
 
 class DetailOrtuController extends GetxController {
-  String userRole = '';
-
-  bool get isAdmin => userRole == 'admin';
-  bool get isUstadz => userRole == 'ustadz';
-  bool get isSantri => userRole == 'santri';
-  bool get isOrtu => userRole == 'ortu';
-
   var isLoading = false.obs;
   var isLoadingSantriList = false.obs;
   var isSaveLoading = false.obs;
@@ -44,7 +37,9 @@ class DetailOrtuController extends GetxController {
   void onInit() async {
     super.onInit();
     getOrtuDetail(ortuId!);
-    getSantriList(ortuId!);
+    if (AuthService.to.isAdmin) {
+      getSantriList(ortuId!);
+    }
   }
 
   String getImageUrl(String imageUrl) {
@@ -55,9 +50,7 @@ class DetailOrtuController extends GetxController {
   Future<void> getOrtuDetail(String ortuId) async {
     try {
       isLoading.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      userRole = prefs.getString('role') ?? '';
+      final token = AuthService.to.token;
 
       final response = await http.get(
         Uri.parse(ApiUrl.ortuDetail(ortuId)),
@@ -96,11 +89,9 @@ class DetailOrtuController extends GetxController {
   Future<void> getSantriList(String ortuId) async {
     try {
       isLoadingSantriList.value = true;
+      final token = AuthService.to.token;
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
+      if (token.isEmpty) {
         ToastUtils.showErrorToast('Anda tidak terautentikasi');
         Get.offAllNamed('/login');
         return;
