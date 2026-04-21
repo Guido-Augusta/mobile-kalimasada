@@ -207,6 +207,16 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
   }
 
   Widget _buildUstadzCard(Datum ustadz) {
+    String getGenderLabel(String gender) {
+      if (gender.toLowerCase() == 'l') {
+        return 'Laki-laki';
+      } else if (gender.toLowerCase() == 'p') {
+        return 'Perempuan';
+      } else {
+        return '-';
+      }
+    }
+
     return Card(
       color: Colors.white,
       margin: const EdgeInsets.only(bottom: 12),
@@ -303,9 +313,9 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 2),
                                   Text(
-                                    ustadz.nomorHp ?? '-',
+                                    getGenderLabel(ustadz.jenisKelamin ?? '-'),
                                     style: const TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey,

@@ -302,9 +302,9 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 2),
                                   Text(
-                                    ortu.nomorHp ?? '-',
+                                    ortu.tipe ?? '-',
                                     style: const TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey,

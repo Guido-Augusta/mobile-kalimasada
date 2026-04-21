@@ -891,7 +891,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
             value: santri.user?.email ?? '-',
           ),
 
-          if (controller.isOrtu) ...[
+          if (controller.isOrtu || controller.isAdmin) ...[
             Divider(color: Colors.grey[200], height: 16),
             _buildInfoTile(
               icon: santri.jenisKelamin?.toLowerCase() == 'l'
