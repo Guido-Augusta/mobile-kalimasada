@@ -80,7 +80,9 @@ class EditOrtuController extends GetxController {
         final data = jsonDecode(response.body);
         final ortu = Ortu.fromJson(data['data']);
         ortuDetail.value = ortu;
-        fotoProfil.value = getImageUrl(ortu.fotoProfil!);
+        if (ortu.fotoProfil != null && ortu.fotoProfil!.isNotEmpty) {
+          fotoProfil.value = getImageUrl(ortu.fotoProfil!);
+        }
 
         // Initialize text controllers with current values
         namaC.text = ortuDetail.value!.nama!;

@@ -240,9 +240,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                     ),
                     child: ClipOval(
                       child:
-                          ortu.fotoProfil != null ||
-                              ortu.fotoProfil!.isNotEmpty ||
-                              ortu.fotoProfil! != ''
+                          ortu.fotoProfil != null && ortu.fotoProfil!.isNotEmpty
                           ? CachedNetworkImage(
                               imageUrl: controller.getImageUrl(
                                 ortu.fotoProfil!,

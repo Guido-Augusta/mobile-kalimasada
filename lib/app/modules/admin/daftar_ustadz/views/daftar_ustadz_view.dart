@@ -251,9 +251,8 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
                     ),
                     child: ClipOval(
                       child:
-                          ustadz.fotoProfil != null ||
-                              ustadz.fotoProfil!.isNotEmpty ||
-                              ustadz.fotoProfil! != ''
+                          ustadz.fotoProfil != null &&
+                              ustadz.fotoProfil!.isNotEmpty
                           ? CachedNetworkImage(
                               imageUrl: controller.getImageUrl(
                                 ustadz.fotoProfil!,

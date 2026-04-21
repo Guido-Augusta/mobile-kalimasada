@@ -72,7 +72,9 @@ class EditUstadzController extends GetxController {
         final data = jsonDecode(response.body);
         final ustadz = Ustadz.fromJson(data['data']);
         ustadzDetail.value = ustadz;
-        fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+        if (ustadz.fotoProfil != null && ustadz.fotoProfil!.isNotEmpty) {
+          fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+        }
 
         // Initialize text controllers with current values
         namaC.text = ustadzDetail.value!.nama!;

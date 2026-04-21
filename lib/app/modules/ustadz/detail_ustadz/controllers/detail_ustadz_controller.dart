@@ -51,7 +51,9 @@ class DetailUstadzController extends GetxController {
         final data = jsonDecode(response.body);
         final ustadz = Ustadz.fromJson(data['data']);
         ustadzData.value = ustadz;
-        fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+        if (ustadz.fotoProfil != null && ustadz.fotoProfil!.isNotEmpty) {
+          fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+        }
         namaC.text = ustadz.nama!;
         noHpC.text = ustadz.nomorHp!;
         alamatC.text = ustadz.alamat!;
