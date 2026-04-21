@@ -596,16 +596,12 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: jenisKelamin.toLowerCase() == 'l'
-                    ? Colors.blue.withValues(alpha: 0.1)
-                    : Colors.pink.withValues(alpha: 0.1),
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.person,
-                color: jenisKelamin.toLowerCase() == 'l'
-                    ? Colors.blue
-                    : Colors.pink,
+                color: Colors.deepPurpleAccent,
                 size: 20,
               ),
             ),
@@ -625,23 +621,12 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    noInduk,
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
                   const SizedBox(height: 4),
                   // Badges Row
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
-                      vertical: 4,
+                      vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: _getTahapColor(tahap).withValues(alpha: 0.2),
