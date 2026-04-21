@@ -42,8 +42,8 @@ class AdminHomeView extends GetView<AdminHomeController> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Colors.deepPurpleAccent.withValues(alpha: 0.3),
-              width: 3,
+              color: Colors.deepPurple.withValues(alpha: 0.3),
+              width: 2,
             ),
             boxShadow: [
               BoxShadow(
@@ -54,7 +54,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
             ],
           ),
           child: CircleAvatar(
-            radius: 28,
+            radius: 26,
             backgroundColor: Colors.grey[200],
             child: Text(
               'A',
@@ -87,9 +87,8 @@ class AdminHomeView extends GetView<AdminHomeController> {
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 style: GoogleFonts.poppins(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.deepPurple[800],
                 ),
               ),
             ],
@@ -183,7 +182,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
   Widget _buildWelcomeCard(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
@@ -215,15 +214,6 @@ class AdminHomeView extends GetView<AdminHomeController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Selamat Datang',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
                       'Dashboard Admin',
                       style: GoogleFonts.poppins(
                         fontSize: 20,
@@ -234,11 +224,11 @@ class AdminHomeView extends GetView<AdminHomeController> {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                        horizontal: 12,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
@@ -284,11 +274,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
       children: [
         Text(
           'Kelola Data Pengguna',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.deepPurple[800],
-          ),
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 15),
         // Daftar User (Ustadz/ah, Orang Tua, Santri)
@@ -296,7 +282,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
           context,
           title: 'Daftar Ustadz/ah',
           subtitle: 'Kelola data ustadz/ah',
-          icon: Icons.person_add_alt_1_rounded,
+          icon: Icons.school_outlined,
           onTap: () => Get.toNamed('/daftar-ustadz'),
         ),
         const SizedBox(height: 15),
@@ -304,7 +290,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
           context,
           title: 'Daftar Orang Tua',
           subtitle: 'Kelola data Orang Tua',
-          icon: Icons.family_restroom_rounded,
+          icon: Icons.family_restroom_outlined,
           onTap: () => Get.toNamed('/daftar-ortu'),
         ),
         const SizedBox(height: 15),
@@ -312,18 +298,14 @@ class AdminHomeView extends GetView<AdminHomeController> {
           context,
           title: 'Daftar Santri',
           subtitle: 'Kelola data Santri',
-          icon: Icons.school_outlined,
+          icon: Icons.person_add_alt_1_outlined,
           onTap: () => Get.toNamed('/daftar-santri'),
         ),
 
         const SizedBox(height: 25),
         Text(
           'Fitur Lainnya',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.deepPurple[800],
-          ),
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 15),
         // Al-Qur'an dan Peringkat
@@ -336,7 +318,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -351,7 +333,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
                   child: Column(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.deepPurple.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
@@ -359,10 +341,10 @@ class AdminHomeView extends GetView<AdminHomeController> {
                         child: const Icon(
                           Icons.menu_book_rounded,
                           color: Colors.deepPurple,
-                          size: 32,
+                          size: 26,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 6),
                       Text(
                         'Al-Qur\'an',
                         style: GoogleFonts.poppins(
@@ -393,7 +375,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -408,7 +390,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
                   child: Column(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.orange.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
@@ -416,10 +398,10 @@ class AdminHomeView extends GetView<AdminHomeController> {
                         child: const Icon(
                           Icons.leaderboard_outlined,
                           color: Colors.orange,
-                          size: 32,
+                          size: 26,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 6),
                       Text(
                         'Peringkat',
                         style: GoogleFonts.poppins(
