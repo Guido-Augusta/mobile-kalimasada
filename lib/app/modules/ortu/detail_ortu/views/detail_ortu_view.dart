@@ -348,7 +348,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
           Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
-            icon: Icons.person,
+            icon: Icons.family_restroom_rounded,
             label: 'Peran',
             value: ortu.tipe ?? '-',
           ),
@@ -455,9 +455,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
                 return _buildChildTile(
                   id: santri.id.toString(),
                   nama: santri.nama ?? '-',
-                  noInduk: santri.noInduk ?? '-',
                   tahap: santri.tahapHafalan ?? '-',
-                  jenisKelamin: santri.jenisKelamin ?? '-',
                 );
               },
             );
@@ -572,9 +570,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
   Widget _buildChildTile({
     required String id,
     required String nama,
-    required String noInduk,
     required String tahap,
-    required String jenisKelamin,
   }) {
     return GestureDetector(
       onTap: () {
