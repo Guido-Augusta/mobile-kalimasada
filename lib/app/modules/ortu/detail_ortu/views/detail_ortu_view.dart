@@ -115,7 +115,6 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
                 onPressed: () => Get.back(),
               ),
             ),
-
             expandedHeight: 230,
             pinned: false,
             backgroundColor: Colors.transparent,

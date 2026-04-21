@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,26 +13,42 @@ import '../controllers/detail_ustadz_controller.dart';
 
 class DetailUstadzView extends GetView<DetailUstadzController> {
   const DetailUstadzView({super.key});
+  Ustadz get _dummyUstadz => Ustadz(
+    id: 0,
+    userId: 0,
+    nama: 'Loading Name Placeholder',
+    nomorHp: '081234567890',
+    alamat: 'Jl. Contoh Alamat No. 123',
+    jenisKelamin: 'L',
+    fotoProfil: '',
+    waliKelasTahap: 'Level1',
+    user: User(
+      id: 0,
+      email: 'placeholder@email.com',
+      password: '',
+      role: '',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Obx(
       () => Scaffold(
         backgroundColor: const Color(0xFFF1F5F9),
-        appBar: controller.ustadzData.value == null
+        appBar:
+            (!controller.isLoading.value && controller.ustadzData.value == null)
             ? AppBar(
                 title: const Text(
                   'Detail Ustadz/ah',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 centerTitle: true,
-                backgroundColor: Colors.deepPurpleAccent,
+                backgroundColor: const Color(0xFFF1F5F9),
                 elevation: 0,
                 leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () => Get.back(),
                 ),
               )
@@ -41,7 +58,10 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
 
           // Loading
           if (controller.isLoading.value) {
-            return _buildLoadingState();
+            return Skeletonizer(
+              enabled: true,
+              child: _buildContent(_dummyUstadz),
+            );
           }
           // Data kosong
           if (ustadz == null) {
@@ -53,160 +73,164 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
             );
           }
 
-          return RefreshIndicator(
-            onRefresh: () async {
-              controller.fetchUstadzData(isRefresh: false);
-            },
-            child: CustomScrollView(
-              slivers: [
-                // Custom App Bar with Gradient Background
-                SliverAppBar(
-                  centerTitle: true,
-                  foregroundColor: Colors.white,
-                  title: Text(
-                    ustadz.jenisKelamin?.toLowerCase() == 'l'
-                        ? 'Detail Ustadz'
-                        : 'Detail Ustazah',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  expandedHeight: 250,
-                  pinned: false,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.deepPurpleAccent,
-                            Colors.deepPurple[700]!,
-                          ],
-                        ),
-                      ),
-                      child: SafeArea(
-                        child: Column(
-                          children: [
-                            // Profile Section
-                            const SizedBox(height: 40),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Profile Picture
-                                  Container(
-                                    width: 120,
-                                    height: 120,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 4,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(
-                                            alpha: 0.2,
-                                          ),
-                                          blurRadius: 20,
-                                          offset: const Offset(0, 8),
-                                        ),
-                                      ],
-                                    ),
-                                    child: ClipOval(
-                                      child: CachedNetworkImage(
-                                        imageUrl: controller.getImageUrl(
-                                          controller.fotoProfil.value,
-                                        ),
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) =>
-                                            Container(
-                                              color: Colors.grey[300],
-                                              child: const Icon(
-                                                Icons.person,
-                                                size: 40,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                        errorWidget: (context, url, error) =>
-                                            Container(
-                                              color: Colors.grey[300],
-                                              child: const Icon(
-                                                Icons.person,
-                                                size: 40,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 16),
-
-                                  // Name
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    child: Text(
-                                      ustadz.nama ?? 'Nama tidak tersedia',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Main Content
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      // Personal Information
-                      _buildPersonalInfoSection(ustadz),
-                      const SizedBox(height: 50), // Space for bottom buttons
-                    ]),
-                  ),
-                ),
-              ],
-            ),
-          );
+          return _buildContent(ustadz);
         }),
       ),
     );
   }
 
-  Center _buildLoadingState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(),
-          SizedBox(height: 16),
-          Text(
-            'Loading...',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
+  RefreshIndicator _buildContent(Ustadz ustadz) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        controller.fetchUstadzData(isRefresh: false);
+      },
+      child: CustomScrollView(
+        slivers: [
+          // Custom App Bar with Gradient Background
+          SliverAppBar(
+            centerTitle: true,
+            title: Skeletonizer(
+              enabled: controller.isLoading.value,
+              effect: ShimmerEffect(
+                baseColor: Colors.white.withValues(alpha: 0.2),
+                highlightColor: Colors.white.withValues(alpha: 0.4),
+              ),
+              child: Text(
+                ustadz.jenisKelamin?.toLowerCase() == 'l'
+                    ? 'Detail Ustadz'
+                    : 'Detail Ustadzah',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            leading: Skeletonizer(
+              enabled: controller.isLoading.value,
+              effect: ShimmerEffect(
+                baseColor: Colors.white.withValues(alpha: 0.2),
+                highlightColor: Colors.white.withValues(alpha: 0.4),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Get.back(),
+              ),
+            ),
+            expandedHeight: 230,
+            pinned: false,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
+                  ),
+                ),
+                child: Skeletonizer(
+                  enabled: controller.isLoading.value,
+                  effect: ShimmerEffect(
+                    baseColor: Colors.white.withValues(alpha: 0.2),
+                    highlightColor: Colors.white.withValues(alpha: 0.4),
+                  ),
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        // Profile Section
+                        const SizedBox(height: 40),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Profile Picture
+                              Container(
+                                width: 110,
+                                height: 110,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 4,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.2,
+                                      ),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 8),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipOval(
+                                  child: CachedNetworkImage(
+                                    imageUrl: controller.getImageUrl(
+                                      controller.fotoProfil.value,
+                                    ),
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(
+                                      color: Colors.grey[300],
+                                      child: const Icon(
+                                        Icons.person,
+                                        size: 40,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                          color: Colors.grey[300],
+                                          child: const Icon(
+                                            Icons.person,
+                                            size: 40,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 16),
+
+                              // Name
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                child: Text(
+                                  ustadz.nama ?? 'Nama tidak tersedia',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Main Content
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                // Personal Information
+                _buildPersonalInfoSection(ustadz),
+                const SizedBox(height: 50), // Space for bottom buttons
+              ]),
             ),
           ),
         ],
@@ -244,7 +268,8 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
               'Data ustadz tidak ditemukan',
               style: GoogleFonts.poppins(
                 fontSize: 16,
-                fontWeight: FontWeight.w500,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
@@ -278,7 +303,7 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
           Text(
             'Informasi Pribadi',
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -287,20 +312,20 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
 
           _buildInfoTile(
             icon: Icons.email_rounded,
-            label: 'email',
+            label: 'Email',
             value: ustadz.user?.email ?? '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.phone,
             label: 'No. Telepon',
             value: ustadz.nomorHp ?? '-',
-            telepon: ustadz.nomorHp,
+            telepon: controller.isLoading.value ? null : ustadz.nomorHp,
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: ustadz.jenisKelamin?.toLowerCase() == 'l'
@@ -312,21 +337,21 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
                 : 'Perempuan',
           ),
 
-          if (ustadz.waliKelasTahap != null) const SizedBox(height: 12),
-
-          if (ustadz.waliKelasTahap != null)
+          if (ustadz.waliKelasTahap != null) ...[
+            Divider(color: Colors.grey[200], height: 16),
             _buildInfoTile(
               icon: FontAwesomeIcons.school,
               label: 'Penanggung Jawab Kelas',
               value: _getTahapLabel(ustadz.waliKelasTahap ?? ''),
             ),
+          ],
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.location_on,
             label: 'Alamat',
-            value: ustadz.alamat ?? 'Tidak ada data',
+            value: ustadz.alamat ?? '-',
           ),
         ],
       ),
@@ -340,11 +365,7 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
     String? telepon,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       child: Row(
         children: [
           Container(

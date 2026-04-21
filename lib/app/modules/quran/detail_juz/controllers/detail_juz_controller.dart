@@ -6,8 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_juz.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
+
+import '../../../../services/auth_service.dart';
 
 class DetailJuzController extends GetxController {
   RxBool isLoading = false.obs;
@@ -28,9 +29,7 @@ class DetailJuzController extends GetxController {
   void getDetailJuz() async {
     try {
       isLoading.value = true;
-      await Future.delayed(Duration(seconds: 2));
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      final token = AuthService.to.token;
 
       final response = await http
           .get(

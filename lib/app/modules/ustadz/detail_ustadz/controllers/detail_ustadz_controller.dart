@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../data/constants/api_url.dart';
 import '../../../../data/models/ustadz.dart';
+import '../../../../services/auth_service.dart';
 import '../../../../utils/toast_utils.dart';
 
 class DetailUstadzController extends GetxController {
@@ -36,8 +36,7 @@ class DetailUstadzController extends GetxController {
   Future<void> fetchUstadzData({bool isRefresh = true}) async {
     try {
       isLoading.value = isRefresh;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      final token = AuthService.to.token;
 
       final response = await http.get(
         Uri.parse(ApiUrl.ustadzDetail(ustadzId)),
