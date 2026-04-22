@@ -4,13 +4,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 
 import '../../../../data/constants/api_url.dart';
 import '../../../../data/models/daftar_ortu.dart';
 import '../../../../utils/toast_utils.dart';
 
 class DaftarOrtuController extends GetxController {
+  final token = AuthService.to.token.value;
+
   final isLoading = false.obs;
   final isSaveLoading = false.obs;
   final isLoadingDeleteAccount = false.obs;
@@ -68,10 +70,7 @@ class DaftarOrtuController extends GetxController {
       isLoading.value = true;
       resetPagination();
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
+      if (token.isEmpty) {
         ToastUtils.showErrorToast('Anda tidak terautentikasi');
         Get.offAllNamed('/login');
         return;
@@ -130,10 +129,7 @@ class DaftarOrtuController extends GetxController {
       isLoadingMore.value = true;
       currentPage++;
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
+      if (token.isEmpty) {
         ToastUtils.showErrorToast('Anda tidak terautentikasi');
         Get.offAllNamed('/login');
         return;
@@ -188,8 +184,6 @@ class DaftarOrtuController extends GetxController {
 
   void deleteOrtuAccount(String ortuId) async {
     isLoadingDeleteAccount.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
     try {
       final response = await http
           .delete(

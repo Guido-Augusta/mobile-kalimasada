@@ -13,11 +13,11 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF1F5F9),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Daftar Ustadz/ah',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 18),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         centerTitle: true,
         backgroundColor: const Color(0xFFF1F5F9),

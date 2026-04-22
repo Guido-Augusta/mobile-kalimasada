@@ -13,7 +13,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF1F5F9),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         title: const Text(
           'Daftar Orang Tua',
@@ -100,19 +100,18 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
     );
   }
 
-  Padding _buildSearchBar() {
+  Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey[200]!,
-              spreadRadius: 2,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -122,12 +121,18 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
             onChanged: (value) {
               controller.searchQuery.value = value;
             },
+            style: GoogleFonts.poppins(fontSize: 14),
             decoration: InputDecoration(
               hintText: 'Cari orang tua...',
-              prefixIcon: const Icon(Icons.search, color: Colors.grey),
+              hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+              prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[400]),
               suffixIcon: controller.searchQuery.value.isNotEmpty
                   ? IconButton(
-                      icon: const Icon(Icons.clear_rounded, color: Colors.grey),
+                      icon: Icon(
+                        Icons.clear_rounded,
+                        color: Colors.grey[400],
+                        size: 20,
+                      ),
                       onPressed: () {
                         controller.searchQuery.value = '';
                         controller.searchController.clear();
@@ -136,7 +141,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                   : null,
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
-                vertical: 16,
+                vertical: 14,
                 horizontal: 20,
               ),
             ),
@@ -155,7 +160,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
         const SizedBox(height: 16),
         Text(
           'Tidak ada data orang tua',
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             color: Colors.grey[600],
             fontSize: 18,
             fontWeight: FontWeight.w500,
@@ -168,7 +173,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                     controller.ortuList.isEmpty
                 ? 'Orang tua tidak ditemukan'
                 : 'Tarik ke bawah untuk refresh',
-            style: TextStyle(color: Colors.grey[500], fontSize: 14),
+            style: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 14),
           ),
         ),
       ],
@@ -192,13 +197,13 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: 100),
-          CircularProgressIndicator(
+          const CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Memuat data...',
-            style: TextStyle(color: Colors.grey, fontSize: 16),
+            style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
           ),
         ],
       ),
@@ -206,154 +211,177 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
   }
 
   Widget _buildOrtuCard(Datum ortu) {
-    return Card(
-      color: Colors.white,
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 3,
-      shadowColor: Colors.grey.withValues(alpha: 0.1),
-      child: InkWell(
-        onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-          Get.toNamed(
-            '/detail-ortu',
-            arguments: {'ortuId': ortu.id.toString()},
-          );
-        },
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Profile Picture
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.grey[200],
-                      border: Border.all(color: Colors.grey[300]!, width: 2),
-                    ),
-                    child: ClipOval(
-                      child:
-                          ortu.fotoProfil != null && ortu.fotoProfil!.isNotEmpty
-                          ? CachedNetworkImage(
-                              imageUrl: controller.getImageUrl(
-                                ortu.fotoProfil!,
-                              ),
-                              fit: BoxFit.cover,
-                              width: 60,
-                              height: 60,
-                              placeholder: (context, url) => Icon(
-                                Icons.person,
-                                size: 30,
-                                color: Colors.grey[400],
-                              ),
-                              errorWidget: (context, url, error) => Icon(
-                                Icons.person,
-                                size: 30,
-                                color: Colors.grey[400],
-                              ),
-                            )
-                          : Icon(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            Get.toNamed(
+              '/detail-ortu',
+              arguments: {'ortuId': ortu.id.toString()},
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: [
+                // Profile Picture
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.grey[50],
+                    border: Border.all(color: Colors.grey[100]!, width: 2),
+                  ),
+                  child: ClipOval(
+                    child:
+                        ortu.fotoProfil != null && ortu.fotoProfil!.isNotEmpty
+                        ? CachedNetworkImage(
+                            imageUrl: controller.getImageUrl(ortu.fotoProfil!),
+                            fit: BoxFit.cover,
+                            width: 56,
+                            height: 56,
+                            placeholder: (context, url) => Icon(
                               Icons.person,
-                              size: 30,
+                              size: 28,
                               color: Colors.grey[400],
                             ),
-                    ),
+                            errorWidget: (context, url, error) => Icon(
+                              Icons.person,
+                              size: 28,
+                              color: Colors.grey[400],
+                            ),
+                          )
+                        : Icon(Icons.person, size: 28, color: Colors.grey[400]),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Nama, No HP, Email
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    ortu.nama ?? 'Nama tidak tersedia',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    ortu.user?.email ?? '-',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    ortu.tipe ?? '-',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            PopupMenuButton(
-                              itemBuilder: (context) => [
-                                PopupMenuItem(
-                                  value: 'edit',
-                                  child: const Text('Edit'),
-                                  onTap: () {
-                                    Get.toNamed(
-                                      '/edit-ortu',
-                                      arguments: {'ortuId': ortu.id.toString()},
-                                    );
-                                  },
-                                ),
-                                PopupMenuItem(
-                                  value: 'delete',
-                                  child: const Text('Hapus'),
-                                  onTap: () {
-                                    _showDeleteAccountDialog(context, ortu);
-                                  },
-                                ),
-                              ],
-                              onSelected: (value) {},
-                              color: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              popUpAnimationStyle: const AnimationStyle(
-                                curve: Curves.easeInOut,
-                                duration: Duration(milliseconds: 150),
-                              ),
-                              style: ButtonStyle(
-                                visualDensity: VisualDensity.compact,
-                              ),
-                            ),
-                          ],
+                ),
+                const SizedBox(width: 14),
+
+                // Info Section
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        ortu.nama ?? 'Nama tidak tersedia',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
                         ),
-                      ],
-                    ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        ortu.user?.email ?? '-',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        ortu.tipe ?? '-',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: Colors.grey[500],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ],
+                ),
+
+                // Admin Menu Actions
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    Icons.more_vert_rounded,
+                    color: Colors.grey[400],
+                    size: 22,
+                  ),
+                  padding: EdgeInsets.zero,
+                  surfaceTintColor: Colors.transparent,
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  offset: const Offset(0, 40),
+                  elevation: 4,
+                  shadowColor: Colors.black.withValues(alpha: 0.2),
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.edit_outlined,
+                            size: 18,
+                            color: Colors.orange[600],
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Edit Profil',
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.delete_outline_rounded,
+                            size: 18,
+                            color: Colors.red[600],
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Hapus Akun',
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      Get.toNamed(
+                        '/edit-ortu',
+                        arguments: {'ortuId': ortu.id.toString()},
+                      );
+                    } else if (value == 'delete') {
+                      _showDeleteAccountDialog(Get.context!, ortu);
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -364,27 +392,68 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
     return showDialog(
       context: context,
       builder: (context) {
+        String roleLabel = 'akun';
+        if (ortu.tipe?.toLowerCase() == 'ayah') {
+          roleLabel = 'akun Ayah';
+        } else if (ortu.tipe?.toLowerCase() == 'ibu') {
+          roleLabel = 'akun Ibu';
+        } else if (ortu.tipe?.toLowerCase() == 'wali') {
+          roleLabel = 'akun Wali';
+        }
+
         return AlertDialog(
           backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
-          title: Text(
-            'Hapus Akun',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          title: Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.red[600]),
+              const SizedBox(width: 10),
+              Text(
+                'Konfirmasi Hapus',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18,
+                ),
+              ),
+            ],
           ),
-          content: Text(
-            'Apakah anda yakin ingin menghapus akun ${ortu.user?.email ?? 'ini'}?',
-            style: GoogleFonts.poppins(),
+          content: Text.rich(
+            TextSpan(
+              text: 'Apakah anda yakin ingin menghapus $roleLabel ',
+              children: [
+                TextSpan(
+                  text: (ortu.nama?.isNotEmpty ?? false) ? ortu.nama : 'ini',
+                  style: TextStyle(
+                    fontWeight: (ortu.nama?.isNotEmpty ?? false)
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    color: (ortu.nama?.isNotEmpty ?? false)
+                        ? Colors.black87
+                        : null,
+                  ),
+                ),
+                const TextSpan(text: '? Tindakan ini tidak dapat dibatalkan.'),
+              ],
+            ),
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: Colors.grey[700],
+              height: 1.5,
+            ),
           ),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           actions: [
             TextButton(
-              onPressed: () {
-                Get.back();
-              },
+              onPressed: () => Get.back(),
               child: Text(
-                'Tidak',
-                style: GoogleFonts.poppins(color: Colors.grey[600]),
+                'Batal',
+                style: GoogleFonts.poppins(
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             const SizedBox(width: 4),
@@ -396,28 +465,29 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                         controller.deleteOrtuAccount(ortu.id!.toString());
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Colors.red[600],
                   foregroundColor: Colors.white,
+                  elevation: 0,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
-                    vertical: 8,
+                    vertical: 10,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
                 child: controller.isLoadingDeleteAccount.value
                     ? const SizedBox(
-                        width: 16,
-                        height: 16,
+                        width: 20,
+                        height: 20,
                         child: CircularProgressIndicator(
-                          strokeWidth: 1,
+                          strokeWidth: 2,
                           color: Colors.white,
                         ),
                       )
                     : Text(
-                        'Ya',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                        'Hapus Akun',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
                       ),
               ),
             ),

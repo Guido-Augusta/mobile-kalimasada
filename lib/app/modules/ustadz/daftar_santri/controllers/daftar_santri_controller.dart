@@ -4,13 +4,13 @@ import 'package:get/get.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart' as ds;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../../../../services/auth_service.dart';
+
 class DaftarSantriController extends GetxController {
-  var userRole = ''.obs;
-  bool get isAdmin => userRole.value == 'admin';
+  final token = AuthService.to.token.value;
 
   final isLoading = false.obs;
   final isLoadingDeleteAccount = false.obs;
@@ -35,7 +35,6 @@ class DaftarSantriController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getUserRole();
     fetchData();
     setupScrollController();
 
@@ -48,11 +47,6 @@ class DaftarSantriController extends GetxController {
   void onClose() {
     scrollController.dispose();
     super.onClose();
-  }
-
-  Future<void> getUserRole() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    userRole.value = prefs.getString('role') ?? '';
   }
 
   void resetPagination() {
@@ -76,10 +70,7 @@ class DaftarSantriController extends GetxController {
       isLoading.value = true;
       resetPagination();
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
+      if (token.isEmpty) {
         ToastUtils.showErrorToast('Anda tidak terautentikasi');
         Get.offAllNamed('/login');
         return;
@@ -150,10 +141,7 @@ class DaftarSantriController extends GetxController {
       isLoadingMore.value = true;
       currentPage++;
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
+      if (token.isEmpty) {
         ToastUtils.showErrorToast('Anda tidak terautentikasi');
         Get.offAllNamed('/login');
         return;
@@ -211,8 +199,6 @@ class DaftarSantriController extends GetxController {
 
   void deleteSantriAccount(String santriId) async {
     isLoadingDeleteAccount.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
     try {
       final response = await http
           .delete(

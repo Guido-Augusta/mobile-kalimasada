@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart';
+import '../../../../services/auth_service.dart';
 import '../controllers/daftar_santri_controller.dart';
 
 class DaftarSantriView extends GetView<DaftarSantriController> {
@@ -11,7 +12,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF1F5F9),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         title: const Text(
           'Daftar Santri',
@@ -32,7 +33,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
         ],
       ),
       floatingActionButton: Obx(() {
-        if (!controller.isAdmin) {
+        if (AuthService.to.isAdmin) {
           return const SizedBox.shrink();
         }
         return Padding(
@@ -103,7 +104,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                       return _buildLoadMoreIndicator();
                     }
                     final santri = controller.santriList[index];
-                    if (controller.isAdmin) {
+                    if (AuthService.to.isAdmin) {
                       return _buildSantriCardForAdmin(santri);
                     } else {
                       return _buildSantriCard(santri);
