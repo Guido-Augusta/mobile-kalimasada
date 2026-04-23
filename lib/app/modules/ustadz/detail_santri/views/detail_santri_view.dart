@@ -51,7 +51,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                 controller.santriDetail.value == null)
             ? AppBar(
                 title: Text(
-                  'Detail Santri',
+                  'Profil Santri',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 centerTitle: true,

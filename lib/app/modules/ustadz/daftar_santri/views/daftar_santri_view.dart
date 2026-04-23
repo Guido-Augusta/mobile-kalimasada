@@ -33,7 +33,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
         ],
       ),
       floatingActionButton: Obx(() {
-        if (AuthService.to.isAdmin) {
+        if (!AuthService.to.isAdmin) {
           return const SizedBox.shrink();
         }
         return Padding(

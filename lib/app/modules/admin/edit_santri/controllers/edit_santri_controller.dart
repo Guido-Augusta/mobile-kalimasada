@@ -284,7 +284,6 @@ class EditSantriController extends GetxController {
         if (Get.isRegistered<DaftarSantriController>()) {
           await Get.find<DaftarSantriController>().fetchData();
         }
-        Get.back();
         ToastUtils.showSuccessToast('Profil berhasil diperbarui');
       } else {
         ToastUtils.showErrorToast('Gagal memperbarui data profil');

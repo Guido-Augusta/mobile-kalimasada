@@ -16,11 +16,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
       appBar: AppBar(
         title: Text(
           'Riwayat Hafalan',
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         elevation: 0,

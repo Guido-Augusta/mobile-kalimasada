@@ -50,7 +50,10 @@ class EditSantriView extends GetView<EditSantriController> {
               slivers: [
                 // Main Content
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       Form(
@@ -63,7 +66,7 @@ class EditSantriView extends GetView<EditSantriController> {
                               'Perbarui Data Profil',
                               style: GoogleFonts.poppins(
                                 fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -86,7 +89,7 @@ class EditSantriView extends GetView<EditSantriController> {
 
                             // Parents Information
                             _buildSectionContainer(
-                              title: 'Data Orang Tua / Wali',
+                              title: 'Data Orang Tua/Wali',
                               icon: Icons.family_restroom_rounded,
                               child: _buildEditParentsSection(),
                             ),
@@ -292,7 +295,7 @@ class EditSantriView extends GetView<EditSantriController> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Minimal satu orang tua / wali wajib dipilih.',
+                  'Minimal satu orang tua/wali harus diisi.',
                   style: GoogleFonts.poppins(
                     fontSize: 12,
                     color: Colors.orange[900],
@@ -543,7 +546,7 @@ class EditSantriView extends GetView<EditSantriController> {
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: 14,
+                        vertical: 12,
                       ),
                     ),
                   ),
@@ -708,7 +711,7 @@ class EditSantriView extends GetView<EditSantriController> {
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
-                vertical: 14,
+                vertical: 12,
               ),
             ),
           ),
@@ -736,7 +739,7 @@ class EditSantriView extends GetView<EditSantriController> {
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical: 14,
+                  vertical: 12,
                 ),
               ),
             ),
@@ -887,7 +890,7 @@ class EditSantriView extends GetView<EditSantriController> {
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Colors.red),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     );
   }
 }
