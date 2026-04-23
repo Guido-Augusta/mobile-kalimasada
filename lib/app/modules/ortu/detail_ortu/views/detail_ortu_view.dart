@@ -46,7 +46,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
             ? AppBar(
                 title: const Text(
                   'Detail Orang Tua',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 centerTitle: true,
                 backgroundColor: const Color(0xFFF1F5F9),

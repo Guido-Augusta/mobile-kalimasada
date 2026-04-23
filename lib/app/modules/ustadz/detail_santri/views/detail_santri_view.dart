@@ -52,10 +52,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
             ? AppBar(
                 title: Text(
                   'Detail Santri',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 centerTitle: true,
                 backgroundColor: const Color(0xFFF1F5F9),
