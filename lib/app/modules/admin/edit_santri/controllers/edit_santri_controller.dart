@@ -57,13 +57,7 @@ class EditSantriController extends GetxController {
     id: 0,
     userId: 0,
     nama: 'Loading...',
-    noInduk: 'Loading...',
-    nomorHp: 'Loading...',
-    alamat: 'Loading...',
-    jenisKelamin: 'L',
-    tanggalLahir: DateTime.now(),
     tahapHafalan: '',
-    fotoProfil: '',
     orangTua: [],
     totalPoin: 0,
     peringkat: 0,
@@ -114,17 +108,9 @@ class EditSantriController extends GetxController {
         final data = jsonDecode(response.body);
         final santri = Santri.fromJson(data['data']);
         santriDetail.value = santri;
-        fotoProfil.value = getImageUrl(santri.fotoProfil!);
 
         // Initialize text controllers with current values
         namaC.text = santriDetail.value!.nama!;
-        noIndukC.text = santriDetail.value!.noInduk!;
-        noHpC.text = santriDetail.value!.nomorHp!;
-        alamatC.text = santriDetail.value!.alamat!;
-        jenisKelaminC.text = santriDetail.value!.jenisKelamin!;
-        tanggalLahirC = TextEditingController(
-          text: formatDateToDisplay(santriDetail.value!.tanggalLahir!),
-        );
         tahapHafalanC.text = santriDetail.value!.tahapHafalan!;
 
         emailC.text = santriDetail.value!.user!.email!;
@@ -350,35 +336,6 @@ class EditSantriController extends GetxController {
     }
   }
 
-  // Function to show date picker
-  Future<void> selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: tanggalLahirC.text.isNotEmpty
-          ? DateTime.parse(convertDisplayToApiFormat(tanggalLahirC.text))
-          : santriDetail.value!.tanggalLahir!,
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.deepPurple,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null && picked != santriDetail.value!.tanggalLahir) {
-      tanggalLahirC.text = formatDateToDisplay(picked);
-    }
-  }
-
   Future<void> updateProfileSantri(
     String? nama,
     String? noInduk,
@@ -394,12 +351,6 @@ class EditSantriController extends GetxController {
     try {
       bool hasNoChange =
           (nama == santriDetail.value?.nama &&
-          noInduk == santriDetail.value?.noInduk &&
-          noHp == santriDetail.value?.nomorHp &&
-          alamat == santriDetail.value?.alamat &&
-          jenisKelamin == santriDetail.value?.jenisKelamin &&
-          tanggalLahir ==
-              formatDateToDisplay(santriDetail.value!.tanggalLahir!) &&
           tahapHafalan == santriDetail.value?.tahapHafalan &&
           selectedAyah?.id ==
               getOrangTuaIdByTipe(santriDetail.value!.orangTua, 'Ayah') &&
@@ -443,14 +394,6 @@ class EditSantriController extends GetxController {
             },
             body: jsonEncode({
               'nama': nama ?? santriDetail.value?.nama,
-              'noInduk': noInduk ?? santriDetail.value?.noInduk,
-              'nomorHp': noHp ?? santriDetail.value?.nomorHp,
-              'alamat': alamat ?? santriDetail.value?.alamat,
-              'jenisKelamin': jenisKelamin ?? santriDetail.value?.jenisKelamin,
-              'tanggalLahir': convertDisplayToApiFormat(
-                tanggalLahir ??
-                    formatDateToDisplay(santriDetail.value!.tanggalLahir!),
-              ),
               'tahapHafalan': tahapHafalan ?? santriDetail.value?.tahapHafalan,
               'ortuId': listIdOrtu,
             }),

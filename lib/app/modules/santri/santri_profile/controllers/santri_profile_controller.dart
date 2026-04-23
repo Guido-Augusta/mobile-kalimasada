@@ -100,7 +100,6 @@ class SantriProfileController extends GetxController {
         final data = jsonDecode(response.body);
         final santri = Santri.fromJson(data['data']);
         santriDetail.value = santri;
-        fotoProfil.value = getImageUrl(santri.fotoProfil!);
         if (kDebugMode) {
           print('Santri detail loaded: ${santri.nama}');
         }
@@ -220,12 +219,7 @@ class SantriProfileController extends GetxController {
   ) async {
     try {
       isSaveLoading.value = true;
-      bool hasNoChange =
-          (nama == santriDetail.value?.nama &&
-          noHp == santriDetail.value?.nomorHp &&
-          alamat == santriDetail.value?.alamat &&
-          jenisKelamin == santriDetail.value?.jenisKelamin &&
-          tanggalLahir == formatDate(santriDetail.value!.tanggalLahir!));
+      bool hasNoChange = (nama == santriDetail.value?.nama);
 
       if (hasNoChange) {
         final now = DateTime.now();
@@ -248,15 +242,7 @@ class SantriProfileController extends GetxController {
               'Authorization': 'Bearer $token',
               'x-platform': 'mobile',
             },
-            body: jsonEncode({
-              'nama': nama ?? santriDetail.value?.nama,
-              'nomorHp': noHp ?? santriDetail.value?.nomorHp,
-              'alamat': alamat ?? santriDetail.value?.alamat,
-              'jenisKelamin': jenisKelamin ?? santriDetail.value?.jenisKelamin,
-              'tanggalLahir': convertDisplayToApiFormat(
-                tanggalLahir ?? formatDate(santriDetail.value!.tanggalLahir!),
-              ),
-            }),
+            body: jsonEncode({'nama': nama ?? santriDetail.value?.nama}),
           )
           .timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {

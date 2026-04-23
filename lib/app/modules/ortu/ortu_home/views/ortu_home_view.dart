@@ -360,32 +360,11 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                             color: Colors.grey[200],
                           ),
                           child: ClipOval(
-                            child:
-                                child.fotoProfil != null &&
-                                    child.fotoProfil!.isNotEmpty
-                                ? CachedNetworkImage(
-                                    imageUrl: controller.getImageUrl(
-                                      child.fotoProfil!,
-                                    ),
-                                    fit: BoxFit.cover,
-                                    width: 60,
-                                    height: 60,
-                                    placeholder: (context, url) => Icon(
-                                      Icons.person,
-                                      size: 30,
-                                      color: Colors.grey[400],
-                                    ),
-                                    errorWidget: (context, url, error) => Icon(
-                                      Icons.person,
-                                      size: 30,
-                                      color: Colors.grey[400],
-                                    ),
-                                  )
-                                : Icon(
-                                    Icons.person,
-                                    size: 30,
-                                    color: Colors.grey[400],
-                                  ),
+                            child: Icon(
+                              Icons.person,
+                              size: 30,
+                              color: Colors.grey[400],
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -406,101 +385,31 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 6),
-                              // Badges Row
-                              Wrap(
-                                spacing: 6,
-                                runSpacing: 6,
-                                children: [
-                                  // Level Badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: _getTahapColor(
-                                        child.tahapHafalan,
-                                      ).withValues(alpha: 0.2),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: _getTahapColor(
-                                          child.tahapHafalan,
-                                        ).withValues(alpha: 0.3),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      _getTahapLabel(child.tahapHafalan),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: _getTahapColor(
-                                          child.tahapHafalan,
-                                        ),
-                                      ),
-                                    ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: _getTahapColor(
+                                    child.tahapHafalan,
+                                  ).withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: _getTahapColor(
+                                      child.tahapHafalan,
+                                    ).withValues(alpha: 0.3),
+                                    width: 1,
                                   ),
-                                  // Gender Badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          child.jenisKelamin?.toLowerCase() ==
-                                              'l'
-                                          ? Colors.blue.withValues(alpha: 0.1)
-                                          : Colors.pink.withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color:
-                                            child.jenisKelamin?.toLowerCase() ==
-                                                'l'
-                                            ? Colors.blue.withValues(alpha: 0.2)
-                                            : Colors.pink.withValues(
-                                                alpha: 0.2,
-                                              ),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          child.jenisKelamin?.toLowerCase() ==
-                                                  'l'
-                                              ? Icons.male
-                                              : Icons.female,
-                                          size: 14,
-                                          color:
-                                              child.jenisKelamin
-                                                      ?.toLowerCase() ==
-                                                  'l'
-                                              ? Colors.blue
-                                              : Colors.pink,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          child.jenisKelamin?.toLowerCase() ==
-                                                  'l'
-                                              ? 'Laki-laki'
-                                              : 'Perempuan',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color:
-                                                child.jenisKelamin
-                                                        ?.toLowerCase() ==
-                                                    'l'
-                                                ? Colors.blue
-                                                : Colors.pink,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                ),
+                                child: Text(
+                                  _getTahapLabel(child.tahapHafalan),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: _getTahapColor(child.tahapHafalan),
                                   ),
-                                ],
+                                ),
                               ),
                             ],
                           ),

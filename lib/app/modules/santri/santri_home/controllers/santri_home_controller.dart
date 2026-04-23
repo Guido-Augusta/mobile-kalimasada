@@ -17,9 +17,6 @@ class SantriHomeController extends GetxController {
   var isLoadingChart = true.obs;
   var isChartError = false.obs;
   var isLoadingLogout = false.obs;
-  var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
-          .obs;
 
   var santri = Rxn<s.Santri>();
   var chart = Rxn<c.Chart>();
@@ -69,7 +66,6 @@ class SantriHomeController extends GetxController {
       if (response.statusCode == 200) {
         getChart();
         santri.value = s.Santri.fromJson(data['data']);
-        fotoProfil.value = getImageUrl(santri.value!.fotoProfil!);
       } else {
         ToastUtils.showErrorToast('Gagal mendapatkan data');
       }

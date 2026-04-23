@@ -1,9 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
 
 import '../../../ortu/detail_ortu/controllers/detail_ortu_controller.dart';
@@ -138,82 +135,36 @@ class SantriProfileView extends GetView<SantriProfileController> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  // Profile Picture with Border and Shadow
-                                  Stack(
-                                    children: [
-                                      Container(
-                                        width: 110,
-                                        height: 110,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 4,
+                                  // Profile Picture
+                                  Container(
+                                    width: 110,
+                                    height: 110,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 4,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.2,
                                           ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(
-                                                alpha: 0.2,
-                                              ),
-                                              blurRadius: 20,
-                                              offset: const Offset(0, 8),
-                                            ),
-                                          ],
+                                          blurRadius: 20,
+                                          offset: const Offset(0, 8),
                                         ),
-                                        child: ClipOval(
-                                          child: CachedNetworkImage(
-                                            imageUrl: controller.getImageUrl(
-                                              controller.fotoProfil.value,
-                                            ),
-                                            fit: BoxFit.cover,
-                                            placeholder: (context, url) =>
-                                                Container(
-                                                  color: Colors.grey[300],
-                                                  child: const Icon(
-                                                    Icons.person,
-                                                    size: 40,
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    Container(
-                                                      color: Colors.grey[300],
-                                                      child: const Icon(
-                                                        Icons.person,
-                                                        size: 40,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-                                          ),
+                                      ],
+                                    ),
+                                    child: ClipOval(
+                                      child: Container(
+                                        color: Colors.grey[300],
+                                        child: Icon(
+                                          Icons.person,
+                                          size: 40,
+                                          color: Colors.grey,
                                         ),
                                       ),
-                                      Positioned(
-                                        bottom: 0,
-                                        right: 0,
-                                        child: Material(
-                                          shape: const CircleBorder(),
-                                          child: InkWell(
-                                            onTap: () {
-                                              _showEditPhotoProfileBottomSheet();
-                                            },
-                                            customBorder: const CircleBorder(),
-                                            child: Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: const BoxDecoration(
-                                                color: Colors.white,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                Icons.camera_alt,
-                                                color: Colors.deepPurpleAccent,
-                                                size: 20,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
 
                                   const SizedBox(height: 16),
@@ -255,11 +206,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
 
                       const SizedBox(height: 18),
 
-                      // Personal Information
-                      _buildPersonalInfoSection(santri),
-
-                      const SizedBox(height: 18),
-
                       // Parents Information
                       _buildParentsInfoSection(santri),
 
@@ -280,99 +226,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
     );
   }
 
-  void _showEditPhotoProfileBottomSheet() {
-    Get.bottomSheet(
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Foto Profil',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            ListTile(
-              minTileHeight: 40,
-              leading: Icon(Icons.camera_alt_outlined),
-              title: Text('Kamera'),
-              onTap: () {
-                controller.pickImage(ImageSource.camera);
-                Get.back();
-              },
-            ),
-            ListTile(
-              minTileHeight: 40,
-              leading: Icon(Icons.photo_outlined),
-              title: Text('Galeri'),
-              onTap: () {
-                controller.pickImage(ImageSource.gallery);
-                Get.back();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _showEditProfileDialog() {
-    controller.tanggalLahirC = TextEditingController(
-      text: controller.formatDate(controller.santriDetail.value!.tanggalLahir!),
-    );
-
-    Future<void> selectDate(BuildContext context) async {
-      final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: controller.tanggalLahirC.text.isNotEmpty
-            ? DateTime.parse(
-                controller.convertDisplayToApiFormat(
-                  controller.tanggalLahirC.text,
-                ),
-              )
-            : controller.santriDetail.value!.tanggalLahir!,
-        firstDate: DateTime(1900),
-        lastDate: DateTime.now(),
-        builder: (BuildContext context, Widget? child) {
-          return Theme(
-            data: ThemeData.light().copyWith(
-              colorScheme: const ColorScheme.light(
-                primary: Colors.deepPurple,
-                onPrimary: Colors.white,
-                surface: Colors.white,
-                onSurface: Colors.black,
-              ),
-            ),
-            child: child!,
-          );
-        },
-      );
-
-      if (picked != null &&
-          picked != controller.santriDetail.value!.tanggalLahir) {
-        controller.tanggalLahirC.text = controller.formatDate(picked);
-      }
-    }
-
     Get.dialog(
       barrierDismissible: false,
       Dialog(
@@ -381,7 +235,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(Get.context!).size.height * 0.7,
+            maxHeight: MediaQuery.of(Get.context!).size.height * 0.35,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -459,229 +313,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
                           },
                           decoration: InputDecoration(
                             hintText: 'Masukkan Nama Lengkap',
-                            hintStyle: TextStyle(color: Colors.grey[500]),
-                            fillColor: Colors.grey[50],
-                            filled: true,
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.deepPurple),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Text(
-                              'Nomor HP',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              '(Opsional)',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          keyboardType: TextInputType.phone,
-                          style: TextStyle(color: Colors.black),
-                          controller: controller.noHpC,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (value) {
-                            if (value!.isNotEmpty && !value.isNumericOnly) {
-                              return 'Nomor HP harus berupa angka';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            hintText: 'Masukkan Nomor HP',
-                            hintStyle: TextStyle(color: Colors.grey[500]),
-                            fillColor: Colors.grey[50],
-                            filled: true,
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.deepPurple),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                        ),
-                        // Inside the form's Column, add this after the alamat field
-                        const SizedBox(height: 16),
-                        Text(
-                          'Tanggal Lahir',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          controller: controller.tanggalLahirC,
-                          onTap: () => selectDate(Get.context!),
-                          readOnly: true,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Tanggal lahir tidak boleh kosong';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            hintText: 'Pilih Tanggal Lahir',
-                            hintStyle: TextStyle(color: Colors.grey[500]),
-                            prefixIcon: Icon(
-                              Icons.calendar_today,
-                              color: Colors.deepPurple,
-                              size: 20,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.deepPurple),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[50],
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Jenis Kelamin',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          initialValue: controller.jenisKelaminC.text,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Jenis kelamin tidak boleh kosong';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            fillColor: Colors.grey[50],
-                            filled: true,
-                            hintText: 'Pilih Jenis Kelamin',
-                            hintStyle: TextStyle(color: Colors.grey[500]),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.deepPurple),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.red),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          dropdownColor: Colors.white,
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'P',
-                              child: Text('Perempuan'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'L',
-                              child: Text('Laki-laki'),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            controller.jenisKelaminC.text = value!;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Alamat',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          maxLines: 5,
-                          minLines: 3,
-                          controller: controller.alamatC,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Alamat tidak boleh kosong';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            hintText: 'Masukkan Alamat',
                             hintStyle: TextStyle(color: Colors.grey[500]),
                             fillColor: Colors.grey[50],
                             filled: true,
@@ -1031,11 +662,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
               onTap: () {
                 Get.back(); // close bottom sheet
                 controller.namaC.text = controller.santriDetail.value!.nama!;
-                controller.noHpC.text = controller.santriDetail.value!.nomorHp!;
-                controller.alamatC.text =
-                    controller.santriDetail.value!.alamat!;
-                controller.jenisKelaminC.text =
-                    controller.santriDetail.value!.jenisKelamin!;
                 _showEditProfileDialog();
               },
             ),
@@ -1129,98 +755,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
           ],
         );
       },
-    );
-  }
-
-  Widget _buildPersonalInfoSection(Santri santri) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Informasi Pribadi',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          _buildInfoTile(
-            icon: Icons.credit_card,
-            label: 'No. Induk',
-            value: santri.noInduk ?? '-',
-          ),
-
-          Divider(color: Colors.grey[200], height: 16),
-
-          _buildInfoTile(
-            icon: Icons.email,
-            label: 'Email',
-            value: santri.user?.email ?? '-',
-          ),
-
-          Divider(color: Colors.grey[200], height: 16),
-
-          _buildInfoTile(
-            icon: Icons.calendar_today_rounded,
-            label: 'Tanggal Lahir',
-            value: santri.tanggalLahir != null
-                ? DateFormat(
-                    'dd MMMM yyyy',
-                    'id_ID',
-                  ).format(santri.tanggalLahir!)
-                : '-',
-          ),
-
-          Divider(color: Colors.grey[200], height: 16),
-
-          _buildInfoTile(
-            icon: Icons.phone,
-            label: 'No. Telepon',
-            value: santri.nomorHp!.isEmpty || santri.nomorHp == null
-                ? '-'
-                : santri.nomorHp!,
-          ),
-
-          Divider(color: Colors.grey[200], height: 16),
-
-          _buildInfoTile(
-            icon: santri.jenisKelamin!.toLowerCase() == 'l'
-                ? Icons.male
-                : santri.jenisKelamin!.toLowerCase() == 'p'
-                ? Icons.female
-                : Icons.person,
-            label: 'Jenis Kelamin',
-            value: santri.jenisKelamin!.toLowerCase() == 'l'
-                ? 'Laki-laki'
-                : santri.jenisKelamin!.toLowerCase() == 'p'
-                ? 'Perempuan'
-                : '-',
-          ),
-
-          Divider(color: Colors.grey[200], height: 16),
-
-          _buildInfoTile(
-            icon: Icons.location_on,
-            label: 'Alamat',
-            value: santri.alamat ?? '-',
-          ),
-        ],
-      ),
     );
   }
 

@@ -9,16 +9,19 @@ import 'package:mobile_kalimasada/app/modules/ustadz/daftar_santri/controllers/d
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../services/auth_service.dart';
+
 enum ChartType { tambahHafalan, murajaah, tahsin }
 
 class DetailSantriController extends GetxController {
-  String userRole = '';
+  String token = AuthService.to.token.value;
+  Rx<UserRole> userRole = AuthService.to.currentRole;
 
   // Helper methods
-  bool get isAdmin => userRole == 'admin';
-  bool get isUstadz => userRole == 'ustadz';
-  bool get isSantri => userRole == 'santri';
-  bool get isOrtu => userRole == 'ortu';
+  bool get isAdmin => userRole.value == UserRole.admin;
+  bool get isUstadz => userRole.value == UserRole.ustadz;
+  bool get isSantri => userRole.value == UserRole.santri;
+  bool get isOrtu => userRole.value == UserRole.ortu;
 
   var isLoading = false.obs;
   var isSaveLoading = false.obs;
@@ -73,11 +76,8 @@ class DetailSantriController extends GetxController {
   Future<void> getSantriDetail(String santriId, {bool isRefresh = true}) async {
     try {
       isLoading.value = isRefresh;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      userRole = prefs.getString('role') ?? '';
 
-      if (token == null) {
+      if (token.isEmpty) {
         ToastUtils.showErrorToast('Anda tidak terautentikasi');
         Get.offAllNamed('/login');
         return;

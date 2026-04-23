@@ -3,12 +3,6 @@ class Santri {
     required this.id,
     required this.userId,
     required this.nama,
-    required this.nomorHp,
-    required this.noInduk,
-    required this.alamat,
-    required this.jenisKelamin,
-    required this.tanggalLahir,
-    required this.fotoProfil,
     required this.tahapHafalan,
     required this.peringkat,
     required this.totalPoin,
@@ -22,12 +16,6 @@ class Santri {
   final int? id;
   final int? userId;
   final String? nama;
-  final String? nomorHp;
-  final dynamic noInduk;
-  final String? alamat;
-  final String? jenisKelamin;
-  final DateTime? tanggalLahir;
-  final String? fotoProfil;
   final String? tahapHafalan;
   final int? peringkat;
   final int? totalPoin;
@@ -42,12 +30,6 @@ class Santri {
       id: json["id"],
       userId: json["userId"],
       nama: json["nama"],
-      nomorHp: json["nomorHp"],
-      noInduk: json["noInduk"],
-      alamat: json["alamat"],
-      jenisKelamin: json["jenisKelamin"],
-      tanggalLahir: DateTime.tryParse(json["tanggalLahir"] ?? ""),
-      fotoProfil: json["fotoProfil"],
       tahapHafalan: json["tahapHafalan"],
       peringkat: json["peringkat"],
       totalPoin: json["totalPoin"],
@@ -71,12 +53,6 @@ class Santri {
     "id": id,
     "userId": userId,
     "nama": nama,
-    "nomorHp": nomorHp,
-    "noInduk": noInduk,
-    "alamat": alamat,
-    "jenisKelamin": jenisKelamin,
-    "tanggalLahir": tanggalLahir?.toIso8601String(),
-    "fotoProfil": fotoProfil,
     "tahapHafalan": tahapHafalan,
     "peringkat": peringkat,
     "totalPoin": totalPoin,
@@ -89,7 +65,7 @@ class Santri {
 
   @override
   String toString() {
-    return "$id, $userId, $nama, $nomorHp, $noInduk, $alamat, $jenisKelamin, $tanggalLahir, $fotoProfil, $tahapHafalan, $peringkat, $totalPoin, $createdAt, $poinUpdatedAt, $user, $orangTua, $waliKelas, ";
+    return "$id, $userId, $nama, $tahapHafalan, $peringkat, $totalPoin, $createdAt, $poinUpdatedAt, $user, $orangTua, $waliKelas, ";
   }
 }
 
@@ -123,7 +99,7 @@ class User {
   });
 
   final int? id;
-  final String? email;
+  final dynamic email;
   final String? password;
   final String? role;
   final DateTime? createdAt;

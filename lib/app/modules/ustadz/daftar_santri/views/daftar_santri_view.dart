@@ -625,6 +625,8 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
         onTap: onTap,
+        highlightColor: color.withValues(alpha: 0.2),
+        splashColor: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(10),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),

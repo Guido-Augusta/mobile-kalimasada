@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -50,22 +49,25 @@ class SantriHomeView extends GetView<SantriHomeController> {
   Widget _buildHeader(BuildContext context) {
     return Row(
       children: [
-        Obx(
-          () => CircleAvatar(
-            radius: 28,
-            backgroundColor: Colors.grey[200],
-            backgroundImage: CachedNetworkImageProvider(
-              controller.getImageUrl(controller.fotoProfil.value),
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.deepPurple.withValues(alpha: 0.3),
+              width: 2,
             ),
-            onBackgroundImageError: (_, _) {
-              controller.fotoProfil.value =
-                  'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg';
-            },
-            child:
-                controller.fotoProfil.value.isEmpty ||
-                    controller.fotoProfil.value == ''
-                ? Icon(Icons.person, size: 28, color: Colors.deepPurpleAccent)
-                : null,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: CircleAvatar(
+            radius: 26,
+            backgroundColor: Colors.grey[200],
+            child: Icon(Icons.person, size: 28, color: Colors.deepPurpleAccent),
           ),
         ),
         const SizedBox(width: 10),

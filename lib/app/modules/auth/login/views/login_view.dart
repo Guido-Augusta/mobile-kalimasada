@@ -108,9 +108,9 @@ class LoginView extends GetView<LoginController> {
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: controller.emailController,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              validator: controller.validateEmail,
+                              // autovalidateMode:
+                              //     AutovalidateMode.onUserInteraction,
+                              // validator: controller.validateEmail,
                               keyboardType: TextInputType.emailAddress,
                               decoration: InputDecoration(
                                 hintText: 'Masukkan Email Anda',

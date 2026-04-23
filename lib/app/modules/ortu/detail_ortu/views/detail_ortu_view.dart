@@ -227,6 +227,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
               delegate: SliverChildListDelegate([
                 // Personal Information
                 _buildPersonalInfoSection(ortu),
+                const SizedBox(height: 2400),
 
                 () {
                   if (AuthService.to.isAdmin) {
