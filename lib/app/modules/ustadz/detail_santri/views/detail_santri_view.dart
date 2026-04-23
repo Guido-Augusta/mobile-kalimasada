@@ -1406,13 +1406,13 @@ class DetailSantriView extends GetView<DetailSantriController> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF4F46E5).withValues(alpha: 0.1),
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.person_off_rounded,
                 size: 48,
-                color: Color(0xFF4F46E5),
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 24),
@@ -1421,16 +1421,15 @@ class DetailSantriView extends GetView<DetailSantriController> {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF1E293B),
+                color: Colors.grey[700],
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               'Tarik ke bawah untuk refresh',
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: const Color(0xFF64748B),
-              ),
+              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

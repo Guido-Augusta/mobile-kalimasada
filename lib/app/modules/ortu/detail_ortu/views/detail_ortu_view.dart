@@ -272,30 +272,32 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Icon(
-                  Icons.person,
+                  Icons.person_off_rounded,
                   size: 48,
                   color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                'Data tidak ditemukan',
+                'Data orang tua tidak ditemukan',
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   color: Colors.grey[700],
                   fontWeight: FontWeight.w600,
                 ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
                 'Tarik ke bawah untuk refresh',
                 style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
