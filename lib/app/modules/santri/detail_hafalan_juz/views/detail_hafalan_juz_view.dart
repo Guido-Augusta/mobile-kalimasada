@@ -7,6 +7,7 @@ import 'package:super_sliver_list/super_sliver_list.dart';
 
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan_juz.dart';
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import '../../../../utils/quran_utils.dart';
 import '../controllers/detail_hafalan_juz_controller.dart';
 
 class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
@@ -753,8 +754,8 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
               Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  ayat!.arab!,
-                  style: GoogleFonts.amiri(fontSize: 22, height: 2.2),
+                  '${ayat!.arab!} ${QuranUtils.getAyahEndSymbol(ayat.nomorAyat!)}',
+                  style: GoogleFonts.amiri(fontSize: 22, height: 2.5),
                   textAlign: TextAlign.right,
                   textDirection: TextDirection.rtl,
                 ),
@@ -767,7 +768,7 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
                 ayat!.latin!,
                 style: TextStyle(
                   fontSize: 13,
-                  color: Colors.grey[600],
+                  color: Colors.green,
                   fontStyle: FontStyle.italic,
                   height: 1.5,
                 ),

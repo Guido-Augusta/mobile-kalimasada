@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart' hide TextDirection;
+import '../../../../utils/quran_utils.dart';
 import '../controllers/detail_riwayat_hafalan_controller.dart';
 
 class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
@@ -399,7 +400,7 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
                               child: Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  ayat.arab!,
+                                  '${ayat.arab!} ${QuranUtils.getAyahEndSymbol(ayat.nomorAyat!)}',
                                   style: GoogleFonts.amiri(
                                     fontSize: 24,
                                     height: 2.5,
@@ -418,7 +419,7 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
                                 ayat.latin!,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.grey[700],
+                                  color: Colors.green,
                                   fontStyle: FontStyle.italic,
                                   height: 1.4,
                                 ),

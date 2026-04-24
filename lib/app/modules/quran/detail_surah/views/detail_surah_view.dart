@@ -312,7 +312,7 @@ class DetailSurahView extends GetView<DetailSurahController> {
                                         '${ayat.ar!} ${QuranUtils.getAyahEndSymbol(ayat.nomor!)}',
                                         style: GoogleFonts.amiri(
                                           fontSize: 22,
-                                          height: 2.2,
+                                          height: 2.5,
                                         ),
                                         textAlign: TextAlign.right,
                                         textDirection: TextDirection.rtl,

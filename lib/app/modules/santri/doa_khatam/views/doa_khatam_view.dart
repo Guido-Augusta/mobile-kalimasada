@@ -131,12 +131,9 @@ class DoaKhatamView extends GetView<DoaKhatamController> {
         children: [
           SelectableText(
             controller.doaArab.trim(),
-            style: GoogleFonts.amiri(
-              fontSize: 24,
-              height: 2.5,
-              color: Colors.black87,
-            ),
+            style: GoogleFonts.amiri(fontSize: 24, height: 2.5),
             textAlign: TextAlign.right,
+            textDirection: TextDirection.rtl,
           ),
 
           SizedBox(height: 12),
@@ -146,7 +143,7 @@ class DoaKhatamView extends GetView<DoaKhatamController> {
               controller.doaLatin,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[700],
+                color: Colors.green,
                 fontStyle: FontStyle.italic,
                 height: 1.4,
               ),

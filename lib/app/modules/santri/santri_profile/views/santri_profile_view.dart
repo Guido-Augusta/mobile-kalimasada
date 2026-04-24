@@ -123,7 +123,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
             icon: const Icon(
               Icons.settings_rounded,
               color: Colors.white,
-              size: 24,
+              size: 22,
             ),
             tooltip: 'Pengaturan',
             onPressed: () => _showSettingsBottomSheet(context),

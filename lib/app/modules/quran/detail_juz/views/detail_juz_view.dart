@@ -535,7 +535,7 @@ class DetailJuzView extends GetView<DetailJuzController> {
                         alignment: Alignment.centerRight,
                         child: Text(
                           '${ayat.arab!} ${QuranUtils.getAyahEndSymbol(ayat.nomorAyat!)}',
-                          style: GoogleFonts.amiri(fontSize: 22, height: 2.2),
+                          style: GoogleFonts.amiri(fontSize: 22, height: 2.5),
                           textAlign: TextAlign.right,
                           textDirection: TextDirection.rtl,
                         ),
