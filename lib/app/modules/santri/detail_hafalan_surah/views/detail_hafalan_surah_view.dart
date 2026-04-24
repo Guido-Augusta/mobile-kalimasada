@@ -935,7 +935,7 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
             ),
           ),
           const SizedBox(width: 12),
-          // Tombol Tambah Progress
+          // Tombol Tambah Progres
           Expanded(
             child: Material(
               color: color,
@@ -1266,7 +1266,7 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Tambah Progress $label',
+                    'Tambah Progres $label',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

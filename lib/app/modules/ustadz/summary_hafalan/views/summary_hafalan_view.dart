@@ -667,7 +667,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
       ),
       child: Column(
         children: [
-          _buildCardHeader(item.id, item.nama, item.noInduk, tanggal),
+          _buildCardHeader(item.id, item.nama, tanggal),
           Divider(height: 1, color: Colors.grey[100]),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
@@ -800,7 +800,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
       ),
       child: Column(
         children: [
-          _buildCardHeader(item.id, item.nama, item.noInduk, tanggal),
+          _buildCardHeader(item.id, item.nama, tanggal),
           Divider(height: 1, color: Colors.grey[100]),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
@@ -910,12 +910,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
   // SHARED CARD COMPONENTS
   // ══════════════════════════════════════════════════════════════════
 
-  Widget _buildCardHeader(
-    int? santriId,
-    String? nama,
-    String? noInduk,
-    String? tanggal,
-  ) {
+  Widget _buildCardHeader(int? santriId, String? nama, String? tanggal) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
       child: GestureDetector(
@@ -930,29 +925,18 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
             _buildAvatar(),
             const SizedBox(width: 12),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    nama ?? 'Nama Santri',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(
+                  nama ?? 'Nama Santri',
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[800],
                   ),
-                  Text(
-                    noInduk ?? '-',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
             if (tanggal != null) _buildDateBadge(tanggal),

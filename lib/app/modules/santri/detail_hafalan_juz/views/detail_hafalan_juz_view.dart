@@ -1178,7 +1178,7 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Tambah Progress $label',
+                    'Tambah Progres $label',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
