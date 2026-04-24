@@ -13,6 +13,9 @@ import 'package:mobile_kalimasada/app/modules/santri/santri_home/controllers/san
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:path/path.dart' as path;
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
+
+enum ChartType { tambahHafalan, murajaah, tahsin }
 
 class SantriProfileController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -34,6 +37,13 @@ class SantriProfileController extends GetxController {
   var alamatC = TextEditingController();
   var jenisKelaminC = TextEditingController();
   var tanggalLahirC = TextEditingController();
+
+  var isLoadingChart = false.obs;
+  var isChartError = false.obs;
+  var chart = Rxn<c.Chart>();
+  var range = '1w'.obs;
+  var selectedChartType = ChartType.tambahHafalan.obs;
+  var selectedChartMode = 'ayat'.obs;
 
   DateTime? _lastErrorShown;
   DateTime? _lastNoChangeShown;
@@ -97,6 +107,7 @@ class SantriProfileController extends GetxController {
       );
 
       if (response.statusCode == 200) {
+        getChart();
         final data = jsonDecode(response.body);
         final santri = Santri.fromJson(data['data']);
         santriDetail.value = santri;
@@ -324,5 +335,50 @@ class SantriProfileController extends GetxController {
     } catch (e) {
       return displayDate;
     }
+  }
+
+  void getChart() async {
+    isLoadingChart.value = true;
+    isChartError.value = false;
+    final token = AuthService.to.token.value;
+    try {
+      final santriId = AuthService.to.roleId.value;
+      final queryParams = {
+        'range': range.value,
+        'santriId': santriId.toString(),
+        'mode': selectedChartMode.value,
+      };
+
+      final uri = Uri.parse(ApiUrl.chart).replace(queryParameters: queryParams);
+
+      final response = await http
+          .get(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+              'x-platform': 'mobile',
+            },
+          )
+          .timeout(const Duration(seconds: 30));
+      var data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        chart.value = c.Chart.fromJson(data);
+      } else {
+        isChartError.value = true;
+        ToastUtils.showErrorToast('Gagal mendapatkan data chart');
+      }
+    } catch (e) {
+      isChartError.value = true;
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
+    }
+    isLoadingChart.value = false;
   }
 }
