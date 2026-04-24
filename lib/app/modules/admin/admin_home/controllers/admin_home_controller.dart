@@ -10,6 +10,19 @@ import 'package:mobile_kalimasada/app/services/auth_service.dart';
 class AdminHomeController extends GetxController {
   var isLoadingLogout = false.obs;
   DateTime? _lastErrorShown;
+  DateTime? lastBackPressTime;
+
+  Future<bool> onWillPop() async {
+    final currentTime = DateTime.now();
+    if (lastBackPressTime == null ||
+        currentTime.difference(lastBackPressTime!) >
+            const Duration(seconds: 2)) {
+      lastBackPressTime = currentTime;
+      ToastUtils.showErrorToast('Tekan sekali lagi untuk keluar');
+      return false; // Prevent exit
+    }
+    return true; // Allow exit
+  }
 
   void logout() async {
     isLoadingLogout.value = true;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,27 +10,39 @@ class AdminHomeView extends GetView<AdminHomeController> {
   const AdminHomeView({super.key});
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
-      appBar: AppBar(backgroundColor: Color(0xFFF1F5F9), toolbarHeight: 0),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.only(
-            top: 20,
-            left: 20,
-            right: 20,
-            bottom: 30,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        final canExit = await controller.onWillPop();
+        if (canExit) {
+          Get.reset();
+          SystemNavigator.pop(); // Exit app
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF1F5F9),
+        appBar: AppBar(backgroundColor: Color(0xFFF1F5F9), toolbarHeight: 0),
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.only(
+              top: 20,
+              left: 20,
+              right: 20,
+              bottom: 30,
+            ),
+            children: [
+              _buildHeader(context),
+              const SizedBox(height: 30),
+              _buildWelcomeCard(context),
+              const SizedBox(height: 25),
+              _buildFeatureCards(context),
+              const SizedBox(height: 25),
+              _buildIslamicDecoration(context),
+              const SizedBox(height: 25),
+            ],
           ),
-          children: [
-            _buildHeader(context),
-            const SizedBox(height: 30),
-            _buildWelcomeCard(context),
-            const SizedBox(height: 25),
-            _buildFeatureCards(context),
-            const SizedBox(height: 25),
-            _buildIslamicDecoration(context),
-            const SizedBox(height: 25),
-          ],
         ),
       ),
     );
