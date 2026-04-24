@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mobile_kalimasada/app/data/models/peringkat.dart';
+import 'package:mobile_kalimasada/app/widgets/level_info_dialog.dart';
 
 import '../controllers/peringkat_controller.dart';
 
@@ -27,7 +28,7 @@ class PeringkatView extends GetView<PeringkatController> {
             icon: const Icon(Icons.info_outline_rounded),
             onPressed: () {
               // dialog informasi level
-              showLevelInfoDialog(context);
+              LevelInfoDialog.show(context);
             },
           ),
         ],
@@ -497,123 +498,6 @@ class PeringkatView extends GetView<PeringkatController> {
           Text(
             'Tarik ke bawah untuk refresh',
             style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void showLevelInfoDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Informasi Level Hafalan',
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF6B46C1),
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildLevelInfo(
-                context,
-                title: 'Level 1',
-                description: 'Juz 30',
-                color: const Color(0xFF10B981), // Green
-              ),
-              const SizedBox(height: 12),
-              _buildLevelInfo(
-                context,
-                title: 'Level 2',
-                description: 'Surah Pilihan',
-                color: const Color(0xFFF59E0B), // Amber
-              ),
-              const SizedBox(height: 12),
-              _buildLevelInfo(
-                context,
-                title: 'Level 3',
-                description: 'Juz 1-29',
-                color: const Color(0xFFEF4444), // Red
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6B46C1),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  child: Text(
-                    'Mengerti',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLevelInfo(
-    BuildContext context, {
-    required String title,
-    required String description,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            child: const Icon(Icons.check, color: Colors.white, size: 16),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
