@@ -32,6 +32,8 @@ class DetailJuzController extends GetxController {
   @override
   void onClose() {
     searchC.dispose();
+    listC.dispose();
+    scrollC.dispose();
     super.onClose();
   }
 
@@ -85,13 +87,15 @@ class DetailJuzController extends GetxController {
       (item) => item is Ayat && item.halaman == hal,
     );
     if (targetIndex != -1) {
-      listC.animateToItem(
-        index: targetIndex,
-        scrollController: scrollC,
-        alignment: 0,
-        duration: (estimatedDistance) => const Duration(milliseconds: 800),
-        curve: (estimatedDistance) => Curves.easeInOutCubic,
-      );
+      if (listC.isAttached) {
+        listC.animateToItem(
+          index: targetIndex,
+          scrollController: scrollC,
+          alignment: 0,
+          duration: (estimatedDistance) => const Duration(milliseconds: 800),
+          curve: (estimatedDistance) => Curves.easeInOutCubic,
+        );
+      }
     } else {
       ToastUtils.showErrorToast('Halaman $hal tidak ditemukan di juz ini');
     }

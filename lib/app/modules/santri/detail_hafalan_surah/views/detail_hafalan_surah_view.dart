@@ -188,14 +188,21 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                 backgroundColor: Colors.deepPurpleAccent,
                 mini: true,
                 onPressed: () {
-                  controller.listC.animateToItem(
-                    index: controller.currentLastChecked,
-                    scrollController: controller.scrollC,
-                    alignment: 0,
-                    duration: (estimatedDistance) =>
-                        const Duration(milliseconds: 1000),
-                    curve: (estimatedDistance) => Curves.fastLinearToSlowEaseIn,
-                  );
+                  final ayatLength = controller.currentDetail?.ayat.length ?? 0;
+                  if (ayatLength > 0 && controller.listC.isAttached) {
+                    final targetIndex = controller.currentLastChecked;
+                    if (targetIndex >= 0 && targetIndex < ayatLength) {
+                      controller.listC.animateToItem(
+                        index: targetIndex,
+                        scrollController: controller.scrollC,
+                        alignment: 0,
+                        duration: (estimatedDistance) =>
+                            const Duration(milliseconds: 1000),
+                        curve: (estimatedDistance) =>
+                            Curves.fastLinearToSlowEaseIn,
+                      );
+                    }
+                  }
                 },
                 child: const Icon(
                   Icons.keyboard_arrow_down_outlined,

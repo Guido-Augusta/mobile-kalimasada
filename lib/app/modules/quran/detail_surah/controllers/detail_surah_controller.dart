@@ -35,6 +35,8 @@ class DetailSurahController extends GetxController {
   @override
   void onClose() {
     searchC.dispose();
+    scrollC.dispose();
+    listC.dispose();
     audioPlayer.dispose();
     super.onClose();
   }
@@ -103,13 +105,15 @@ class DetailSurahController extends GetxController {
     final targetIndex = ayatList.indexWhere((a) => a.nomor == nomor);
 
     if (targetIndex != -1) {
-      listC.animateToItem(
-        index: targetIndex,
-        scrollController: scrollC,
-        alignment: 0,
-        duration: (estimatedDistance) => const Duration(milliseconds: 800),
-        curve: (estimatedDistance) => Curves.easeInOutCubic,
-      );
+      if (listC.isAttached) {
+        listC.animateToItem(
+          index: targetIndex,
+          scrollController: scrollC,
+          alignment: 0,
+          duration: (estimatedDistance) => const Duration(milliseconds: 800),
+          curve: (estimatedDistance) => Curves.easeInOutCubic,
+        );
+      }
     } else {
       ToastUtils.showErrorToast('Ayat $nomor tidak ditemukan');
     }

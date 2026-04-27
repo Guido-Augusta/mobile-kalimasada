@@ -104,6 +104,8 @@ class DetailHafalanJuzController extends GetxController {
   @override
   void onClose() {
     searchC.dispose();
+    scrollC.dispose();
+    listC.dispose();
     super.onClose();
   }
 
@@ -122,9 +124,10 @@ class DetailHafalanJuzController extends GetxController {
   }
 
   int _getLastCheckedIndex(List<dynamic> flatItems) {
-    return flatItems.lastIndexWhere(
+    int idx = flatItems.lastIndexWhere(
       (item) => item is Ayat && item.checked == true,
     );
+    return idx == -1 ? 0 : idx;
   }
 
   int getAyatCount(List<SurahElement> surahs) {
@@ -246,13 +249,15 @@ class DetailHafalanJuzController extends GetxController {
     );
 
     if (targetIndex != -1) {
-      listC.animateToItem(
-        index: targetIndex,
-        scrollController: scrollC,
-        alignment: 0,
-        duration: (estimatedDistance) => const Duration(milliseconds: 800),
-        curve: (estimatedDistance) => Curves.easeInOutCubic,
-      );
+      if (listC.isAttached) {
+        listC.animateToItem(
+          index: targetIndex,
+          scrollController: scrollC,
+          alignment: 0,
+          duration: (estimatedDistance) => const Duration(milliseconds: 800),
+          curve: (estimatedDistance) => Curves.easeInOutCubic,
+        );
+      }
     } else {
       ToastUtils.showErrorToast('Halaman $hal tidak ditemukan di juz ini');
     }
