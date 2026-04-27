@@ -125,30 +125,60 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                     final processingState = playerState?.processingState;
                     final playing = playerState?.playing;
 
-                    IconData iconData;
-                    VoidCallback? onTap;
-
-                    if (!(playing ?? false)) {
-                      iconData = Icons.play_arrow_rounded;
-                      onTap = controller.audioPlayer.play;
-                    } else if (processingState != ProcessingState.completed) {
-                      iconData = Icons.pause_rounded;
-                      onTap = controller.audioPlayer.pause;
-                    } else {
-                      iconData = Icons.play_arrow_rounded;
-                      onTap = () {
-                        controller.audioPlayer.seek(Duration.zero);
-                        controller.audioPlayer.play();
-                      };
+                    if (processingState == ProcessingState.loading ||
+                        processingState == ProcessingState.buffering) {
+                      return FloatingActionButton(
+                        heroTag: 'play_pause',
+                        backgroundColor: Colors.deepPurpleAccent,
+                        mini: true,
+                        onPressed: null,
+                        child: const Padding(
+                          padding: EdgeInsets.all(12.0),
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.0,
+                          ),
+                        ),
+                      );
                     }
 
-                    return FloatingActionButton(
-                      heroTag: 'play_pause',
-                      backgroundColor: Colors.deepPurpleAccent,
-                      mini: true,
-                      onPressed: onTap,
-                      child: Icon(iconData, color: Colors.white),
-                    );
+                    if (!(playing ?? false)) {
+                      return FloatingActionButton(
+                        heroTag: 'play_pause',
+                        backgroundColor: Colors.deepPurpleAccent,
+                        mini: true,
+                        onPressed: controller.audioPlayer.play,
+                        child: const Icon(
+                          Icons.play_arrow_rounded,
+                          color: Colors.white,
+                        ),
+                      );
+                    } else if (processingState != ProcessingState.completed) {
+                      return FloatingActionButton(
+                        heroTag: 'play_pause',
+                        backgroundColor: Colors.deepPurpleAccent,
+                        mini: true,
+                        onPressed: controller.audioPlayer.pause,
+                        child: const Icon(
+                          Icons.pause_rounded,
+                          color: Colors.white,
+                        ),
+                      );
+                    } else {
+                      return FloatingActionButton(
+                        heroTag: 'play_pause',
+                        backgroundColor: Colors.deepPurpleAccent,
+                        mini: true,
+                        onPressed: () {
+                          controller.audioPlayer.seek(Duration.zero);
+                          controller.audioPlayer.play();
+                        },
+                        child: const Icon(
+                          Icons.replay_rounded,
+                          color: Colors.white,
+                        ),
+                      );
+                    }
                   },
                 ),
                 const SizedBox(height: 8),
@@ -473,6 +503,19 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                         final processingState = playerState?.processingState;
                         final playing = playerState?.playing;
 
+                        if (processingState == ProcessingState.loading ||
+                            processingState == ProcessingState.buffering) {
+                          return Container(
+                            width: 44,
+                            height: 44,
+                            padding: const EdgeInsets.all(10),
+                            child: const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          );
+                        }
+
                         IconData iconData;
                         VoidCallback? onTap;
 
@@ -484,7 +527,7 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                           iconData = Icons.pause_circle_filled_rounded;
                           onTap = controller.audioPlayer.pause;
                         } else {
-                          iconData = Icons.play_circle_filled_rounded;
+                          iconData = Icons.replay_circle_filled_rounded;
                           onTap = () {
                             controller.audioPlayer.seek(Duration.zero);
                             controller.audioPlayer.play();
@@ -919,6 +962,20 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                   final processingState = playerState?.processingState;
                   final playing = playerState?.playing;
 
+                  if (processingState == ProcessingState.loading ||
+                      processingState == ProcessingState.buffering) {
+                    return Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: color,
+                          strokeWidth: 2.5,
+                        ),
+                      ),
+                    );
+                  }
+
                   IconData iconData;
                   VoidCallback? onTap;
 
@@ -929,7 +986,7 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                     iconData = Icons.pause_rounded;
                     onTap = controller.audioPlayer.pause;
                   } else {
-                    iconData = Icons.play_arrow_rounded;
+                    iconData = Icons.replay_rounded;
                     onTap = () {
                       controller.audioPlayer.seek(Duration.zero);
                       controller.audioPlayer.play();

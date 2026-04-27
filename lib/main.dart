@@ -4,13 +4,14 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:get/get.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:toastification/toastification.dart';
 
 import 'app/routes/app_pages.dart';
 import 'app/services/auth_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Get.putAsync(() => AuthService().init());
@@ -19,6 +20,12 @@ void main() async {
 
   // Initialize date formatting for Indonesian locale
   await initializeDateFormatting('id_ID', null);
+
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

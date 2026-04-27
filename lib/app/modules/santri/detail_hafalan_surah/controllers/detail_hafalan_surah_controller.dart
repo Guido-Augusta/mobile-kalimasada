@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan_surah.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_surah.dart' hide Ayat;
@@ -223,7 +224,15 @@ class DetailHafalanSurahController extends GetxController {
               .replaceAll('127.0.0.1', '10.0.2.2');
 
           try {
-            await audioPlayer.setUrl(audioUrl);
+            final mediaItem = MediaItem(
+              id: surahInfo.value?.nomor?.toString() ?? surahId,
+              title: surahInfo.value?.namaLatin ?? 'Surah $surahId',
+              album: 'Al-Quran - Hafalan',
+            );
+
+            await audioPlayer.setAudioSource(
+              AudioSource.uri(Uri.parse(audioUrl), tag: mediaItem),
+            );
             if (kDebugMode) {
               print('Audio loaded successfully');
             }

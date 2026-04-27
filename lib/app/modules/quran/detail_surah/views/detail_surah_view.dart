@@ -91,60 +91,68 @@ class DetailSurahView extends GetView<DetailSurahController> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                FloatingActionButton(
-                  heroTag: 'play_pause',
-                  backgroundColor: Colors.deepPurpleAccent,
-                  mini: true,
-                  onPressed: () {
-                    controller.audioPlayer.play();
-                  },
-                  child: StreamBuilder<PlayerState>(
-                    stream: controller.audioPlayer.playerStateStream,
-                    builder: (context, snapshot) {
-                      final playerState = snapshot.data;
-                      final processingState = playerState?.processingState;
-                      final playing = playerState?.playing;
-                      if (!(playing ?? false)) {
-                        return IconButton(
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          icon: const Icon(
-                            Icons.play_arrow_rounded,
+                StreamBuilder<PlayerState>(
+                  stream: controller.audioPlayer.playerStateStream,
+                  builder: (context, snapshot) {
+                    final playerState = snapshot.data;
+                    final processingState = playerState?.processingState;
+                    final playing = playerState?.playing;
+
+                    if (processingState == ProcessingState.loading ||
+                        processingState == ProcessingState.buffering) {
+                      return FloatingActionButton(
+                        heroTag: 'play_pause',
+                        backgroundColor: Colors.deepPurpleAccent,
+                        mini: true,
+                        onPressed: null,
+                        child: const Padding(
+                          padding: EdgeInsets.all(12.0),
+                          child: CircularProgressIndicator(
                             color: Colors.white,
+                            strokeWidth: 2.0,
                           ),
-                          onPressed: () {
-                            controller.audioPlayer.play();
-                          },
-                        );
-                      } else if (processingState != ProcessingState.completed) {
-                        return IconButton(
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          icon: const Icon(
-                            Icons.pause_rounded,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            controller.audioPlayer.pause();
-                          },
-                        );
-                      }
-                      return IconButton(
-                        onPressed: () {
-                          if (processingState == ProcessingState.completed) {
-                            controller.audioPlayer.seek(Duration.zero);
-                            controller.audioPlayer.play();
-                          }
-                        },
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        icon: Icon(
+                        ),
+                      );
+                    }
+
+                    if (!(playing ?? false)) {
+                      return FloatingActionButton(
+                        heroTag: 'play_pause',
+                        backgroundColor: Colors.deepPurpleAccent,
+                        mini: true,
+                        onPressed: controller.audioPlayer.play,
+                        child: const Icon(
                           Icons.play_arrow_rounded,
                           color: Colors.white,
                         ),
                       );
-                    },
-                  ),
+                    } else if (processingState != ProcessingState.completed) {
+                      return FloatingActionButton(
+                        heroTag: 'play_pause',
+                        backgroundColor: Colors.deepPurpleAccent,
+                        mini: true,
+                        onPressed: controller.audioPlayer.pause,
+                        child: const Icon(
+                          Icons.pause_rounded,
+                          color: Colors.white,
+                        ),
+                      );
+                    } else {
+                      return FloatingActionButton(
+                        heroTag: 'play_pause',
+                        backgroundColor: Colors.deepPurpleAccent,
+                        mini: true,
+                        onPressed: () {
+                          controller.audioPlayer.seek(Duration.zero);
+                          controller.audioPlayer.play();
+                        },
+                        child: const Icon(
+                          Icons.replay_rounded,
+                          color: Colors.white,
+                        ),
+                      );
+                    }
+                  },
                 ),
                 SizedBox(
                   height:
@@ -489,6 +497,19 @@ class DetailSurahView extends GetView<DetailSurahController> {
                         final processingState = playerState?.processingState;
                         final playing = playerState?.playing;
 
+                        if (processingState == ProcessingState.loading ||
+                            processingState == ProcessingState.buffering) {
+                          return Container(
+                            width: 44,
+                            height: 44,
+                            padding: const EdgeInsets.all(10),
+                            child: const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          );
+                        }
+
                         IconData iconData;
                         VoidCallback? onTap;
 
@@ -500,7 +521,7 @@ class DetailSurahView extends GetView<DetailSurahController> {
                           iconData = Icons.pause_circle_filled_rounded;
                           onTap = controller.audioPlayer.pause;
                         } else {
-                          iconData = Icons.play_circle_filled_rounded;
+                          iconData = Icons.replay_circle_filled_rounded;
                           onTap = () {
                             controller.audioPlayer.seek(Duration.zero);
                             controller.audioPlayer.play();
