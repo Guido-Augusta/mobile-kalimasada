@@ -543,8 +543,9 @@ class DetailSantriView extends GetView<DetailSantriController> {
                   title: ortu.nama ?? '-',
                   subtitle: ortu.tipe ?? '-',
                   onTap: () {
-                    if (Get.isRegistered<DetailOrtuController>())
+                    if (Get.isRegistered<DetailOrtuController>()) {
                       Get.delete<DetailOrtuController>();
+                    }
                     Get.toNamed(
                       '/detail-ortu',
                       arguments: {'ortuId': ortu.id.toString()},

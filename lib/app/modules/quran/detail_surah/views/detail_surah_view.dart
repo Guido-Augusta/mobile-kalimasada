@@ -44,18 +44,12 @@ class DetailSurahView extends GetView<DetailSurahController> {
           child: SafeArea(
             child: Obx(
               () => CustomAnimationSearchBar(
-                controller: TextEditingController(),
-                onChanged: (text) {
+                controller: controller.searchC,
+                onSubmitted: (text) {
                   final val = int.tryParse(text);
-                  if (val == null) return;
-                  controller.listC.animateToItem(
-                    index: val - 1,
-                    scrollController: controller.scrollC,
-                    alignment: 0,
-                    duration: (estimatedDistance) =>
-                        const Duration(milliseconds: 1000),
-                    curve: (estimatedDistance) => Curves.fastLinearToSlowEaseIn,
-                  );
+                  if (val != null) {
+                    controller.scrollToAyat(val);
+                  }
                 },
                 centerTitle: 'Detail Surah',
                 hintText:

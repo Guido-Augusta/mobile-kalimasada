@@ -22,6 +22,7 @@ class DetailSurahController extends GetxController {
 
   final listC = ListController();
   final scrollC = ScrollController();
+  final searchC = TextEditingController();
   RxInt lastCheckedAyat = 0.obs;
 
   @override
@@ -32,8 +33,9 @@ class DetailSurahController extends GetxController {
 
   @override
   void onClose() {
-    super.onClose();
+    searchC.dispose();
     audioPlayer.dispose();
+    super.onClose();
   }
 
   void getDetailSurah() async {
@@ -84,6 +86,23 @@ class DetailSurahController extends GetxController {
       );
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  void scrollToAyat(int nomor) {
+    final ayatList = detailSurah.value?.ayat ?? [];
+    final targetIndex = ayatList.indexWhere((a) => a.nomor == nomor);
+
+    if (targetIndex != -1) {
+      listC.animateToItem(
+        index: targetIndex,
+        scrollController: scrollC,
+        alignment: 0,
+        duration: (estimatedDistance) => const Duration(milliseconds: 800),
+        curve: (estimatedDistance) => Curves.easeInOutCubic,
+      );
+    } else {
+      ToastUtils.showErrorToast('Ayat $nomor tidak ditemukan');
     }
   }
 }

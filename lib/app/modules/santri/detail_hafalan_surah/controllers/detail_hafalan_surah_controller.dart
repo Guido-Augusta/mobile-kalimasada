@@ -39,6 +39,7 @@ class DetailHafalanSurahController extends GetxController {
 
   final listC = ListController();
   final scrollC = ScrollController();
+  final searchC = TextEditingController();
 
   // Last checked per mode
   RxInt lastCheckedTambah = 0.obs;
@@ -245,6 +246,24 @@ class DetailHafalanSurahController extends GetxController {
       );
     } finally {
       isSurahInfoLoading.value = false;
+    }
+  }
+
+  Future<void> scrollToAyat(int nomor) async {
+    final index =
+        currentDetail?.ayat.indexWhere((a) => a.nomorAyat == nomor) ?? -1;
+    if (index != -1) {
+      listC.animateToItem(
+        index: index,
+        scrollController: scrollC,
+        alignment: 0,
+        duration: (estimatedDistance) => const Duration(milliseconds: 800),
+        curve: (estimatedDistance) => Curves.easeInOutCubic,
+      );
+    } else {
+      if (nomor != 0) {
+        ToastUtils.showErrorToast('Ayat $nomor tidak ditemukan di surah ini');
+      }
     }
   }
 

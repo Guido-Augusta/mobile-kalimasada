@@ -7,6 +7,7 @@ import 'package:super_sliver_list/super_sliver_list.dart';
 
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan_juz.dart';
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import 'package:mobile_kalimasada/app/widgets/custom_animation_search_bar.dart';
 import '../../../../utils/quran_utils.dart';
 import '../controllers/detail_hafalan_juz_controller.dart';
 
@@ -24,31 +25,16 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
     return _cached!;
   }
 
-  int _getTotalItemsCount() {
-    final detail = controller.currentDetail;
-    if (detail == null) return 0;
-    int count = 0;
-    for (var s in detail.surah) {
-      count += 1; // untuk header surah
-      count += s.ayat.length;
-    }
-    return count;
-  }
+  int _getTotalItemsCount() => controller.currentItems.length;
 
   Widget _buildItemByIndex(int index) {
-    final detail = controller.currentDetail;
-    if (detail == null) return const SizedBox.shrink();
+    if (index >= controller.currentItems.length) return const SizedBox.shrink();
+    final item = controller.currentItems[index];
 
-    int currentIdx = 0;
-    for (var s in detail.surah) {
-      if (index == currentIdx) {
-        return _buildSurahSubHeader(s.surah);
-      }
-      currentIdx++;
-      if (index < currentIdx + s.ayat.length) {
-        return _buildAyatCard(s.ayat[index - currentIdx]);
-      }
-      currentIdx += s.ayat.length;
+    if (item is SurahElement) {
+      return _buildSurahSubHeader(item.surah);
+    } else if (item is Ayat) {
+      return _buildAyatCard(item);
     }
     return const SizedBox.shrink();
   }
@@ -57,14 +43,32 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF1F5F9),
-        surfaceTintColor: Colors.transparent,
-        title: const Text(
-          'Detail Hafalan',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: SafeArea(
+          child: Obx(() {
+            return CustomAnimationSearchBar(
+              controller: controller.searchC,
+              onSubmitted: (text) {
+                final val = int.tryParse(text);
+                if (val != null) {
+                  controller.scrollToHalaman(val);
+                }
+              },
+              centerTitle: 'Detail Hafalan',
+              hintText:
+                  'Cari halaman (${controller.firstHalaman}-${controller.lastHalaman})...',
+              keyboardType: TextInputType.number,
+              minValue: controller.firstHalaman,
+              maxValue: controller.lastHalaman,
+              minValueErrorMessage:
+                  'Halaman tidak ada di juz ini (${controller.firstHalaman}-${controller.lastHalaman})',
+              maxValueErrorMessage:
+                  'Halaman tidak ada di juz ini (${controller.firstHalaman}-${controller.lastHalaman})',
+              showSearchIcon: !controller.isJuzInfoLoading.value,
+            );
+          }),
         ),
-        centerTitle: true,
       ),
       bottomNavigationBar: Obx(() {
         if (!AuthService.to.isUstadz) {

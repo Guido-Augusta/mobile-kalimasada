@@ -24,15 +24,21 @@ class DetailHafalanJuzController extends GetxController {
   // let's grab it or default to something
   String santriName = 'Santri';
 
-  // Data per mode
+  // Data per mode (Original)
   var detailTambah = Rxn<DetailHafalanJuz>();
   var detailMurajaah = Rxn<DetailHafalanJuz>();
   var detailTahsin = Rxn<DetailHafalanJuz>();
+
+  // Data per mode (Flattened for UI)
+  final RxList<dynamic> itemsTambah = <dynamic>[].obs;
+  final RxList<dynamic> itemsMurajaah = <dynamic>[].obs;
+  final RxList<dynamic> itemsTahsin = <dynamic>[].obs;
 
   RxBool isFabVisible = true.obs;
 
   final listC = ListController();
   final scrollC = ScrollController();
+  final searchC = TextEditingController();
 
   // Last checked per mode
   RxInt lastCheckedTambah = 0.obs;
@@ -54,10 +60,28 @@ class DetailHafalanJuzController extends GetxController {
     return detailTahsin.value;
   }
 
+  List<dynamic> get currentItems {
+    if (selectedTab.value == 0) return itemsTambah;
+    if (selectedTab.value == 1) return itemsMurajaah;
+    return itemsTahsin;
+  }
+
   int get currentLastChecked {
     if (selectedTab.value == 0) return lastCheckedTambah.value;
     if (selectedTab.value == 1) return lastCheckedMurajaah.value;
     return lastCheckedTahsin.value;
+  }
+
+  int get firstHalaman {
+    final detail = currentDetail;
+    if (detail == null || detail.surah.isEmpty) return 0;
+    return detail.surah.first.ayat.first.halaman ?? 0;
+  }
+
+  int get lastHalaman {
+    final detail = currentDetail;
+    if (detail == null || detail.surah.isEmpty) return 0;
+    return detail.surah.last.ayat.last.halaman ?? 0;
   }
 
   DateTime? _lastErrorShown;
@@ -73,7 +97,14 @@ class DetailHafalanJuzController extends GetxController {
         santriName = args['santriName'].toString();
       }
     }
+
     getDetailTambah();
+  }
+
+  @override
+  void onClose() {
+    searchC.dispose();
+    super.onClose();
   }
 
   void changeTab(int index) {
@@ -90,19 +121,10 @@ class DetailHafalanJuzController extends GetxController {
     }
   }
 
-  int _getLastCheckedIndex(List<SurahElement> surahs) {
-    int lastIdx = 0;
-    int indexCounter = 0;
-    for (int s = 0; s < surahs.length; s++) {
-      indexCounter++; // for the surah header
-      for (int a = 0; a < surahs[s].ayat.length; a++) {
-        if (surahs[s].ayat[a].checked == true) {
-          lastIdx = indexCounter;
-        }
-        indexCounter++;
-      }
-    }
-    return lastIdx;
+  int _getLastCheckedIndex(List<dynamic> flatItems) {
+    return flatItems.lastIndexWhere(
+      (item) => item is Ayat && item.checked == true,
+    );
   }
 
   int getAyatCount(List<SurahElement> surahs) {
@@ -142,10 +164,10 @@ class DetailHafalanJuzController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        detailTambah.value = DetailHafalanJuz.fromJson(data);
-        lastCheckedTambah.value = _getLastCheckedIndex(
-          detailTambah.value!.surah,
-        );
+        final detail = DetailHafalanJuz.fromJson(data);
+        detailTambah.value = detail;
+        itemsTambah.assignAll(detail.surah.expand((s) => [s, ...s.ayat]));
+        lastCheckedTambah.value = _getLastCheckedIndex(itemsTambah);
       } else {
         ToastUtils.showErrorToast('Gagal memuat hafalan juz');
       }
@@ -173,10 +195,10 @@ class DetailHafalanJuzController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        detailMurajaah.value = DetailHafalanJuz.fromJson(data);
-        lastCheckedMurajaah.value = _getLastCheckedIndex(
-          detailMurajaah.value!.surah,
-        );
+        final detail = DetailHafalanJuz.fromJson(data);
+        detailMurajaah.value = detail;
+        itemsMurajaah.assignAll(detail.surah.expand((s) => [s, ...s.ayat]));
+        lastCheckedMurajaah.value = _getLastCheckedIndex(itemsMurajaah);
       } else {
         ToastUtils.showErrorToast('Gagal memuat murajaah juz');
       }
@@ -204,10 +226,10 @@ class DetailHafalanJuzController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        detailTahsin.value = DetailHafalanJuz.fromJson(data);
-        lastCheckedTahsin.value = _getLastCheckedIndex(
-          detailTahsin.value!.surah,
-        );
+        final detail = DetailHafalanJuz.fromJson(data);
+        detailTahsin.value = detail;
+        itemsTahsin.assignAll(detail.surah.expand((s) => [s, ...s.ayat]));
+        lastCheckedTahsin.value = _getLastCheckedIndex(itemsTahsin);
       } else {
         ToastUtils.showErrorToast('Gagal memuat tahsin juz');
       }
@@ -215,6 +237,24 @@ class DetailHafalanJuzController extends GetxController {
       ToastUtils.showErrorToast('Periksa koneksi internet Anda');
     } finally {
       isLoadingTahsin.value = false;
+    }
+  }
+
+  void scrollToHalaman(int hal) {
+    int targetIndex = currentItems.indexWhere(
+      (item) => item is Ayat && item.halaman == hal,
+    );
+
+    if (targetIndex != -1) {
+      listC.animateToItem(
+        index: targetIndex,
+        scrollController: scrollC,
+        alignment: 0,
+        duration: (estimatedDistance) => const Duration(milliseconds: 800),
+        curve: (estimatedDistance) => Curves.easeInOutCubic,
+      );
+    } else {
+      ToastUtils.showErrorToast('Halaman $hal tidak ditemukan di juz ini');
     }
   }
 

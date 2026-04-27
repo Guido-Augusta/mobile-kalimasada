@@ -37,23 +37,12 @@ class DetailJuzView extends GetView<DetailJuzController> {
               final lastHalaman = halamanList.isNotEmpty ? halamanList.last : 0;
 
               return CustomAnimationSearchBar(
-                controller: TextEditingController(),
+                controller: controller.searchC,
                 onSubmitted: (text) {
                   final val = int.tryParse(text);
-                  if (val == null) return;
-                  final ayatList = juzData?.ayat ?? [];
-                  final targetIndex = ayatList.indexWhere(
-                    (a) => a.halaman == val,
-                  );
-                  if (targetIndex == -1) return;
-                  controller.listC.animateToItem(
-                    index: targetIndex,
-                    scrollController: controller.scrollC,
-                    alignment: 0,
-                    duration: (estimatedDistance) =>
-                        const Duration(milliseconds: 1000),
-                    curve: (estimatedDistance) => Curves.fastLinearToSlowEaseIn,
-                  );
+                  if (val != null) {
+                    controller.scrollToHalaman(val);
+                  }
                 },
                 centerTitle: 'Detail Juz',
                 hintText: 'Cari halaman ($firstHalaman-$lastHalaman)...',
@@ -205,19 +194,15 @@ class DetailJuzView extends GetView<DetailJuzController> {
                     listController: controller.listC,
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        final ayatList =
-                            controller.detailJuz.value?.data?.ayat ?? [];
-                        final ayat = ayatList[index];
-                        final showSurahSeparator =
-                            index == 0 ||
-                            ayat.surah?.nomor !=
-                                ayatList[index - 1].surah?.nomor;
-                        return _buildAyatCard(
-                          ayat,
-                          showSurahSeparator: showSurahSeparator,
-                        );
+                        final item = controller.items[index];
+                        if (item is Surah) {
+                          return _buildSurahSeparator(item);
+                        } else if (item is Ayat) {
+                          return _buildAyatCard(item);
+                        }
+                        return const SizedBox.shrink();
                       },
-                      childCount: controller.detailJuz.value?.data?.ayat.length,
+                      childCount: controller.items.length,
                     ),
                   ),
                 const SliverToBoxAdapter(child: SizedBox(height: 24)),
@@ -393,71 +378,72 @@ class DetailJuzView extends GetView<DetailJuzController> {
 
   // ── Ayat Card ─────────────────────────────────────────────────────────────────
 
-  Widget _buildAyatCard(Ayat? ayat, {bool showSurahSeparator = false}) {
-    return Column(
-      children: [
-        // Surah separator
-        if (showSurahSeparator && ayat?.surah != null)
+  Widget _buildSurahSeparator(Surah? surah) {
+    if (surah == null) return const SizedBox.shrink();
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.deepPurple.withValues(alpha: 0.08),
+            Colors.deepPurpleAccent.withValues(alpha: 0.04),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.deepPurple.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Row(
+        children: [
           Container(
-            margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.deepPurple.withValues(alpha: 0.08),
-                  Colors.deepPurpleAccent.withValues(alpha: 0.04),
-                ],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.deepPurple.withValues(alpha: 0.1),
-              ),
+              color: Colors.deepPurpleAccent.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurpleAccent.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${ayat?.surah?.nomor ?? ''}',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                  ),
+            child: Center(
+              child: Text(
+                '${surah.nomor ?? ''}',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple,
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    ayat?.surah?.namaLatin ?? '',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple[700],
-                    ),
-                  ),
-                ),
-                Text(
-                  ayat?.surah?.nama ?? '',
-                  style: GoogleFonts.amiri(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              surah.namaLatin ?? '',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.deepPurple[700],
+              ),
+            ),
+          ),
+          Text(
+            surah.nama ?? '',
+            style: GoogleFonts.amiri(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.deepPurple,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildAyatCard(Ayat? ayat) {
+    return Column(
+      children: [
         // Ayat card
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

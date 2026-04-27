@@ -10,6 +10,7 @@ import 'package:super_sliver_list/super_sliver_list.dart';
 
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan_surah.dart';
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import 'package:mobile_kalimasada/app/widgets/custom_animation_search_bar.dart';
 import '../../../../utils/quran_utils.dart';
 import '../controllers/detail_hafalan_surah_controller.dart';
 
@@ -43,14 +44,26 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF1F5F9),
-        surfaceTintColor: Colors.transparent,
-        title: const Text(
-          'Detail Hafalan',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: SafeArea(
+          child: Obx(
+            () => CustomAnimationSearchBar(
+              controller: controller.searchC,
+              onSubmitted: (text) {
+                final val = int.tryParse(text);
+                if (val == null) return;
+                controller.scrollToAyat(val);
+              },
+              centerTitle: 'Detail Hafalan',
+              hintText:
+                  'Cari ayat (1-${controller.surahInfo.value?.jumlahAyat ?? 0})...',
+              keyboardType: TextInputType.number,
+              maxValue: controller.surahInfo.value?.jumlahAyat,
+              showSearchIcon: !controller.isSurahInfoLoading.value,
+            ),
+          ),
         ),
-        centerTitle: true,
       ),
 
       // ── 3 Action Buttons (bottom bar) ────────────────────────────────────────

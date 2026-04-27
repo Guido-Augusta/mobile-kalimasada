@@ -19,11 +19,20 @@ class DetailJuzController extends GetxController {
 
   final listC = ListController();
   final scrollC = ScrollController();
+  final searchC = TextEditingController();
+
+  final RxList<dynamic> items = <dynamic>[].obs;
 
   @override
   void onInit() {
     super.onInit();
     getDetailJuz();
+  }
+
+  @override
+  void onClose() {
+    searchC.dispose();
+    super.onClose();
   }
 
   void getDetailJuz() async {
@@ -39,11 +48,26 @@ class DetailJuzController extends GetxController {
               'Content-Type': 'application/json',
             },
           )
-          .timeout(Duration(seconds: 15));
+          .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        detailJuz.value = DetailJuz.fromJson(data);
+        final detail = DetailJuz.fromJson(data);
+        detailJuz.value = detail;
+
+        // Flattening logic: Pisahkan Header Surah menjadi item tersendiri
+        final List<dynamic> flat = [];
+        final ayatList = detail.data?.ayat ?? [];
+        for (int i = 0; i < ayatList.length; i++) {
+          final ayat = ayatList[i];
+          final bool isNewSurah =
+              i == 0 || ayat.surah?.nomor != ayatList[i - 1].surah?.nomor;
+          if (isNewSurah && ayat.surah != null) {
+            flat.add(ayat.surah); // Tambahkan header surah
+          }
+          flat.add(ayat); // Tambahkan ayat
+        }
+        items.assignAll(flat);
       } else {
         ToastUtils.showErrorToast('Gagal memuat data');
       }
@@ -53,6 +77,23 @@ class DetailJuzController extends GetxController {
       );
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  void scrollToHalaman(int hal) {
+    final targetIndex = items.indexWhere(
+      (item) => item is Ayat && item.halaman == hal,
+    );
+    if (targetIndex != -1) {
+      listC.animateToItem(
+        index: targetIndex,
+        scrollController: scrollC,
+        alignment: 0,
+        duration: (estimatedDistance) => const Duration(milliseconds: 800),
+        curve: (estimatedDistance) => Curves.easeInOutCubic,
+      );
+    } else {
+      ToastUtils.showErrorToast('Halaman $hal tidak ditemukan di juz ini');
     }
   }
 }
