@@ -72,7 +72,7 @@ class AlquranView extends GetView<AlquranController> {
         child: Column(
           children: [
             Stack(
-              alignment: Alignment.center,
+              alignment: Alignment.topCenter,
               children: [
                 if (canPop)
                   Align(
@@ -102,20 +102,20 @@ class AlquranView extends GetView<AlquranController> {
                     Text(
                       'Al-Qur\'an',
                       style: GoogleFonts.poppins(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
                         color: Colors.white,
-                        letterSpacing: 1.2,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Membaca & Mendengarkan Al-Qur\'an',
                       style: GoogleFonts.poppins(
-                        fontSize: 12,
+                        fontSize: 14,
                         color: Colors.white.withValues(alpha: 0.7),
                         letterSpacing: 0.5,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),

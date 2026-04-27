@@ -65,7 +65,7 @@ class DetailOrtuController extends GetxController {
         final data = jsonDecode(response.body);
         final ortu = Ortu.fromJson(data['data']);
         ortuDetail.value = ortu;
-        if (ortu.fotoProfil != null && ortu.fotoProfil!.isNotEmpty) {
+        if (ortu.fotoProfil?.isNotEmpty == true) {
           fotoProfil.value = getImageUrl(ortu.fotoProfil!);
         }
         if (kDebugMode) {

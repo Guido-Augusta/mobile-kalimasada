@@ -65,9 +65,8 @@ class OrtuProfileController extends GetxController {
         final data = jsonDecode(response.body);
         final ortu = Ortu.fromJson(data['data']);
         ortuDetail.value = ortu;
-        fotoProfil.value = getImageUrl(ortu.fotoProfil!);
-        if (kDebugMode) {
-          print('Ortu detail loaded: ${ortu.nama}');
+        if (ortu.fotoProfil?.isNotEmpty == true) {
+          fotoProfil.value = getImageUrl(ortu.fotoProfil!);
         }
       } else {
         ToastUtils.showErrorToast('Gagal memuat data profil');

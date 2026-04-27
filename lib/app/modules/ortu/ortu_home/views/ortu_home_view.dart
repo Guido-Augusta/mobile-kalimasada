@@ -45,21 +45,26 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
     return Row(
       children: [
         Obx(
-          () => CircleAvatar(
-            radius: 28,
-            backgroundColor: Colors.grey[200],
-            backgroundImage: CachedNetworkImageProvider(
-              controller.getImageUrl(controller.fotoProfil.value),
+          () => CachedNetworkImage(
+            imageUrl: controller.getImageUrl(controller.fotoProfil.value),
+            imageBuilder: (context, imageProvider) => CircleAvatar(
+              radius: 28,
+              backgroundColor: Colors.grey[200],
+              backgroundImage: imageProvider,
             ),
-            onBackgroundImageError: (_, _) {
-              controller.fotoProfil.value =
-                  'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg';
-            },
-            child:
-                controller.fotoProfil.value.isEmpty ||
-                    controller.fotoProfil.value == ''
-                ? Icon(Icons.person, size: 28, color: Colors.deepPurpleAccent)
-                : null,
+            placeholder: (context, url) => Skeletonizer(
+              enabled: true,
+              child: const CircleAvatar(radius: 28),
+            ),
+            errorWidget: (context, url, error) => CircleAvatar(
+              radius: 28,
+              backgroundColor: Colors.grey[200],
+              child: const Icon(
+                Icons.person,
+                size: 28,
+                color: Colors.deepPurpleAccent,
+              ),
+            ),
           ),
         ),
         const SizedBox(width: 10),
@@ -330,160 +335,117 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
         itemCount: controller.childrenList.length,
         itemBuilder: (context, index) {
           final child = controller.childrenList[index];
-          return Card(
-            color: Colors.white,
+          return Container(
             margin: const EdgeInsets.only(bottom: 12),
-            shape: RoundedRectangleBorder(
+            decoration: BoxDecoration(
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            elevation: 3,
-            shadowColor: Colors.grey.withValues(alpha: 0.1),
-            child: InkWell(
-              onTap: () {
-                Get.toNamed('/detail-santri', arguments: child.id.toString());
-              },
-              borderRadius: BorderRadius.circular(16),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  Get.toNamed('/detail-santri', arguments: child.id.toString());
+                },
+                borderRadius: BorderRadius.circular(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Profile Picture
-                        Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey[200],
-                          ),
-                          child: ClipOval(
-                            child: Icon(
-                              Icons.person,
-                              size: 30,
-                              color: Colors.grey[400],
+                    Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Row(
+                        children: [
+                          // Profile Picture
+                          Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.grey[50],
+                              border: Border.all(
+                                color: Colors.grey[100]!,
+                                width: 2,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.grey[400],
+                                size: 28,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        // Name and Badges
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Name
-                              Text(
-                                child.nama ?? 'Nama tidak tersedia',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: _getTahapColor(
-                                    child.tahapHafalan,
-                                  ).withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: _getTahapColor(
-                                      child.tahapHafalan,
-                                    ).withValues(alpha: 0.3),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Text(
-                                  _getTahapLabel(child.tahapHafalan),
-                                  style: TextStyle(
-                                    fontSize: 12,
+                          const SizedBox(width: 14),
+
+                          // Name and Badge
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  child.nama ?? 'Nama tidak tersedia',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w600,
-                                    color: _getTahapColor(child.tahapHafalan),
+                                    color: Colors.black87,
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 4),
+                                _buildTahapBadge(child.tahapHafalan),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                          Icon(
+                            Icons.chevron_right_rounded,
+                            color: Colors.grey[300],
+                            size: 24,
+                          ),
+                        ],
+                      ),
                     ),
 
-                    const SizedBox(height: 8),
-
-                    // Action Buttons Section
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.history),
-                            label: Text(
-                              'Riwayat',
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
+                    // Action Buttons
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _buildActionButton(
+                              label: 'Riwayat',
+                              icon: Icons.history_rounded,
+                              color: Colors.orange,
+                              onTap: () {
+                                Get.toNamed(
+                                  '/riwayat-hafalan',
+                                  arguments: {'santriId': child.id.toString()},
+                                );
+                              },
                             ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange[50],
-                              foregroundColor: Colors.orange,
-                              shadowColor: Colors.transparent,
-                              side: const BorderSide(color: Colors.orange),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: () {
-                              Get.toNamed(
-                                '/riwayat-hafalan',
-                                arguments: {'santriId': child.id.toString()},
-                              );
-                            },
                           ),
-                        ),
-
-                        const SizedBox(width: 12),
-
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.book_rounded),
-                            label: Text(
-                              'Hafalan',
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _buildActionButton(
+                              label: 'Hafalan',
+                              icon: Icons.book_rounded,
+                              color: const Color(0xFF10B981),
+                              onTap: () {
+                                Get.toNamed(
+                                  '/progres-hafalan',
+                                  arguments: {'santriId': child.id.toString()},
+                                );
+                              },
                             ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(
-                                0xFF10B981,
-                              ).withValues(alpha: 0.1),
-                              foregroundColor: const Color(0xFF10B981),
-                              shadowColor: Colors.transparent,
-                              side: const BorderSide(color: Color(0xFF10B981)),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: () {
-                              Get.toNamed(
-                                '/progres-hafalan',
-                                arguments: {'santriId': child.id.toString()},
-                              );
-                            },
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -590,6 +552,68 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
     );
   }
 
+  // Modern Badge Builder
+  Widget _buildTahapBadge(String? tahap) {
+    final color = _getTahapColor(tahap);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Text(
+        _getTahapLabel(tahap),
+        style: GoogleFonts.poppins(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  // Modern Action Button Builder for Santri Card
+  Widget _buildActionButton({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: color.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        onTap: onTap,
+        highlightColor: color.withValues(alpha: 0.2),
+        splashColor: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 16, color: color),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Color _getTahapColor(String? tahap) {
     switch (tahap?.toLowerCase()) {
       case 'level1':
@@ -607,11 +631,11 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
   String _getTahapLabel(String? tahap) {
     switch (tahap?.toLowerCase()) {
       case 'level1':
-        return 'Juz 30';
+        return 'Level 1 - Juz 30';
       case 'level2':
-        return 'Surah Pilihan';
+        return 'Level 2 - Surah Pilihan';
       case 'level3':
-        return 'Juz 1-29';
+        return 'Level 3 - Juz 1-29';
       default:
         return 'Tahap ?';
     }

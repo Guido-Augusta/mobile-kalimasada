@@ -22,7 +22,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
         surfaceTintColor: Colors.transparent,
         title: const Text(
           'Progres Hafalan',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         centerTitle: true,
       ),

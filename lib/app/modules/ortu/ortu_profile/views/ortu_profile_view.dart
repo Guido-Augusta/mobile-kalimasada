@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../controllers/ortu_profile_controller.dart';
 
@@ -238,22 +239,23 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                                             ),
                                             fit: BoxFit.cover,
                                             placeholder: (context, url) =>
-                                                Container(
-                                                  color: Colors.grey[300],
-                                                  child: const Icon(
-                                                    Icons.person,
-                                                    size: 40,
-                                                    color: Colors.grey,
+                                                Skeletonizer(
+                                                  enabled: true,
+                                                  child: Container(
+                                                    color: Colors.white,
+                                                    width: 110,
+                                                    height: 110,
                                                   ),
                                                 ),
                                             errorWidget:
                                                 (context, url, error) =>
                                                     Container(
-                                                      color: Colors.grey[300],
+                                                      color: Colors.grey[200],
                                                       child: const Icon(
                                                         Icons.person,
-                                                        size: 40,
-                                                        color: Colors.grey,
+                                                        size: 48,
+                                                        color: Colors
+                                                            .deepPurpleAccent,
                                                       ),
                                                     ),
                                           ),

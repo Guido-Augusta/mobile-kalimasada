@@ -131,8 +131,8 @@ class DetailSantriView extends GetView<DetailSantriController> {
         ),
         child: Text(
           'Profil Santri',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
+          style: TextStyle(
+            fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),

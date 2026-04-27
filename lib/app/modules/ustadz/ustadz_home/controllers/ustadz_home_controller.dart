@@ -50,7 +50,9 @@ class UstadzHomeController extends GetxController {
       }
       if (response.statusCode == 200) {
         ustadz.value = Ustadz.fromJson(data['data']);
-        fotoProfil.value = getImageUrl(ustadz.value!.fotoProfil!);
+        if (ustadz.value?.fotoProfil?.isNotEmpty == true) {
+          fotoProfil.value = getImageUrl(ustadz.value!.fotoProfil!);
+        }
       } else {
         ToastUtils.showErrorToast('Gagal mendapatkan data');
       }

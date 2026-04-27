@@ -57,7 +57,9 @@ class OrtuHomeController extends GetxController {
       }
       if (response.statusCode == 200) {
         ortu.value = o.Ortu.fromJson(data['data']);
-        fotoProfil.value = getImageUrl(ortu.value!.fotoProfil!);
+        if (ortu.value?.fotoProfil?.isNotEmpty == true) {
+          fotoProfil.value = getImageUrl(ortu.value!.fotoProfil!);
+        }
 
         if (ortu.value?.santri != null && ortu.value!.santri.isNotEmpty) {
           isLoadingChildren.value = true;
@@ -83,20 +85,31 @@ class OrtuHomeController extends GetxController {
 
   Future<void> getChildrenList() async {
     try {
-      childrenList.clear();
-
-      if (ortu.value?.santri != null) {
-        final futures = ortu.value!.santri
-            .map((santri) => getChildren(santri.id.toString()))
-            .toList();
-        await Future.wait(futures, eagerError: false);
+      if (ortu.value?.santri == null || ortu.value!.santri.isEmpty) {
+        childrenList.clear();
+        return;
       }
+
+      // Map to futures and preserve order
+      final futures = ortu.value!.santri
+          .map((santri) => getChildren(santri.id.toString()))
+          .toList();
+
+      // Wait for all results
+      final results = await Future.wait(futures, eagerError: false);
+
+      // Filter out null results (failed requests) and update list in one go
+      final List<s.Santri> validChildren = results
+          .whereType<s.Santri>()
+          .toList();
+
+      childrenList.assignAll(validChildren);
     } catch (e) {
       ToastUtils.showErrorToast('Gagal memuat data anak');
     }
   }
 
-  Future<void> getChildren(String santriId) async {
+  Future<s.Santri?> getChildren(String santriId) async {
     try {
       final token = AuthService.to.token.value;
       final response = await get(
@@ -107,17 +120,15 @@ class OrtuHomeController extends GetxController {
           'x-platform': 'mobile',
         },
       ).timeout(const Duration(seconds: 30));
+
       var data = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        childrenList.addIf(
-          !childrenList.any((child) => child.id.toString() == santriId),
-          s.Santri.fromJson(data['data']),
-        );
+        return s.Santri.fromJson(data['data']);
       } else {
-        ToastUtils.showErrorToast('Gagal mendapatkan data anak');
+        return null;
       }
     } catch (e) {
-      ToastUtils.showErrorToast('Terjadi kesalahan\nCoba refresh');
+      return null;
     }
   }
 

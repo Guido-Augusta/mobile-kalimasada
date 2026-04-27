@@ -45,21 +45,29 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
     return Row(
       children: [
         Obx(
-          () => CircleAvatar(
-            radius: 28,
-            backgroundColor: Colors.grey[200],
-            backgroundImage: CachedNetworkImageProvider(
-              controller.getImageUrl(controller.fotoProfil.value),
-            ),
-            onBackgroundImageError: (_, _) {
-              controller.fotoProfil.value =
-                  'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg';
-            },
-            child:
-                controller.fotoProfil.value.isEmpty ||
-                    controller.fotoProfil.value == ''
-                ? Icon(Icons.person, size: 28, color: Colors.deepPurpleAccent)
-                : null,
+          () => CachedNetworkImage(
+            imageUrl: controller.getImageUrl(controller.fotoProfil.value),
+            imageBuilder:
+                (context, imageProvider) => CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Colors.grey[200],
+                  backgroundImage: imageProvider,
+                ),
+            placeholder:
+                (context, url) => Skeletonizer(
+                  enabled: true,
+                  child: const CircleAvatar(radius: 28),
+                ),
+            errorWidget:
+                (context, url, error) => CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Colors.grey[200],
+                  child: const Icon(
+                    Icons.person,
+                    size: 28,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                ),
           ),
         ),
         const SizedBox(width: 15),
