@@ -20,7 +20,7 @@ class TambahSantriController extends GetxController {
 
   GlobalKey<FormState> profileFormKey = GlobalKey<FormState>();
   GlobalKey<FormState> ortuFormKey = GlobalKey<FormState>();
-  var passwordFieldKey = GlobalKey<FormFieldState>();
+  GlobalKey<FormFieldState> passwordFieldKey = GlobalKey<FormFieldState>();
   var ayahDropdownKey = GlobalKey<DropdownSearchState<Datum>>();
   var ibuDropdownKey = GlobalKey<DropdownSearchState<Datum>>();
   var waliDropdownKey = GlobalKey<DropdownSearchState<Datum>>();

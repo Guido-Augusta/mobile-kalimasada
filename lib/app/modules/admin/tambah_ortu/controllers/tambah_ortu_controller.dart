@@ -20,6 +20,7 @@ class TambahOrtuController extends GetxController {
   final RxBool isUploadingImage = false.obs;
   final RxBool isSaveProfileLoading = false.obs;
   final RxBool isSaveEmailPasswordLoading = false.obs;
+  final RxBool isPasswordVisible = false.obs;
 
   var ortuDetail = Rxn<Ortu>();
 
@@ -30,8 +31,7 @@ class TambahOrtuController extends GetxController {
           .obs;
 
   GlobalKey<FormState> profileFormKey = GlobalKey<FormState>();
-  final GlobalKey<FormFieldState> passwordFieldKey =
-      GlobalKey<FormFieldState>();
+  GlobalKey<FormFieldState> passwordFieldKey = GlobalKey<FormFieldState>();
 
   var namaC = TextEditingController();
   var noHpC = TextEditingController();
@@ -124,6 +124,7 @@ class TambahOrtuController extends GetxController {
 
   void resetForm() {
     profileFormKey.currentState?.reset();
+    passwordFieldKey.currentState?.reset();
     pickedImage.value = null;
     namaC.clear();
     noHpC.clear();
@@ -132,8 +133,10 @@ class TambahOrtuController extends GetxController {
     passwordC.clear();
     jenisKelaminC.text = 'L';
     tipeC.text = 'Ayah';
+    isPasswordVisible.value = false;
 
     profileFormKey = GlobalKey<FormState>();
+    passwordFieldKey = GlobalKey<FormFieldState>();
     update();
   }
 
