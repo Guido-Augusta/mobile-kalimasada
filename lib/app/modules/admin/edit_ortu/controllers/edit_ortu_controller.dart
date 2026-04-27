@@ -24,6 +24,7 @@ class EditOrtuController extends GetxController {
   final RxBool isSearching = false.obs;
   final RxBool isSaveProfileLoading = false.obs;
   final RxBool isSaveEmailPasswordLoading = false.obs;
+  final RxBool isPasswordVisible = false.obs;
 
   var ortuDetail = Rxn<Ortu>();
 
@@ -365,9 +366,22 @@ class EditOrtuController extends GetxController {
           )
           .timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
+        String oldEmail = ortuDetail.value?.user?.email ?? "";
+        bool emailChanged = email != oldEmail;
+        bool passwordChanged = password != null && password.isNotEmpty;
+
         await getOrtuDetail(isReload: false);
         Get.back();
-        ToastUtils.showSuccessToast('Email dan password berhasil diperbarui');
+
+        if (emailChanged && passwordChanged) {
+          ToastUtils.showSuccessToast('Email dan password berhasil diperbarui');
+        } else if (emailChanged) {
+          ToastUtils.showSuccessToast('Email berhasil diperbarui');
+        } else if (passwordChanged) {
+          ToastUtils.showSuccessToast('Password berhasil diperbarui');
+        } else {
+          ToastUtils.showSuccessToast('Data berhasil diperbarui');
+        }
       } else {
         final now = DateTime.now();
         if (lastErrorShown == null ||

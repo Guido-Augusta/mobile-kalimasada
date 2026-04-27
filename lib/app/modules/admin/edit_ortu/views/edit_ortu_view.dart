@@ -1,8 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fullscreen_image_viewer/fullscreen_image_viewer.dart';
-
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,243 +11,100 @@ import '../controllers/edit_ortu_controller.dart';
 
 class EditOrtuView extends GetView<EditOrtuController> {
   const EditOrtuView({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      return Scaffold(
-        backgroundColor: const Color(0xFFF1F5F9),
-        body: () {
-          return CustomScrollView(
+    return Scaffold(
+      backgroundColor: const Color(0xFFF1F5F9),
+      appBar: AppBar(
+        title: Text(
+          'Edit Orang Tua',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Get.back(),
+        ),
+      ),
+      body: Obx(() {
+        if (!controller.isLoading.value &&
+            controller.ortuDetail.value == null) {
+          return _buildEmptyState();
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => controller.getOrtuDetail(),
+          color: Colors.deepPurpleAccent,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
             slivers: [
-              // Custom App Bar
-              SliverAppBar(
-                centerTitle: true,
-                title: Text(
-                  'Edit Orang Tua',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Get.back(),
-                ),
-                expandedHeight: 180,
-                pinned: false,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.deepPurpleAccent,
-                          Colors.deepPurple[700]!,
-                        ],
-                      ),
-                    ),
-                    child: SafeArea(
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 40),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Profile Picture
-                                  Skeletonizer(
-                                    enabled: controller.isLoading.value,
-                                    child: Container(
-                                      width: 100,
-                                      height: 100,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 4,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(
-                                              alpha: 0.2,
-                                            ),
-                                            blurRadius: 20,
-                                            offset: const Offset(0, 8),
-                                          ),
-                                        ],
-                                      ),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          FullscreenImageViewer.open(
-                                            context: context,
-                                            child: Hero(
-                                              tag: 'foto-profil',
-                                              child: CachedNetworkImage(
-                                                imageUrl: controller
-                                                    .getImageUrl(
-                                                      controller
-                                                          .fotoProfil
-                                                          .value,
-                                                    ),
-                                                fit: BoxFit.cover,
-                                                placeholder: (context, url) =>
-                                                    Container(
-                                                      color: Colors.grey[300],
-                                                      child: const Icon(
-                                                        Icons.person,
-                                                        size: 40,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-                                                errorWidget:
-                                                    (context, url, error) =>
-                                                        Container(
-                                                          color:
-                                                              Colors.grey[300],
-                                                          child: const Icon(
-                                                            Icons.person,
-                                                            size: 40,
-                                                            color: Colors.grey,
-                                                          ),
-                                                        ),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        child: Hero(
-                                          tag: 'foto-profil',
-                                          child: ClipOval(
-                                            child: CachedNetworkImage(
-                                              imageUrl: controller.getImageUrl(
-                                                controller.fotoProfil.value,
-                                              ),
-                                              fit: BoxFit.cover,
-                                              placeholder: (context, url) =>
-                                                  Container(
-                                                    color: Colors.grey[300],
-                                                    child: const Icon(
-                                                      Icons.person,
-                                                      size: 40,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      Container(
-                                                        color: Colors.grey[300],
-                                                        child: const Icon(
-                                                          Icons.person,
-                                                          size: 40,
-                                                          color: Colors.grey,
-                                                        ),
-                                                      ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  const SizedBox(width: 16),
-                                  Flexible(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Skeletonizer(
-                                          effect: ShimmerEffect(
-                                            baseColor: Colors.orangeAccent,
-                                            highlightColor: Colors.orange[300]!,
-                                          ),
-                                          enabled: controller.isLoading.value,
-                                          child: ElevatedButton(
-                                            onPressed:
-                                                controller
-                                                    .isUploadingImage
-                                                    .value
-                                                ? null
-                                                : () {
-                                                    controller.alamatFocusNode
-                                                        .unfocus();
-                                                    FocusScope.of(
-                                                      Get.context!,
-                                                    ).unfocus();
-                                                    _showEditPhotoProfileBottomSheet();
-                                                  },
-                                            style: ElevatedButton.styleFrom(
-                                              disabledBackgroundColor:
-                                                  Colors.grey[400],
-                                              disabledForegroundColor:
-                                                  Colors.white,
-                                              backgroundColor:
-                                                  Colors.orangeAccent,
-                                              foregroundColor: Colors.white,
-                                            ),
-                                            child: Text(
-                                              controller.isUploadingImage.value
-                                                  ? 'Uploading...'
-                                                  : 'Upload Foto',
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                            ),
-                                          ),
-                                        ),
-                                        // const SizedBox(height: 6),
-                                        const Text(
-                                          '(Opsional)',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // Main Content
               SliverPadding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    // Edit Email/Password Button
-                    EditEmailPasswordButton(controller: controller),
                     Form(
                       key: controller.profileFormKey,
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const SizedBox(height: 16),
-
-                          // Personal Information
-                          _buildPersonalInfoSectionForm(),
+                          Text(
+                            'Edit Data Orang Tua',
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Perbarui informasi orang tua/wali santri.',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
                           const SizedBox(height: 24),
 
-                          // Save Button
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              SaveProfileButton(
-                                controller: controller,
-                                formKey: controller.profileFormKey,
-                              ),
-                            ],
+                          // Foto Profil
+                          _buildSectionContainer(
+                            title: 'Foto Profil',
+                            icon: Icons.camera_alt_rounded,
+                            child: _buildPhotoUploadSection(context),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Informasi Personal
+                          Skeletonizer(
+                            enabled: controller.isLoading.value,
+                            child: _buildSectionContainer(
+                              title: 'Informasi Personal',
+                              icon: Icons.person_rounded,
+                              child: _buildPersonalInfoSection(),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Akses Login
+                          Skeletonizer(
+                            enabled: controller.isLoading.value,
+                            child: _buildLoginAccessSection(),
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Buttons
+                          Skeletonizer(
+                            enabled: controller.isLoading.value,
+                            child: SaveProfileButton(
+                              controller: controller,
+                              formKey: controller.profileFormKey,
+                            ),
                           ),
                           const SizedBox(height: 50),
                         ],
@@ -259,13 +114,170 @@ class EditOrtuView extends GetView<EditOrtuController> {
                 ),
               ),
             ],
-          );
-        }(),
-      );
-    });
+          ),
+        );
+      }),
+    );
   }
 
-  void _showEditPhotoProfileBottomSheet() {
+  Widget _buildSectionContainer({
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhotoUploadSection(BuildContext context) {
+    return Row(
+      children: [
+        Skeletonizer(
+          enabled: controller.isLoading.value,
+          child: Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey[200]!, width: 2),
+            ),
+            child: GestureDetector(
+              onTap: () {
+                FullscreenImageViewer.open(
+                  context: context,
+                  child: Hero(
+                    tag: 'foto-profil-edit',
+                    child: CachedNetworkImage(
+                      imageUrl: controller.fotoProfil.value,
+                      fit: BoxFit.cover,
+                      placeholder: (c, u) => _placeholderIcon(),
+                      errorWidget: (c, u, e) => _placeholderIcon(),
+                    ),
+                  ),
+                );
+              },
+              child: Hero(
+                tag: 'foto-profil-edit',
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: controller.fotoProfil.value,
+                    fit: BoxFit.cover,
+                    placeholder: (c, u) => _placeholderIcon(),
+                    errorWidget: (c, u, e) => _placeholderIcon(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Skeletonizer(
+                enabled: controller.isLoading.value,
+                child: OutlinedButton.icon(
+                  onPressed: controller.isUploadingImage.value
+                      ? null
+                      : () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          _showPhotoBottomSheet();
+                        },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    side: const BorderSide(color: Colors.deepPurpleAccent),
+                    foregroundColor: Colors.deepPurpleAccent,
+                  ),
+                  icon: controller.isUploadingImage.value
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.deepPurpleAccent,
+                          ),
+                        )
+                      : const Icon(Icons.upload_rounded, size: 18),
+                  label: Text(
+                    controller.isUploadingImage.value
+                        ? 'Mengunggah...'
+                        : 'Ubah Foto',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Format: JPG, PNG. (Opsional)',
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  color: Colors.grey[500],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _placeholderIcon() {
+    return Container(
+      color: Colors.grey[100],
+      child: Icon(Icons.person_rounded, size: 40, color: Colors.grey[400]),
+    );
+  }
+
+  void _showPhotoBottomSheet() {
     Get.bottomSheet(
       Container(
         width: double.infinity,
@@ -320,317 +332,214 @@ class EditOrtuView extends GetView<EditOrtuController> {
     );
   }
 
-  Widget _buildPersonalInfoSectionForm() {
-    return Skeletonizer(
-      enabled: controller.isLoading.value,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Nama Lengkap',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              style: TextStyle(color: Colors.black),
-              controller: controller.namaC,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Nama tidak boleh kosong';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                hintText: 'Masukkan Nama Lengkap',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                fillColor: Colors.grey[50],
-                filled: true,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Nomor HP',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              keyboardType: TextInputType.phone,
-              style: TextStyle(color: Colors.black),
-              controller: controller.noHpC,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Nomor HP tidak boleh kosong';
-                }
-                if (value.isNotEmpty && !value.isNumericOnly) {
-                  return 'Nomor HP harus berupa angka';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                hintText: 'Masukkan Nomor HP',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                fillColor: Colors.grey[50],
-                filled: true,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Jenis Kelamin',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              style: TextStyle(
-                color: Colors.black87,
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
-              initialValue: controller.jenisKelaminC.text,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Jenis kelamin tidak boleh kosong';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                fillColor: Colors.grey[50],
-                filled: true,
-                hintText: 'Pilih Jenis Kelamin',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              dropdownColor: Colors.white,
-              items: const [
-                DropdownMenuItem(value: 'P', child: Text('Perempuan')),
-                DropdownMenuItem(value: 'L', child: Text('Laki-laki')),
-              ],
-              onChanged: (value) {
-                controller.jenisKelaminC.text = value!;
-              },
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Tipe Orang Tua',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              style: TextStyle(
-                color: Colors.black87,
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
-              initialValue: controller.tipeC.text,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Tipe orang tua tidak boleh kosong';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                fillColor: Colors.grey[50],
-                filled: true,
-                hintText: 'Pilih Tipe Orang Tua',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              dropdownColor: Colors.white,
-              items: const [
-                DropdownMenuItem(value: 'Ayah', child: Text('Ayah')),
-                DropdownMenuItem(value: 'Ibu', child: Text('Ibu')),
-                DropdownMenuItem(value: 'Wali', child: Text('Wali')),
-              ],
-              onChanged: (value) {
-                controller.tipeC.text = value!;
-              },
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Alamat',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              maxLines: 5,
-              minLines: 3,
-              controller: controller.alamatC,
-              focusNode: controller.alamatFocusNode,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Alamat tidak boleh kosong';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                hintText: 'Masukkan Alamat',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                fillColor: Colors.grey[50],
-                filled: true,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.deepPurple),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-            ),
-          ],
+  InputDecoration _inputDecor(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14),
+      fillColor: Colors.grey[50],
+      filled: true,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey[200]!),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey[200]!),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.deepPurpleAccent),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.red[300]!),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    );
+  }
+
+  Widget _label(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: GoogleFonts.poppins(
+          fontWeight: FontWeight.w500,
+          fontSize: 13,
+          color: Colors.grey[700],
         ),
       ),
     );
   }
-}
 
-class EditEmailPasswordButton extends StatelessWidget {
-  const EditEmailPasswordButton({super.key, required this.controller});
-
-  final EditOrtuController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Skeletonizer(
-      enabled: controller.isLoading.value,
-      effect: ShimmerEffect(
-        baseColor: Colors.black,
-        highlightColor: Colors.black54,
-      ),
-      child: ElevatedButton.icon(
-        onPressed: () {
-          // Dialog Edit Email & Password
-          _showEditEmailPasswordDialog();
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+  Widget _buildPersonalInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _label('Nama Lengkap'),
+        TextFormField(
+          controller: controller.namaC,
+          style: GoogleFonts.poppins(color: Colors.black),
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          validator: (v) =>
+              (v == null || v.isEmpty) ? 'Nama tidak boleh kosong' : null,
+          decoration: _inputDecor('Masukkan nama orang tua/wali'),
         ),
-        icon: Icon(Icons.edit),
-        label: Text('Edit Email/Password'),
+        const SizedBox(height: 16),
+        _label('Nomor HP'),
+        TextFormField(
+          controller: controller.noHpC,
+          keyboardType: TextInputType.phone,
+          style: GoogleFonts.poppins(color: Colors.black),
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          validator: (v) {
+            if (v!.isEmpty) return 'Nomor HP tidak boleh kosong';
+            if (!v.isNumericOnly) return 'Nomor HP harus berupa angka';
+            return null;
+          },
+          decoration: _inputDecor('Masukkan nomor handphone'),
+        ),
+        const SizedBox(height: 16),
+        _label('Jenis Kelamin'),
+        DropdownButtonFormField<String>(
+          dropdownColor: Colors.white,
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+          initialValue: controller.jenisKelaminC.text,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          decoration: _inputDecor(''),
+          items: const [
+            DropdownMenuItem(value: 'L', child: Text('Laki-laki')),
+            DropdownMenuItem(value: 'P', child: Text('Perempuan')),
+          ],
+          onChanged: (v) => controller.jenisKelaminC.text = v!,
+        ),
+        const SizedBox(height: 16),
+        _label('Tipe Orang Tua'),
+        DropdownButtonFormField<String>(
+          dropdownColor: Colors.white,
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+          initialValue: controller.tipeC.text,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          decoration: _inputDecor(''),
+          items: const [
+            DropdownMenuItem(value: 'Ayah', child: Text('Ayah')),
+            DropdownMenuItem(value: 'Ibu', child: Text('Ibu')),
+            DropdownMenuItem(value: 'Wali', child: Text('Wali')),
+          ],
+          onChanged: (v) => controller.tipeC.text = v!,
+        ),
+        const SizedBox(height: 16),
+        _label('Alamat'),
+        TextFormField(
+          controller: controller.alamatC,
+          focusNode: controller.alamatFocusNode,
+          minLines: 3,
+          maxLines: 5,
+          style: GoogleFonts.poppins(color: Colors.black),
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          validator: (v) =>
+              (v == null || v.isEmpty) ? 'Alamat tidak boleh kosong' : null,
+          decoration: _inputDecor('Masukkan alamat lengkap'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoginAccessSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.lock_person_rounded,
+                  color: Colors.deepPurpleAccent,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Akses Login',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    'Kredensial untuk orang tua/wali',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _label('Email'),
+          TextFormField(
+            controller: controller.emailC,
+            enabled: false,
+            style: GoogleFonts.poppins(color: Colors.black54),
+            decoration: _inputDecor(
+              'Email',
+            ).copyWith(fillColor: Colors.grey[100]),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => _showEditEmailPasswordDialog(),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                side: const BorderSide(color: Colors.deepPurpleAccent),
+                foregroundColor: Colors.deepPurpleAccent,
+              ),
+              icon: const Icon(Icons.edit_rounded, size: 18),
+              label: Text(
+                'Edit Email & Password',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -638,304 +547,273 @@ class EditEmailPasswordButton extends StatelessWidget {
   void _showEditEmailPasswordDialog() {
     controller.emailC.text = controller.ortuDetail.value!.user!.email!;
     controller.passwordC.text = '';
+    controller.isPasswordVisible.value = false;
+
     Get.dialog(
       barrierDismissible: false,
       Dialog(
         backgroundColor: Colors.white,
         insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(Get.context!).size.height * 0.5,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 20,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.black, Colors.black87],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.black, Colors.black87],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Edit Email & Password',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Ubah email atau password Orang Tua',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white70,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
               ),
-
-              // Content
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 20,
+              child: Column(
+                children: [
+                  Text(
+                    'Edit Email & Password',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
                   ),
-                  child: Form(
-                    key: controller.emailPasswordFormKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Email',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          validator: controller.validateEmail,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: InputDecoration(
-                            hintText: 'Masukkan email',
-                            hintStyle: TextStyle(color: Colors.grey[500]),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            fillColor: Colors.grey[50],
-                            filled: true,
-                            disabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.deepPurpleAccent,
-                              ),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.red),
-                            ),
-                          ),
-                          controller: controller.emailC,
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Password',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: TextFormField(
+                  const SizedBox(height: 4),
+                  Text(
+                    'Ubah email atau password Orang Tua',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Content
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: controller.emailPasswordFormKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _label('Email'),
+                      TextFormField(
+                        controller: controller.emailC,
+                        validator: controller.validateEmail,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        keyboardType: TextInputType.emailAddress,
+                        style: GoogleFonts.poppins(color: Colors.black),
+                        decoration: _inputDecor('Masukkan email'),
+                      ),
+                      const SizedBox(height: 16),
+                      _label('Password'),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Obx(
+                              () => TextFormField(
                                 controller: controller.passwordC,
-                                enabled: false,
-                                readOnly: true,
-                                obscureText: true,
-                                decoration: InputDecoration(
-                                  hintText: 'Password baru',
-                                  hintStyle: TextStyle(color: Colors.grey[500]),
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 12,
-                                  ),
-                                  fillColor: Colors.grey[50],
-                                  filled: true,
-                                  disabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[300]!,
+                                obscureText:
+                                    !controller.isPasswordVisible.value,
+                                style: GoogleFonts.poppins(color: Colors.black),
+                                decoration: _inputDecor('Password baru')
+                                    .copyWith(
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          controller.isPasswordVisible.value
+                                              ? Icons.visibility_rounded
+                                              : Icons.visibility_off_rounded,
+                                          color: Colors.grey[500],
+                                          size: 20,
+                                        ),
+                                        onPressed: () {
+                                          controller.isPasswordVisible.value =
+                                              !controller
+                                                  .isPasswordVisible
+                                                  .value;
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey[300]!,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: Colors.deepPurpleAccent,
-                                    ),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: Colors.red),
-                                  ),
-                                ),
-                                autovalidateMode: AutovalidateMode.always,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Generate password baru';
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                validator: (v) {
+                                  if (v == null || v.isEmpty) {
+                                    return 'Password tidak boleh kosong';
+                                  }
+                                  if (v.length < 8) {
+                                    return 'Password minimal 8 karakter';
                                   }
                                   return null;
                                 },
                               ),
                             ),
-                            const SizedBox(width: 8),
-
-                            // Button Generate
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: const Size(100, 48),
-                                backgroundColor: Colors.black,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
+                          ),
+                          const SizedBox(width: 12),
+                          OutlinedButton.icon(
+                            onPressed: () {
+                              controller.passwordC.text = controller
+                                  .generatePassword();
+                              controller.isPasswordVisible.value = true;
+                              controller.emailPasswordFormKey.currentState
+                                  ?.validate();
+                            },
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
                               ),
-                              onPressed: () {
-                                controller.passwordC.text = controller
-                                    .generatePassword();
-                                if (kDebugMode) {
-                                  print(controller.passwordC.text);
-                                }
-
-                                final formState = controller
-                                    .emailPasswordFormKey
-                                    .currentState;
-                                if (formState != null) {
-                                  formState.validate();
-                                }
-                              },
-                              child: Text('Generate'),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              side: const BorderSide(
+                                color: Colors.deepPurpleAccent,
+                              ),
+                              foregroundColor: Colors.deepPurpleAccent,
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                            icon: const Icon(Icons.autorenew_rounded, size: 18),
+                            label: Text(
+                              'Acak',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-
-              // Actions
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
+            ),
+            // Actions
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(16),
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.vertical(
-                    bottom: Radius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(color: Colors.grey[400]!),
+                      ),
+                      child: Text(
+                        'Batal',
+                        style: GoogleFonts.poppins(
+                          color: Colors.grey[700],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          Get.back();
-                        },
-                        style: TextButton.styleFrom(
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Obx(
+                      () => ElevatedButton(
+                        onPressed: controller.isSaveEmailPasswordLoading.value
+                            ? null
+                            : () {
+                                if (controller
+                                    .emailPasswordFormKey
+                                    .currentState!
+                                    .validate()) {
+                                  controller.updateEmailPasswordOrtu(
+                                    controller.emailC.text,
+                                    controller.passwordC.text,
+                                  );
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(color: Colors.grey[400]!),
+                            borderRadius: BorderRadius.circular(12),
                           ),
+                          elevation: 0,
                         ),
-                        child: const Text(
-                          'Batal',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Obx(
-                        () => ElevatedButton(
-                          onPressed: controller.isSaveEmailPasswordLoading.value
-                              ? null
-                              : () {
-                                  print(controller.emailC.text);
-                                  print(controller.passwordC.text);
-                                  print(
-                                    controller
-                                        .emailPasswordFormKey
-                                        .currentState!
-                                        .validate(),
-                                  );
-                                  if (controller
-                                      .emailPasswordFormKey
-                                      .currentState!
-                                      .validate()) {
-                                    controller.updateEmailPasswordOrtu(
-                                      controller.emailC.text,
-                                      controller.passwordC.text,
-                                    );
-                                  }
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            padding: controller.isSaveEmailPasswordLoading.value
-                                ? EdgeInsets.symmetric(vertical: 4)
-                                : EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: controller.isSaveEmailPasswordLoading.value
-                              ? Transform.scale(
-                                  scale: 0.5,
-                                  child: const CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Text(
-                                  'Simpan',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                        child: controller.isSaveEmailPasswordLoading.value
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
                                 ),
-                        ),
+                              )
+                            : Text(
+                                'Simpan',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
                     ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return RefreshIndicator(
+      onRefresh: () => controller.getOrtuDetail(),
+      color: Colors.deepPurpleAccent,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: 500,
+          width: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.person_off_outlined,
+                  size: 48,
+                  color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Data orang tua tidak ditemukan',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Tarik ke bawah untuk memuat ulang',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.grey[600],
                 ),
               ),
             ],
@@ -959,49 +837,70 @@ class SaveProfileButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => Skeletonizer(
-        enabled: controller.isLoading.value,
-        effect: ShimmerEffect(
-          baseColor: Colors.black,
-          highlightColor: Colors.black54,
-        ),
-        child: ElevatedButton(
-          onPressed: !controller.isSaveProfileLoading.value
-              ? () {
-                  controller.alamatFocusNode.unfocus();
-                  FocusScope.of(Get.context!).unfocus();
-                  if (formKey.currentState!.validate()) {
-                    controller.updateProfileOrtu(
-                      controller.namaC.text,
-                      controller.noHpC.text,
-                      controller.alamatC.text,
-                      controller.jenisKelaminC.text,
-                      controller.tipeC.text,
-                    );
-                  } else {
-                    final now = DateTime.now();
-                    if (controller.lastErrorShown == null ||
-                        now.difference(controller.lastErrorShown!) >
-                            Duration(seconds: 3)) {
-                      controller.lastErrorShown = now;
-                      ToastUtils.showErrorToast(
-                        'Pastikan data yang diisi valid',
-                      );
-                    }
+      () => ElevatedButton(
+        onPressed: !controller.isSaveProfileLoading.value
+            ? () {
+                controller.alamatFocusNode.unfocus();
+                FocusScope.of(Get.context!).unfocus();
+                if (formKey.currentState!.validate()) {
+                  controller.updateProfileOrtu(
+                    controller.namaC.text,
+                    controller.noHpC.text,
+                    controller.alamatC.text,
+                    controller.jenisKelaminC.text,
+                    controller.tipeC.text,
+                  );
+                } else {
+                  final now = DateTime.now();
+                  if (controller.lastErrorShown == null ||
+                      now.difference(controller.lastErrorShown!) >
+                          Duration(seconds: 3)) {
+                    controller.lastErrorShown = now;
+                    ToastUtils.showErrorToast('Pastikan data yang diisi valid');
                   }
                 }
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+              }
+            : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: controller.isSaveProfileLoading.value
-              ? Text('Menyimpan...')
-              : Text('Simpan Perubahan'),
         ),
+        child: controller.isSaveProfileLoading.value
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Menyimpan...',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              )
+            : Text(
+                'Simpan Perubahan',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
       ),
     );
   }

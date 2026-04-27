@@ -40,9 +40,8 @@ class EditSantriView extends GetView<EditSantriController> {
           }
 
           return RefreshIndicator(
-            onRefresh: () async {
-              controller.getSantriDetail();
-            },
+            onRefresh: () => controller.getSantriDetail(),
+            color: Colors.deepPurpleAccent,
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
@@ -80,37 +79,52 @@ class EditSantriView extends GetView<EditSantriController> {
                             const SizedBox(height: 24),
 
                             // Personal Information
-                            _buildSectionContainer(
-                              title: 'Informasi Pribadi',
-                              icon: Icons.person_outline_rounded,
-                              child: _buildEditPersonalInfoSection(),
+                            Skeletonizer(
+                              enabled: isLoading,
+                              child: _buildSectionContainer(
+                                title: 'Informasi Pribadi',
+                                icon: Icons.person_outline_rounded,
+                                child: _buildEditPersonalInfoSection(),
+                              ),
                             ),
                             const SizedBox(height: 20),
 
                             // Parents Information
-                            _buildSectionContainer(
-                              title: 'Data Orang Tua/Wali',
-                              icon: Icons.family_restroom_rounded,
-                              child: _buildEditParentsSection(),
+                            Skeletonizer(
+                              enabled: isLoading,
+                              child: _buildSectionContainer(
+                                title: 'Data Orang Tua/Wali',
+                                icon: Icons.family_restroom_rounded,
+                                child: _buildEditParentsSection(),
+                              ),
                             ),
                             const SizedBox(height: 20),
 
                             // Tahap Hafalan Information
-                            _buildSectionContainer(
-                              title: 'Tahap Hafalan',
-                              icon: Icons.menu_book_rounded,
-                              child: _buildEditTahapHafalanSection(),
+                            Skeletonizer(
+                              enabled: isLoading,
+                              child: _buildSectionContainer(
+                                title: 'Tahap Hafalan',
+                                icon: Icons.menu_book_rounded,
+                                child: _buildEditTahapHafalanSection(),
+                              ),
                             ),
                             const SizedBox(height: 20),
 
                             // Ubah Password Container
-                            _buildPasswordActionContainer(),
+                            Skeletonizer(
+                              enabled: isLoading,
+                              child: _buildPasswordActionContainer(),
+                            ),
                             const SizedBox(height: 32),
 
                             // Save Button
-                            SaveProfileButton(
-                              controller: controller,
-                              formKey: controller.profileFormKey,
+                            Skeletonizer(
+                              enabled: isLoading,
+                              child: SaveProfileButton(
+                                controller: controller,
+                                formKey: controller.profileFormKey,
+                              ),
                             ),
                             const SizedBox(height: 50),
                           ],
@@ -129,9 +143,8 @@ class EditSantriView extends GetView<EditSantriController> {
 
   Widget _buildEmptyState() {
     return RefreshIndicator(
-      onRefresh: () async {
-        controller.getSantriDetail();
-      },
+      onRefresh: () => controller.getSantriDetail(),
+      color: Colors.deepPurpleAccent,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: SizedBox(
@@ -436,212 +449,226 @@ class EditSantriView extends GetView<EditSantriController> {
   }
 
   void _showEditPasswordDialog() {
-    controller.passwordC.clear();
+    controller.passwordC.text = '';
     controller.isPasswordVisible.value = false;
 
     Get.dialog(
+      barrierDismissible: false,
       Dialog(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: controller.passwordFormKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Dialog Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Ubah Password',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Dialog Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Ubah Password',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
-                    InkWell(
-                      onTap: () => Get.back(),
-                      borderRadius: BorderRadius.circular(50),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.close_rounded,
-                          size: 20,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // Content
-                Text(
-                  'Password Baru',
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 13,
-                    color: Colors.grey[700],
                   ),
-                ),
-                const SizedBox(height: 8),
-                Obx(
-                  () => TextFormField(
-                    controller: controller.passwordC,
-                    obscureText: !controller.isPasswordVisible.value,
-                    style: GoogleFonts.poppins(color: Colors.black),
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Password baru tidak boleh kosong';
-                      }
-                      if (value.length < 8) {
-                        return 'Password minimal 8 karakter';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Ketik password baru...',
-                      hintStyle: GoogleFonts.poppins(
-                        color: Colors.grey[400],
-                        fontSize: 14,
+                  InkWell(
+                    onTap: () => Get.back(),
+                    borderRadius: BorderRadius.circular(50),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        shape: BoxShape.circle,
                       ),
-                      fillColor: Colors.grey[50],
-                      filled: true,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          controller.isPasswordVisible.value
-                              ? Icons.visibility_rounded
-                              : Icons.visibility_off_rounded,
-                          color: Colors.grey,
-                          size: 20,
-                        ),
-                        onPressed: () {
-                          controller.isPasswordVisible.toggle();
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.deepPurple),
-                      ),
-                      errorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.red),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 20,
+                        color: Colors.grey[600],
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 2),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
 
-                // Generate Button
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton.icon(
-                    onPressed: () {
-                      controller.passwordC.text = controller.generatePassword();
-                      controller.isPasswordVisible.value = true;
-                      controller.passwordFormKey.currentState?.validate();
-                    },
-                    icon: const Icon(Icons.autorenew_rounded, size: 18),
-                    label: Text(
-                      'Buat Otomatis',
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
+            // Content
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: controller.passwordFormKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Password Baru',
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                          color: Colors.grey[700],
+                        ),
                       ),
-                    ),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.deepPurple,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 18),
-
-                // Action Buttons
-                Obx(
-                  () => ElevatedButton(
-                    onPressed: controller.isSavePasswordLoading.value
-                        ? null
-                        : () {
-                            if (controller.passwordFormKey.currentState!
-                                .validate()) {
-                              controller.updatePasswordSantri(
-                                controller.passwordC.text,
-                              );
+                      const SizedBox(height: 8),
+                      Obx(
+                        () => TextFormField(
+                          controller: controller.passwordC,
+                          obscureText: !controller.isPasswordVisible.value,
+                          style: GoogleFonts.poppins(color: Colors.black),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Password baru tidak boleh kosong';
                             }
+                            if (value.length < 8) {
+                              return 'Password minimal 8 karakter';
+                            }
+                            return null;
                           },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: controller.isSavePasswordLoading.value
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2.5,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                'Menyimpan...',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          )
-                        : Text(
-                            'Simpan Password',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w600,
+                          decoration: InputDecoration(
+                            hintText: 'Ketik password baru...',
+                            hintStyle: GoogleFonts.poppins(
+                              color: Colors.grey[400],
                               fontSize: 14,
                             ),
+                            fillColor: Colors.grey[50],
+                            filled: true,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                controller.isPasswordVisible.value
+                                    ? Icons.visibility_rounded
+                                    : Icons.visibility_off_rounded,
+                                color: Colors.grey,
+                                size: 20,
+                              ),
+                              onPressed: () {
+                                controller.isPasswordVisible.toggle();
+                              },
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Colors.deepPurple,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.red),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+
+                      // Generate Button
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () {
+                            controller.passwordC.text = controller
+                                .generatePassword();
+                            controller.isPasswordVisible.value = true;
+                            controller.passwordFormKey.currentState?.validate();
+                          },
+                          icon: const Icon(Icons.autorenew_rounded, size: 18),
+                          label: Text(
+                            'Buat Otomatis',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.deepPurple,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      // Action Buttons
+                      Obx(
+                        () => ElevatedButton(
+                          onPressed: controller.isSavePasswordLoading.value
+                              ? null
+                              : () {
+                                  if (controller.passwordFormKey.currentState!
+                                      .validate()) {
+                                    controller.updatePasswordSantri(
+                                      controller.passwordC.text,
+                                    );
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: controller.isSavePasswordLoading.value
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2.5,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Menyimpan...',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Text(
+                                  'Simpan Password',
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
