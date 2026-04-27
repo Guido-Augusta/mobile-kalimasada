@@ -12,7 +12,7 @@ import 'package:mobile_kalimasada/app/services/auth_service.dart';
 class LoginController extends GetxController {
   final formKey = GlobalKey<FormState>();
 
-  final emailController = TextEditingController();
+  final identifierController = TextEditingController();
   final passwordController = TextEditingController();
 
   // Observable variables for UI state
@@ -22,7 +22,7 @@ class LoginController extends GetxController {
   @override
   void onClose() {
     super.onClose();
-    emailController.clear();
+    identifierController.clear();
     passwordController.clear();
   }
 
@@ -38,7 +38,7 @@ class LoginController extends GetxController {
       final response = await post(
         Uri.parse(ApiUrl.login),
         body: jsonEncode({
-          'email': emailController.text,
+          'email': identifierController.text,
           'password': passwordController.text,
           'platform': 'mobile',
         }),
@@ -89,14 +89,9 @@ class LoginController extends GetxController {
     }
   }
 
-  String? validateEmail(String? email) {
-    RegExp emailRegex = RegExp(
-      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-    );
-    if (email == null || email.isEmpty) {
-      return 'Email tidak boleh kosong';
-    } else if (!emailRegex.hasMatch(email)) {
-      return 'Masukkan email yang valid';
+  String? validateIdentifier(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Email atau Nama tidak boleh kosong';
     }
     return null;
   }
