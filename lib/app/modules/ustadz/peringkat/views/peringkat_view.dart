@@ -314,22 +314,16 @@ class PeringkatView extends GetView<PeringkatController> {
 
   Widget _buildRankingCard(Datum item, int index) {
     final int rank = item.peringkat ?? (index + 1);
-    final bool isTop3 = rank <= 3;
 
     List<Color> rankGradient;
-    Color borderColor;
     if (rank == 1) {
       rankGradient = [const Color(0xFFFFD700), const Color(0xFFF59E0B)];
-      borderColor = const Color(0xFFFFD700);
     } else if (rank == 2) {
       rankGradient = [const Color(0xFFE2E8F0), const Color(0xFF94A3B8)];
-      borderColor = const Color(0xFFCBD5E1);
     } else if (rank == 3) {
       rankGradient = [const Color(0xFFFDBA74), const Color(0xFFEA580C)];
-      borderColor = const Color(0xFFFDBA74);
     } else {
       rankGradient = [Colors.deepPurpleAccent, Colors.deepPurple.shade700];
-      borderColor = Colors.transparent;
     }
 
     return InkWell(
@@ -343,12 +337,6 @@ class PeringkatView extends GetView<PeringkatController> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: isTop3
-              ? Border.all(
-                  color: borderColor.withValues(alpha: 0.3),
-                  width: 1.5,
-                )
-              : Border.all(color: Colors.transparent),
         ),
         child: Row(
           children: [
@@ -366,8 +354,8 @@ class PeringkatView extends GetView<PeringkatController> {
                 boxShadow: [
                   BoxShadow(
                     color: rankGradient.last.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
