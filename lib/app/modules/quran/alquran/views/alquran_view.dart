@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_surah.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_juz.dart' as juz_model;
+import 'package:skeletonizer/skeletonizer.dart';
 import '../controllers/alquran_controller.dart';
 
 class AlquranView extends GetView<AlquranController> {
@@ -37,15 +38,26 @@ class AlquranView extends GetView<AlquranController> {
                 _buildHeader(context, canPop),
                 _buildSearchBar(),
                 _buildTabBar(),
-                if (controller.isLoadingSurah.value ||
-                    controller.isLoadingJuz.value)
-                  _buildLoading()
-                else if (controller.totalCount == 0)
-                  _buildEmpty()
-                else if (controller.selectedTab.value == 0)
-                  _buildSurahList()
-                else
-                  _buildJuzList(),
+                Obx(() {
+                  final isLoading = controller.selectedTab.value == 0
+                      ? controller.isLoadingSurah.value
+                      : controller.isLoadingJuz.value;
+
+                  if (isLoading && controller.totalCount == 0) {
+                    return Skeletonizer.sliver(
+                      enabled: true,
+                      child: controller.selectedTab.value == 0
+                          ? _buildSurahSkeleton()
+                          : _buildJuzSkeleton(),
+                    );
+                  }
+
+                  if (controller.totalCount == 0) return _buildEmpty();
+
+                  return controller.selectedTab.value == 0
+                      ? _buildSurahList()
+                      : _buildJuzList();
+                }),
               ],
             ),
           ),
@@ -479,14 +491,57 @@ class AlquranView extends GetView<AlquranController> {
     );
   }
 
-  // ── State Widgets ────────────────────────────────────────────────────
-  Widget _buildLoading() {
-    return SliverFillRemaining(
-      child: Center(
-        child: CircularProgressIndicator(color: _purple, strokeWidth: 2.5),
+  // ── Skeleton Widgets ────────────────────────────────────────────────
+  Widget _buildSurahSkeleton() {
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => _surahCard(
+            Datum(
+              id: 1,
+              nomor: 1,
+              nama: "الفاتحة",
+              namaLatin: "Al-Fatihah",
+              tempatTurun: "Mekah",
+              totalAyat: 7,
+              arti: "Pembukaan",
+              deskripsi: "Surah Al-Fatihah",
+              audio: "",
+            ),
+          ),
+          childCount: 10,
+        ),
       ),
     );
   }
+
+  Widget _buildJuzSkeleton() {
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => _juzCard(
+            juz_model.Datum(
+              juz: 1,
+              totalAyat: 148,
+              mulaiDari: juz_model.MulaiDari(
+                surah: juz_model.Surah(
+                  nomor: 1,
+                  nama: "الفاتحة",
+                  namaLatin: "Al-Baqarah",
+                ),
+                ayat: 1,
+              ),
+            ),
+          ),
+          childCount: 10,
+        ),
+      ),
+    );
+  }
+
+  // ── State Widgets ────────────────────────────────────────────────────
 
   Widget _buildEmpty() {
     return SliverFillRemaining(
@@ -494,11 +549,24 @@ class AlquranView extends GetView<AlquranController> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.menu_book_rounded, size: 52, color: Colors.grey[300]),
+            Icon(
+              Icons.menu_book_rounded,
+              size: 52,
+              color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+            ),
             const SizedBox(height: 12),
             Text(
-              'Belum ada data',
-              style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14),
+              'Tidak ada data',
+              style: GoogleFonts.poppins(
+                color: Colors.grey[600],
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Tarik ke bawah untuk refresh',
+              style: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 14),
             ),
           ],
         ),
@@ -513,11 +581,24 @@ class AlquranView extends GetView<AlquranController> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off_rounded, size: 52, color: Colors.grey[400]),
+            Icon(
+              Icons.search_off_rounded,
+              size: 52,
+              color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+            ),
             const SizedBox(height: 12),
             Text(
               'Tidak ada hasil yang cocok',
-              style: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
+              style: GoogleFonts.poppins(
+                color: Colors.grey[600],
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Coba cari dengan kata kunci lain',
+              style: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 13),
             ),
           ],
         ),
