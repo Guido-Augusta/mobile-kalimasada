@@ -48,6 +48,8 @@ class AlquranView extends GetView<AlquranController> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final bool canPop = ModalRoute.of(context)?.canPop ?? false;
+
     return SliverToBoxAdapter(
       child: Container(
         padding: EdgeInsets.only(
@@ -62,31 +64,62 @@ class AlquranView extends GetView<AlquranController> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(32),
             bottomRight: Radius.circular(32),
           ),
         ),
         child: Column(
           children: [
-            const SizedBox(height: 10),
-            Text(
-              'Al-Qur\'an',
-              style: GoogleFonts.poppins(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 1.2,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Membaca & Mendengarkan Al-Qur\'an',
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: Colors.white.withValues(alpha: 0.7),
-                letterSpacing: 0.5,
-              ),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                if (canPop)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => Get.back(),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                Column(
+                  children: [
+                    Text(
+                      'Al-Qur\'an',
+                      style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Membaca & Mendengarkan Al-Qur\'an',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.white.withValues(alpha: 0.7),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
             const SizedBox(height: 14),
             // Search Bar
