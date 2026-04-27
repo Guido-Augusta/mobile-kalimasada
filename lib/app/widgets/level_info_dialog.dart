@@ -61,7 +61,7 @@ class LevelInfoDialog {
                     // Level Cards
                     _buildLevelInfo(
                       title: 'Level 1',
-                      description: 'Fokus pada Juz 30 (Juz Amma)',
+                      description: 'Fokus pada Juz 30',
                       color: Colors.green.withValues(alpha: 0.8),
                       icon: '1',
                     ),
