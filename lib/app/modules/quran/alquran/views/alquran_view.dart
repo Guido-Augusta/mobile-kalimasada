@@ -9,8 +9,16 @@ import '../controllers/alquran_controller.dart';
 class AlquranView extends GetView<AlquranController> {
   const AlquranView({super.key});
 
+  static final _purple = Colors.deepPurple[700]!;
+  static const _purpleLight = Colors.deepPurpleAccent;
+  static const _orange = Colors.orange;
+  static const _orangeLight = Colors.orangeAccent;
+  static const _bgColor = Color(0xFFF1F5F9);
+
   @override
   Widget build(BuildContext context) {
+    final bool canPop = ModalRoute.of(context)?.canPop ?? false;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -18,18 +26,17 @@ class AlquranView extends GetView<AlquranController> {
         statusBarBrightness: Brightness.dark,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: _bgColor,
         body: RefreshIndicator(
-          onRefresh: () async {
-            controller.refreshData();
-          },
+          color: _purple,
+          onRefresh: () async => controller.refreshData(),
           child: Obx(
             () => CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
-                _buildHeader(context),
-                _buildTabSelector(),
-                // _buildSearchInfo(),
+                _buildHeader(context, canPop),
+                _buildSearchBar(),
+                _buildTabBar(),
                 if (controller.isLoadingSurah.value ||
                     controller.isLoadingJuz.value)
                   _buildLoading()
@@ -47,130 +54,74 @@ class AlquranView extends GetView<AlquranController> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    final bool canPop = ModalRoute.of(context)?.canPop ?? false;
-
+  // ── Header ───────────────────────────────────────────────────────────
+  Widget _buildHeader(BuildContext context, bool canPop) {
     return SliverToBoxAdapter(
       child: Container(
         padding: EdgeInsets.only(
-          top: MediaQuery.of(context).padding.top + 10,
+          top: MediaQuery.of(context).padding.top + 12,
           left: 20,
           right: 20,
-          bottom: 24,
+          bottom: 20,
         ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
+            colors: [_purpleLight, _purple],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(32),
-            bottomRight: Radius.circular(32),
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(28),
+            bottomRight: Radius.circular(28),
           ),
         ),
         child: Column(
           children: [
-            Stack(
-              alignment: Alignment.topCenter,
+            // Top row: back button + title
+            Row(
               children: [
                 if (canPop)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () => Get.back(),
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.arrow_back_ios_new,
-                            color: Colors.white,
-                            size: 18,
-                          ),
+                  GestureDetector(
+                    onTap: () => Get.back(),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                if (canPop) const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: canPop
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Al-Qur\'an',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
                         ),
                       ),
-                    ),
+                      Text(
+                        'Membaca & Mendengarkan Al-Qur\'an',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: Colors.white.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
                   ),
-                Column(
-                  children: [
-                    Text(
-                      'Al-Qur\'an',
-                      style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Membaca & Mendengarkan Al-Qur\'an',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: Colors.white.withValues(alpha: 0.7),
-                        letterSpacing: 0.5,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
                 ),
               ],
-            ),
-            const SizedBox(height: 14),
-            // Search Bar
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: TextField(
-                controller: controller.searchController,
-                onChanged: (value) {
-                  controller.searchQuery.value = value;
-                },
-                decoration: InputDecoration(
-                  hintText: controller.selectedTab.value == 0
-                      ? 'Cari surah...'
-                      : 'Cari juz...',
-                  hintStyle: GoogleFonts.poppins(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: Colors.deepPurple,
-                  ),
-                  suffixIcon: Obx(() {
-                    if (controller.searchQuery.value.isNotEmpty) {
-                      return IconButton(
-                        icon: const Icon(Icons.clear, color: Colors.grey),
-                        onPressed: () {
-                          controller.searchQuery.value = '';
-                          controller.searchController.clear();
-                        },
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  }),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 20,
-                  ),
-                ),
-              ),
             ),
           ],
         ),
@@ -178,16 +129,82 @@ class AlquranView extends GetView<AlquranController> {
     );
   }
 
-  Widget _buildTabSelector() {
+  // ── Search Bar ───────────────────────────────────────────────────────
+  Widget _buildSearchBar() {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
         child: Container(
-          height: 50,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: TextField(
+            controller: controller.searchController,
+            onChanged: (v) => controller.searchQuery.value = v,
+            style: GoogleFonts.poppins(fontSize: 14),
+            decoration: InputDecoration(
+              hintText: controller.selectedTab.value == 0
+                  ? 'Cari surah...'
+                  : 'Cari juz...',
+              hintStyle: GoogleFonts.poppins(
+                fontSize: 14,
+                color: Colors.grey[500],
+              ),
+              prefixIcon: Icon(Icons.search_rounded, color: _purple, size: 22),
+              suffixIcon: Obx(() {
+                if (controller.searchQuery.value.isNotEmpty) {
+                  return IconButton(
+                    icon: Icon(
+                      Icons.close_rounded,
+                      color: Colors.grey[500],
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      controller.searchQuery.value = '';
+                      controller.searchController.clear();
+                    },
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 14,
+                horizontal: 16,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Tab Bar ──────────────────────────────────────────────────────────
+  Widget _buildTabBar() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
+        child: Container(
+          height: 44,
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Colors.deepPurpleAccent.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(16),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
             children: [_buildTabItem(0, 'Surah'), _buildTabItem(1, 'Juz')],
@@ -198,31 +215,24 @@ class AlquranView extends GetView<AlquranController> {
   }
 
   Widget _buildTabItem(int index, String label) {
-    bool isSelected = controller.selectedTab.value == index;
+    final isSelected = controller.selectedTab.value == index;
     return Expanded(
       child: GestureDetector(
         onTap: () => controller.selectedTab.value = index,
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : [],
+            color: isSelected ? Colors.deepPurpleAccent : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
           ),
           alignment: Alignment.center,
           child: Text(
             label,
             style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-              color: isSelected ? Colors.deepPurple : Colors.grey,
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              color: isSelected ? Colors.white : Colors.grey[500],
             ),
           ),
         ),
@@ -230,83 +240,65 @@ class AlquranView extends GetView<AlquranController> {
     );
   }
 
+  // ── Surah List ───────────────────────────────────────────────────────
   Widget _buildSurahList() {
     if (controller.filteredSurahList.isEmpty &&
         controller.searchQuery.value.isNotEmpty) {
       return _buildNoResults();
     }
     return SliverPadding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
       sliver: SliverList(
-        delegate: SliverChildBuilderDelegate((context, index) {
-          final surah = controller.filteredSurahList[index];
-          return _surahCard(surah);
-        }, childCount: controller.filteredSurahList.length),
-      ),
-    );
-  }
-
-  Widget _buildJuzList() {
-    if (controller.filteredJuzList.isEmpty &&
-        controller.searchQuery.value.isNotEmpty) {
-      return _buildNoResults();
-    }
-    return SliverPadding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-      sliver: SliverList(
-        delegate: SliverChildBuilderDelegate((context, index) {
-          final juz = controller.filteredJuzList[index];
-          return _juzCard(juz);
-        }, childCount: controller.filteredJuzList.length),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => _surahCard(controller.filteredSurahList[index]),
+          childCount: controller.filteredSurahList.length,
+        ),
       ),
     );
   }
 
   Widget _surahCard(Datum surah) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.deepPurple.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
       child: Material(
-        color: Colors.transparent,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
             Get.toNamed('/detail-surah', arguments: surah.id);
           },
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               children: [
-                // Surah Number
+                // Number badge — orange accent
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 42,
+                  height: 42,
                   decoration: BoxDecoration(
-                    color: Colors.orange.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        _orangeLight.withValues(alpha: 0.2),
+                        _orange.withValues(alpha: 0.12),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Center(
-                    child: Text(
-                      '${surah.nomor}',
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange,
-                      ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '${surah.nomor}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: _orange,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 // Info
                 Expanded(
                   child: Column(
@@ -315,29 +307,51 @@ class AlquranView extends GetView<AlquranController> {
                       Text(
                         surah.namaLatin ?? '',
                         style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${surah.tempatTurun} • ${surah.totalAyat} Ayat',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _purple.withValues(alpha: 0.07),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              surah.tempatTurun ?? '',
+                              style: GoogleFonts.poppins(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: _purple,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${surah.totalAyat} Ayat',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 6),
-                // Arabic Name
+                // Arabic name
                 Text(
                   surah.nama ?? '',
                   style: GoogleFonts.amiri(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: _purple,
                   ),
                 ),
               ],
@@ -348,51 +362,65 @@ class AlquranView extends GetView<AlquranController> {
     );
   }
 
-  Widget _juzCard(juz_model.Datum juz) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.deepPurple.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+  // ── Juz List ─────────────────────────────────────────────────────────
+  Widget _buildJuzList() {
+    if (controller.filteredJuzList.isEmpty &&
+        controller.searchQuery.value.isNotEmpty) {
+      return _buildNoResults();
+    }
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => _juzCard(controller.filteredJuzList[index]),
+          childCount: controller.filteredJuzList.length,
+        ),
       ),
+    );
+  }
+
+  Widget _juzCard(juz_model.Datum juz) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
       child: Material(
-        color: Colors.transparent,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
             Get.toNamed('/detail-juz', arguments: juz.juz);
           },
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               children: [
-                // Juz Number
+                // Number badge — orange accent
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 42,
+                  height: 42,
                   decoration: BoxDecoration(
-                    color: Colors.orange.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        _orangeLight.withValues(alpha: 0.2),
+                        _orange.withValues(alpha: 0.12),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Center(
-                    child: Text(
-                      '${juz.juz}',
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange,
-                      ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '${juz.juz}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: _orange,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 // Info
                 Expanded(
                   child: Column(
@@ -401,16 +429,16 @@ class AlquranView extends GetView<AlquranController> {
                       Text(
                         'Juz ${juz.juz}',
                         style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
-                        'Mulai: ${juz.mulaiDari?.surah?.namaLatin} (${juz.mulaiDari?.ayat})',
+                        '${juz.mulaiDari?.surah?.namaLatin ?? '-'} ayat ${juz.mulaiDari?.ayat ?? '-'}',
                         style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey,
+                          fontSize: 11,
+                          color: Colors.grey[500],
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -418,32 +446,30 @@ class AlquranView extends GetView<AlquranController> {
                     ],
                   ),
                 ),
-                // Total Ayat info
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '${juz.totalAyat}',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
-                      ),
+                // Ayat count badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _purple.withValues(alpha: 0.07),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${juz.totalAyat} Ayat',
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: _purple,
                     ),
-                    Text(
-                      'Ayat',
-                      style: GoogleFonts.poppins(
-                        fontSize: 10,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-                const SizedBox(width: 8),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 14,
-                  color: Colors.grey,
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 20,
+                  color: Colors.grey[400],
                 ),
               ],
             ),
@@ -453,9 +479,12 @@ class AlquranView extends GetView<AlquranController> {
     );
   }
 
+  // ── State Widgets ────────────────────────────────────────────────────
   Widget _buildLoading() {
-    return const SliverFillRemaining(
-      child: Center(child: CircularProgressIndicator(color: Colors.deepPurple)),
+    return SliverFillRemaining(
+      child: Center(
+        child: CircularProgressIndicator(color: _purple, strokeWidth: 2.5),
+      ),
     );
   }
 
@@ -463,13 +492,13 @@ class AlquranView extends GetView<AlquranController> {
     return SliverFillRemaining(
       child: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.book_outlined, size: 64, color: Colors.grey[300]),
-            const SizedBox(height: 16),
+            Icon(Icons.menu_book_rounded, size: 52, color: Colors.grey[300]),
+            const SizedBox(height: 12),
             Text(
               'Belum ada data',
-              style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
+              style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14),
             ),
           ],
         ),
@@ -482,13 +511,13 @@ class AlquranView extends GetView<AlquranController> {
       hasScrollBody: false,
       child: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off, size: 64, color: Colors.grey[300]),
-            const SizedBox(height: 16),
+            Icon(Icons.search_off_rounded, size: 52, color: Colors.grey[400]),
+            const SizedBox(height: 12),
             Text(
               'Tidak ada hasil yang cocok',
-              style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
+              style: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
             ),
           ],
         ),

@@ -22,7 +22,6 @@ class AlquranController extends GetxController {
   // UI State
   var selectedTab = 0.obs; // 0 for Surah, 1 for Juz
   var searchQuery = ''.obs;
-  var lastReadSurah = Rxn<Datum>();
   var searchController = TextEditingController();
 
   DateTime? _lastErrorShown;
@@ -137,8 +136,9 @@ class AlquranController extends GetxController {
     }
   }
 
-  int get searchResultCount =>
-      selectedTab.value == 0 ? filteredSurahList.length : filteredJuzList.length;
+  int get searchResultCount => selectedTab.value == 0
+      ? filteredSurahList.length
+      : filteredJuzList.length;
 
   int get totalCount =>
       selectedTab.value == 0 ? surahList.length : juzList.length;
