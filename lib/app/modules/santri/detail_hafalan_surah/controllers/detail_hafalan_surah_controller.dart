@@ -13,6 +13,8 @@ import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
+import '../../../ustadz/progres_hafalan/controllers/progres_hafalan_controller.dart';
+
 class DetailHafalanSurahController extends GetxController {
   RxBool isSurahInfoLoading = false.obs;
 
@@ -319,7 +321,6 @@ class DetailHafalanSurahController extends GetxController {
           : selectedTab.value == 1
           ? 'Murajaah'
           : 'Tahsin';
-      print(status);
 
       if (kualitas == 'Sangat Baik') {
         kualitas = 'SangatBaik';
@@ -350,6 +351,16 @@ class DetailHafalanSurahController extends GetxController {
           getDetailMurajaah();
         } else if (selectedTab.value == 2) {
           getDetailTahsin();
+        }
+        if (Get.isRegistered<ProgresHafalanController>()) {
+          await Future.wait([
+            Get.find<ProgresHafalanController>().getProgresHafalanSurah(
+              santriId.toString(),
+            ),
+            Get.find<ProgresHafalanController>().getProgresHafalanJuz(
+              santriId.toString(),
+            ),
+          ]);
         }
         return true;
       } else {

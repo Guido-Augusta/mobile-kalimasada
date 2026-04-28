@@ -28,38 +28,41 @@ class AlquranView extends GetView<AlquranController> {
       ),
       child: Scaffold(
         backgroundColor: _bgColor,
-        body: RefreshIndicator(
-          onRefresh: () async => controller.refreshData(),
-          color: Colors.deepPurpleAccent,
-          backgroundColor: Colors.white,
-          child: Obx(
-            () => CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                _buildHeader(context, canPop),
-                _buildSearchBar(),
-                _buildTabBar(),
-                Obx(() {
-                  final isLoading = controller.selectedTab.value == 0
-                      ? controller.isLoadingSurah.value
-                      : controller.isLoadingJuz.value;
+        body: SafeArea(
+          top: false,
+          child: RefreshIndicator(
+            onRefresh: () async => controller.refreshData(),
+            color: Colors.deepPurpleAccent,
+            backgroundColor: Colors.white,
+            child: Obx(
+              () => CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  _buildHeader(context, canPop),
+                  _buildSearchBar(),
+                  _buildTabBar(),
+                  Obx(() {
+                    final isLoading = controller.selectedTab.value == 0
+                        ? controller.isLoadingSurah.value
+                        : controller.isLoadingJuz.value;
 
-                  if (isLoading && controller.totalCount == 0) {
-                    return Skeletonizer.sliver(
-                      enabled: true,
-                      child: controller.selectedTab.value == 0
-                          ? _buildSurahSkeleton()
-                          : _buildJuzSkeleton(),
-                    );
-                  }
+                    if (isLoading && controller.totalCount == 0) {
+                      return Skeletonizer.sliver(
+                        enabled: true,
+                        child: controller.selectedTab.value == 0
+                            ? _buildSurahSkeleton()
+                            : _buildJuzSkeleton(),
+                      );
+                    }
 
-                  if (controller.totalCount == 0) return _buildEmpty();
+                    if (controller.totalCount == 0) return _buildEmpty();
 
-                  return controller.selectedTab.value == 0
-                      ? _buildSurahList()
-                      : _buildJuzList();
-                }),
-              ],
+                    return controller.selectedTab.value == 0
+                        ? _buildSurahList()
+                        : _buildJuzList();
+                  }),
+                ],
+              ),
             ),
           ),
         ),

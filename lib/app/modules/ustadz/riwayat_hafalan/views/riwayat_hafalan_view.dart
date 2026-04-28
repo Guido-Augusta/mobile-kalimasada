@@ -24,18 +24,21 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         surfaceTintColor: Colors.transparent,
       ),
       body: Obx(() {
-        return RefreshIndicator(
-          onRefresh: () async {
-            controller.refreshRiwayatHafalan();
-          },
-          color: Colors.deepPurpleAccent,
-          backgroundColor: Colors.white,
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
+        return SafeArea(
+          top: false,
+          child: RefreshIndicator(
+            onRefresh: () async {
+              controller.refreshRiwayatHafalan();
+            },
+            color: Colors.deepPurpleAccent,
+            backgroundColor: Colors.white,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
+              controller: controller.scrollController,
+              slivers: [_buildHeader(), _buildFilter(), _buildRiwayatList()],
             ),
-            controller: controller.scrollController,
-            slivers: [_buildHeader(), _buildFilter(), _buildRiwayatList()],
           ),
         );
       }),

@@ -127,186 +127,194 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
         );
       }),
 
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await controller.getProgresHafalanSurah(controller.santriId);
-          await controller.getProgresHafalanJuz(controller.santriId);
-        },
-        backgroundColor: Colors.white,
-        color: Colors.deepPurpleAccent,
-        child: NotificationListener<UserScrollNotification>(
-          onNotification: (notification) {
-            if (notification.direction == ScrollDirection.reverse) {
-              if (controller.isFabVisible.value) {
-                controller.isFabVisible.value = false;
-              }
-            } else if (notification.direction == ScrollDirection.forward) {
-              if (!controller.isFabVisible.value) {
-                controller.isFabVisible.value = true;
-              }
-            }
-            return true;
+      body: SafeArea(
+        top: false,
+        child: RefreshIndicator(
+          onRefresh: () async {
+            await Future.wait([
+              controller.getProgresHafalanSurah(controller.santriId),
+              controller.getProgresHafalanJuz(controller.santriId),
+            ]);
           },
-          child: CustomScrollView(
-            controller: controller.scrollC,
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
-            slivers: [
-              // Student Info Card
-              Obx(() => _buildHeader()),
-
-              // Search Bar + Toggle (combined)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                  child: _buildSearchAndToggleBar(),
-                ),
+          backgroundColor: Colors.white,
+          color: Colors.deepPurpleAccent,
+          child: NotificationListener<UserScrollNotification>(
+            onNotification: (notification) {
+              if (notification.direction == ScrollDirection.reverse) {
+                if (controller.isFabVisible.value) {
+                  controller.isFabVisible.value = false;
+                }
+              } else if (notification.direction == ScrollDirection.forward) {
+                if (!controller.isFabVisible.value) {
+                  controller.isFabVisible.value = true;
+                }
+              }
+              return true;
+            },
+            child: CustomScrollView(
+              controller: controller.scrollC,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
               ),
+              slivers: [
+                // Student Info Card
+                Obx(() => _buildHeader()),
 
-              // List (reactive)
-              Obx(() {
-                // Loading state
-                if (controller.isLoading.value) {
-                  return const SliverFillRemaining(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(
-                            color: Colors.deepPurpleAccent,
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'Memuat data...',
-                            style: TextStyle(color: Colors.grey, fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
+                // Search Bar + Toggle (combined)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                    child: _buildSearchAndToggleBar(),
+                  ),
+                ),
 
-                // Empty data state
-                if ((controller.filterMode.value == 'surah' &&
-                        controller.progresHafalanSurah.isEmpty) ||
-                    (controller.filterMode.value == 'juz' &&
-                        controller.progresHafalanJuz.isEmpty)) {
-                  return SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(32),
-                            decoration: BoxDecoration(
-                              color: Colors.deepPurpleAccent.withValues(
-                                alpha: 0.05,
-                              ),
-                              shape: BoxShape.circle,
+                // List (reactive)
+                Obx(() {
+                  // Loading state
+                  if (controller.isLoading.value) {
+                    return const SliverFillRemaining(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              color: Colors.deepPurpleAccent,
                             ),
-                            child: Icon(
-                              Icons.book_outlined,
-                              size: 64,
-                              color: Colors.deepPurpleAccent.withValues(
-                                alpha: 0.3,
+                            SizedBox(height: 16),
+                            Text(
+                              'Memuat data...',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            'Tidak Ada Data',
-                            style: GoogleFonts.poppins(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Tarik ke bawah untuk refresh',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                }
+                    );
+                  }
 
-                // No search result
-                final isSearching = controller.searchQuery.value.isNotEmpty;
-                final isNoSearchResult =
-                    isSearching &&
-                    (controller.filterMode.value == 'surah'
-                        ? controller.filteredSurahList.isEmpty
-                        : controller.filteredJuzList.isEmpty);
+                  // Empty data state
+                  if ((controller.filterMode.value == 'surah' &&
+                          controller.progresHafalanSurah.isEmpty) ||
+                      (controller.filterMode.value == 'juz' &&
+                          controller.progresHafalanJuz.isEmpty)) {
+                    return SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(32),
+                              decoration: BoxDecoration(
+                                color: Colors.deepPurpleAccent.withValues(
+                                  alpha: 0.05,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.book_outlined,
+                                size: 64,
+                                color: Colors.deepPurpleAccent.withValues(
+                                  alpha: 0.3,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Text(
+                              'Tidak Ada Data',
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Tarik ke bawah untuk refresh',
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
 
-                if (isNoSearchResult) {
-                  return _buildNoSearchResult();
-                }
+                  // No search result
+                  final isSearching = controller.searchQuery.value.isNotEmpty;
+                  final isNoSearchResult =
+                      isSearching &&
+                      (controller.filterMode.value == 'surah'
+                          ? controller.filteredSurahList.isEmpty
+                          : controller.filteredJuzList.isEmpty);
 
-                // Surah mode
-                if (controller.filterMode.value == 'surah') {
-                  final surahList = controller.searchQuery.value.isEmpty
-                      ? controller.progresHafalanSurah
-                      : controller.filteredSurahList;
+                  if (isNoSearchResult) {
+                    return _buildNoSearchResult();
+                  }
+
+                  // Surah mode
+                  if (controller.filterMode.value == 'surah') {
+                    final surahList = controller.searchQuery.value.isEmpty
+                        ? controller.progresHafalanSurah
+                        : controller.filteredSurahList;
+                    return SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
+                      sliver: SuperSliverList(
+                        listController: controller.listSurahC,
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            if (index == surahList.length) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: _buildDoaKhatamCard(),
+                              );
+                            }
+                            final surah = surahList[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: RepaintBoundary(
+                                child: _buildSurahProgressCard(surah, index),
+                              ),
+                            );
+                          },
+                          childCount: surahList.length + 1,
+                          addAutomaticKeepAlives: false,
+                          addRepaintBoundaries: false,
+                        ),
+                      ),
+                    );
+                  }
+
+                  // Juz mode
+                  final juzList = controller.searchQuery.value.isEmpty
+                      ? controller.progresHafalanJuz
+                      : controller.filteredJuzList;
                   return SliverPadding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
                     sliver: SuperSliverList(
-                      listController: controller.listSurahC,
+                      listController: controller.listJuzC,
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          if (index == surahList.length) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: _buildDoaKhatamCard(),
-                            );
-                          }
-                          final surah = surahList[index];
+                          final juz = juzList[index];
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: RepaintBoundary(
-                              child: _buildSurahProgressCard(surah, index),
+                              child: _buildJuzProgressCard(juz),
                             ),
                           );
                         },
-                        childCount: surahList.length + 1,
+                        childCount: juzList.length,
                         addAutomaticKeepAlives: false,
                         addRepaintBoundaries: false,
                       ),
                     ),
                   );
-                }
-
-                // Juz mode
-                final juzList = controller.searchQuery.value.isEmpty
-                    ? controller.progresHafalanJuz
-                    : controller.filteredJuzList;
-                return SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
-                  sliver: SuperSliverList(
-                    listController: controller.listJuzC,
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final juz = juzList[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: RepaintBoundary(
-                            child: _buildJuzProgressCard(juz),
-                          ),
-                        );
-                      },
-                      childCount: juzList.length,
-                      addAutomaticKeepAlives: false,
-                      addRepaintBoundaries: false,
-                    ),
-                  ),
-                );
-              }),
-            ],
+                }),
+              ],
+            ),
           ),
         ),
       ),
@@ -329,7 +337,9 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
       if (parts.length >= 2) {
         initials = '${parts[0][0]}${parts[1][0]}'.toUpperCase();
       } else {
-        initials = parts[0].substring(0, parts[0].length > 1 ? 2 : 1).toUpperCase();
+        initials = parts[0]
+            .substring(0, parts[0].length > 1 ? 2 : 1)
+            .toUpperCase();
       }
     }
 

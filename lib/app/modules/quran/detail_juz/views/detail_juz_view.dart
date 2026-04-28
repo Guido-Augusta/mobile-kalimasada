@@ -98,118 +98,121 @@ class DetailJuzView extends GetView<DetailJuzController> {
             ),
           );
         }),
-        body: Obx(() {
-          if (controller.isLoading.value) {
-            return _buildSkeleton();
-          }
-
-          if (controller.detailJuz.value == null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
+        body: SafeArea(
+          top: false,
+          child: Obx(() {
+            if (controller.isLoading.value) {
+              return _buildSkeleton();
+            }
+  
+            if (controller.detailJuz.value == null) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.book_outlined,
+                        size: 48,
+                        color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+                      ),
                     ),
-                    child: Icon(
-                      Icons.book_outlined,
-                      size: 48,
-                      color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Data tidak ditemukan',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Data tidak ditemukan',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
+                  ],
+                ),
+              );
+            }
+  
+            return NotificationListener<UserScrollNotification>(
+              onNotification: (notification) {
+                if (notification.direction == ScrollDirection.reverse) {
+                  if (controller.isFabVisible.value) {
+                    controller.isFabVisible.value = false;
+                  }
+                } else if (notification.direction == ScrollDirection.forward) {
+                  if (!controller.isFabVisible.value) {
+                    controller.isFabVisible.value = true;
+                  }
+                }
+                return true;
+              },
+              child: CustomScrollView(
+                controller: controller.scrollC,
+                slivers: [
+                  // Header
+                  SliverToBoxAdapter(child: _buildJuzHeaderCard(context)),
+  
+                  // Ayat List
+                  if (controller.detailJuz.value?.data?.ayat.isEmpty ?? true)
+                    SliverFillRemaining(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: Colors.deepPurpleAccent.withValues(
+                                  alpha: 0.1,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.format_list_numbered_outlined,
+                                size: 48,
+                                color: Colors.deepPurpleAccent.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Tidak ada ayat',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    SuperSliverList(
+                      listController: controller.listC,
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final item = controller.items[index];
+                          if (item is Surah) {
+                            return _buildSurahSeparator(item);
+                          } else if (item is Ayat) {
+                            return _buildAyatCard(item);
+                          }
+                          return const SizedBox.shrink();
+                        },
+                        childCount: controller.items.length,
+                      ),
                     ),
-                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
                 ],
               ),
             );
-          }
-
-          return NotificationListener<UserScrollNotification>(
-            onNotification: (notification) {
-              if (notification.direction == ScrollDirection.reverse) {
-                if (controller.isFabVisible.value) {
-                  controller.isFabVisible.value = false;
-                }
-              } else if (notification.direction == ScrollDirection.forward) {
-                if (!controller.isFabVisible.value) {
-                  controller.isFabVisible.value = true;
-                }
-              }
-              return true;
-            },
-            child: CustomScrollView(
-              controller: controller.scrollC,
-              slivers: [
-                // Header
-                SliverToBoxAdapter(child: _buildJuzHeaderCard(context)),
-
-                // Ayat List
-                if (controller.detailJuz.value?.data?.ayat.isEmpty ?? true)
-                  SliverFillRemaining(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: Colors.deepPurpleAccent.withValues(
-                                alpha: 0.1,
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.format_list_numbered_outlined,
-                              size: 48,
-                              color: Colors.deepPurpleAccent.withValues(
-                                alpha: 0.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Tidak ada ayat',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                else
-                  SuperSliverList(
-                    listController: controller.listC,
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final item = controller.items[index];
-                        if (item is Surah) {
-                          return _buildSurahSeparator(item);
-                        } else if (item is Ayat) {
-                          return _buildAyatCard(item);
-                        }
-                        return const SizedBox.shrink();
-                      },
-                      childCount: controller.items.length,
-                    ),
-                  ),
-                const SliverToBoxAdapter(child: SizedBox(height: 24)),
-              ],
-            ),
-          );
-        }),
+          }),
+        ),
       ),
     );
   }

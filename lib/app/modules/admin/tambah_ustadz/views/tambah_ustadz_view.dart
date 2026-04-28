@@ -30,110 +30,116 @@ class TambahUstadzView extends GetView<TambahUstadzController> {
           onPressed: () => Get.back(),
         ),
       ),
-      body: GetBuilder<TambahUstadzController>(
-        builder: (_) => CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics(),
-          ),
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  Form(
-                    key: controller.profileFormKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Header Title
-                        Text(
-                          'Daftarkan Ustadz/ah Baru',
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
+      body: SafeArea(
+        top: false,
+        child: GetBuilder<TambahUstadzController>(
+          builder: (_) => CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    Form(
+                      key: controller.profileFormKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Header Title
+                          Text(
+                            'Daftarkan Ustadz/ah Baru',
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Silakan lengkapi data ustadz atau ustadzah.',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.grey[600],
+                          const SizedBox(height: 4),
+                          Text(
+                            'Silakan lengkapi data ustadz atau ustadzah.',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Foto Profil Section
-                        _buildSectionContainer(
-                          title: 'Foto Profil',
-                          icon: Icons.camera_alt_rounded,
-                          child: _buildPhotoUploadSection(context),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Personal Information
-                        _buildSectionContainer(
-                          title: 'Informasi Pribadi',
-                          icon: Icons.person_rounded,
-                          child: _buildPersonalInfoSectionForm(),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Wali Kelas Tahap Information
-                        _buildSectionContainer(
-                          title: 'Wali Kelas',
-                          icon: Icons.school_rounded,
-                          child: _buildWaliKelasTahapSectionForm(),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Akses Login
-                        _buildLoginAccessSectionForm(),
-                        const SizedBox(height: 32),
-
-                        // Save Button
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  controller.resetForm();
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
+                          const SizedBox(height: 24),
+  
+                          // Foto Profil Section
+                          _buildSectionContainer(
+                            title: 'Foto Profil',
+                            icon: Icons.camera_alt_rounded,
+                            child: _buildPhotoUploadSection(context),
+                          ),
+                          const SizedBox(height: 20),
+  
+                          // Personal Information
+                          _buildSectionContainer(
+                            title: 'Informasi Pribadi',
+                            icon: Icons.person_rounded,
+                            child: _buildPersonalInfoSectionForm(),
+                          ),
+                          const SizedBox(height: 20),
+  
+                          // Wali Kelas Tahap Information
+                          _buildSectionContainer(
+                            title: 'Wali Kelas',
+                            icon: Icons.school_rounded,
+                            child: _buildWaliKelasTahapSectionForm(),
+                          ),
+                          const SizedBox(height: 20),
+  
+                          // Akses Login
+                          _buildLoginAccessSectionForm(),
+                          const SizedBox(height: 32),
+  
+                          // Save Button
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    controller.resetForm();
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    side: BorderSide(color: Colors.grey[400]!),
                                   ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  side: BorderSide(color: Colors.grey[400]!),
-                                ),
-                                child: Text(
-                                  'Reset',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey[700],
+                                  child: Text(
+                                    'Reset',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.grey[700],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              flex: 2,
-                              child: SaveProfileButton(controller: controller),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 50),
-                      ],
+                              const SizedBox(width: 12),
+                              Expanded(
+                                flex: 2,
+                                child: SaveProfileButton(controller: controller),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 50),
+                        ],
+                      ),
                     ),
-                  ),
-                ]),
+                  ]),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

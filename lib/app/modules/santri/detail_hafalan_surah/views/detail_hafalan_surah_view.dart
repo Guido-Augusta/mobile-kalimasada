@@ -1,6 +1,7 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
@@ -273,112 +274,115 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
         }
 
         // Main content
-        return NotificationListener<UserScrollNotification>(
-          onNotification: (notification) {
-            if (notification.direction == ScrollDirection.reverse) {
-              if (controller.isFabVisible.value) {
-                controller.isFabVisible.value = false;
+        return SafeArea(
+          top: false,
+          child: NotificationListener<UserScrollNotification>(
+            onNotification: (notification) {
+              if (notification.direction == ScrollDirection.reverse) {
+                if (controller.isFabVisible.value) {
+                  controller.isFabVisible.value = false;
+                }
+              } else if (notification.direction == ScrollDirection.forward) {
+                if (!controller.isFabVisible.value) {
+                  controller.isFabVisible.value = true;
+                }
               }
-            } else if (notification.direction == ScrollDirection.forward) {
-              if (!controller.isFabVisible.value) {
-                controller.isFabVisible.value = true;
-              }
-            }
-            return true;
-          },
-          child: CustomScrollView(
-            controller: controller.scrollC,
-            slivers: [
-              // ── Surah Info Header Card ───────────────────────────────────────
-              SliverToBoxAdapter(child: _buildSurahHeaderCard(context)),
+              return true;
+            },
+            child: CustomScrollView(
+              controller: controller.scrollC,
+              slivers: [
+                // ── Surah Info Header Card ───────────────────────────────────────
+                SliverToBoxAdapter(child: _buildSurahHeaderCard(context)),
 
-              // ── Tab Bar Mode ───────────────────────────────────────────────
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _StickyTabBarDelegate(child: _buildTabBar()),
-              ),
-
-              // ── Progres Summary Bar ──────────────────────────────────────────
-              SliverToBoxAdapter(
-                child: Skeletonizer(
-                  enabled: controller.isCurrentLoading,
-                  child: _buildProgressSummaryBar(),
+                // ── Tab Bar Mode ───────────────────────────────────────────────
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _StickyTabBarDelegate(child: _buildTabBar()),
                 ),
-              ),
 
-              // ── Ayat List ────────────────────────────────────────────────────
-              if (controller.isCurrentLoading &&
-                  (controller.currentDetail?.ayat.isEmpty ?? true))
-                SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    return Skeletonizer(
-                      enabled: true,
-                      child: _buildAyatCard(
-                        Ayat(
-                          id: 0,
-                          nomorAyat: index + 1,
-                          arab: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ',
-                          latin: 'Bismillaahir Rahmaanir Raheem',
-                          terjemah:
-                              'Dengan nama Allah Yang Maha Pengasih lagi Maha Penyayang.',
-                          juz: 30,
-                          checked: false,
-                          kualitas: 'Baik',
-                          keterangan: 'Lanjut',
-                        ),
-                      ),
-                    );
-                  }, childCount: 5),
-                )
-              else if (controller.currentDetail?.ayat.isEmpty ?? true)
-                SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurpleAccent.withValues(
-                              alpha: 0.1,
-                            ),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.format_list_numbered_outlined,
-                            size: 48,
-                            color: Colors.deepPurpleAccent.withValues(
-                              alpha: 0.5,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Tidak ada ayat',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
+                // ── Progres Summary Bar ──────────────────────────────────────────
+                SliverToBoxAdapter(
+                  child: Skeletonizer(
+                    enabled: controller.isCurrentLoading,
+                    child: _buildProgressSummaryBar(),
                   ),
-                )
-              else
-                SuperSliverList(
-                  listController: controller.listC,
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final ayat = controller.currentDetail?.ayat[index];
-                    return Skeletonizer(
-                      enabled: controller.isCurrentLoading,
-                      child: _buildAyatCard(ayat),
-                    );
-                  }, childCount: controller.currentDetail?.ayat.length ?? 0),
                 ),
 
-              const SliverToBoxAdapter(child: SizedBox(height: 24)),
-            ],
+                // ── Ayat List ────────────────────────────────────────────────────
+                if (controller.isCurrentLoading &&
+                    (controller.currentDetail?.ayat.isEmpty ?? true))
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return Skeletonizer(
+                        enabled: true,
+                        child: _buildAyatCard(
+                          Ayat(
+                            id: 0,
+                            nomorAyat: index + 1,
+                            arab: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ',
+                            latin: 'Bismillaahir Rahmaanir Raheem',
+                            terjemah:
+                                'Dengan nama Allah Yang Maha Pengasih lagi Maha Penyayang.',
+                            juz: 30,
+                            checked: false,
+                            kualitas: 'Baik',
+                            keterangan: 'Lanjut',
+                          ),
+                        ),
+                      );
+                    }, childCount: 5),
+                  )
+                else if (controller.currentDetail?.ayat.isEmpty ?? true)
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.deepPurpleAccent.withValues(
+                                alpha: 0.1,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.format_list_numbered_outlined,
+                              size: 48,
+                              color: Colors.deepPurpleAccent.withValues(
+                                alpha: 0.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Tidak ada ayat',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  SuperSliverList(
+                    listController: controller.listC,
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final ayat = controller.currentDetail?.ayat[index];
+                      return Skeletonizer(
+                        enabled: controller.isCurrentLoading,
+                        child: _buildAyatCard(ayat),
+                      );
+                    }, childCount: controller.currentDetail?.ayat.length ?? 0),
+                  ),
+
+                const SliverToBoxAdapter(child: SizedBox(height: 24)),
+              ],
+            ),
           ),
         );
       }),
@@ -513,9 +517,9 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                         if (processingState == ProcessingState.loading ||
                             processingState == ProcessingState.buffering) {
                           return Container(
-                            width: 44,
-                            height: 44,
-                            padding: const EdgeInsets.all(10),
+                            width: 38,
+                            height: 38,
+                            padding: const EdgeInsets.all(8),
                             child: const CircularProgressIndicator(
                               color: Colors.white,
                               strokeWidth: 3,
@@ -527,14 +531,14 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
                         VoidCallback? onTap;
 
                         if (!(playing ?? false)) {
-                          iconData = Icons.play_circle_filled_rounded;
+                          iconData = Icons.play_arrow_rounded;
                           onTap = controller.audioPlayer.play;
                         } else if (processingState !=
                             ProcessingState.completed) {
-                          iconData = Icons.pause_circle_filled_rounded;
+                          iconData = Icons.pause_rounded;
                           onTap = controller.audioPlayer.pause;
                         } else {
-                          iconData = Icons.replay_circle_filled_rounded;
+                          iconData = Icons.replay_rounded;
                           onTap = () {
                             controller.audioPlayer.seek(Duration.zero);
                             controller.audioPlayer.play();
@@ -543,12 +547,20 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
 
                         return GestureDetector(
                           onTap: onTap,
-                          child: Icon(iconData, size: 44, color: Colors.white),
+                          child: CircleAvatar(
+                            radius: 19,
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              iconData,
+                              size: 28,
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
                         );
                       },
                     ),
 
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 14),
 
                     // Progress bar
                     Expanded(
@@ -1152,6 +1164,9 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
+      inputFormatters: keyboardType == TextInputType.number
+          ? [FilteringTextInputFormatter.digitsOnly]
+          : null,
       maxLines: maxLines,
       decoration: InputDecoration(
         labelText: label,
@@ -1179,7 +1194,7 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
       validator: isRequired
           ? (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Wajib diisi';
+                return 'Harus diisi';
               }
               if (!value.isNumericOnly) {
                 return 'Harus berupa angka';
@@ -1331,169 +1346,184 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
           topRight: Radius.circular(24),
         ),
       ),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Tambah Progres $label',
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                  IconButton(
-                    onPressed: () => Get.back(),
-                    icon: const Icon(Icons.close, color: Colors.grey),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue[100]!),
-                ),
-                child: Row(
+      child: SafeArea(
+        top: false,
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
+                    Text(
+                      'Tambah Progres $label',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      child: const Icon(
-                        Icons.person,
-                        color: Colors.blue,
-                        size: 20,
-                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            Get.find<DetailHafalanSurahController>().santriName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: Colors.black87,
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.blue[100]!),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.blue,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              Get.find<DetailHafalanSurahController>()
+                                  .santriName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today_rounded,
-                                size: 12,
-                                color: Colors.blueGrey[600],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${DateTime.now().day} ${['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][DateTime.now().month - 1]} ${DateTime.now().year}',
-                                style: TextStyle(
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_today_rounded,
+                                  size: 12,
                                   color: Colors.blueGrey[600],
-                                  fontSize: 11,
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              Icon(
-                                Icons.menu_book_rounded,
-                                size: 12,
-                                color: Colors.blueGrey[600],
-                              ),
-                              const SizedBox(width: 4),
-                              Expanded(
-                                child: Text(
-                                  'Surah ${Get.find<DetailHafalanSurahController>().surahInfo.value?.namaLatin ?? ''}',
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${DateTime.now().day} ${['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][DateTime.now().month - 1]} ${DateTime.now().year}',
                                   style: TextStyle(
                                     color: Colors.blueGrey[600],
                                     fontSize: 11,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (_errorMessage != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.red[50],
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red[200]!),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        color: Colors.red[700],
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _errorMessage!,
-                          style: TextStyle(
-                            color: Colors.red[700],
-                            fontSize: 13,
-                          ),
+                                const SizedBox(width: 12),
+                                Icon(
+                                  Icons.menu_book_rounded,
+                                  size: 12,
+                                  color: Colors.blueGrey[600],
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    'Surah ${Get.find<DetailHafalanSurahController>().surahInfo.value?.namaLatin ?? ''}',
+                                    style: TextStyle(
+                                      color: Colors.blueGrey[600],
+                                      fontSize: 11,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
-              ],
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: _buildTextField(
-                      controller: _ayatMulaiC,
-                      label: 'Ayat Mulai',
-                      keyboardType: TextInputType.number,
+                if (_errorMessage != null) ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red[200]!),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: Colors.red[700],
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: TextStyle(
+                              color: Colors.red[700],
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildTextField(
-                      controller: _ayatSelesaiC,
-                      label: 'Ayat Selesai',
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
+                  const SizedBox(height: 16),
                 ],
-              ),
-              if (widget.modeIndex == 0) ...[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _ayatMulaiC,
+                        label: 'Ayat Mulai',
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _ayatSelesaiC,
+                        label: 'Ayat Selesai',
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
+                if (widget.modeIndex == 0) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    'Kualitas',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildKualitasChips(),
+                ],
                 const SizedBox(height: 16),
                 Text(
-                  'Kualitas',
+                  'Keterangan',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -1501,63 +1531,52 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                _buildKualitasChips(),
-              ],
-              const SizedBox(height: 16),
-              Text(
-                'Keterangan',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey[700],
+                _buildKeteranganChips(),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: _catatanC,
+                  label: 'Catatan (Opsional)',
+                  maxLines: 3,
+                  isRequired: false,
                 ),
-              ),
-              const SizedBox(height: 8),
-              _buildKeteranganChips(),
-              const SizedBox(height: 16),
-              _buildTextField(
-                controller: _catatanC,
-                label: 'Catatan (Opsional)',
-                maxLines: 3,
-                isRequired: false,
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: Obx(() {
-                  final controller = Get.find<DetailHafalanSurahController>();
-                  final isLoading = controller.isSaveLoading.value;
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: Obx(() {
+                    final controller = Get.find<DetailHafalanSurahController>();
+                    final isLoading = controller.isSaveLoading.value;
 
-                  return ElevatedButton(
-                    onPressed: isLoading ? null : _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: themeColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    return ElevatedButton(
+                      onPressed: isLoading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: themeColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
+                      child: isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Simpan',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
-                          )
-                        : const Text(
-                            'Simpan',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                  );
-                }),
-              ),
-            ],
+                    );
+                  }),
+                ),
+              ],
+            ),
           ),
         ),
       ),

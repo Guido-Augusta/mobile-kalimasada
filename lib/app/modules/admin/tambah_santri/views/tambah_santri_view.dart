@@ -27,113 +27,121 @@ class TambahSantriView extends GetView<TambahSantriController> {
           onPressed: () => Get.back(),
         ),
       ),
-      body: GetBuilder<TambahSantriController>(
-        builder: (_) => CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics(),
-          ),
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  Form(
-                    key: controller.profileFormKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Header Title
-                        Text(
-                          'Daftarkan Santri Baru',
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
+      body: SafeArea(
+        top: false,
+        child: GetBuilder<TambahSantriController>(
+          builder: (_) => CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    Form(
+                      key: controller.profileFormKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Header Title
+                          Text(
+                            'Daftarkan Santri Baru',
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Silakan lengkapi data santri baru.',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.grey[600],
+                          const SizedBox(height: 4),
+                          Text(
+                            'Silakan lengkapi data santri baru.',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 24),
+                          const SizedBox(height: 24),
 
-                        // Nama Lengkap
-                        _buildSectionContainer(
-                          title: 'Informasi Pribadi',
-                          icon: Icons.person_rounded,
-                          child: _buildPersonalInfoSectionForm(),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Orang Tua/Wali
-                        Form(
-                          key: controller.ortuFormKey,
-                          child: _buildSectionContainer(
-                            title: 'Orang Tua/Wali',
-                            icon: Icons.family_restroom_rounded,
-                            child: _buildParentsSectionForm(),
+                          // Nama Lengkap
+                          _buildSectionContainer(
+                            title: 'Informasi Pribadi',
+                            icon: Icons.person_rounded,
+                            child: _buildPersonalInfoSectionForm(),
                           ),
-                        ),
-                        const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
-                        // Tahap Hafalan
-                        _buildSectionContainer(
-                          title: 'Tahap Hafalan',
-                          icon: Icons.menu_book_rounded,
-                          child: _buildTahapHafalanSectionForm(),
-                        ),
-                        const SizedBox(height: 20),
+                          // Orang Tua/Wali
+                          Form(
+                            key: controller.ortuFormKey,
+                            child: _buildSectionContainer(
+                              title: 'Orang Tua/Wali',
+                              icon: Icons.family_restroom_rounded,
+                              child: _buildParentsSectionForm(),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
 
-                        // Password
-                        _buildPasswordActionContainer(),
-                        const SizedBox(height: 32),
+                          // Tahap Hafalan
+                          _buildSectionContainer(
+                            title: 'Tahap Hafalan',
+                            icon: Icons.menu_book_rounded,
+                            child: _buildTahapHafalanSectionForm(),
+                          ),
+                          const SizedBox(height: 20),
 
-                        // Save Button
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  controller.resetForm();
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
+                          // Password
+                          _buildPasswordActionContainer(),
+                          const SizedBox(height: 32),
+
+                          // Save Button
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    controller.resetForm();
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    side: BorderSide(color: Colors.grey[400]!),
                                   ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  side: BorderSide(color: Colors.grey[400]!),
-                                ),
-                                child: Text(
-                                  'Reset',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey[700],
+                                  child: Text(
+                                    'Reset',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.grey[700],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              flex: 2,
-                              child: SaveProfileButton(controller: controller),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 50),
-                      ],
+                              const SizedBox(width: 12),
+                              Expanded(
+                                flex: 2,
+                                child: SaveProfileButton(
+                                  controller: controller,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 50),
+                        ],
+                      ),
                     ),
-                  ),
-                ]),
+                  ]),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -438,10 +446,45 @@ class TambahSantriView extends GetView<TambahSantriController> {
                 ),
               ),
             ),
+            title: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Center(
+                child: Container(
+                  height: 5,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+              ),
+            ),
+            listViewProps: ListViewProps(
+              padding: EdgeInsets.fromLTRB(
+                0,
+                0,
+                0,
+                MediaQuery.of(Get.context!).padding.bottom + 20,
+              ),
+            ),
             itemBuilder: (context, item, isDisabled, isSelected) {
               return Obx(
                 () => !controller.isSearching.value
                     ? ListTile(
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.deepPurpleAccent.withValues(
+                              alpha: 0.1,
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.person,
+                            color: Colors.deepPurpleAccent,
+                            size: 20,
+                          ),
+                        ),
                         title: Text(
                           item.nama ?? '',
                           style: GoogleFonts.poppins(

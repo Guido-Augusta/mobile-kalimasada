@@ -54,25 +54,28 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
                 elevation: 0,
               )
             : null,
-        body: Obx(() {
-          final ortu = controller.ortuDetail.value;
-          final santriList = controller.santriList;
-
-          // Loading
-          if (controller.isLoading.value) {
-            return Skeletonizer(
-              enabled: true,
-              child: _buildContent(_dummyOrtu, const []),
-            );
-          }
-          // Empty Data
-          if (ortu == null) {
-            return _buildEmptyState(context);
-          }
-
-          // Main Content
-          return _buildContent(ortu, santriList);
-        }),
+        body: SafeArea(
+          top: false,
+          child: Obx(() {
+            final ortu = controller.ortuDetail.value;
+            final santriList = controller.santriList;
+  
+            // Loading
+            if (controller.isLoading.value) {
+              return Skeletonizer(
+                enabled: true,
+                child: _buildContent(_dummyOrtu, const []),
+              );
+            }
+            // Empty Data
+            if (ortu == null) {
+              return _buildEmptyState(context);
+            }
+  
+            // Main Content
+            return _buildContent(ortu, santriList);
+          }),
+        ),
       ),
     );
   }

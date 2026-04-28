@@ -43,60 +43,63 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
           ),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          controller.fetchData();
-        },
-        color: Colors.deepPurpleAccent,
-        backgroundColor: Colors.white,
-        child: NotificationListener<UserScrollNotification>(
-          onNotification: (notification) {
-            if (notification.direction == ScrollDirection.reverse) {
-              if (controller.isFabVisible.value) {
-                controller.isFabVisible.value = false;
-              }
-            } else if (notification.direction == ScrollDirection.forward) {
-              if (!controller.isFabVisible.value) {
-                controller.isFabVisible.value = true;
-              }
-            }
-            return true;
+      body: SafeArea(
+        top: false,
+        child: RefreshIndicator(
+          onRefresh: () async {
+            controller.fetchData();
           },
-          child: ListView(
-            controller: controller.scrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: [
-              // Search Bar
-              _buildSearchBar(),
-
-              // Student List
-              Obx(() {
-                if (controller.isLoading.value &&
-                    controller.searchQuery.value.isEmpty) {
-                  return _buildLoadingIndicator();
-                } else if (controller.ustadzList.isEmpty) {
-                  return _buildEmptyState();
-                } else if (controller.searchQuery.value.isNotEmpty &&
-                    controller.ustadzList.isEmpty) {
-                  return _buildEmptyState();
+          color: Colors.deepPurpleAccent,
+          backgroundColor: Colors.white,
+          child: NotificationListener<UserScrollNotification>(
+            onNotification: (notification) {
+              if (notification.direction == ScrollDirection.reverse) {
+                if (controller.isFabVisible.value) {
+                  controller.isFabVisible.value = false;
                 }
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
-                  itemCount:
-                      controller.ustadzList.length +
-                      (controller.hasMore.value ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index >= controller.ustadzList.length) {
-                      return _buildLoadMoreIndicator();
-                    }
-                    final ustadz = controller.ustadzList[index];
-                    return _buildUstadzCard(ustadz);
-                  },
-                );
-              }),
-            ],
+              } else if (notification.direction == ScrollDirection.forward) {
+                if (!controller.isFabVisible.value) {
+                  controller.isFabVisible.value = true;
+                }
+              }
+              return true;
+            },
+            child: ListView(
+              controller: controller.scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                // Search Bar
+                _buildSearchBar(),
+  
+                // Student List
+                Obx(() {
+                  if (controller.isLoading.value &&
+                      controller.searchQuery.value.isEmpty) {
+                    return _buildLoadingIndicator();
+                  } else if (controller.ustadzList.isEmpty) {
+                    return _buildEmptyState();
+                  } else if (controller.searchQuery.value.isNotEmpty &&
+                      controller.ustadzList.isEmpty) {
+                    return _buildEmptyState();
+                  }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
+                    itemCount:
+                        controller.ustadzList.length +
+                        (controller.hasMore.value ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= controller.ustadzList.length) {
+                        return _buildLoadMoreIndicator();
+                      }
+                      final ustadz = controller.ustadzList[index];
+                      return _buildUstadzCard(ustadz);
+                    },
+                  );
+                }),
+              ],
+            ),
           ),
         ),
       ),

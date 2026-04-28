@@ -33,111 +33,114 @@ class EditSantriView extends GetView<EditSantriController> {
             onPressed: () => Get.back(),
           ),
         ),
-        body: () {
-          // Data kosong
-          if (!isLoading && santri == null) {
-            return _buildEmptyState();
-          }
+        body: SafeArea(
+          top: false,
+          child: () {
+            // Data kosong
+            if (!isLoading && santri == null) {
+              return _buildEmptyState();
+            }
 
-          return RefreshIndicator(
-            onRefresh: () => controller.getSantriDetail(),
-            color: Colors.deepPurpleAccent,
-            backgroundColor: Colors.white,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: BouncingScrollPhysics(),
-              ),
-              slivers: [
-                // Main Content
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      Form(
-                        key: controller.profileFormKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            // Header Title
-                            Text(
-                              'Perbarui Data Profil',
-                              style: GoogleFonts.poppins(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Ubah data santri yang diperlukan.',
-                              style: GoogleFonts.poppins(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-
-                            // Personal Information
-                            Skeletonizer(
-                              enabled: isLoading,
-                              child: _buildSectionContainer(
-                                title: 'Informasi Pribadi',
-                                icon: Icons.person_rounded,
-                                child: _buildEditPersonalInfoSection(),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-
-                            // Parents Information
-                            Skeletonizer(
-                              enabled: isLoading,
-                              child: _buildSectionContainer(
-                                title: 'Data Orang Tua/Wali',
-                                icon: Icons.family_restroom_rounded,
-                                child: _buildEditParentsSection(),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-
-                            // Tahap Hafalan Information
-                            Skeletonizer(
-                              enabled: isLoading,
-                              child: _buildSectionContainer(
-                                title: 'Tahap Hafalan',
-                                icon: Icons.menu_book_rounded,
-                                child: _buildEditTahapHafalanSection(),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-
-                            // Ubah Password Container
-                            Skeletonizer(
-                              enabled: isLoading,
-                              child: _buildPasswordActionContainer(),
-                            ),
-                            const SizedBox(height: 32),
-
-                            // Save Button
-                            Skeletonizer(
-                              enabled: isLoading,
-                              child: SaveProfileButton(
-                                controller: controller,
-                                formKey: controller.profileFormKey,
-                              ),
-                            ),
-                            const SizedBox(height: 50),
-                          ],
-                        ),
-                      ),
-                    ]),
-                  ),
+            return RefreshIndicator(
+              onRefresh: () => controller.getSantriDetail(),
+              color: Colors.deepPurpleAccent,
+              backgroundColor: Colors.white,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
                 ),
-              ],
-            ),
-          );
-        }(),
+                slivers: [
+                  // Main Content
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        Form(
+                          key: controller.profileFormKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // Header Title
+                              Text(
+                                'Perbarui Data Profil',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Ubah data santri yang diperlukan.',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+
+                              // Personal Information
+                              Skeletonizer(
+                                enabled: isLoading,
+                                child: _buildSectionContainer(
+                                  title: 'Informasi Pribadi',
+                                  icon: Icons.person_rounded,
+                                  child: _buildEditPersonalInfoSection(),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+
+                              // Parents Information
+                              Skeletonizer(
+                                enabled: isLoading,
+                                child: _buildSectionContainer(
+                                  title: 'Data Orang Tua/Wali',
+                                  icon: Icons.family_restroom_rounded,
+                                  child: _buildEditParentsSection(),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+
+                              // Tahap Hafalan Information
+                              Skeletonizer(
+                                enabled: isLoading,
+                                child: _buildSectionContainer(
+                                  title: 'Tahap Hafalan',
+                                  icon: Icons.menu_book_rounded,
+                                  child: _buildEditTahapHafalanSection(),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+
+                              // Ubah Password Container
+                              Skeletonizer(
+                                enabled: isLoading,
+                                child: _buildPasswordActionContainer(),
+                              ),
+                              const SizedBox(height: 32),
+
+                              // Save Button
+                              Skeletonizer(
+                                enabled: isLoading,
+                                child: SaveProfileButton(
+                                  controller: controller,
+                                  formKey: controller.profileFormKey,
+                                ),
+                              ),
+                              const SizedBox(height: 50),
+                            ],
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }(),
+        ),
       );
     });
   }
@@ -841,6 +844,14 @@ class EditSantriView extends GetView<EditSantriController> {
                     borderRadius: BorderRadius.circular(5),
                   ),
                 ),
+              ),
+            ),
+            listViewProps: ListViewProps(
+              padding: EdgeInsets.fromLTRB(
+                0,
+                0,
+                0,
+                MediaQuery.of(Get.context!).padding.bottom + 20,
               ),
             ),
             itemBuilder: (context, item, isDisabled, isSelected) {

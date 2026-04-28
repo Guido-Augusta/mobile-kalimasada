@@ -165,211 +165,219 @@ class DetailSurahView extends GetView<DetailSurahController> {
             ),
           );
         }),
-        body: Obx(() {
-          if (controller.isLoading.value) {
-            return _buildSkeleton();
-          }
+        body: SafeArea(
+          top: false,
+          child: Obx(() {
+            if (controller.isLoading.value) {
+              return _buildSkeleton();
+            }
 
-          if (controller.detailSurah.value == null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.book_outlined,
-                      size: 48,
-                      color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Data tidak ditemukan',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return NotificationListener<UserScrollNotification>(
-            onNotification: (notification) {
-              if (notification.direction == ScrollDirection.reverse) {
-                if (controller.isFabVisible.value) {
-                  controller.isFabVisible.value = false;
-                }
-              } else if (notification.direction == ScrollDirection.forward) {
-                if (!controller.isFabVisible.value) {
-                  controller.isFabVisible.value = true;
-                }
-              }
-              return true;
-            },
-            child: CustomScrollView(
-              controller: controller.scrollC,
-              slivers: [
-                // Header
-                SliverToBoxAdapter(child: _buildSurahHeaderCard(context)),
-
-                // Ayat List
-                if (controller.detailSurah.value?.ayat.isEmpty ?? true)
-                  SliverFillRemaining(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: Colors.deepPurpleAccent.withValues(
-                                alpha: 0.1,
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.format_list_numbered_outlined,
-                              size: 48,
-                              color: Colors.deepPurpleAccent.withValues(
-                                alpha: 0.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Tidak ada ayat',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+            if (controller.detailSurah.value == null) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.book_outlined,
+                        size: 48,
+                        color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
                       ),
                     ),
-                  )
-                else
-                  SuperSliverList(
-                    listController: controller.listC,
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final ayat = controller.detailSurah.value?.ayat[index];
-                      return Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 4,
-                        ),
-                        child: Card(
-                          color: Colors.white,
-                          elevation: 1,
-                          shadowColor: Colors.black.withValues(alpha: 0.05),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(
-                              color: Colors.grey[200]!,
-                              width: 1,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    color: Colors.deepPurpleAccent.withValues(
-                                      alpha: 0.1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '${ayat?.nomor}',
-                                      style: TextStyle(
-                                        color: Colors.deepPurpleAccent[700],
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Data tidak ditemukan',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return NotificationListener<UserScrollNotification>(
+              onNotification: (notification) {
+                if (notification.direction == ScrollDirection.reverse) {
+                  if (controller.isFabVisible.value) {
+                    controller.isFabVisible.value = false;
+                  }
+                } else if (notification.direction == ScrollDirection.forward) {
+                  if (!controller.isFabVisible.value) {
+                    controller.isFabVisible.value = true;
+                  }
+                }
+                return true;
+              },
+              child: CustomScrollView(
+                controller: controller.scrollC,
+                slivers: [
+                  // Header
+                  SliverToBoxAdapter(child: _buildSurahHeaderCard(context)),
+
+                  // Ayat List
+                  if (controller.detailSurah.value?.ayat.isEmpty ?? true)
+                    SliverFillRemaining(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: Colors.deepPurpleAccent.withValues(
+                                  alpha: 0.1,
                                 ),
-                                const SizedBox(height: 12),
-
-                                // Arabic Text
-                                if (ayat?.ar != null && ayat!.ar!.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 12),
-                                    child: Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Text(
-                                        '${ayat.ar!} ${QuranUtils.getAyahEndSymbol(ayat.nomor!)}',
-                                        style: GoogleFonts.amiri(
-                                          fontSize: 22,
-                                          height: 2.5,
-                                        ),
-                                        textAlign: TextAlign.right,
-                                        textDirection: TextDirection.rtl,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.format_list_numbered_outlined,
+                                size: 48,
+                                color: Colors.deepPurpleAccent.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Tidak ada ayat',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    SuperSliverList(
+                      listController: controller.listC,
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final ayat = controller.detailSurah.value?.ayat[index];
+                        return Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          child: Card(
+                            color: Colors.white,
+                            elevation: 1,
+                            shadowColor: Colors.black.withValues(alpha: 0.05),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(
+                                color: Colors.grey[200]!,
+                                width: 1,
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      color: Colors.deepPurpleAccent.withValues(
+                                        alpha: 0.1,
                                       ),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                  ),
-
-                                // Latin Text
-                                if (ayat?.tr != null && ayat!.tr!.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 8),
-                                    child: Text(
-                                      ayat.tr!,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.green,
-                                        fontStyle: FontStyle.italic,
-                                        height: 1.4,
-                                      ),
-                                    ),
-                                  ),
-
-                                // Translation
-                                if (ayat?.idn != null && ayat!.idn!.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.deepPurpleAccent
-                                            .withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
+                                    child: Center(
                                       child: Text(
-                                        ayat.idn!,
+                                        '${ayat?.nomor}',
                                         style: TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.grey[600],
+                                          color: Colors.deepPurpleAccent[700],
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+
+                                  // Arabic Text
+                                  if (ayat?.ar != null && ayat!.ar!.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 12,
+                                      ),
+                                      child: Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                          '${ayat.ar!} ${QuranUtils.getAyahEndSymbol(ayat.nomor!)}',
+                                          style: GoogleFonts.amiri(
+                                            fontSize: 22,
+                                            height: 2.5,
+                                          ),
+                                          textAlign: TextAlign.right,
+                                          textDirection: TextDirection.rtl,
+                                        ),
+                                      ),
+                                    ),
+
+                                  // Latin Text
+                                  if (ayat?.tr != null && ayat!.tr!.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: Text(
+                                        ayat.tr!,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.green,
+                                          fontStyle: FontStyle.italic,
                                           height: 1.4,
                                         ),
                                       ),
                                     ),
-                                  ),
-                              ],
+
+                                  // Translation
+                                  if (ayat?.idn != null &&
+                                      ayat!.idn!.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.deepPurpleAccent
+                                              .withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          ayat.idn!,
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey[600],
+                                            height: 1.4,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }, childCount: controller.detailSurah.value?.ayat.length),
-                  ),
-                const SliverToBoxAdapter(child: SizedBox(height: 24)),
-              ],
-            ),
-          );
-        }),
+                        );
+                      }, childCount: controller.detailSurah.value?.ayat.length),
+                    ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                ],
+              ),
+            );
+          }),
+        ),
       ),
     );
   }
@@ -500,9 +508,9 @@ class DetailSurahView extends GetView<DetailSurahController> {
                         if (processingState == ProcessingState.loading ||
                             processingState == ProcessingState.buffering) {
                           return Container(
-                            width: 44,
-                            height: 44,
-                            padding: const EdgeInsets.all(10),
+                            width: 38,
+                            height: 38,
+                            padding: const EdgeInsets.all(8),
                             child: const CircularProgressIndicator(
                               color: Colors.white,
                               strokeWidth: 3,
@@ -514,14 +522,14 @@ class DetailSurahView extends GetView<DetailSurahController> {
                         VoidCallback? onTap;
 
                         if (!(playing ?? false)) {
-                          iconData = Icons.play_circle_filled_rounded;
+                          iconData = Icons.play_arrow_rounded;
                           onTap = controller.audioPlayer.play;
                         } else if (processingState !=
                             ProcessingState.completed) {
-                          iconData = Icons.pause_circle_filled_rounded;
+                          iconData = Icons.pause_rounded;
                           onTap = controller.audioPlayer.pause;
                         } else {
-                          iconData = Icons.replay_circle_filled_rounded;
+                          iconData = Icons.replay_rounded;
                           onTap = () {
                             controller.audioPlayer.seek(Duration.zero);
                             controller.audioPlayer.play();
@@ -530,7 +538,15 @@ class DetailSurahView extends GetView<DetailSurahController> {
 
                         return GestureDetector(
                           onTap: onTap,
-                          child: Icon(iconData, size: 44, color: Colors.white),
+                          child: CircleAvatar(
+                            radius: 19,
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              iconData,
+                              size: 28,
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
                         );
                       },
                     ),

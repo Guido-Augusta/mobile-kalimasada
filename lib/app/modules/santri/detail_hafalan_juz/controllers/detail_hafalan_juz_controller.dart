@@ -8,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 import 'package:flutter/material.dart';
 
+import '../../../ustadz/progres_hafalan/controllers/progres_hafalan_controller.dart';
+
 class DetailHafalanJuzController extends GetxController {
   RxBool isJuzInfoLoading = false.obs;
 
@@ -320,6 +322,17 @@ class DetailHafalanJuzController extends GetxController {
           getDetailMurajaah();
         } else if (selectedTab.value == 2) {
           getDetailTahsin();
+        }
+
+        if (Get.isRegistered<ProgresHafalanController>()) {
+          await Future.wait([
+            Get.find<ProgresHafalanController>().getProgresHafalanSurah(
+              santriId.toString(),
+            ),
+            Get.find<ProgresHafalanController>().getProgresHafalanJuz(
+              santriId.toString(),
+            ),
+          ]);
         }
         return true;
       } else {

@@ -59,22 +59,25 @@ class DetailSantriView extends GetView<DetailSantriController> {
                 elevation: 0,
               )
             : null,
-        body: Obx(() {
-          final santri = controller.santriDetail.value;
+        body: SafeArea(
+          top: false,
+          child: Obx(() {
+            final santri = controller.santriDetail.value;
 
-          if (controller.isLoading.value) {
-            return Skeletonizer(
-              enabled: true,
-              child: _buildContent(context, _dummySantri),
-            );
-          }
+            if (controller.isLoading.value) {
+              return Skeletonizer(
+                enabled: true,
+                child: _buildContent(context, _dummySantri),
+              );
+            }
 
-          if (santri == null) {
-            return _buildEmptyState(context);
-          }
+            if (santri == null) {
+              return _buildEmptyState(context);
+            }
 
-          return _buildContent(context, santri);
-        }),
+            return _buildContent(context, santri);
+          }),
+        ),
         bottomNavigationBar:
             (controller.santriDetail.value != null &&
                 !controller.isLoading.value &&

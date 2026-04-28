@@ -54,30 +54,33 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
                 ),
               )
             : null,
-        body: Obx(() {
-          final ustadz = controller.ustadzData.value;
-
-          // Loading
-          if (controller.isLoading.value) {
-            return Skeletonizer(
-              enabled: true,
-              child: _buildContent(_dummyUstadz),
-            );
-          }
-          // Data kosong
-          if (ustadz == null) {
-            return RefreshIndicator(
-              onRefresh: () async {
-                controller.fetchUstadzData();
-              },
-              color: Colors.deepPurpleAccent,
-              backgroundColor: Colors.white,
-              child: _buildEmptyState(context),
-            );
-          }
-
-          return _buildContent(ustadz);
-        }),
+        body: SafeArea(
+          top: false,
+          child: Obx(() {
+            final ustadz = controller.ustadzData.value;
+  
+            // Loading
+            if (controller.isLoading.value) {
+              return Skeletonizer(
+                enabled: true,
+                child: _buildContent(_dummyUstadz),
+              );
+            }
+            // Data kosong
+            if (ustadz == null) {
+              return RefreshIndicator(
+                onRefresh: () async {
+                  controller.fetchUstadzData();
+                },
+                color: Colors.deepPurpleAccent,
+                backgroundColor: Colors.white,
+                child: _buildEmptyState(context),
+              );
+            }
+  
+            return _buildContent(ustadz);
+          }),
+        ),
       ),
     );
   }

@@ -29,106 +29,109 @@ class EditUstadzView extends GetView<EditUstadzController> {
           onPressed: () => Get.back(),
         ),
       ),
-      body: Obx(() {
-        if (!controller.isLoading.value &&
-            controller.ustadzDetail.value == null) {
-          return _buildEmptyState();
-        }
-
-        return RefreshIndicator(
-          onRefresh: () => controller.getUstadzDetail(),
-          color: Colors.deepPurpleAccent,
-          backgroundColor: Colors.white,
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            slivers: [
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
-                ),
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    Form(
-                      key: controller.profileFormKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            'Edit Data Ustadz/ah',
-                            style: GoogleFonts.poppins(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Perbarui informasi ustadz atau ustadzah.',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-
-                          // Foto Profil
-                          _buildSectionContainer(
-                            title: 'Foto Profil',
-                            icon: Icons.camera_alt_rounded,
-                            child: _buildPhotoUploadSection(context),
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Informasi Pribadi
-                          Skeletonizer(
-                            enabled: controller.isLoading.value,
-                            child: _buildSectionContainer(
-                              title: 'Informasi Pribadi',
-                              icon: Icons.person_rounded,
-                              child: _buildPersonalInfoSection(),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Wali Kelas Tahap Information
-                          Skeletonizer(
-                            enabled: controller.isLoading.value,
-                            child: _buildSectionContainer(
-                              title: 'Wali Kelas',
-                              icon: Icons.school_rounded,
-                              child: _buildWaliKelasTahapSectionForm(),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Akses Login
-                          Skeletonizer(
-                            enabled: controller.isLoading.value,
-                            child: _buildLoginAccessSection(),
-                          ),
-                          const SizedBox(height: 32),
-
-                          // Buttons
-                          Skeletonizer(
-                            enabled: controller.isLoading.value,
-                            child: SaveProfileButton(
-                              controller: controller,
-                              formKey: controller.profileFormKey,
-                            ),
-                          ),
-                          const SizedBox(height: 50),
-                        ],
-                      ),
-                    ),
-                  ]),
-                ),
+      body: SafeArea(
+        top: false,
+        child: Obx(() {
+          if (!controller.isLoading.value &&
+              controller.ustadzDetail.value == null) {
+            return _buildEmptyState();
+          }
+  
+          return RefreshIndicator(
+            onRefresh: () => controller.getUstadzDetail(),
+            color: Colors.deepPurpleAccent,
+            backgroundColor: Colors.white,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
               ),
-            ],
-          ),
-        );
-      }),
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      Form(
+                        key: controller.profileFormKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              'Edit Data Ustadz/ah',
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Perbarui informasi ustadz atau ustadzah.',
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+  
+                            // Foto Profil
+                            _buildSectionContainer(
+                              title: 'Foto Profil',
+                              icon: Icons.camera_alt_rounded,
+                              child: _buildPhotoUploadSection(context),
+                            ),
+                            const SizedBox(height: 20),
+  
+                            // Informasi Pribadi
+                            Skeletonizer(
+                              enabled: controller.isLoading.value,
+                              child: _buildSectionContainer(
+                                title: 'Informasi Pribadi',
+                                icon: Icons.person_rounded,
+                                child: _buildPersonalInfoSection(),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+  
+                            // Wali Kelas Tahap Information
+                            Skeletonizer(
+                              enabled: controller.isLoading.value,
+                              child: _buildSectionContainer(
+                                title: 'Wali Kelas',
+                                icon: Icons.school_rounded,
+                                child: _buildWaliKelasTahapSectionForm(),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+  
+                            // Akses Login
+                            Skeletonizer(
+                              enabled: controller.isLoading.value,
+                              child: _buildLoginAccessSection(),
+                            ),
+                            const SizedBox(height: 32),
+  
+                            // Buttons
+                            Skeletonizer(
+                              enabled: controller.isLoading.value,
+                              child: SaveProfileButton(
+                                controller: controller,
+                                formKey: controller.profileFormKey,
+                              ),
+                            ),
+                            const SizedBox(height: 50),
+                          ],
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ),
     );
   }
 

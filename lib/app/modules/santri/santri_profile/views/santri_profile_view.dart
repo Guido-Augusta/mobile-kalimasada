@@ -17,7 +17,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
   Santri get _dummySantri => Santri(
     id: 0,
     userId: 0,
-    nama: 'Loading Name Placeholder',
+    nama: 'Name Placeholder',
     tahapHafalan: '',
     peringkat: 10,
     totalPoin: 100,
@@ -1069,22 +1069,22 @@ class SantriProfileView extends GetView<SantriProfileController> {
               _buildSettingsInfoTile(
                 icon: Icons.edit_note_rounded,
                 label: 'Profil',
-                value: 'Edit Informasi Profil',
+                value: 'Edit Nama',
                 isAccountAction: true,
                 onTap: () {
-                  Get.back(); // close bottom sheet
+                  Get.back();
                   controller.namaC.text = controller.santriDetail.value!.nama!;
                   _showEditProfileDialog();
                 },
               ),
               Divider(color: Colors.grey[200], height: 16),
               _buildSettingsInfoTile(
-                icon: Icons.lock_reset_rounded,
+                icon: Icons.vpn_key_rounded,
                 label: 'Keamanan',
-                value: 'Ubah Password Akun',
+                value: 'Ubah Password',
                 isAccountAction: true,
                 onTap: () {
-                  Get.back(); // close bottom sheet
+                  Get.back();
                   Get.toNamed('/change-password');
                 },
               ),
@@ -1096,7 +1096,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                 isAccountAction: true,
                 iconColor: Colors.redAccent,
                 onTap: () {
-                  Get.back(); // close bottom sheet
+                  Get.back();
                   _showLogoutDialog(context);
                 },
               ),
