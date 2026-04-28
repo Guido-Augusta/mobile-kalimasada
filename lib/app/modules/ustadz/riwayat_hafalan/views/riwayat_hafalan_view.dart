@@ -28,10 +28,12 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
           onRefresh: () async {
             controller.refreshRiwayatHafalan();
           },
-          color: Colors.deepPurple,
+          color: Colors.deepPurpleAccent,
           backgroundColor: Colors.white,
           child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
             controller: controller.scrollController,
             slivers: [_buildHeader(), _buildFilter(), _buildRiwayatList()],
           ),
