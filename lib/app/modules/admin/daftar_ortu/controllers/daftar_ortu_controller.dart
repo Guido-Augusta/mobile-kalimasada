@@ -18,6 +18,7 @@ class DaftarOrtuController extends GetxController {
   final isLoadingDeleteAccount = false.obs;
 
   var searchQuery = ''.obs;
+  var appliedSearchQuery = ''.obs;
   var searchController = TextEditingController();
 
   var ortuList = <Datum>[].obs;
@@ -39,6 +40,7 @@ class DaftarOrtuController extends GetxController {
     setupScrollController();
 
     debounce(searchQuery, (callback) {
+      appliedSearchQuery.value = searchQuery.value;
       fetchData();
     }, time: const Duration(milliseconds: 700));
   }

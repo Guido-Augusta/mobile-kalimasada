@@ -69,7 +69,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
               children: [
                 // Search Bar
                 _buildSearchBar(),
-  
+
                 // Student List
                 Obx(() {
                   if (controller.isLoading.value &&
@@ -174,8 +174,8 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
         const SizedBox(height: 8),
         Obx(
           () => Text(
-            controller.searchQuery.value.isNotEmpty &&
-                    controller.ortuList.isEmpty
+            (controller.appliedSearchQuery.value.isNotEmpty &&
+                    controller.ortuList.isEmpty)
                 ? 'Orang tua tidak ditemukan'
                 : 'Tarik ke bawah untuk refresh',
             style: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 14),
@@ -332,6 +332,9 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                   offset: const Offset(0, 40),
                   elevation: 4,
                   shadowColor: Colors.black.withValues(alpha: 0.2),
+                  onOpened: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   itemBuilder: (context) => [
                     PopupMenuItem(
                       value: 'edit',
