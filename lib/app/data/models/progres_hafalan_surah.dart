@@ -34,7 +34,13 @@ class Datum {
     required this.namaLatin,
     required this.totalAyat,
     required this.progress,
-  });
+  }) {
+    final parts = progress?.split('/') ?? ['0', '0'];
+    currentAyat = int.tryParse(parts[0]) ?? 0;
+    maxAyat = totalAyat ?? int.tryParse(parts[1]) ?? 0;
+    percentage = maxAyat > 0 ? (currentAyat / maxAyat) : 0.0;
+    percentageString = (percentage * 100).toStringAsFixed(0);
+  }
 
   final int? id;
   final int? nomor;
@@ -42,6 +48,11 @@ class Datum {
   final String? namaLatin;
   final int? totalAyat;
   final String? progress;
+
+  late final int currentAyat;
+  late final int maxAyat;
+  late final double percentage;
+  late final String percentageString;
 
   factory Datum.fromJson(Map<String, dynamic> json) {
     return Datum(
@@ -75,7 +86,6 @@ class Santri {
     required this.nama,
     required this.tahapHafalan,
     required this.totalPoin,
-    required this.noInduk,
     required this.orangTua,
   });
 
@@ -83,7 +93,6 @@ class Santri {
   final String? nama;
   final String? tahapHafalan;
   final int? totalPoin;
-  final String? noInduk;
   final List<OrangTua> orangTua;
 
   factory Santri.fromJson(Map<String, dynamic> json) {
@@ -92,7 +101,6 @@ class Santri {
       nama: json["nama"],
       tahapHafalan: json["tahapHafalan"],
       totalPoin: json["totalPoin"],
-      noInduk: json["noInduk"],
       orangTua: json["orangTua"] == null
           ? []
           : List<OrangTua>.from(
@@ -106,13 +114,12 @@ class Santri {
     "nama": nama,
     "tahapHafalan": tahapHafalan,
     "totalPoin": totalPoin,
-    "noInduk": noInduk,
     "orangTua": orangTua.map((x) => x.toJson()).toList(),
   };
 
   @override
   String toString() {
-    return "$id, $nama, $tahapHafalan, $totalPoin, $noInduk, $orangTua, ";
+    return "$id, $nama, $tahapHafalan, $totalPoin, $orangTua, ";
   }
 }
 

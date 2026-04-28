@@ -20,7 +20,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
         elevation: 0,
         backgroundColor: const Color(0xFFF1F5F9),
         surfaceTintColor: Colors.transparent,
-        title: const Text(
+        title: Text(
           'Progres Hafalan',
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
@@ -48,16 +48,18 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                 heroTag: 'scroll_up',
                 backgroundColor: Colors.deepPurpleAccent,
                 mini: true,
+                elevation: 4,
                 onPressed: () {
                   controller.scrollC.animateTo(
                     0,
                     duration: const Duration(milliseconds: 800),
-                    curve: Curves.fastLinearToSlowEaseIn,
+                    curve: Curves.easeInOutCubic,
                   );
                 },
                 child: const Icon(
-                  Icons.keyboard_arrow_up_outlined,
+                  Icons.keyboard_arrow_up_rounded,
                   color: Colors.white,
+                  size: 24,
                 ),
               ),
               const SizedBox(height: 10),
@@ -65,6 +67,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                 heroTag: 'scroll_down',
                 backgroundColor: Colors.deepPurpleAccent,
                 mini: true,
+                elevation: 4,
                 onPressed: () {
                   if (controller.filterMode.value == 'surah') {
                     controller.listSurahC.animateToItem(
@@ -77,26 +80,39 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                       }(),
                       scrollController: controller.scrollC,
                       alignment: 0,
-                      duration: (estimatedDistance) =>
-                          const Duration(milliseconds: 1000),
-                      curve: (estimatedDistance) =>
-                          Curves.fastLinearToSlowEaseIn,
+                      duration: (estimatedDistance) {
+                        final ms = (estimatedDistance * 0.1)
+                            .clamp(300, 1500)
+                            .toInt();
+                        return Duration(milliseconds: ms);
+                      },
+                      curve: (estimatedDistance) => Curves.easeInOutCubic,
                     );
                   } else {
                     controller.listJuzC.animateToItem(
-                      index: 29,
+                      index: () {
+                        if (controller.searchQuery.value.isEmpty) {
+                          return controller.progresHafalanJuz.length - 1;
+                        } else {
+                          return controller.filteredJuzList.length - 1;
+                        }
+                      }(),
                       scrollController: controller.scrollC,
                       alignment: 0,
-                      duration: (estimatedDistance) =>
-                          const Duration(milliseconds: 800),
-                      curve: (estimatedDistance) =>
-                          Curves.fastLinearToSlowEaseIn,
+                      duration: (estimatedDistance) {
+                        final ms = (estimatedDistance * 0.1)
+                            .clamp(300, 1500)
+                            .toInt();
+                        return Duration(milliseconds: ms);
+                      },
+                      curve: (estimatedDistance) => Curves.easeInOutCubic,
                     );
                   }
                 },
                 child: const Icon(
-                  Icons.keyboard_arrow_down_outlined,
+                  Icons.keyboard_arrow_down_rounded,
                   color: Colors.white,
+                  size: 24,
                 ),
               ),
               SizedBox(
@@ -116,6 +132,8 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
           await controller.getProgresHafalanSurah(controller.santriId);
           await controller.getProgresHafalanJuz(controller.santriId);
         },
+        backgroundColor: Colors.white,
+        color: Colors.deepPurpleAccent,
         child: NotificationListener<UserScrollNotification>(
           onNotification: (notification) {
             if (notification.direction == ScrollDirection.reverse) {
@@ -131,6 +149,9 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
           },
           child: CustomScrollView(
             controller: controller.scrollC,
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
             slivers: [
               // Student Info Card
               Obx(() => _buildHeader()),
@@ -172,33 +193,33 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                     (controller.filterMode.value == 'juz' &&
                         controller.progresHafalanJuz.isEmpty)) {
                   return SliverFillRemaining(
+                    hasScrollBody: false,
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(24),
+                            padding: const EdgeInsets.all(32),
                             decoration: BoxDecoration(
                               color: Colors.deepPurpleAccent.withValues(
-                                alpha: 0.1,
+                                alpha: 0.05,
                               ),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
                               Icons.book_outlined,
-                              size: 48,
+                              size: 64,
                               color: Colors.deepPurpleAccent.withValues(
-                                alpha: 0.5,
+                                alpha: 0.3,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 24),
                           Text(
-                            'Tidak ada data',
+                            'Tidak Ada Data',
                             style: GoogleFonts.poppins(
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: FontWeight.w600,
-                              color: Colors.grey[700],
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -206,7 +227,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                             'Tarik ke bawah untuk refresh',
                             style: GoogleFonts.poppins(
                               fontSize: 14,
-                              color: Colors.grey,
+                              color: Colors.grey[500],
                             ),
                           ),
                         ],
@@ -236,21 +257,26 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
                     sliver: SuperSliverList(
                       listController: controller.listSurahC,
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        if (index == surahList.length) {
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          if (index == surahList.length) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: _buildDoaKhatamCard(),
+                            );
+                          }
+                          final surah = surahList[index];
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8),
-                            child: _buildDoaKhatamCard(),
+                            child: RepaintBoundary(
+                              child: _buildSurahProgressCard(surah, index),
+                            ),
                           );
-                        }
-                        final surah = surahList[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: RepaintBoundary(
-                            child: _buildSurahProgressCard(surah, index),
-                          ),
-                        );
-                      }, childCount: surahList.length + 1),
+                        },
+                        childCount: surahList.length + 1,
+                        addAutomaticKeepAlives: false,
+                        addRepaintBoundaries: false,
+                      ),
                     ),
                   );
                 }
@@ -263,13 +289,20 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
                   sliver: SuperSliverList(
                     listController: controller.listJuzC,
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final juz = juzList[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: _buildJuzProgressCard(juz),
-                      );
-                    }, childCount: juzList.length),
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final juz = juzList[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: RepaintBoundary(
+                            child: _buildJuzProgressCard(juz),
+                          ),
+                        );
+                      },
+                      childCount: juzList.length,
+                      addAutomaticKeepAlives: false,
+                      addRepaintBoundaries: false,
+                    ),
                   ),
                 );
               }),
@@ -289,10 +322,18 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
         controller.isLoading.value || controller.santriData.value == null;
     final santri = controller.santriData.value;
 
+    // Initials from name
+    String initials = '?';
+    if (santri?.nama != null && santri!.nama!.isNotEmpty) {
+      final parts = santri.nama!.trim().split(' ');
+      initials = parts.length >= 2
+          ? '${parts[0][0]}${parts[1][0]}'.toUpperCase()
+          : parts[0][0].toUpperCase();
+    }
+
     return SliverToBoxAdapter(
       child: Container(
-        margin: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 8),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           gradient: LinearGradient(
@@ -302,109 +343,141 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF6B46C1).withValues(alpha: 0.4),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
+              color: Colors.deepPurpleAccent.withValues(alpha: 0.45),
+              blurRadius: 20,
+              spreadRadius: -2,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      width: 2,
-                    ),
-                  ),
-                  child: const CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Colors.white24,
-                    child: Icon(
-                      Icons.person_rounded,
-                      size: 26,
-                      color: Colors.white,
-                    ),
-                  ),
+            // Decorative circles
+            Positioned(
+              top: -20,
+              right: -20,
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.05),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+            ),
+            Positioned(
+              bottom: -30,
+              right: 60,
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.04),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Skeletonizer(
-                        enabled: isLoading,
-                        effect: ShimmerEffect(
-                          baseColor: Colors.white.withValues(alpha: 0.2),
-                          highlightColor: Colors.white.withValues(alpha: 0.4),
-                        ),
-                        child: Text(
-                          santri?.nama ?? 'Nama Santri',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            height: 1.2,
+                      // Avatar with initials
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: 0.18),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.35),
+                            width: 2,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                        ),
+                        child: Center(
+                          child: Skeletonizer(
+                            enabled: isLoading,
+                            effect: ShimmerEffect(
+                              baseColor: Colors.white.withValues(alpha: 0.2),
+                              highlightColor: Colors.white.withValues(
+                                alpha: 0.4,
+                              ),
+                            ),
+                            child: Text(
+                              isLoading ? 'SA' : initials,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Skeletonizer(
-                        enabled: isLoading,
-                        effect: ShimmerEffect(
-                          baseColor: Colors.white.withValues(alpha: 0.2),
-                          highlightColor: Colors.white.withValues(alpha: 0.4),
-                        ),
-                        child: Text(
-                          santri?.noInduk ?? 'Nomor Induk',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Informasi Santri',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white.withValues(alpha: 0.65),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Skeletonizer(
+                              enabled: isLoading,
+                              effect: ShimmerEffect(
+                                baseColor: Colors.white.withValues(alpha: 0.2),
+                                highlightColor: Colors.white.withValues(
+                                  alpha: 0.4,
+                                ),
+                              ),
+                              child: Text(
+                                santri?.nama ?? 'Nama Santri',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.2,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-              ),
-              child: IntrinsicHeight(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildHeaderStat(
-                      title: 'Total Poin',
-                      value: '${santri?.totalPoin ?? 0}',
-                      flex: 4,
-                    ),
-                    VerticalDivider(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      thickness: 1,
-                    ),
-                    _buildHeaderStat(
-                      title: 'Tahap Hafalan',
-                      value: getTahapanLabel(santri?.tahapHafalan ?? '-'),
-                      flex: 7,
-                    ),
-                  ],
-                ),
+                  const SizedBox(height: 12),
+                  // Stats row with icon chips
+                  Row(
+                    children: [
+                      _buildStatChip(
+                        label: 'Total Poin',
+                        value: isLoading ? '---' : '${santri?.totalPoin ?? 0}',
+                        isLoading: isLoading,
+                      ),
+                      const SizedBox(width: 10),
+                      _buildStatChip(
+                        label: 'Tahap Hafalan',
+                        value: isLoading
+                            ? '-------------'
+                            : getTahapanLabel(santri?.tahapHafalan ?? '-'),
+                        isLoading: isLoading,
+                        expanded: true,
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
@@ -413,28 +486,30 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
     );
   }
 
-  Widget _buildHeaderStat({
-    required String title,
+  Widget _buildStatChip({
+    required String label,
     required String value,
-    int? flex,
+    required bool isLoading,
+    bool expanded = false,
   }) {
-    final bool isLoading =
-        controller.isLoading.value || controller.santriData.value == null;
-    return Expanded(
-      flex: flex ?? 1,
+    Widget chip = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.13),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            title,
+            label,
             style: GoogleFonts.poppins(
-              color: Colors.white.withValues(alpha: 0.8),
-              fontSize: 12,
+              color: Colors.white.withValues(alpha: 0.65),
+              fontSize: 10,
               fontWeight: FontWeight.w500,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 4),
           Skeletonizer(
             enabled: isLoading,
             effect: ShimmerEffect(
@@ -445,17 +520,18 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
               value,
               style: GoogleFonts.poppins(
                 color: Colors.white,
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.bold,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
             ),
           ),
         ],
       ),
     );
+
+    return expanded ? Expanded(child: chip) : chip;
   }
 
   // ── Search + Toggle Bar (combined) ──────────────────────────────────────────
@@ -467,16 +543,15 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
           // Search field
           Expanded(
             child: Container(
-              height: 48,
+              height: 52,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey[200]!,
-                    spreadRadius: 1,
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
@@ -493,24 +568,27 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                     controller.searchJuz(value);
                   }
                 },
-                style: const TextStyle(fontSize: 14),
+                style: GoogleFonts.poppins(fontSize: 14),
                 decoration: InputDecoration(
                   hintText: controller.filterMode.value == 'surah'
                       ? 'Cari surah...'
                       : 'Cari juz (1-30)...',
-                  hintStyle: TextStyle(fontSize: 14, color: Colors.grey[400]),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: Colors.grey,
-                    size: 20,
+                  hintStyle: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.grey[400],
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: Colors.deepPurpleAccent.withValues(alpha: 0.6),
+                    size: 22,
                   ),
                   border: InputBorder.none,
                   suffixIcon: controller.searchQuery.value.isNotEmpty
                       ? IconButton(
                           icon: const Icon(
-                            Icons.clear,
+                            Icons.cancel_rounded,
                             color: Colors.grey,
-                            size: 18,
+                            size: 20,
                           ),
                           onPressed: () {
                             controller.searchQuery.value = '';
@@ -518,30 +596,26 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                           },
                         )
                       : null,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 14,
-                    horizontal: 4,
-                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
                 ),
               ),
             ),
           ),
 
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
 
           // Toggle Surah / Juz
           Container(
-            height: 48,
-            padding: const EdgeInsets.all(4),
+            height: 52,
+            padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey[200]!,
-                  spreadRadius: 1,
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
@@ -563,17 +637,18 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
     return GestureDetector(
       onTap: () => controller.switchFilterMode(mode),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isActive ? Colors.deepPurpleAccent : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           label,
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontSize: 13,
-            fontWeight: FontWeight.w600,
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
             color: isActive ? Colors.white : Colors.grey[500],
           ),
         ),
@@ -596,36 +671,24 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
     }
   }
 
-  Color _progressColor(int current, int total) {
-    if (current == 0) return Colors.red[400]!;
-    if (current >= total) return const Color(0xFF10B981); // emerald green
-    return Colors.orange[400]!;
-  }
-
   // ── Juz Progress Card (compact) ─────────────────────────────────────────────
 
   Widget _buildJuzProgressCard(juz_model.Datum juz) {
-    final progressParts = juz.progress?.split('/') ?? ['0', '0'];
-    final currentAyat = int.tryParse(progressParts[0]) ?? 0;
-    final totalAyat = juz.totalAyat ?? int.tryParse(progressParts[1]) ?? 0;
-    final progressPercentage = totalAyat > 0 ? (currentAyat / totalAyat) : 0.0;
-    final pct = (progressPercentage * 100).toStringAsFixed(0);
-
-    final statusLabel = currentAyat == 0
+    final statusLabel = juz.currentAyat == 0
         ? 'Belum Mulai'
-        : currentAyat >= totalAyat
+        : juz.currentAyat >= juz.maxAyat
         ? 'Hafal'
         : 'Proses';
 
-    final statusColor = currentAyat == 0
-        ? Colors.red[600]!
-        : currentAyat >= totalAyat
-        ? const Color(0xFF059669)
-        : Colors.orange[700]!;
+    final statusColor = juz.currentAyat == 0
+        ? Colors.red[400]!
+        : juz.currentAyat >= juz.maxAyat
+        ? const Color(0xFF10B981)
+        : Colors.orange[500]!;
 
-    final statusBg = currentAyat == 0
+    final statusBg = juz.currentAyat == 0
         ? Colors.red[50]!
-        : currentAyat >= totalAyat
+        : juz.currentAyat >= juz.maxAyat
         ? Colors.green[50]!
         : Colors.orange[50]!;
 
@@ -642,113 +705,139 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
         );
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: Column(
-          children: [
-            // Row 1: Nomor Juz + Nama + Status badge
-            Row(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Nomor badge
+                // Left accent bar
                 Container(
-                  width: 38,
-                  height: 38,
-                  alignment: Alignment.center,
+                  width: 5,
                   decoration: BoxDecoration(
-                    color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '${juz.juz}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepPurpleAccent[700],
+                    color: statusColor,
+                    gradient: LinearGradient(
+                      colors: [statusColor, statusColor.withValues(alpha: 0.5)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                // Label Juz
                 Expanded(
-                  child: Text(
-                    'Juz ${juz.juz}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            // Number badge
+                            Container(
+                              width: 40,
+                              height: 40,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: statusColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '${juz.juz}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: statusColor,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Juz ${juz.juz}',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${juz.currentAyat} dari ${juz.maxAyat} ayat',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 11,
+                                      color: Colors.grey[500],
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Percentage pill
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: statusBg,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: statusColor.withValues(alpha: 0.25),
+                                ),
+                              ),
+                              child: Text(
+                                statusLabel == 'Hafal'
+                                    ? '✓ Hafal'
+                                    : '${juz.percentageString}%',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: statusColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        // Progress bar
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: LinearProgressIndicator(
+                            value: juz.percentage,
+                            minHeight: 7,
+                            backgroundColor: statusColor.withValues(alpha: 0.1),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              statusColor,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                // Status badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusBg,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    statusLabel,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: statusColor,
-                    ),
+                // Chevron
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Icon(
+                    Icons.chevron_right_rounded,
+                    color: Colors.grey[300],
+                    size: 20,
                   ),
                 ),
               ],
             ),
-
-            const SizedBox(height: 10),
-
-            // Row 2: Progress bar + fraction + pct
-            Row(
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: progressPercentage,
-                      minHeight: 6,
-                      backgroundColor: Colors.grey[200],
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        _progressColor(currentAyat, totalAyat),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  '$currentAyat/$totalAyat',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '($pct%)',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: _progressColor(currentAyat, totalAyat),
-                  ),
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -757,27 +846,21 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
   // ── Surah Progress Card (compact) ───────────────────────────────────────────
 
   Widget _buildSurahProgressCard(Datum surah, int index) {
-    final progressParts = surah.progress?.split('/') ?? ['0', '0'];
-    final currentAyat = int.tryParse(progressParts[0]) ?? 0;
-    final totalAyat = surah.totalAyat ?? int.tryParse(progressParts[1]) ?? 0;
-    final progressPercentage = totalAyat > 0 ? (currentAyat / totalAyat) : 0.0;
-    final pct = (progressPercentage * 100).toStringAsFixed(0);
-
-    final statusLabel = currentAyat == 0
+    final statusLabel = surah.currentAyat == 0
         ? 'Belum Mulai'
-        : currentAyat >= totalAyat
+        : surah.currentAyat >= surah.maxAyat
         ? 'Hafal'
         : 'Proses';
 
-    final statusColor = currentAyat == 0
-        ? Colors.red[600]!
-        : currentAyat >= totalAyat
-        ? const Color(0xFF059669)
-        : Colors.orange[700]!;
+    final statusColor = surah.currentAyat == 0
+        ? Colors.red[400]!
+        : surah.currentAyat >= surah.maxAyat
+        ? const Color(0xFF10B981)
+        : Colors.orange[500]!;
 
-    final statusBg = currentAyat == 0
+    final statusBg = surah.currentAyat == 0
         ? Colors.red[50]!
-        : currentAyat >= totalAyat
+        : surah.currentAyat >= surah.maxAyat
         ? Colors.green[50]!
         : Colors.orange[50]!;
 
@@ -794,116 +877,141 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
         );
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: Column(
-          children: [
-            // Row 1: Nomor + Nama Surah + Status badge
-            Row(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Nomor badge
+                // Left accent bar
                 Container(
-                  width: 38,
-                  height: 38,
-                  alignment: Alignment.center,
+                  width: 5,
                   decoration: BoxDecoration(
-                    color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '${surah.nomor}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepPurpleAccent[700],
+                    color: statusColor,
+                    gradient: LinearGradient(
+                      colors: [statusColor, statusColor.withValues(alpha: 0.5)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                // Nama Latin
                 Expanded(
-                  child: Text(
-                    surah.namaLatin ?? '-',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            // Number badge
+                            Container(
+                              width: 40,
+                              height: 40,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: statusColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '${surah.nomor}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: statusColor,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    surah.namaLatin ?? '-',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    '${surah.currentAyat} dari ${surah.maxAyat} ayat',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 11,
+                                      color: Colors.grey[500],
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Percentage pill
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: statusBg,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: statusColor.withValues(alpha: 0.25),
+                                ),
+                              ),
+                              child: Text(
+                                statusLabel == 'Hafal'
+                                    ? '✓ Hafal'
+                                    : '${surah.percentageString}%',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: statusColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        // Progress bar
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: LinearProgressIndicator(
+                            value: surah.percentage,
+                            minHeight: 7,
+                            backgroundColor: statusColor.withValues(alpha: 0.1),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              statusColor,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 8),
-                // Status badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusBg,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    statusLabel,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: statusColor,
-                    ),
+                // Chevron
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Icon(
+                    Icons.chevron_right_rounded,
+                    color: Colors.grey[300],
+                    size: 20,
                   ),
                 ),
               ],
             ),
-
-            const SizedBox(height: 10),
-
-            // Row 2: Progress bar + fraction + pct
-            Row(
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: progressPercentage,
-                      minHeight: 6,
-                      backgroundColor: Colors.grey[200],
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        _progressColor(currentAyat, totalAyat),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  '$currentAyat/$totalAyat',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '($pct%)',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: _progressColor(currentAyat, totalAyat),
-                  ),
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -920,37 +1028,38 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
             Get.toNamed('/doa-khatam');
           },
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Colors.deepPurple[700]!, Colors.deepPurpleAccent],
+                colors: [Color(0xFF1E293B), Color(0xFF334155)],
               ),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.deepPurple.withValues(alpha: 0.25),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
+                  color: const Color(0xFF1E293B).withValues(alpha: 0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.white.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
-                    Icons.menu_book_rounded,
+                    Icons.auto_stories_rounded,
                     color: Colors.white,
-                    size: 22,
+                    size: 24,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -959,24 +1068,25 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                         'Doa Khatam Al-Qur\'an',
                         style: GoogleFonts.poppins(
                           color: Colors.white,
-                          fontSize: 14,
+                          fontSize: 15,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
-                        'Doa setelah menyelesaikan pembacaan Al-Qur\'an',
+                        'Amalkan doa setelah membaca Al-Qur\'an',
                         style: GoogleFonts.poppins(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          fontSize: 11,
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 12,
                         ),
                       ),
                     ],
                   ),
                 ),
+                const SizedBox(width: 4),
                 const Icon(
-                  Icons.keyboard_arrow_right_rounded,
+                  Icons.arrow_forward_ios_rounded,
                   color: Colors.white,
-                  size: 22,
+                  size: 16,
                 ),
               ],
             ),
@@ -995,30 +1105,30 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.manage_search_rounded,
-                size: 48,
-                color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+                Icons.search_off_rounded,
+                size: 64,
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.3),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               'Tidak ada hasil pencarian',
               style: GoogleFonts.poppins(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Coba cari dengan kata kunci lain',
-              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+              'Coba dengan kata kunci lain',
+              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[500]),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

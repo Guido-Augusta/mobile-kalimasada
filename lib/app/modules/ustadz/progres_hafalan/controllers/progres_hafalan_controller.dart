@@ -45,8 +45,18 @@ class ProgresHafalanController extends GetxController {
     userRole.value = AuthService.to.roleString;
     currentUserRole.value = AuthService.to.roleString;
     santriId = Get.arguments['santriId'];
-    getProgresHafalanSurah(santriId);
-    getProgresHafalanJuz(santriId);
+    // Fetch both endpoints in parallel for faster initial load
+    await Future.wait([
+      getProgresHafalanSurah(santriId),
+      getProgresHafalanJuz(santriId),
+    ]);
+  }
+
+  @override
+  void onClose() {
+    scrollC.dispose();
+    searchController.dispose();
+    super.onClose();
   }
 
   Future<void> getProgresHafalanSurah(String santriId) async {
@@ -168,16 +178,4 @@ class ProgresHafalanController extends GetxController {
     filteredJuzList.value = filteredList;
   }
 
-  String getLabelTahapan(String tahapan) {
-    switch (tahapan) {
-      case 'Level1':
-        return 'Level 1 - Juz 30';
-      case 'Level2':
-        return 'Level 2 - Surah Pilihan';
-      case 'Level3':
-        return 'Level 3 - Juz 1-29';
-      default:
-        return '-';
-    }
-  }
 }
