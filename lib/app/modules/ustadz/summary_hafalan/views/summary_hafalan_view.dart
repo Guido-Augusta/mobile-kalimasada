@@ -39,6 +39,8 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
       ),
       body: RefreshIndicator(
         onRefresh: () async => controller.getSummaryHafalan(),
+        color: Colors.deepPurpleAccent,
+        backgroundColor: Colors.white,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: controller.scrollController,

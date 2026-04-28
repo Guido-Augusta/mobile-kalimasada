@@ -29,8 +29,9 @@ class AlquranView extends GetView<AlquranController> {
       child: Scaffold(
         backgroundColor: _bgColor,
         body: RefreshIndicator(
-          color: _purple,
           onRefresh: () async => controller.refreshData(),
+          color: Colors.deepPurpleAccent,
+          backgroundColor: Colors.white,
           child: Obx(
             () => CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),

@@ -46,6 +46,8 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
         onRefresh: () async {
           controller.fetchData();
         },
+        color: Colors.deepPurpleAccent,
+        backgroundColor: Colors.white,
         child: NotificationListener<UserScrollNotification>(
           onNotification: (notification) {
             if (notification.direction == ScrollDirection.reverse) {

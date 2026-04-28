@@ -69,6 +69,8 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
               onRefresh: () async {
                 controller.fetchUstadzData();
               },
+              color: Colors.deepPurpleAccent,
+              backgroundColor: Colors.white,
               child: _buildEmptyState(context),
             );
           }
@@ -84,6 +86,8 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
       onRefresh: () async {
         controller.fetchUstadzData(isRefresh: false);
       },
+      color: Colors.deepPurpleAccent,
+      backgroundColor: Colors.white,
       child: CustomScrollView(
         slivers: [
           // Custom App Bar with Gradient Background

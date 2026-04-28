@@ -52,6 +52,8 @@ class DetailRiwayatHafalanView extends GetView<DetailRiwayatHafalanController> {
           return LayoutBuilder(
             builder: (context, constraints) => RefreshIndicator(
               onRefresh: () async => controller.getDetailRiwayatHafalan(),
+              color: Colors.deepPurpleAccent,
+              backgroundColor: Colors.white,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: ConstrainedBox(

@@ -84,6 +84,8 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
           controller.getSantriList(controller.ortuId!);
         }
       },
+      color: Colors.deepPurpleAccent,
+      backgroundColor: Colors.white,
       child: CustomScrollView(
         slivers: [
           // Custom App Bar with Gradient Background
@@ -258,6 +260,8 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
           controller.getSantriList(controller.ortuId!);
         }
       },
+      color: Colors.deepPurpleAccent,
+      backgroundColor: Colors.white,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: SizedBox(

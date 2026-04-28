@@ -42,6 +42,7 @@ class EditSantriView extends GetView<EditSantriController> {
           return RefreshIndicator(
             onRefresh: () => controller.getSantriDetail(),
             color: Colors.deepPurpleAccent,
+            backgroundColor: Colors.white,
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
@@ -145,6 +146,7 @@ class EditSantriView extends GetView<EditSantriController> {
     return RefreshIndicator(
       onRefresh: () => controller.getSantriDetail(),
       color: Colors.deepPurpleAccent,
+      backgroundColor: Colors.white,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: SizedBox(

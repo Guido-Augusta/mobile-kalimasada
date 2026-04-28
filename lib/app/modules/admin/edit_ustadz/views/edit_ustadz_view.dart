@@ -38,6 +38,7 @@ class EditUstadzView extends GetView<EditUstadzController> {
         return RefreshIndicator(
           onRefresh: () => controller.getUstadzDetail(),
           color: Colors.deepPurpleAccent,
+          backgroundColor: Colors.white,
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(
               parent: BouncingScrollPhysics(),

@@ -38,6 +38,7 @@ class EditOrtuView extends GetView<EditOrtuController> {
         return RefreshIndicator(
           onRefresh: () => controller.getOrtuDetail(),
           color: Colors.deepPurpleAccent,
+          backgroundColor: Colors.white,
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(
               parent: BouncingScrollPhysics(),
@@ -787,6 +788,7 @@ class EditOrtuView extends GetView<EditOrtuController> {
     return RefreshIndicator(
       onRefresh: () => controller.getOrtuDetail(),
       color: Colors.deepPurpleAccent,
+      backgroundColor: Colors.white,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: SizedBox(

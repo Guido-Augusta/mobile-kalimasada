@@ -19,6 +19,8 @@ class SantriHomeView extends GetView<SantriHomeController> {
           onRefresh: () async {
             controller.getSantri();
           },
+          color: Colors.deepPurpleAccent,
+          backgroundColor: Colors.white,
           child: ListView(
             padding: const EdgeInsets.only(
               top: 20,

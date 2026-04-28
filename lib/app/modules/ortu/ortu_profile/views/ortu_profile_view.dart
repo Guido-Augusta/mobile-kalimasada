@@ -45,6 +45,8 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
               onRefresh: () async {
                 controller.getOrtuDetail();
               },
+              color: Colors.deepPurpleAccent,
+              backgroundColor: Colors.white,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: SizedBox(
@@ -119,6 +121,8 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
             onRefresh: () async {
               controller.getOrtuDetail();
             },
+            color: Colors.deepPurpleAccent,
+            backgroundColor: Colors.white,
             child: Skeletonizer(
               enabled: isLoading,
               child: CustomScrollView(

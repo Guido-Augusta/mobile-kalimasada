@@ -19,6 +19,8 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
           onRefresh: () async {
             controller.getUstadz();
           },
+          color: Colors.deepPurpleAccent,
+          backgroundColor: Colors.white,
           child: ListView(
             padding: const EdgeInsets.only(
               top: 20,
@@ -54,10 +56,8 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
                 backgroundColor: Colors.grey[200],
                 backgroundImage: imageProvider,
               ),
-              placeholder: (context, url) => CircleAvatar(
-                radius: 28,
-                backgroundColor: Colors.grey[300],
-              ),
+              placeholder: (context, url) =>
+                  CircleAvatar(radius: 28, backgroundColor: Colors.grey[300]),
               errorWidget: (context, url, error) => CircleAvatar(
                 radius: 28,
                 backgroundColor: Colors.grey[200],

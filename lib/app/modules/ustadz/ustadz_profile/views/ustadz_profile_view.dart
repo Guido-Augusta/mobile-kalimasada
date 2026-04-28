@@ -45,6 +45,8 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
               onRefresh: () async {
                 controller.fetchUstadzData();
               },
+              color: Colors.deepPurpleAccent,
+              backgroundColor: Colors.white,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: SizedBox(
@@ -118,6 +120,8 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
             onRefresh: () async {
               controller.fetchUstadzData();
             },
+            color: Colors.deepPurpleAccent,
+            backgroundColor: Colors.white,
             child: Skeletonizer(
               enabled: isLoading,
               child: CustomScrollView(

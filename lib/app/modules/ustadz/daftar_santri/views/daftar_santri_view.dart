@@ -58,6 +58,8 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
         onRefresh: () async {
           controller.fetchData();
         },
+        color: Colors.deepPurpleAccent,
+        backgroundColor: Colors.white,
         child: NotificationListener<UserScrollNotification>(
           onNotification: (notification) {
             if (notification.direction == ScrollDirection.reverse) {

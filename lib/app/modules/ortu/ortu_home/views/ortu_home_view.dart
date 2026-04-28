@@ -17,6 +17,8 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async => controller.getOrtu(),
+          color: Colors.deepPurpleAccent,
+          backgroundColor: Colors.white,
           child: ListView(
             padding: const EdgeInsets.only(
               top: 20,
