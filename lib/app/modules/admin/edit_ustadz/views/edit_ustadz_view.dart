@@ -294,67 +294,69 @@ class EditUstadzView extends GetView<EditUstadzController> {
 
   void _showPhotoBottomSheet() {
     Get.bottomSheet(
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
+      SafeArea(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Foto Profil',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+              const SizedBox(height: 16),
+              Text(
+                'Foto Profil',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-            ListTile(
-              minTileHeight: 40,
-              leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text('Kamera'),
-              onTap: () async {
-                Get.back();
-                await controller.pickImage(ImageSource.camera);
-              },
-            ),
-            ListTile(
-              minTileHeight: 40,
-              leading: const Icon(Icons.photo_outlined),
-              title: const Text('Galeri'),
-              onTap: () async {
-                Get.back();
-                await controller.pickImage(ImageSource.gallery);
-              },
-            ),
-            if (!controller.fotoProfil.value.contains('placeholder'))
               ListTile(
                 minTileHeight: 40,
-                leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: const Text(
-                  'Hapus Foto',
-                  style: TextStyle(color: Colors.red),
-                ),
-                onTap: () {
+                leading: const Icon(Icons.camera_alt_outlined),
+                title: const Text('Kamera'),
+                onTap: () async {
                   Get.back();
-                  controller.deleteImage();
+                  await controller.pickImage(ImageSource.camera);
                 },
               ),
-          ],
+              ListTile(
+                minTileHeight: 40,
+                leading: const Icon(Icons.photo_outlined),
+                title: const Text('Galeri'),
+                onTap: () async {
+                  Get.back();
+                  await controller.pickImage(ImageSource.gallery);
+                },
+              ),
+              if (!controller.fotoProfil.value.contains('placeholder'))
+                ListTile(
+                  minTileHeight: 40,
+                  leading: const Icon(Icons.delete_outline, color: Colors.red),
+                  title: const Text(
+                    'Hapus Foto',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  onTap: () {
+                    Get.back();
+                    controller.deleteImage();
+                  },
+                ),
+            ],
+          ),
         ),
       ),
     );

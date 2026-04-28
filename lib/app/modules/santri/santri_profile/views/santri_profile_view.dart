@@ -1032,75 +1032,77 @@ class SantriProfileView extends GetView<SantriProfileController> {
 
   void _showSettingsBottomSheet(BuildContext context) {
     Get.bottomSheet(
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+      SafeArea(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Pengaturan Akun',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 16),
+              Text(
+                'Pengaturan Akun',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildSettingsInfoTile(
-              icon: Icons.edit_note_rounded,
-              label: 'Profil',
-              value: 'Edit Informasi Profil',
-              isAccountAction: true,
-              onTap: () {
-                Get.back(); // close bottom sheet
-                controller.namaC.text = controller.santriDetail.value!.nama!;
-                _showEditProfileDialog();
-              },
-            ),
-            Divider(color: Colors.grey[200], height: 16),
-            _buildSettingsInfoTile(
-              icon: Icons.lock_reset_rounded,
-              label: 'Keamanan',
-              value: 'Ubah Password Akun',
-              isAccountAction: true,
-              onTap: () {
-                Get.back(); // close bottom sheet
-                Get.toNamed('/change-password');
-              },
-            ),
-            Divider(color: Colors.grey[200], height: 16),
-            _buildSettingsInfoTile(
-              icon: Icons.logout_rounded,
-              label: 'Sesi',
-              value: 'Keluar dari Aplikasi',
-              isAccountAction: true,
-              iconColor: Colors.redAccent,
-              onTap: () {
-                Get.back(); // close bottom sheet
-                _showLogoutDialog(context);
-              },
-            ),
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 16),
+              _buildSettingsInfoTile(
+                icon: Icons.edit_note_rounded,
+                label: 'Profil',
+                value: 'Edit Informasi Profil',
+                isAccountAction: true,
+                onTap: () {
+                  Get.back(); // close bottom sheet
+                  controller.namaC.text = controller.santriDetail.value!.nama!;
+                  _showEditProfileDialog();
+                },
+              ),
+              Divider(color: Colors.grey[200], height: 16),
+              _buildSettingsInfoTile(
+                icon: Icons.lock_reset_rounded,
+                label: 'Keamanan',
+                value: 'Ubah Password Akun',
+                isAccountAction: true,
+                onTap: () {
+                  Get.back(); // close bottom sheet
+                  Get.toNamed('/change-password');
+                },
+              ),
+              Divider(color: Colors.grey[200], height: 16),
+              _buildSettingsInfoTile(
+                icon: Icons.logout_rounded,
+                label: 'Sesi',
+                value: 'Keluar dari Aplikasi',
+                isAccountAction: true,
+                iconColor: Colors.redAccent,
+                onTap: () {
+                  Get.back(); // close bottom sheet
+                  _showLogoutDialog(context);
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
       isScrollControlled: true,

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fullscreen_image_viewer/fullscreen_image_viewer.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -209,32 +210,45 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                                               ),
                                             ],
                                           ),
-                                          child: ClipOval(
-                                            child: CachedNetworkImage(
-                                              imageUrl: controller.getImageUrl(
-                                                controller.fotoProfil.value,
-                                              ),
-                                              fit: BoxFit.cover,
-                                              placeholder: (context, url) =>
-                                                  Container(
-                                                    width: 110,
-                                                    height: 110,
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: Colors.grey[300],
-                                                    ),
-                                                  ),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      Container(
-                                                        color: Colors.grey[200],
-                                                        child: const Icon(
-                                                          Icons.person,
-                                                          size: 48,
-                                                          color: Colors
-                                                              .deepPurpleAccent,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              FullscreenImageViewer.open(
+                                                context: Get.context!,
+                                                child: Hero(
+                                                  tag: 'foto-profil-ustadz',
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: controller
+                                                        .getImageUrl(
+                                                          controller
+                                                              .fotoProfil
+                                                              .value,
                                                         ),
+                                                    fit: BoxFit.contain,
+                                                    placeholder: (c, u) =>
+                                                        _buildProfilePlaceholder(),
+                                                    errorWidget: (c, u, e) =>
+                                                        _buildProfilePlaceholder(),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Hero(
+                                              tag: 'foto-profil-ustadz',
+                                              child: ClipOval(
+                                                child: CachedNetworkImage(
+                                                  imageUrl: controller
+                                                      .getImageUrl(
+                                                        controller
+                                                            .fotoProfil
+                                                            .value,
                                                       ),
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (c, u) =>
+                                                      _buildProfilePlaceholder(),
+                                                  errorWidget: (c, u, e) =>
+                                                      _buildProfilePlaceholder(),
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -979,54 +993,56 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
 
   void _showEditPhotoProfileBottomSheet() {
     Get.bottomSheet(
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
+      SafeArea(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Foto Profil',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+              const SizedBox(height: 16),
+              Text(
+                'Foto Profil',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-            ListTile(
-              minTileHeight: 40,
-              leading: Icon(Icons.camera_alt_outlined),
-              title: Text('Kamera'),
-              onTap: () {
-                controller.pickImage(ImageSource.camera);
-                Get.back();
-              },
-            ),
-            ListTile(
-              minTileHeight: 40,
-              leading: Icon(Icons.photo_outlined),
-              title: Text('Galeri'),
-              onTap: () {
-                controller.pickImage(ImageSource.gallery);
-                Get.back();
-              },
-            ),
-          ],
+              ListTile(
+                minTileHeight: 40,
+                leading: Icon(Icons.camera_alt_outlined),
+                title: Text('Kamera'),
+                onTap: () {
+                  controller.pickImage(ImageSource.camera);
+                  Get.back();
+                },
+              ),
+              ListTile(
+                minTileHeight: 40,
+                leading: Icon(Icons.photo_outlined),
+                title: Text('Galeri'),
+                onTap: () {
+                  controller.pickImage(ImageSource.gallery);
+                  Get.back();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1043,5 +1059,12 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
       default:
         return 'Tahap tidak ditemukan';
     }
+  }
+
+  Widget _buildProfilePlaceholder() {
+    return Container(
+      color: Colors.grey[300],
+      child: const Icon(Icons.person, size: 40, color: Colors.grey),
+    );
   }
 }

@@ -135,6 +135,7 @@ class EditUstadzController extends GetxController {
     try {
       bool? confirm = await Get.dialog<bool>(
         AlertDialog(
+          backgroundColor: Colors.white,
           title: const Text('Hapus Foto Profil'),
           content: const Text('Apakah Anda yakin ingin menghapus foto profil?'),
           actions: [
@@ -182,6 +183,9 @@ class EditUstadzController extends GetxController {
         );
 
         await getUstadzDetail(isReload: false);
+        if (Get.isRegistered<DaftarUstadzController>()) {
+          await Get.find<DaftarUstadzController>().fetchData();
+        }
         ToastUtils.showSuccessToast('Foto profil berhasil dihapus');
       } else {
         ToastUtils.showErrorToast('Gagal menghapus foto profil');
@@ -346,7 +350,8 @@ class EditUstadzController extends GetxController {
     String? password,
   ) async {
     try {
-      bool hasNoChange = (email == ustadzDetail.value?.user?.email &&
+      bool hasNoChange =
+          (email == ustadzDetail.value?.user?.email &&
           (password == null || password.isEmpty));
 
       if (hasNoChange) {
@@ -358,7 +363,7 @@ class EditUstadzController extends GetxController {
         }
         return;
       }
-      
+
       isSaveEmailPasswordLoading.value = true;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -382,7 +387,7 @@ class EditUstadzController extends GetxController {
 
         await getUstadzDetail(isReload: false);
         Get.back();
-        
+
         if (emailChanged && passwordChanged) {
           ToastUtils.showSuccessToast('Email dan password berhasil diperbarui');
         } else if (emailChanged) {

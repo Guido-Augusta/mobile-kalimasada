@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fullscreen_image_viewer/fullscreen_image_viewer.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import 'package:get/get.dart';
@@ -165,29 +166,39 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
                                     ),
                                   ],
                                 ),
-                                child: ClipOval(
-                                  child: CachedNetworkImage(
-                                    imageUrl: controller.getImageUrl(
-                                      controller.fotoProfil.value,
-                                    ),
-                                    fit: BoxFit.cover,
-                                    placeholder: (context, url) => Container(
-                                      color: Colors.grey[300],
-                                      child: const Icon(
-                                        Icons.person,
-                                        size: 40,
-                                        color: Colors.grey,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    FullscreenImageViewer.open(
+                                      context: Get.context!,
+                                      child: Hero(
+                                        tag: 'foto-profil-detail-ortu',
+                                        child: CachedNetworkImage(
+                                          imageUrl: controller.getImageUrl(
+                                            controller.fotoProfil.value,
+                                          ),
+                                          fit: BoxFit.contain,
+                                          placeholder: (context, url) =>
+                                              _buildProfilePlaceholder(),
+                                          errorWidget: (context, url, error) =>
+                                              _buildProfilePlaceholder(),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Hero(
+                                    tag: 'foto-profil-detail-ortu',
+                                    child: ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl: controller.getImageUrl(
+                                          controller.fotoProfil.value,
+                                        ),
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) =>
+                                            _buildProfilePlaceholder(),
+                                        errorWidget: (context, url, error) =>
+                                            _buildProfilePlaceholder(),
                                       ),
                                     ),
-                                    errorWidget: (context, url, error) =>
-                                        Container(
-                                          color: Colors.grey[300],
-                                          child: const Icon(
-                                            Icons.person,
-                                            size: 40,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
                                   ),
                                 ),
                               ),
@@ -684,5 +695,12 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
       default:
         return 'Tahap ?';
     }
+  }
+
+  Widget _buildProfilePlaceholder() {
+    return Container(
+      color: Colors.grey[300],
+      child: const Icon(Icons.person, size: 40, color: Colors.grey),
+    );
   }
 }
