@@ -241,10 +241,21 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
   }
 
   SliverToBoxAdapter _buildHeader() {
+    final santri = controller.profilSantri.value;
+    final bool isLoading = controller.isInitialLoading.value || santri == null;
+
+    // Initials from name
+    String initials = '?';
+    if (santri?.nama != null && santri!.nama!.isNotEmpty) {
+      final parts = santri.nama!.trim().split(' ');
+      initials = parts.length >= 2
+          ? '${parts[0][0]}${parts[1][0]}'.toUpperCase()
+          : parts[0][0].toUpperCase();
+    }
+
     return SliverToBoxAdapter(
       child: Container(
         margin: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 8),
-        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           gradient: LinearGradient(
@@ -260,110 +271,162 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      width: 2,
-                    ),
-                  ),
-                  child: const CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Colors.white24,
-                    child: Icon(
-                      Icons.person_rounded,
-                      size: 26,
-                      color: Colors.white,
-                    ),
-                  ),
+            // Decorative circles
+            Positioned(
+              top: -20,
+              right: -20,
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.05),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+            ),
+            Positioned(
+              bottom: -30,
+              right: 60,
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.04),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Skeletonizer(
-                        enabled:
-                            controller.isInitialLoading.value ||
-                            controller.profilSantri.value == null,
-                        effect: ShimmerEffect(
-                          baseColor: Colors.white.withValues(alpha: 0.2),
-                          highlightColor: Colors.white.withValues(alpha: 0.4),
-                        ),
-                        child: Text(
-                          controller.profilSantri.value?.nama ?? 'Nama Santri',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            height: 1.2,
+                      // Avatar with initials
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: 0.18),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.35),
+                            width: 2,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                        ),
+                        child: Center(
+                          child: Skeletonizer(
+                            enabled: isLoading,
+                            effect: ShimmerEffect(
+                              baseColor: Colors.white.withValues(alpha: 0.2),
+                              highlightColor: Colors.white.withValues(
+                                alpha: 0.4,
+                              ),
+                            ),
+                            child: Text(
+                              isLoading ? 'SA' : initials,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Skeletonizer(
-                        enabled:
-                            controller.isInitialLoading.value ||
-                            controller.profilSantri.value == null,
-                        effect: ShimmerEffect(
-                          baseColor: Colors.white.withValues(alpha: 0.2),
-                          highlightColor: Colors.white.withValues(alpha: 0.4),
-                        ),
-                        child: Text(
-                          controller.profilSantri.value?.noInduk ??
-                              'Nomor Induk',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Skeletonizer(
+                              enabled: isLoading,
+                              effect: ShimmerEffect(
+                                baseColor: Colors.white.withValues(alpha: 0.2),
+                                highlightColor: Colors.white.withValues(
+                                  alpha: 0.4,
+                                ),
+                              ),
+                              child: Text(
+                                'Informasi Santri',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white.withValues(alpha: 0.65),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Skeletonizer(
+                              enabled: isLoading,
+                              effect: ShimmerEffect(
+                                baseColor: Colors.white.withValues(alpha: 0.2),
+                                highlightColor: Colors.white.withValues(
+                                  alpha: 0.4,
+                                ),
+                              ),
+                              child: Text(
+                                controller.profilSantri.value?.nama ??
+                                    'Nama Santri',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.2,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-              ),
-              child: IntrinsicHeight(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildHeaderStat(
-                      title: 'Total Poin',
-                      value: '${controller.profilSantri.value?.totalPoin ?? 0}',
-                      flex: 4,
-                    ),
-                    VerticalDivider(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      thickness: 1,
-                    ),
-                    _buildHeaderStat(
-                      title: 'Tahap Hafalan',
-                      value: getTahapanLabel(
-                        controller.profilSantri.value?.tahapHafalan ?? '-',
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.2),
                       ),
-                      flex: 7,
                     ),
-                  ],
-                ),
+                    child: IntrinsicHeight(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildHeaderStat(
+                            title: 'Total Poin',
+                            value:
+                                '${controller.profilSantri.value?.totalPoin ?? 0}',
+                            flex: 4,
+                            isLoading: isLoading,
+                          ),
+                          VerticalDivider(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            thickness: 1,
+                          ),
+                          _buildHeaderStat(
+                            title: 'Tahap Hafalan',
+                            value: getTahapanLabel(
+                              controller.profilSantri.value?.tahapHafalan ??
+                                  '-',
+                            ),
+                            flex: 7,
+                            isLoading: isLoading,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -375,6 +438,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
   Widget _buildHeaderStat({
     required String title,
     required String value,
+    required bool isLoading,
     int? flex,
   }) {
     return Expanded(
@@ -385,7 +449,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
             title,
             style: GoogleFonts.poppins(
               color: Colors.white.withValues(alpha: 0.8),
-              fontSize: 12,
+              fontSize: 10,
               fontWeight: FontWeight.w500,
             ),
             maxLines: 1,
@@ -393,9 +457,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
           ),
           const SizedBox(height: 4),
           Skeletonizer(
-            enabled:
-                controller.isInitialLoading.value ||
-                controller.profilSantri.value == null,
+            enabled: isLoading,
             effect: ShimmerEffect(
               baseColor: Colors.white.withValues(alpha: 0.2),
               highlightColor: Colors.white.withValues(alpha: 0.4),
@@ -404,7 +466,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
               value,
               style: GoogleFonts.poppins(
                 color: Colors.white,
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.bold,
               ),
               maxLines: 1,

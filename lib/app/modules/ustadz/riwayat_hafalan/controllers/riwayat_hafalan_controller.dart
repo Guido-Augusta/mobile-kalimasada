@@ -97,7 +97,7 @@ class RiwayatHafalanController extends GetxController {
           riwayatAyatData.addAll(riwayat.data);
           hasMore.value = riwayat.data.length >= _perPage;
         } else {
-          final riwayat = model_halaman.RiwayatHafalanHafalan.fromJson(data);
+          final riwayat = model_halaman.RiwayatHafalanHalaman.fromJson(data);
           if (data['santri'] != null) {
             profilSantri.value = model_ayat.Santri.fromJson(data['santri']);
           }
@@ -144,7 +144,7 @@ class RiwayatHafalanController extends GetxController {
           riwayatAyatData.addAll(riwayat.data);
           hasMore.value = riwayat.data.length >= _perPage;
         } else {
-          final riwayat = model_halaman.RiwayatHafalanHafalan.fromJson(data);
+          final riwayat = model_halaman.RiwayatHafalanHalaman.fromJson(data);
           riwayatHalamanData.addAll(riwayat.data);
           hasMore.value = riwayat.data.length >= _perPage;
         }
