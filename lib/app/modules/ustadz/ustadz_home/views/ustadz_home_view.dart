@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fullscreen_image_viewer/fullscreen_image_viewer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -61,22 +62,45 @@ class UstadzHomeView extends GetView<UstadzHomeController> {
         Obx(
           () => Skeletonizer(
             enabled: controller.isLoading.value,
-            child: CachedNetworkImage(
-              imageUrl: controller.getImageUrl(controller.fotoProfil.value),
-              imageBuilder: (context, imageProvider) => CircleAvatar(
-                radius: 28,
-                backgroundColor: Colors.grey[200],
-                backgroundImage: imageProvider,
-              ),
-              placeholder: (context, url) =>
-                  CircleAvatar(radius: 28, backgroundColor: Colors.grey[300]),
-              errorWidget: (context, url, error) => CircleAvatar(
-                radius: 28,
-                backgroundColor: Colors.grey[200],
-                child: const Icon(
-                  Icons.person,
-                  size: 28,
-                  color: Colors.deepPurpleAccent,
+            child: GestureDetector(
+              onTap: () {
+                if (controller.fotoProfil.value != '' &&
+                    controller.fotoProfil.value != 'default.png') {
+                  FullscreenImageViewer.open(
+                    context: context,
+                    child: Hero(
+                      tag: 'profile_photo',
+                      child: CachedNetworkImage(
+                        imageUrl:
+                            controller.getImageUrl(controller.fotoProfil.value),
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  );
+                }
+              },
+              child: Hero(
+                tag: 'profile_photo',
+                child: CachedNetworkImage(
+                  imageUrl: controller.getImageUrl(controller.fotoProfil.value),
+                  imageBuilder: (context, imageProvider) => CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Colors.grey[200],
+                    backgroundImage: imageProvider,
+                  ),
+                  placeholder: (context, url) => CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Colors.grey[300],
+                  ),
+                  errorWidget: (context, url, error) => CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Colors.grey[200],
+                    child: const Icon(
+                      Icons.person,
+                      size: 28,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                  ),
                 ),
               ),
             ),

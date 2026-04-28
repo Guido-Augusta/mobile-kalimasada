@@ -1316,12 +1316,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
   // --- Bottom Buttons ---
   Widget _buildBottomButtons() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(
-        20,
-        16,
-        20,
-        32,
-      ), // bottom padding for iOS style
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
