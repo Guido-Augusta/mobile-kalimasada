@@ -16,6 +16,7 @@ class DaftarSantriController extends GetxController {
   final isLoadingDeleteAccount = false.obs;
 
   var searchQuery = ''.obs;
+  final appliedSearchQuery = ''.obs;
   var searchController = TextEditingController();
 
   var tahapHafalan = 'level1'.obs;
@@ -39,6 +40,7 @@ class DaftarSantriController extends GetxController {
     setupScrollController();
 
     debounce(searchQuery, (callback) {
+      appliedSearchQuery.value = searchQuery.value;
       fetchData();
     }, time: const Duration(milliseconds: 700));
   }

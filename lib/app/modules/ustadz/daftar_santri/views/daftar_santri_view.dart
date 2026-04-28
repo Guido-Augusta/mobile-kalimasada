@@ -89,11 +89,11 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                 // Student List
                 Obx(() {
                   if (controller.isLoading.value &&
-                      controller.searchQuery.value.isEmpty) {
+                      controller.appliedSearchQuery.value.isEmpty) {
                     return _buildLoadingIndicator();
                   } else if (controller.santriList.isEmpty) {
                     return _buildEmptyState();
-                  } else if (controller.searchQuery.value.isNotEmpty &&
+                  } else if (controller.appliedSearchQuery.value.isNotEmpty &&
                       controller.santriList.isEmpty) {
                     return _buildEmptyState();
                   }
@@ -307,6 +307,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                         icon: Icons.history_rounded,
                         color: Colors.orange,
                         onTap: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
                           Get.toNamed(
                             '/riwayat-hafalan',
                             arguments: {'santriId': santri.id.toString()},
@@ -321,6 +322,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                         icon: Icons.book_rounded,
                         color: const Color(0xFF10B981),
                         onTap: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
                           Get.toNamed(
                             '/progres-hafalan',
                             arguments: {'santriId': santri.id.toString()},
@@ -391,6 +393,9 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
 
                 // Admin Menu Actions
                 PopupMenuButton<String>(
+                  onOpened: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   icon: Icon(
                     Icons.more_vert_rounded,
                     color: Colors.grey[400],
@@ -689,8 +694,8 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
         const SizedBox(height: 8),
         Obx(
           () => Text(
-            controller.searchQuery.value.isNotEmpty &&
-                    controller.santriList.isEmpty
+            (controller.appliedSearchQuery.value.isNotEmpty &&
+                    controller.santriList.isEmpty)
                 ? 'Santri tidak ditemukan di ${_getLevelLabel(controller.tahapHafalan.value)}'
                 : 'Tarik ke bawah untuk refresh',
             style: TextStyle(color: Colors.grey[500], fontSize: 14),
