@@ -18,6 +18,7 @@ class DaftarUstadzController extends GetxController {
   final isLoadingDeleteAccount = false.obs;
 
   var searchQuery = ''.obs;
+  var appliedSearchQuery = ''.obs;
   var searchController = TextEditingController();
 
   var ustadzList = <Datum>[].obs;
@@ -39,6 +40,7 @@ class DaftarUstadzController extends GetxController {
     setupScrollController();
 
     debounce(searchQuery, (callback) {
+      appliedSearchQuery.value = searchQuery.value;
       fetchData();
     }, time: const Duration(milliseconds: 700));
   }

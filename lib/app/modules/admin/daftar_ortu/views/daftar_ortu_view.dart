@@ -34,6 +34,7 @@ class DaftarOrtuView extends GetView<DaftarOrtuController> {
                 : const Offset(2, 0), // geser ke kanan
             child: FloatingActionButton(
               onPressed: () {
+                FocusManager.instance.primaryFocus?.unfocus();
                 Get.toNamed('/tambah-ortu');
               },
               backgroundColor: Colors.deepPurpleAccent,
