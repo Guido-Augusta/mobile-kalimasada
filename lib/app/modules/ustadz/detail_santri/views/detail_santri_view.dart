@@ -1191,7 +1191,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Pilih tahap hafalan baru untuk santri ini',
+                'Pilih tahap hafalan untuk santri ini',
                 style: GoogleFonts.poppins(
                   fontSize: 13,
                   color: Colors.grey[600],

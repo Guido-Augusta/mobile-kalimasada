@@ -728,7 +728,7 @@ class TambahUstadzView extends GetView<TambahUstadzController> {
                     ),
                   ),
                   Text(
-                    'Kredensial untuk orang tua/wali',
+                    'Kredensial untuk ustadz/ah',
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       color: Colors.grey[600],

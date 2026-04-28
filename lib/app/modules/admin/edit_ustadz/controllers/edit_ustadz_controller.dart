@@ -25,6 +25,7 @@ class EditUstadzController extends GetxController {
   final RxBool isSaveProfileLoading = false.obs;
   final RxBool isSaveEmailPasswordLoading = false.obs;
 
+  final RxBool isPasswordVisible = false.obs;
   var ustadzDetail = Rxn<Ustadz>();
 
   final ImagePicker imagePicker = ImagePicker();
@@ -34,6 +35,7 @@ class EditUstadzController extends GetxController {
 
   final profileFormKey = GlobalKey<FormState>();
   final emailPasswordFormKey = GlobalKey<FormState>();
+  final passwordFieldKey = GlobalKey<FormFieldState>();
 
   var emailC = TextEditingController();
   var passwordC = TextEditingController();
@@ -97,7 +99,7 @@ class EditUstadzController extends GetxController {
       }
       final now = DateTime.now();
       if (lastErrorShown == null ||
-          now.difference(lastErrorShown!) > Duration(seconds: 3)) {
+          now.difference(lastErrorShown!) > const Duration(seconds: 3)) {
         lastErrorShown = now;
         ToastUtils.showErrorToast(
           'Terjadi kesalahan\nPeriksa koneksi internet Anda',
@@ -287,7 +289,7 @@ class EditUstadzController extends GetxController {
       if (hasNoChange) {
         final now = DateTime.now();
         if (_lastNoChangeShown == null ||
-            now.difference(_lastNoChangeShown!) > Duration(seconds: 3)) {
+            now.difference(_lastNoChangeShown!) > const Duration(seconds: 3)) {
           _lastNoChangeShown = now;
           ToastUtils.showErrorToast('Tidak ada perubahan data');
         }
@@ -328,7 +330,7 @@ class EditUstadzController extends GetxController {
     } catch (e) {
       final now = DateTime.now();
       if (lastErrorShown == null ||
-          now.difference(lastErrorShown!) > Duration(seconds: 3)) {
+          now.difference(lastErrorShown!) > const Duration(seconds: 3)) {
         lastErrorShown = now;
         ToastUtils.showErrorToast(
           'Terjadi kesalahan\nPeriksa koneksi internet Anda',
@@ -344,6 +346,19 @@ class EditUstadzController extends GetxController {
     String? password,
   ) async {
     try {
+      bool hasNoChange = (email == ustadzDetail.value?.user?.email &&
+          (password == null || password.isEmpty));
+
+      if (hasNoChange) {
+        final now = DateTime.now();
+        if (_lastNoChangeShown == null ||
+            now.difference(_lastNoChangeShown!) > const Duration(seconds: 3)) {
+          _lastNoChangeShown = now;
+          ToastUtils.showErrorToast('Tidak ada perubahan data');
+        }
+        return;
+      }
+      
       isSaveEmailPasswordLoading.value = true;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -361,13 +376,26 @@ class EditUstadzController extends GetxController {
           )
           .timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
+        String oldEmail = ustadzDetail.value?.user?.email ?? "";
+        bool emailChanged = email != oldEmail;
+        bool passwordChanged = password != null && password.isNotEmpty;
+
         await getUstadzDetail(isReload: false);
         Get.back();
-        ToastUtils.showSuccessToast('Email dan password berhasil diperbarui');
+        
+        if (emailChanged && passwordChanged) {
+          ToastUtils.showSuccessToast('Email dan password berhasil diperbarui');
+        } else if (emailChanged) {
+          ToastUtils.showSuccessToast('Email berhasil diperbarui');
+        } else if (passwordChanged) {
+          ToastUtils.showSuccessToast('Password berhasil diperbarui');
+        } else {
+          ToastUtils.showSuccessToast('Data berhasil diperbarui');
+        }
       } else {
         final now = DateTime.now();
         if (lastErrorShown == null ||
-            now.difference(lastErrorShown!) > Duration(seconds: 3)) {
+            now.difference(lastErrorShown!) > const Duration(seconds: 3)) {
           lastErrorShown = now;
           ToastUtils.showErrorToast('Gagal memperbarui email dan password');
         }
@@ -375,7 +403,7 @@ class EditUstadzController extends GetxController {
     } catch (e) {
       final now = DateTime.now();
       if (lastErrorShown == null ||
-          now.difference(lastErrorShown!) > Duration(seconds: 3)) {
+          now.difference(lastErrorShown!) > const Duration(seconds: 3)) {
         lastErrorShown = now;
         ToastUtils.showErrorToast(
           'Terjadi kesalahan\nPeriksa koneksi internet Anda',
