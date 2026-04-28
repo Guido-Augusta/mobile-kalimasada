@@ -342,19 +342,6 @@ class EditUstadzView extends GetView<EditUstadzController> {
                   await controller.pickImage(ImageSource.gallery);
                 },
               ),
-              if (!controller.fotoProfil.value.contains('placeholder'))
-                ListTile(
-                  minTileHeight: 40,
-                  leading: const Icon(Icons.delete_outline, color: Colors.red),
-                  title: const Text(
-                    'Hapus Foto',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  onTap: () {
-                    Get.back();
-                    controller.deleteImage();
-                  },
-                ),
             ],
           ),
         ),
