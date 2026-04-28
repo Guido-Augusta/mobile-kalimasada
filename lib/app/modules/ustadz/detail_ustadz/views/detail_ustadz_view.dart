@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fullscreen_image_viewer/fullscreen_image_viewer.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -17,7 +16,7 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
   Ustadz get _dummyUstadz => Ustadz(
     id: 0,
     userId: 0,
-    nama: 'Loading Name Placeholder',
+    nama: 'Name Placeholder',
     nomorHp: '081234567890',
     alamat: 'Jl. Contoh Alamat No. 123',
     jenisKelamin: 'L',
@@ -58,7 +57,7 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
           top: false,
           child: Obx(() {
             final ustadz = controller.ustadzData.value;
-  
+
             // Loading
             if (controller.isLoading.value) {
               return Skeletonizer(
@@ -77,7 +76,7 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
                 child: _buildEmptyState(context),
               );
             }
-  
+
             return _buildContent(ustadz);
           }),
         ),
@@ -88,7 +87,7 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
   RefreshIndicator _buildContent(Ustadz ustadz) {
     return RefreshIndicator(
       onRefresh: () async {
-        controller.fetchUstadzData(isRefresh: false);
+        controller.fetchUstadzData();
       },
       color: Colors.deepPurpleAccent,
       backgroundColor: Colors.white,
@@ -360,7 +359,7 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
           if (ustadz.waliKelasTahap != null) ...[
             Divider(color: Colors.grey[200], height: 16),
             _buildInfoTile(
-              icon: FontAwesomeIcons.school,
+              icon: Icons.school,
               label: 'Penanggung Jawab Kelas',
               value: _getTahapLabel(ustadz.waliKelasTahap ?? ''),
             ),

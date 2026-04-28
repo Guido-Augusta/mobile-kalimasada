@@ -20,7 +20,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
   Ortu get _dummyOrtu => Ortu(
     id: 0,
     userId: 0,
-    nama: 'Loading Name Placeholder',
+    nama: 'Name Placeholder',
     nomorHp: '081234567890',
     alamat: 'Jl. Contoh Alamat No. 123',
     jenisKelamin: 'L',
@@ -59,7 +59,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
           child: Obx(() {
             final ortu = controller.ortuDetail.value;
             final santriList = controller.santriList;
-  
+
             // Loading
             if (controller.isLoading.value) {
               return Skeletonizer(
@@ -71,7 +71,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
             if (ortu == null) {
               return _buildEmptyState(context);
             }
-  
+
             // Main Content
             return _buildContent(ortu, santriList);
           }),
