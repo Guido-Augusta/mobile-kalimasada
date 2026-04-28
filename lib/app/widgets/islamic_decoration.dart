@@ -52,7 +52,7 @@ class IslamicDecoration extends StatelessWidget {
                       maxLines: 1,
                     ),
                     Text(
-                      'Tahfidz Digital Terpadu',
+                      'Aplikasi Tahfidz Digital Terpadu',
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         color: Colors.grey[600],
