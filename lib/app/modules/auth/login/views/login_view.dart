@@ -17,7 +17,7 @@ class LoginView extends GetView<LoginController> {
         statusBarBrightness: Brightness.dark,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: const Color(0xFFF1F5F9),
         body: SingleChildScrollView(
           child: Column(
             children: [

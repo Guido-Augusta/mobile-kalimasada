@@ -73,7 +73,7 @@ class SplashController extends GetxController {
         } else if (role == 'ortu') {
           getOrtu();
         } else if (role == 'admin') {
-          Get.offAllNamed('/admin-home');
+          getPeringkat();
         } else {
           AuthService.to.logout();
           Get.offAllNamed('/login');
@@ -221,6 +221,45 @@ class SplashController extends GetxController {
       );
       if (response.statusCode == 200) {
         Get.offAllNamed('/ortu-main');
+      } else if (response.statusCode == 401) {
+        await AuthService.to.logout();
+        Get.offAllNamed('/login');
+        ToastUtils.showErrorToast(
+          'Token tidak ditemukan\nSilakan login kembali',
+        );
+      } else {
+        await AuthService.to.logout();
+        Get.offAllNamed('/login');
+        ToastUtils.showErrorToast('Gagal memuat data\nSilakan login kembali');
+      }
+    } catch (e) {
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
+    }
+  }
+
+  void getPeringkat() async {
+    try {
+      final token = AuthService.to.token.value;
+
+      final queryParams = {'page': '1', 'limit': '1', 'tahapHafalan': 'level1'};
+
+      final uri = Uri.parse(
+        ApiUrl.santriRank,
+      ).replace(queryParameters: queryParams);
+
+      final response = await get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'x-platform': 'mobile',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Get.offAllNamed('/admin-home');
       } else if (response.statusCode == 401) {
         await AuthService.to.logout();
         Get.offAllNamed('/login');

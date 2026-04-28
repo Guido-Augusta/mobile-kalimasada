@@ -19,6 +19,8 @@ class LoginController extends GetxController {
   final isPasswordHidden = true.obs;
   final isLoading = false.obs;
 
+  DateTime? _lastErrorShown;
+
   @override
   void onClose() {
     super.onClose();
@@ -76,14 +78,29 @@ class LoginController extends GetxController {
           ToastUtils.showSuccessToast('Role tidak ditemukan');
         }
       } else if (response.statusCode == 401 || response.statusCode == 404) {
-        ToastUtils.showErrorToast('Email atau password salah');
+        final now = DateTime.now();
+        if (_lastErrorShown == null ||
+            now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+          _lastErrorShown = now;
+          ToastUtils.showErrorToast('Email atau password salah');
+        }
       } else {
-        ToastUtils.showErrorToast('Login gagal');
+        final now = DateTime.now();
+        if (_lastErrorShown == null ||
+            now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+          _lastErrorShown = now;
+          ToastUtils.showErrorToast('Login gagal');
+        }
       }
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
     } finally {
       isLoading.value = false;
     }
