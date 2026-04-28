@@ -47,7 +47,11 @@ class LoginView extends GetView<LoginController> {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        gradient: LinearGradient(
+                          colors: [Colors.orange[700]!, Colors.orangeAccent],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
                           color: Colors.white.withValues(alpha: 0.3),
@@ -55,9 +59,9 @@ class LoginView extends GetView<LoginController> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
+                            color: Colors.orange.withValues(alpha: 0.3),
                             blurRadius: 20,
-                            offset: const Offset(0, 10),
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
@@ -165,7 +169,7 @@ class LoginView extends GetView<LoginController> {
                                 autovalidateMode:
                                     AutovalidateMode.onUserInteraction,
                                 validator: controller.validateIdentifier,
-                                keyboardType: TextInputType.text,
+                                keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
                                   hintText: 'Email / Nama Lengkap',
                                   hintStyle: TextStyle(color: Colors.grey[400]),
