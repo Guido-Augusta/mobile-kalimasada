@@ -20,12 +20,15 @@ class PeringkatView extends GetView<PeringkatController> {
         centerTitle: true,
         title: Text(
           'Peringkat Santri',
-          style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline_rounded),
-            onPressed: () => LevelInfoDialog.show(context),
+            onPressed: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              LevelInfoDialog.show(context);
+            },
           ),
         ],
       ),
@@ -238,7 +241,7 @@ class PeringkatView extends GetView<PeringkatController> {
               Text(
                 'Peringkat Hafalan',
                 style: GoogleFonts.poppins(
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   height: 1.2,
@@ -469,7 +472,7 @@ class PeringkatView extends GetView<PeringkatController> {
           ),
           const SizedBox(height: 24),
           Text(
-            controller.searchQuery.isEmpty
+            controller.appliedSearchQuery.value.isNotEmpty
                 ? 'Belum ada data peringkat'
                 : 'Santri tidak ditemukan',
             style: GoogleFonts.poppins(
@@ -480,9 +483,9 @@ class PeringkatView extends GetView<PeringkatController> {
           ),
           const SizedBox(height: 8),
           Text(
-            controller.searchQuery.isEmpty
-                ? 'Data peringkat akan muncul di sini.'
-                : 'Coba gunakan kata kunci lain.',
+            controller.appliedSearchQuery.value.isNotEmpty
+                ? 'Tarik ke bawah untuk refresh'
+                : 'Coba gunakan kata kunci lain',
             style: GoogleFonts.poppins(
               fontSize: 14,
               color: const Color(0xFF64748B),
