@@ -5,6 +5,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../routes/app_pages.dart';
 import '../../../../widgets/islamic_decoration.dart';
+import '../../../../widgets/welcome_card.dart';
 import '../controllers/santri_home_controller.dart';
 
 class SantriHomeView extends GetView<SantriHomeController> {
@@ -32,7 +33,10 @@ class SantriHomeView extends GetView<SantriHomeController> {
             children: [
               _buildHeader(context),
               const SizedBox(height: 30),
-              _buildWelcomeCard(context),
+              const WelcomeCard(
+                title: 'Dashboard Santri',
+                subtitle: 'Aplikasi Tahfidz Kalimasada',
+              ),
               const SizedBox(height: 25),
               _buildFeatureCards(context),
               const SizedBox(height: 30),
@@ -188,93 +192,6 @@ class SantriHomeView extends GetView<SantriHomeController> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildWelcomeCard(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.deepPurpleAccent.withValues(alpha: 0.3),
-            blurRadius: 25,
-            offset: const Offset(0, 15),
-          ),
-          BoxShadow(
-            color: Colors.deepPurple.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Dashboard Santri',
-                      style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        height: 1.2,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        'Aplikasi Tahfidz Kalimasada',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.dashboard_rounded,
-                  color: Colors.white,
-                  size: 40,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 

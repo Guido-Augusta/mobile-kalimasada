@@ -349,22 +349,13 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Skeletonizer(
-                              enabled: isLoading,
-                              effect: ShimmerEffect(
-                                baseColor: Colors.white.withValues(alpha: 0.2),
-                                highlightColor: Colors.white.withValues(
-                                  alpha: 0.4,
-                                ),
-                              ),
-                              child: Text(
-                                'Informasi Santri',
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white.withValues(alpha: 0.65),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                  letterSpacing: 0.5,
-                                ),
+                            Text(
+                              'Informasi Santri',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white.withValues(alpha: 0.65),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.5,
                               ),
                             ),
                             const SizedBox(height: 2),
