@@ -83,7 +83,7 @@ class EditSantriView extends GetView<EditSantriController> {
                               enabled: isLoading,
                               child: _buildSectionContainer(
                                 title: 'Informasi Pribadi',
-                                icon: Icons.person_outline_rounded,
+                                icon: Icons.person_rounded,
                                 child: _buildEditPersonalInfoSection(),
                               ),
                             ),
@@ -390,7 +390,7 @@ class EditSantriView extends GetView<EditSantriController> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
-                Icons.lock_reset_rounded,
+                Icons.vpn_key_rounded,
                 color: Colors.deepPurpleAccent,
                 size: 20,
               ),

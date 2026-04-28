@@ -80,11 +80,11 @@ class EditOrtuView extends GetView<EditOrtuController> {
                           ),
                           const SizedBox(height: 20),
 
-                          // Informasi Personal
+                          // Informasi Pribadi
                           Skeletonizer(
                             enabled: controller.isLoading.value,
                             child: _buildSectionContainer(
-                              title: 'Informasi Personal',
+                              title: 'Informasi Pribadi',
                               icon: Icons.person_rounded,
                               child: _buildPersonalInfoSection(),
                             ),
@@ -386,18 +386,18 @@ class EditOrtuView extends GetView<EditOrtuController> {
           decoration: _inputDecor('Masukkan nama orang tua/wali'),
         ),
         const SizedBox(height: 16),
-        _label('Nomor HP'),
+        _label('Nomor Telepon'),
         TextFormField(
           controller: controller.noHpC,
           keyboardType: TextInputType.phone,
           style: GoogleFonts.poppins(color: Colors.black),
           autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: (v) {
-            if (v!.isEmpty) return 'Nomor HP tidak boleh kosong';
-            if (!v.isNumericOnly) return 'Nomor HP harus berupa angka';
+            if (v!.isEmpty) return 'Nomor telepon tidak boleh kosong';
+            if (!v.isNumericOnly) return 'Nomor telepon harus berupa angka';
             return null;
           },
-          decoration: _inputDecor('Masukkan nomor handphone'),
+          decoration: _inputDecor('08xxxxxxxxxx'),
         ),
         const SizedBox(height: 16),
         _label('Jenis Kelamin'),
@@ -479,7 +479,7 @@ class EditOrtuView extends GetView<EditOrtuController> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
-                  Icons.lock_person_rounded,
+                  Icons.vpn_key_rounded,
                   color: Colors.deepPurpleAccent,
                   size: 20,
                 ),
@@ -575,9 +575,9 @@ class EditOrtuView extends GetView<EditOrtuController> {
                   Text(
                     'Edit Email & Password',
                     style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 16,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -685,6 +685,14 @@ class EditOrtuView extends GetView<EditOrtuController> {
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Tekan tombol "Acak" untuk generate password.',
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: Colors.grey[500],
+                        ),
                       ),
                     ],
                   ),

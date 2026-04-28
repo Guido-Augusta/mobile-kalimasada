@@ -20,6 +20,7 @@ class TambahUstadzController extends GetxController {
   final RxBool isUploadingImage = false.obs;
   final RxBool isSaveProfileLoading = false.obs;
   final RxBool isSaveEmailPasswordLoading = false.obs;
+  final RxBool isPasswordVisible = false.obs;
 
   var ustadzDetail = Rxn<Ustadz>();
 
@@ -30,8 +31,7 @@ class TambahUstadzController extends GetxController {
           .obs;
 
   GlobalKey<FormState> profileFormKey = GlobalKey<FormState>();
-  final GlobalKey<FormFieldState> passwordFieldKey =
-      GlobalKey<FormFieldState>();
+  GlobalKey<FormFieldState> passwordFieldKey = GlobalKey<FormFieldState>();
 
   var emailC = TextEditingController();
   var passwordC = TextEditingController();
@@ -124,8 +124,10 @@ class TambahUstadzController extends GetxController {
 
   void resetForm() {
     profileFormKey.currentState?.reset();
+    passwordFieldKey.currentState?.reset();
     pickedImage.value = null;
     waliKelasTahapC.value = '';
+    isPasswordVisible.value = false;
     emailC.clear();
     passwordC.clear();
     namaC.clear();
@@ -134,6 +136,7 @@ class TambahUstadzController extends GetxController {
     jenisKelaminC.text = 'L';
 
     profileFormKey = GlobalKey<FormState>();
+    passwordFieldKey = GlobalKey<FormFieldState>();
     update();
   }
 

@@ -62,7 +62,7 @@ class TambahSantriView extends GetView<TambahSantriController> {
 
                         // Nama Lengkap
                         _buildSectionContainer(
-                          title: 'Informasi Santri',
+                          title: 'Informasi Pribadi',
                           icon: Icons.person_rounded,
                           child: _buildPersonalInfoSectionForm(),
                         ),
@@ -573,7 +573,7 @@ class TambahSantriView extends GetView<TambahSantriController> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
-                  Icons.lock_person_rounded,
+                  Icons.vpn_key_rounded,
                   color: Colors.deepPurpleAccent,
                   size: 20,
                 ),
@@ -682,7 +682,7 @@ class TambahSantriView extends GetView<TambahSantriController> {
                   side: const BorderSide(color: Colors.deepPurpleAccent),
                   foregroundColor: Colors.deepPurpleAccent,
                 ),
-                icon: const Icon(Icons.autorenew_rounded, size: 18),
+                icon: const Icon(Icons.auto_awesome_rounded, size: 18),
                 label: Text(
                   'Acak',
                   style: GoogleFonts.poppins(
@@ -692,6 +692,11 @@ class TambahSantriView extends GetView<TambahSantriController> {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Tekan tombol "Acak" untuk generate password.',
+            style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[500]),
           ),
         ],
       ),

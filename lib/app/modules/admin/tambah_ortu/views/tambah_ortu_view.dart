@@ -73,7 +73,7 @@ class TambahOrtuView extends GetView<TambahOrtuController> {
 
                         // Personal Information
                         _buildSectionContainer(
-                          title: 'Informasi Personal',
+                          title: 'Informasi Pribadi',
                           icon: Icons.person_rounded,
                           child: _buildPersonalInfoSectionForm(),
                         ),
@@ -546,16 +546,16 @@ class TambahOrtuView extends GetView<TambahOrtuController> {
           },
         ),
         _buildTextField(
-          label: 'Nomor HP',
-          hintText: 'Masukkan nomor handphone',
+          label: 'Nomor Telepon',
+          hintText: '08xxxxxxxxxx',
           controller: controller.noHpC,
           keyboardType: TextInputType.phone,
           validator: (value) {
             if (value!.isEmpty) {
-              return 'Nomor HP tidak boleh kosong';
+              return 'Nomor telepon tidak boleh kosong';
             }
             if (value.isNotEmpty && !value.isNumericOnly) {
-              return 'Nomor HP harus berupa angka';
+              return 'Nomor telepon harus berupa angka';
             }
             return null;
           },
@@ -626,7 +626,7 @@ class TambahOrtuView extends GetView<TambahOrtuController> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
-                  Icons.lock_person_rounded,
+                  Icons.vpn_key_rounded,
                   color: Colors.deepPurpleAccent,
                   size: 20,
                 ),
@@ -751,7 +751,7 @@ class TambahOrtuView extends GetView<TambahOrtuController> {
                   side: const BorderSide(color: Colors.deepPurpleAccent),
                   foregroundColor: Colors.deepPurpleAccent,
                 ),
-                icon: const Icon(Icons.autorenew_rounded, size: 18),
+                icon: const Icon(Icons.auto_awesome_rounded, size: 18),
                 label: Text(
                   'Acak',
                   style: GoogleFonts.poppins(
@@ -761,6 +761,11 @@ class TambahOrtuView extends GetView<TambahOrtuController> {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Tekan tombol "Acak" untuk generate password.',
+            style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[500]),
           ),
         ],
       ),
