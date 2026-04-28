@@ -22,89 +22,91 @@ class LevelInfoDialog {
               backgroundColor: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Header Icon
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.verified_user_rounded,
-                        color: Colors.deepPurpleAccent,
-                        size: 32,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Tahap Hafalan',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Setiap level memiliki target hafalan yang harus dicapai santri',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Level Cards
-                    _buildLevelInfo(
-                      title: 'Level 1',
-                      description: 'Fokus pada Juz 30',
-                      color: Colors.green.withValues(alpha: 0.8),
-                      icon: '1',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildLevelInfo(
-                      title: 'Level 2',
-                      description: 'Fokus pada Surah-surah Pilihan',
-                      color: Colors.orange.withValues(alpha: 0.8),
-                      icon: '2',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildLevelInfo(
-                      title: 'Level 3',
-                      description: 'Fokus pada Juz 1 - Juz 29',
-                      color: Colors.red.withValues(alpha: 0.8),
-                      icon: '3',
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Close Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurpleAccent,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Header Icon
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
                         ),
-                        child: Text(
-                          'Tutup',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
-                          ),
+                        child: Icon(
+                          Icons.verified_user_rounded,
+                          color: Colors.deepPurpleAccent,
+                          size: 32,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 12),
+                      Text(
+                        'Tahap Hafalan',
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Setiap level memiliki target hafalan yang harus dicapai santri',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Level Cards
+                      _buildLevelInfo(
+                        title: 'Level 1',
+                        description: 'Fokus pada Juz 30',
+                        color: Colors.green.withValues(alpha: 0.8),
+                        icon: '1',
+                      ),
+                      const SizedBox(height: 12),
+                      _buildLevelInfo(
+                        title: 'Level 2',
+                        description: 'Fokus pada Surah-surah Pilihan',
+                        color: Colors.orange.withValues(alpha: 0.8),
+                        icon: '2',
+                      ),
+                      const SizedBox(height: 12),
+                      _buildLevelInfo(
+                        title: 'Level 3',
+                        description: 'Fokus pada Juz 1 - Juz 29',
+                        color: Colors.red.withValues(alpha: 0.8),
+                        icon: '3',
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Close Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurpleAccent,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            'Tutup',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

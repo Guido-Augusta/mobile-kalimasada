@@ -27,6 +27,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
           IconButton(
             icon: const Icon(Icons.info_outline_rounded),
             onPressed: () {
+              FocusManager.instance.primaryFocus?.unfocus();
               // dialog informasi level
               LevelInfoDialog.show(context);
             },
@@ -46,6 +47,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                 : const Offset(2, 0), // geser ke kanan
             child: FloatingActionButton(
               onPressed: () {
+                FocusManager.instance.primaryFocus?.unfocus();
                 Get.toNamed('/tambah-santri');
               },
               backgroundColor: Colors.deepPurpleAccent,
