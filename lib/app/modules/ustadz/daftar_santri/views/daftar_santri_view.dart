@@ -218,7 +218,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
               child: Text(
                 label,
                 style: GoogleFonts.poppins(
-                  color: isActive ? Colors.deepPurple : Colors.grey[500],
+                  color: isActive ? Colors.deepPurpleAccent : Colors.grey[500],
                   fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                   fontSize: 13,
                 ),
@@ -259,22 +259,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
                 child: Row(
                   children: [
                     // Profile Picture
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey[50],
-                        border: Border.all(color: Colors.grey[100]!, width: 2),
-                      ),
-                      child: ClipOval(
-                        child: Icon(
-                          Icons.person,
-                          color: Colors.grey[400],
-                          size: 28,
-                        ),
-                      ),
-                    ),
+                    _buildAvatar(santri.nama),
                     const SizedBox(width: 14),
 
                     // Name and Badge
@@ -375,22 +360,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
             child: Row(
               children: [
                 // Profile Picture
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey[50],
-                    border: Border.all(color: Colors.grey[100]!, width: 2),
-                  ),
-                  child: ClipOval(
-                    child: Icon(
-                      Icons.person,
-                      color: Colors.grey[400],
-                      size: 28,
-                    ),
-                  ),
-                ),
+                _buildAvatar(santri.nama),
                 const SizedBox(width: 14),
 
                 // Info Section
@@ -751,6 +721,42 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
             style: TextStyle(color: Colors.grey, fontSize: 16),
           ),
         ],
+      ),
+    );
+  }
+
+  String _getInitials(String? name) {
+    if (name == null || name.isEmpty) return '?';
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return parts[0].substring(0, parts[0].length > 1 ? 2 : 1).toUpperCase();
+  }
+
+  Widget _buildAvatar(String? name) {
+    final initials = _getInitials(name);
+    return Container(
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.deepPurpleAccent.withValues(alpha: 0.08),
+        border: Border.all(
+          color: Colors.deepPurpleAccent.withValues(alpha: 0.12),
+          width: 1,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          initials,
+          style: GoogleFonts.poppins(
+            color: Colors.deepPurpleAccent,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
       ),
     );
   }

@@ -250,9 +250,13 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
     String initials = '?';
     if (santri?.nama != null && santri!.nama!.isNotEmpty) {
       final parts = santri.nama!.trim().split(' ');
-      initials = parts.length >= 2
-          ? '${parts[0][0]}${parts[1][0]}'.toUpperCase()
-          : parts[0][0].toUpperCase();
+      if (parts.length >= 2) {
+        initials = '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+      } else {
+        initials = parts[0]
+            .substring(0, parts[0].length > 1 ? 2 : 1)
+            .toUpperCase();
+      }
     }
 
     return SliverToBoxAdapter(

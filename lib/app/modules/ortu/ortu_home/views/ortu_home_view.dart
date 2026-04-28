@@ -54,10 +54,8 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                 backgroundColor: Colors.grey[200],
                 backgroundImage: imageProvider,
               ),
-              placeholder: (context, url) => CircleAvatar(
-                radius: 28,
-                backgroundColor: Colors.grey[300],
-              ),
+              placeholder: (context, url) =>
+                  CircleAvatar(radius: 28, backgroundColor: Colors.grey[300]),
               errorWidget: (context, url, error) => CircleAvatar(
                 radius: 28,
                 backgroundColor: Colors.grey[200],
@@ -365,25 +363,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
                       child: Row(
                         children: [
                           // Profile Picture
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.grey[50],
-                              border: Border.all(
-                                color: Colors.grey[100]!,
-                                width: 2,
-                              ),
-                            ),
-                            child: ClipOval(
-                              child: Icon(
-                                Icons.person,
-                                color: Colors.grey[400],
-                                size: 28,
-                              ),
-                            ),
-                          ),
+                          _buildAvatar(child.nama),
                           const SizedBox(width: 14),
 
                           // Name and Badge
@@ -642,5 +622,41 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
       default:
         return 'Tahap ?';
     }
+  }
+
+  String _getInitials(String? name) {
+    if (name == null || name.isEmpty) return '?';
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return parts[0].substring(0, parts[0].length > 1 ? 2 : 1).toUpperCase();
+  }
+
+  Widget _buildAvatar(String? name) {
+    final initials = _getInitials(name);
+    return Container(
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.deepPurpleAccent.withValues(alpha: 0.08),
+        border: Border.all(
+          color: Colors.deepPurpleAccent.withValues(alpha: 0.12),
+          width: 1,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          initials,
+          style: GoogleFonts.poppins(
+            color: Colors.deepPurpleAccent,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ),
+    );
   }
 }
