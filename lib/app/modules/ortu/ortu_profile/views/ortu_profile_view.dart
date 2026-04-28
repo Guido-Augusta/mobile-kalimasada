@@ -36,10 +36,11 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
               )
             : null,
         body: Obx(() {
-          final ortu = controller.ortuDetail.value;
+          final ortuData = controller.ortuDetail.value;
+          final isLoading = controller.isLoading.value;
 
-          // Data kosong
-          if (ortu == null) {
+          // Data kosong dan tidak sedang loading
+          if (ortuData == null && !isLoading) {
             return RefreshIndicator(
               onRefresh: () async {
                 controller.getOrtuDetail();
@@ -91,248 +92,305 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
             );
           }
 
+          // Gunakan dummy data untuk skeleton jika ortuData masih null
+          final ortu =
+              ortuData ??
+              Ortu(
+                id: 0,
+                userId: 0,
+                nama: 'Nama Orang Tua',
+                nomorHp: '081234567890',
+                alamat: 'Alamat lengkap orang tua disini...',
+                jenisKelamin: 'L',
+                fotoProfil: '',
+                tipe: 'ayah',
+                user: User(
+                  id: 0,
+                  email: 'ortu@kalimasada.com',
+                  password: '',
+                  role: 'ortu',
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                ),
+                santri: [],
+              );
+
           return RefreshIndicator(
             onRefresh: () async {
               controller.getOrtuDetail();
             },
-            child: CustomScrollView(
-              slivers: [
-                // Custom App Bar with Gradient Background
-                SliverAppBar(
-                  centerTitle: true,
-                  title: Text(
-                    'Profil Orang Tua',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.logout_rounded,
-                        color: Colors.redAccent,
+            child: Skeletonizer(
+              enabled: isLoading,
+              child: CustomScrollView(
+                slivers: [
+                  // Custom App Bar with Gradient Background
+                  SliverAppBar(
+                    centerTitle: true,
+                    title: Skeletonizer(
+                      enabled: isLoading,
+                      effect: ShimmerEffect(
+                        baseColor: Colors.white.withValues(alpha: 0.2),
+                        highlightColor: Colors.white.withValues(alpha: 0.4),
                       ),
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            title: Text(
-                              'Logout',
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            content: Text(
-                              'Apakah anda yakin ingin logout?',
-                              style: GoogleFonts.poppins(),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Get.back();
-                                },
-                                child: Text(
-                                  'Tidak',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ),
-                              Obx(
-                                () => ElevatedButton(
-                                  onPressed: controller.isLoadingLogout.value
-                                      ? null
-                                      : () {
-                                          controller.logout();
-                                        },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 8,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: controller.isLoadingLogout.value
-                                      ? const SizedBox(
-                                          width: 16,
-                                          height: 16,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 1,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : Text(
-                                          'Ya',
-                                          style: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                  expandedHeight: 230,
-                  pinned: false,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.deepPurpleAccent,
-                            Colors.deepPurple[700]!,
-                          ],
+                      child: const Text(
+                        'Profil Orang Tua',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                      child: SafeArea(
-                        child: Column(
-                          children: [
-                            // Profile Section
-                            const SizedBox(height: 40),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Profile Picture with Border and Shadow
-                                  Stack(
-                                    children: [
-                                      Container(
-                                        width: 110,
-                                        height: 110,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 4,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(
-                                                alpha: 0.2,
-                                              ),
-                                              blurRadius: 20,
-                                              offset: const Offset(0, 8),
-                                            ),
-                                          ],
-                                        ),
-                                        child: ClipOval(
-                                          child: CachedNetworkImage(
-                                            imageUrl: controller.getImageUrl(
-                                              controller.fotoProfil.value,
-                                            ),
-                                            fit: BoxFit.cover,
-                                            placeholder: (context, url) =>
-                                                Skeletonizer(
-                                                  enabled: true,
-                                                  child: Container(
-                                                    color: Colors.white,
-                                                    width: 110,
-                                                    height: 110,
-                                                  ),
-                                                ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    Container(
-                                                      color: Colors.grey[200],
-                                                      child: const Icon(
-                                                        Icons.person,
-                                                        size: 48,
-                                                        color: Colors
-                                                            .deepPurpleAccent,
-                                                      ),
-                                                    ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        bottom: 0,
-                                        right: 0,
-                                        child: Material(
-                                          shape: const CircleBorder(),
-                                          child: InkWell(
-                                            onTap: () {
-                                              _showEditPhotoProfileBottomSheet();
-                                            },
-                                            customBorder: const CircleBorder(),
-                                            child: Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: const BoxDecoration(
-                                                color: Colors.white,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                Icons.camera_alt,
-                                                color: Colors.deepPurpleAccent,
-                                                size: 20,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                    ),
+                    actions: [
+                      Skeletonizer(
+                        enabled: isLoading,
+                        effect: ShimmerEffect(
+                          baseColor: Colors.white.withValues(alpha: 0.2),
+                          highlightColor: Colors.white.withValues(alpha: 0.4),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.logout_rounded,
+                            color: Colors.redAccent,
+                          ),
+                          onPressed: () => showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                title: Text(
+                                  'Logout',
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w600,
                                   ),
-
-                                  const SizedBox(height: 16),
-
-                                  // Name
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
+                                ),
+                                content: Text(
+                                  'Apakah anda yakin ingin logout?',
+                                  style: GoogleFonts.poppins(),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Get.back();
+                                    },
                                     child: Text(
-                                      ortu.nama ?? 'Nama tidak tersedia',
+                                      'Tidak',
                                       style: GoogleFonts.poppins(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                        color: Colors.grey[600],
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  Obx(
+                                    () => ElevatedButton(
+                                      onPressed:
+                                          controller.isLoadingLogout.value
+                                          ? null
+                                          : () {
+                                              controller.logout();
+                                            },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                          vertical: 8,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                      ),
+                                      child: controller.isLoadingLogout.value
+                                          ? const SizedBox(
+                                              width: 16,
+                                              height: 16,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 1,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : Text(
+                                              'Ya',
+                                              style: GoogleFonts.poppins(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
                                     ),
                                   ),
                                 ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                    expandedHeight: 230,
+                    pinned: false,
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.deepPurpleAccent,
+                              Colors.deepPurple[700]!,
+                            ],
+                          ),
+                        ),
+                        child: SafeArea(
+                          child: Column(
+                            children: [
+                              // Profile Section
+                              const SizedBox(height: 40),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // Profile Picture with Border and Shadow
+                                    Stack(
+                                      children: [
+                                        Container(
+                                          width: 110,
+                                          height: 110,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.white,
+                                              width: 4,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(
+                                                  alpha: 0.2,
+                                                ),
+                                                blurRadius: 20,
+                                                offset: const Offset(0, 8),
+                                              ),
+                                            ],
+                                          ),
+                                          child: ClipOval(
+                                            child: CachedNetworkImage(
+                                              imageUrl: controller.getImageUrl(
+                                                controller.fotoProfil.value,
+                                              ),
+                                              fit: BoxFit.cover,
+                                              placeholder: (context, url) =>
+                                                  Container(
+                                                    width: 110,
+                                                    height: 110,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: Colors.grey[300],
+                                                    ),
+                                                  ),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Container(
+                                                        color: Colors.grey[200],
+                                                        child: const Icon(
+                                                          Icons.person,
+                                                          size: 48,
+                                                          color: Colors
+                                                              .deepPurpleAccent,
+                                                        ),
+                                                      ),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: Material(
+                                            shape: const CircleBorder(),
+                                            child: InkWell(
+                                              onTap: () {
+                                                _showEditPhotoProfileBottomSheet();
+                                              },
+                                              customBorder:
+                                                  const CircleBorder(),
+                                              child: Container(
+                                                padding: const EdgeInsets.all(
+                                                  6,
+                                                ),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.camera_alt,
+                                                  color:
+                                                      Colors.deepPurpleAccent,
+                                                  size: 20,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    const SizedBox(height: 16),
+
+                                    // Name
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
+                                      child: Skeletonizer(
+                                        enabled: isLoading,
+                                        effect: ShimmerEffect(
+                                          baseColor: Colors.white.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          highlightColor: Colors.white
+                                              .withValues(alpha: 0.4),
+                                        ),
+                                        child: Text(
+                                          ortu.nama ?? 'Nama tidak tersedia',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
 
-                // Main Content
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      // Personal Information
-                      _buildPersonalInfoSection(ortu),
-                      const SizedBox(height: 16),
-                      // Action Cards
-                      _buildActionSection(ortu),
-                      const SizedBox(height: 50), // Space for bottom buttons
-                    ]),
+                  // Main Content
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        // Personal Information
+                        _buildPersonalInfoSection(ortu),
+                        const SizedBox(height: 16),
+                        // Action Cards
+                        _buildActionSection(ortu),
+                        const SizedBox(height: 50), // Space for bottom buttons
+                      ]),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         }),

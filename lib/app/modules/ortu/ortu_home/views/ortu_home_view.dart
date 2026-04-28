@@ -45,24 +45,27 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
     return Row(
       children: [
         Obx(
-          () => CachedNetworkImage(
-            imageUrl: controller.getImageUrl(controller.fotoProfil.value),
-            imageBuilder: (context, imageProvider) => CircleAvatar(
-              radius: 28,
-              backgroundColor: Colors.grey[200],
-              backgroundImage: imageProvider,
-            ),
-            placeholder: (context, url) => Skeletonizer(
-              enabled: true,
-              child: const CircleAvatar(radius: 28),
-            ),
-            errorWidget: (context, url, error) => CircleAvatar(
-              radius: 28,
-              backgroundColor: Colors.grey[200],
-              child: const Icon(
-                Icons.person,
-                size: 28,
-                color: Colors.deepPurpleAccent,
+          () => Skeletonizer(
+            enabled: controller.isLoading.value,
+            child: CachedNetworkImage(
+              imageUrl: controller.getImageUrl(controller.fotoProfil.value),
+              imageBuilder: (context, imageProvider) => CircleAvatar(
+                radius: 28,
+                backgroundColor: Colors.grey[200],
+                backgroundImage: imageProvider,
+              ),
+              placeholder: (context, url) => CircleAvatar(
+                radius: 28,
+                backgroundColor: Colors.grey[300],
+              ),
+              errorWidget: (context, url, error) => CircleAvatar(
+                radius: 28,
+                backgroundColor: Colors.grey[200],
+                child: const Icon(
+                  Icons.person,
+                  size: 28,
+                  color: Colors.deepPurpleAccent,
+                ),
               ),
             ),
           ),
