@@ -22,8 +22,9 @@ Future<void> main() async {
   await initializeDateFormatting('id_ID', null);
 
   await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
-    androidNotificationChannelName: 'Audio playback',
+    androidNotificationChannelId:
+        'com.kalimasada.mobile_kalimasada.channel.audio',
+    androidNotificationChannelName: 'Pemutaran Audio',
     androidNotificationOngoing: true,
   );
 
