@@ -734,18 +734,6 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Left accent bar
-                Container(
-                  width: 5,
-                  decoration: BoxDecoration(
-                    color: statusColor,
-                    gradient: LinearGradient(
-                      colors: [statusColor, statusColor.withValues(alpha: 0.5)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  ),
-                ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
@@ -906,18 +894,6 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Left accent bar
-                Container(
-                  width: 5,
-                  decoration: BoxDecoration(
-                    color: statusColor,
-                    gradient: LinearGradient(
-                      colors: [statusColor, statusColor.withValues(alpha: 0.5)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  ),
-                ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
