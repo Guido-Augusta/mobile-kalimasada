@@ -15,6 +15,7 @@ class SummaryHafalanController extends GetxController {
   var isLoading = false.obs;
 
   var searchQuery = ''.obs;
+  final appliedSearchQuery = ''.obs;
   var searchController = TextEditingController();
 
   /// mode: 'surah' | 'juz'
@@ -42,7 +43,8 @@ class SummaryHafalanController extends GetxController {
     getSummaryHafalan();
     _setupScrollController();
 
-    debounce(searchQuery, (_) {
+    debounce(searchQuery, (callback) {
+      appliedSearchQuery.value = searchQuery.value;
       getSummaryHafalan();
     }, time: const Duration(milliseconds: 700));
   }

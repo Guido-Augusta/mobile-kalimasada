@@ -1327,6 +1327,7 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<DetailHafalanSurahController>();
     final labels = ['Hafalan', 'Murajaah', 'Tahsin'];
     final label = labels[widget.modeIndex];
 
@@ -1407,8 +1408,10 @@ class _AddProgressBottomSheetState extends State<_AddProgressBottomSheet> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              Get.find<DetailHafalanSurahController>()
-                                  .santriName,
+                              (controller.santriName.isEmpty ||
+                                      controller.santriName == 'null')
+                                  ? 'Nama Santri'
+                                  : controller.santriName,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,

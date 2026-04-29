@@ -16,7 +16,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
   Santri get _dummySantri => Santri(
     id: 0,
     userId: 0,
-    nama: 'Loading Name Placeholder',
+    nama: 'Name Placeholder',
     tahapHafalan: '',
     peringkat: 10,
     totalPoin: 100,

@@ -172,7 +172,10 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
         Obx(() {
           final count = _activeFilterCount();
           return GestureDetector(
-            onTap: () => _showFilterBottomSheet(context),
+            onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              _showFilterBottomSheet(context);
+            },
             child: Container(
               width: 46,
               height: 46,
@@ -233,16 +236,16 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
   Widget _buildLevelFilterRow() {
     return Row(
       children: [
-        _buildLevelChip('Level 1', 'level1', const Color(0xFF10B981)),
+        _buildLevelChip('Level 1', 'level1'),
         const SizedBox(width: 8),
-        _buildLevelChip('Level 2', 'level2', const Color(0xFFF59E0B)),
+        _buildLevelChip('Level 2', 'level2'),
         const SizedBox(width: 8),
-        _buildLevelChip('Level 3', 'level3', const Color(0xFFEF4444)),
+        _buildLevelChip('Level 3', 'level3'),
       ],
     );
   }
 
-  Widget _buildLevelChip(String label, String value, Color color) {
+  Widget _buildLevelChip(String label, String value) {
     final isActive = controller.level.value == value;
     return Expanded(
       child: GestureDetector(
@@ -258,12 +261,12 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: isActive
-                ? Colors.deepPurple.withValues(alpha: 0.12)
+                ? Colors.deepPurpleAccent.withValues(alpha: 0.12)
                 : Colors.white,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: isActive
-                  ? Colors.deepPurple.withValues(alpha: 0.5)
+                  ? Colors.deepPurpleAccent.withValues(alpha: 0.5)
                   : Colors.grey.shade200,
               width: isActive ? 1.5 : 1,
             ),
@@ -273,7 +276,7 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
             style: GoogleFonts.poppins(
               fontSize: 12,
               fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-              color: isActive ? Colors.deepPurple : Colors.grey[500],
+              color: isActive ? Colors.deepPurpleAccent : Colors.grey[500],
             ),
           ),
         ),
@@ -664,10 +667,10 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
         children: [
           _buildCardHeader(item.id, item.nama, tanggal),
           Divider(height: 1, color: Colors.grey[100]),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-            child: hasData
-                ? GestureDetector(
+          hasData
+              ? Material(
+                  color: Colors.transparent,
+                  child: InkWell(
                     onTap: () {
                       FocusManager.instance.primaryFocus?.unfocus();
                       Get.toNamed(
@@ -675,47 +678,53 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                         arguments: {
                           'santriId': item.id,
                           'surahId': terakhir.surahId,
+                          'santriName': item.nama,
                         },
                       );
                     },
-                    behavior: HitTestBehavior.opaque,
-                    child: Row(
-                      children: [
-                        _buildInfoIcon(Icons.auto_stories_rounded),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                terakhir.surah ?? '-',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[800],
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              if ((terakhir.ayatDetail ?? '').isNotEmpty)
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                      child: Row(
+                        children: [
+                          _buildInfoIcon(Icons.auto_stories_rounded),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                                 Text(
-                                  'Ayat ${terakhir.ayatDetail}',
+                                  terakhir.surah ?? '-',
                                   style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    color: Colors.grey[500],
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey[800],
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                            ],
+                                if ((terakhir.ayatDetail ?? '').isNotEmpty)
+                                  Text(
+                                    'Ayat ${terakhir.ayatDetail}',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      color: Colors.grey[500],
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
-                        _buildStatusBadge(status),
-                      ],
+                          _buildStatusBadge(status),
+                        ],
+                      ),
                     ),
-                  )
-                : _buildNoDataText(status),
-          ),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                  child: _buildNoDataText(status),
+                ),
           Divider(height: 1, color: Colors.grey[100]),
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
@@ -795,10 +804,10 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
         children: [
           _buildCardHeader(item.id, item.nama, tanggal),
           Divider(height: 1, color: Colors.grey[100]),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-            child: hasData
-                ? GestureDetector(
+          hasData
+              ? Material(
+                  color: Colors.transparent,
+                  child: InkWell(
                     onTap: () {
                       FocusManager.instance.primaryFocus?.unfocus();
                       Get.toNamed(
@@ -810,44 +819,49 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
                         },
                       );
                     },
-                    behavior: HitTestBehavior.opaque,
-                    child: Row(
-                      children: [
-                        _buildInfoIcon(Icons.menu_book_rounded),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Juz ${terakhir.juz ?? '-'}',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[800],
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              if ((terakhir.halamanDetail ?? '').isNotEmpty)
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                      child: Row(
+                        children: [
+                          _buildInfoIcon(Icons.menu_book_rounded),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                                 Text(
-                                  'Hal. ${terakhir.halamanDetail}',
+                                  'Juz ${terakhir.juz ?? '-'}',
                                   style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    color: Colors.grey[500],
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey[800],
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                            ],
+                                if ((terakhir.halamanDetail ?? '').isNotEmpty)
+                                  Text(
+                                    'Hal. ${terakhir.halamanDetail}',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      color: Colors.grey[500],
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
-                        _buildStatusBadge(status),
-                      ],
+                          _buildStatusBadge(status),
+                        ],
+                      ),
                     ),
-                  )
-                : _buildNoDataText(status),
-          ),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                  child: _buildNoDataText(status),
+                ),
           Divider(height: 1, color: Colors.grey[100]),
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
@@ -902,36 +916,43 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
   // SHARED CARD COMPONENTS
 
   Widget _buildCardHeader(int? santriId, String? nama, String? tanggal) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-      child: GestureDetector(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
           Get.toNamed('/detail-santri', arguments: santriId.toString());
         },
-        behavior: HitTestBehavior.opaque,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildAvatar(),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text(
-                  nama ?? 'Nama Santri',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[800],
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
+        ),
+
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildAvatar(),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(
+                    nama ?? 'Nama Santri',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
-            if (tanggal != null) _buildDateBadge(tanggal),
-          ],
+              if (tanggal != null) _buildDateBadge(tanggal),
+            ],
+          ),
         ),
       ),
     );
@@ -942,11 +963,11 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        color: Colors.deepPurple.withValues(alpha: 0.1),
+        color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,
-      child: Icon(Icons.person, size: 22, color: Colors.deepPurple),
+      child: Icon(Icons.person, size: 22, color: Colors.deepPurpleAccent),
     );
   }
 
@@ -972,10 +993,10 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.deepPurple.withValues(alpha: 0.1),
+        color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Icon(icon, size: 18, color: Colors.deepPurple),
+      child: Icon(icon, size: 18, color: Colors.deepPurpleAccent),
     );
   }
 
@@ -1083,7 +1104,9 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
             Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
-              'Tidak ada data santri',
+              controller.appliedSearchQuery.value.isNotEmpty
+                  ? 'Santri tidak ditemukan'
+                  : 'Tidak ada data santri',
               style: GoogleFonts.poppins(
                 color: Colors.grey[600],
                 fontSize: 16,
@@ -1093,9 +1116,9 @@ class SummaryHafalanView extends GetView<SummaryHafalanController> {
             const SizedBox(height: 8),
             Obx(
               () => Text(
-                controller.searchQuery.value.isNotEmpty
-                    ? 'Santri tidak ditemukan'
-                    : 'Data santri akan muncul di sini',
+                controller.appliedSearchQuery.value.isNotEmpty
+                    ? 'Santri tidak ditemukan di tahap ini'
+                    : 'Tarik ke bawah untuk refresh',
                 style: GoogleFonts.poppins(
                   color: Colors.grey[500],
                   fontSize: 13,
