@@ -13,6 +13,7 @@ import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/controllers/ortu_ho
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:path/path.dart' as path;
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class OrtuProfileController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -25,7 +26,7 @@ class OrtuProfileController extends GetxController {
   final imagePicker = ImagePicker();
   var isUploadingImage = false.obs;
   var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   var namaC = TextEditingController();

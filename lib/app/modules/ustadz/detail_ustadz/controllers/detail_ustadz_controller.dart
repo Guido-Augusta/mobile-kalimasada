@@ -8,6 +8,7 @@ import '../../../../data/constants/api_url.dart';
 import '../../../../data/models/ustadz.dart';
 import '../../../../services/auth_service.dart';
 import '../../../../utils/toast_utils.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class DetailUstadzController extends GetxController {
   final ustadzId = Get.arguments['ustadzId'];
@@ -17,7 +18,7 @@ class DetailUstadzController extends GetxController {
   final isUploadingImage = false.obs;
   var ustadzData = Rxn<Ustadz>();
   var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   var namaC = TextEditingController();

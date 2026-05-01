@@ -7,13 +7,14 @@ import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/ustadz.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class UstadzHomeController extends GetxController {
   var isLoading = true.obs;
   var isLoadingLogout = false.obs;
   var ustadz = Rxn<Ustadz>();
   var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   DateTime? _lastErrorShown;

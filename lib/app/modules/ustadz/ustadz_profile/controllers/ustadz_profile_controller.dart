@@ -13,6 +13,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_home/controllers/ustadz_home_controller.dart';
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class UstadzProfileController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -23,7 +24,7 @@ class UstadzProfileController extends GetxController {
   final isUploadingImage = false.obs;
   var ustadzData = Rxn<Ustadz>();
   var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   var namaC = TextEditingController();

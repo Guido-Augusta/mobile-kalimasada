@@ -15,6 +15,7 @@ import '../../../../data/constants/api_url.dart';
 import '../../../../data/models/ortu.dart';
 import '../../../../utils/toast_utils.dart';
 import '../../daftar_ortu/controllers/daftar_ortu_controller.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class TambahOrtuController extends GetxController {
   final RxBool isUploadingImage = false.obs;
@@ -27,7 +28,7 @@ class TambahOrtuController extends GetxController {
   final ImagePicker imagePicker = ImagePicker();
   var pickedImage = Rxn<XFile>();
   var defaultPhotoProfile =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   GlobalKey<FormState> profileFormKey = GlobalKey<FormState>();

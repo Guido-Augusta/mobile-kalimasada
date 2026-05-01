@@ -11,6 +11,7 @@ import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 
 import '../../../../data/models/daftar_santri.dart';
 import '../../../../services/auth_service.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class DetailOrtuController extends GetxController {
   var isLoading = false.obs;
@@ -24,7 +25,7 @@ class DetailOrtuController extends GetxController {
   final imagePicker = ImagePicker();
   var isUploadingImage = false.obs;
   var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   var namaC = TextEditingController();

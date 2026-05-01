@@ -15,6 +15,7 @@ import '../../../../data/constants/api_url.dart';
 import '../../../../data/models/ortu.dart';
 import '../../../../utils/toast_utils.dart';
 import '../../daftar_ortu/controllers/daftar_ortu_controller.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class EditOrtuController extends GetxController {
   final String ortuId = Get.arguments['ortuId'];
@@ -29,9 +30,7 @@ class EditOrtuController extends GetxController {
   var ortuDetail = Rxn<Ortu>();
 
   final ImagePicker imagePicker = ImagePicker();
-  var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
-          .obs;
+  var fotoProfil = AppConstants.defaultProfileImageUrl.obs;
 
   final profileFormKey = GlobalKey<FormState>();
   final emailPasswordFormKey = GlobalKey<FormState>();

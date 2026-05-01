@@ -10,6 +10,7 @@ import 'package:mobile_kalimasada/app/data/models/ortu.dart' as o;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class OrtuHomeController extends GetxController {
   // ── State Variables ────────────────────────────────────────────────────────
@@ -19,7 +20,7 @@ class OrtuHomeController extends GetxController {
   final isLoadingMore = false.obs;
 
   final fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   final ortu = Rxn<o.Ortu>();
