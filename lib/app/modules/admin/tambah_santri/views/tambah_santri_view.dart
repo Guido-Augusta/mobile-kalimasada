@@ -22,10 +22,6 @@ class TambahSantriView extends GetView<TambahSantriController> {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-          onPressed: () => Get.back(),
-        ),
       ),
       body: SafeArea(
         top: false,

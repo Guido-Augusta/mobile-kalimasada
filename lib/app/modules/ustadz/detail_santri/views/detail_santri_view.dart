@@ -126,6 +126,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
     bool isAdmin = controller.isAdmin;
     return SliverAppBar(
       centerTitle: true,
+      iconTheme: const IconThemeData(color: Colors.white),
       title: Skeletonizer(
         enabled: controller.isLoading.value,
         effect: ShimmerEffect(
@@ -147,14 +148,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
           baseColor: Colors.white.withValues(alpha: 0.2),
           highlightColor: Colors.white.withValues(alpha: 0.4),
         ),
-        child: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Colors.white,
-            size: 20,
-          ),
-          onPressed: () => Get.back(),
-        ),
+        child: const BackButton(),
       ),
       actions: [
         if (isUstadz || isAdmin)

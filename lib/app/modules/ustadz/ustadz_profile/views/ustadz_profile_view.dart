@@ -30,10 +30,6 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                 centerTitle: true,
                 backgroundColor: Colors.deepPurpleAccent,
                 elevation: 0,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Get.back(),
-                ),
               )
             : null,
         body: Obx(() {

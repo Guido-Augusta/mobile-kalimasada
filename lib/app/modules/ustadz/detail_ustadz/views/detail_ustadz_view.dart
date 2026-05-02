@@ -47,10 +47,6 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
                 centerTitle: true,
                 backgroundColor: const Color(0xFFF1F5F9),
                 elevation: 0,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => Get.back(),
-                ),
               )
             : null,
         body: SafeArea(
@@ -96,6 +92,7 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
           // Custom App Bar with Gradient Background
           SliverAppBar(
             centerTitle: true,
+            iconTheme: const IconThemeData(color: Colors.white),
             title: Skeletonizer(
               enabled: controller.isLoading.value,
               effect: ShimmerEffect(
@@ -119,10 +116,7 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
                 baseColor: Colors.white.withValues(alpha: 0.2),
                 highlightColor: Colors.white.withValues(alpha: 0.4),
               ),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Get.back(),
-              ),
+              child: const BackButton(),
             ),
             expandedHeight: 230,
             pinned: false,

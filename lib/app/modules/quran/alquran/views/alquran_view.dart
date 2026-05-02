@@ -106,7 +106,7 @@ class AlquranView extends GetView<AlquranController> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(
-                        Icons.arrow_back_ios_new,
+                        Icons.arrow_back_ios_new_rounded,
                         color: Colors.white,
                         size: 16,
                       ),

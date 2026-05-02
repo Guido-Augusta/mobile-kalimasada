@@ -37,6 +37,13 @@ Future<void> main() async {
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: "Application",
+        theme: ThemeData(
+          useMaterial3: true,
+          actionIconTheme: ActionIconThemeData(
+            backButtonIconBuilder: (BuildContext context) =>
+                const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          ),
+        ),
         initialRoute: AppPages.INITIAL,
         getPages: AppPages.routes,
         localizationsDelegates: const [

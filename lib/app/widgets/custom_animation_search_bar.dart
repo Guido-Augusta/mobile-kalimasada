@@ -27,7 +27,7 @@ class CustomAnimationSearchBar extends StatefulWidget {
     this.centerTitle = 'Title',
     this.keyboardType = TextInputType.text,
     this.cursorColor,
-    this.backIcon,
+    this.backIcon = Icons.arrow_back_ios_new_rounded,
     this.minValue,
     this.maxValue,
     this.minValueErrorMessage,
@@ -65,9 +65,8 @@ class _CustomAnimationSearchBarState extends State<CustomAnimationSearchBar> {
             // Back Button / Search Toggle
             IconButton(
               icon: Icon(
-                _isSearching
-                    ? Icons.close
-                    : widget.backIcon ?? Icons.arrow_back,
+                _isSearching ? Icons.close : widget.backIcon,
+                size: _isSearching ? 24 : 20,
               ),
               onPressed: () {
                 setState(() {
