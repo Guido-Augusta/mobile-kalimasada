@@ -72,7 +72,7 @@ class LoginController extends GetxController {
           Get.offAllNamed('/ortu-main');
           ToastUtils.showSuccessToast('Login berhasil');
         } else if (data['user']['role'] == 'admin') {
-          Get.offAllNamed('/admin-home');
+          Get.offAllNamed('/admin-main');
           ToastUtils.showSuccessToast('Login berhasil');
         } else {
           ToastUtils.showSuccessToast('Role tidak ditemukan');

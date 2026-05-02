@@ -40,6 +40,7 @@ abstract class Routes {
   static const EDIT_USTADZ = _Paths.EDIT_USTADZ;
   static const DETAIL_HAFALAN_JUZ = _Paths.DETAIL_HAFALAN_JUZ;
   static const DETAIL_JUZ = _Paths.DETAIL_JUZ;
+  static const ADMIN_MAIN = _Paths.ADMIN_MAIN;
 }
 
 abstract class _Paths {
@@ -81,4 +82,5 @@ abstract class _Paths {
   static const EDIT_USTADZ = '/edit-ustadz';
   static const DETAIL_HAFALAN_JUZ = '/detail-hafalan-juz';
   static const DETAIL_JUZ = '/detail-juz';
+  static const ADMIN_MAIN = '/admin-main';
 }

@@ -19,6 +19,8 @@ import '../modules/admin/tambah_santri/bindings/tambah_santri_binding.dart';
 import '../modules/admin/tambah_santri/views/tambah_santri_view.dart';
 import '../modules/admin/tambah_ustadz/bindings/tambah_ustadz_binding.dart';
 import '../modules/admin/tambah_ustadz/views/tambah_ustadz_view.dart';
+import '../modules/main/admin_main/bindings/admin_main_binding.dart';
+import '../modules/main/admin_main/views/admin_main_view.dart';
 import '../modules/auth/change_password/bindings/change_password_binding.dart';
 import '../modules/auth/change_password/views/change_password_view.dart';
 import '../modules/auth/forgot_password/bindings/forgot_password_binding.dart';
@@ -293,6 +295,12 @@ class AppPages {
       name: _Paths.DETAIL_JUZ,
       page: () => const DetailJuzView(),
       binding: DetailJuzBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_MAIN,
+      page: () => AdminMainView(),
+      binding: AdminMainBinding(),
+      middlewares: [AdminMiddleware()],
     ),
   ];
 }

@@ -259,7 +259,7 @@ class SplashController extends GetxController {
       );
 
       if (response.statusCode == 200) {
-        Get.offAllNamed('/admin-home');
+        Get.offAllNamed('/admin-main');
       } else if (response.statusCode == 401) {
         await AuthService.to.logout();
         Get.offAllNamed('/login');
