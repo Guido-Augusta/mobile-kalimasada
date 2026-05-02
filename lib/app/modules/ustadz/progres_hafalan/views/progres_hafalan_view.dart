@@ -696,7 +696,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
         ? Colors.red[400]!
         : juz.currentAyat >= juz.maxAyat
         ? const Color(0xFF10B981)
-        : Colors.orange[500]!;
+        : Colors.orange;
 
     final statusBg = juz.currentAyat == 0
         ? Colors.red[50]!
@@ -856,7 +856,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
         ? Colors.red[400]!
         : surah.currentAyat >= surah.maxAyat
         ? const Color(0xFF10B981)
-        : Colors.orange[500]!;
+        : Colors.orange;
 
     final statusBg = surah.currentAyat == 0
         ? Colors.red[50]!
