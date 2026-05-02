@@ -992,9 +992,9 @@ class DetailSantriView extends GetView<DetailSantriController> {
           Wrap(
             spacing: 24,
             children: [
-              _buildLegendItem('Hafalan', Colors.green),
+              _buildLegendItem('Hafalan', Color(0xFF10B981)),
               _buildLegendItem('Murajaah', Colors.orange),
-              _buildLegendItem('Tahsin', Colors.blue),
+              _buildLegendItem('Tahsin', Colors.blueAccent),
             ],
           ),
         ],
@@ -1043,8 +1043,8 @@ class DetailSantriView extends GetView<DetailSantriController> {
       final barColor = chartType == ChartType.tambahHafalan
           ? const Color(0xFF10B981)
           : chartType == ChartType.murajaah
-          ? const Color(0xFFF59E0B)
-          : const Color(0xFF3B82F6);
+          ? Colors.orange
+          : Colors.blueAccent;
 
       return BarChartGroupData(
         x: index,
