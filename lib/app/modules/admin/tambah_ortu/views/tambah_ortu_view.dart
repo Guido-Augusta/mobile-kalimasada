@@ -23,7 +23,7 @@ class TambahOrtuView extends GetView<TambahOrtuController> {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFFF1F5F9),
         elevation: 0,
       ),
       body: SafeArea(
@@ -63,7 +63,7 @@ class TambahOrtuView extends GetView<TambahOrtuController> {
                             ),
                           ),
                           const SizedBox(height: 24),
-  
+
                           // Foto Profil Section
                           _buildSectionContainer(
                             title: 'Foto Profil',
@@ -71,7 +71,7 @@ class TambahOrtuView extends GetView<TambahOrtuController> {
                             child: _buildPhotoUploadSection(context),
                           ),
                           const SizedBox(height: 20),
-  
+
                           // Personal Information
                           _buildSectionContainer(
                             title: 'Informasi Pribadi',
@@ -79,11 +79,11 @@ class TambahOrtuView extends GetView<TambahOrtuController> {
                             child: _buildPersonalInfoSectionForm(),
                           ),
                           const SizedBox(height: 20),
-  
+
                           // Akses Login
                           _buildLoginAccessSectionForm(),
                           const SizedBox(height: 32),
-  
+
                           // Save Button
                           Row(
                             children: [
@@ -115,7 +115,9 @@ class TambahOrtuView extends GetView<TambahOrtuController> {
                               const SizedBox(width: 12),
                               Expanded(
                                 flex: 2,
-                                child: SaveProfileButton(controller: controller),
+                                child: SaveProfileButton(
+                                  controller: controller,
+                                ),
                               ),
                             ],
                           ),

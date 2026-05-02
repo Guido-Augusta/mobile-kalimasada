@@ -26,7 +26,7 @@ class EditSantriView extends GetView<EditSantriController> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
           centerTitle: true,
-          backgroundColor: Colors.transparent,
+          backgroundColor: const Color(0xFFF1F5F9),
           elevation: 0,
         ),
         body: SafeArea(

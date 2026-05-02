@@ -22,7 +22,7 @@ class EditOrtuView extends GetView<EditOrtuController> {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFFF1F5F9),
         elevation: 0,
       ),
       body: SafeArea(
@@ -32,7 +32,7 @@ class EditOrtuView extends GetView<EditOrtuController> {
               controller.ortuDetail.value == null) {
             return _buildEmptyState();
           }
-  
+
           return RefreshIndicator(
             onRefresh: () => controller.getOrtuDetail(),
             color: Colors.deepPurpleAccent,
@@ -70,7 +70,7 @@ class EditOrtuView extends GetView<EditOrtuController> {
                               ),
                             ),
                             const SizedBox(height: 24),
-  
+
                             // Foto Profil
                             _buildSectionContainer(
                               title: 'Foto Profil',
@@ -78,7 +78,7 @@ class EditOrtuView extends GetView<EditOrtuController> {
                               child: _buildPhotoUploadSection(context),
                             ),
                             const SizedBox(height: 20),
-  
+
                             // Informasi Pribadi
                             Skeletonizer(
                               enabled: controller.isLoading.value,
@@ -89,14 +89,14 @@ class EditOrtuView extends GetView<EditOrtuController> {
                               ),
                             ),
                             const SizedBox(height: 20),
-  
+
                             // Akses Login
                             Skeletonizer(
                               enabled: controller.isLoading.value,
                               child: _buildLoginAccessSection(),
                             ),
                             const SizedBox(height: 32),
-  
+
                             // Buttons
                             Skeletonizer(
                               enabled: controller.isLoading.value,
