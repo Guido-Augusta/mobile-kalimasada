@@ -55,12 +55,15 @@ class SantriMainView extends GetView<SantriMainController> {
               },
               items: [
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.home, color: Colors.grey),
-                  activeIcon: Icon(Icons.home, color: Colors.deepPurpleAccent),
+                  icon: Icon(Icons.home_outlined, color: Colors.grey),
+                  activeIcon: Icon(
+                    Icons.home_rounded,
+                    color: Colors.deepPurpleAccent,
+                  ),
                   label: 'Beranda',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.person, color: Colors.grey),
+                  icon: Icon(Icons.person_outline, color: Colors.grey),
                   activeIcon: Icon(
                     Icons.person,
                     color: Colors.deepPurpleAccent,
