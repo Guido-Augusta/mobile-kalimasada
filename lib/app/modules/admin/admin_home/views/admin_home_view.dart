@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+import '../../../../routes/app_pages.dart';
 import '../../../../widgets/islamic_decoration.dart';
 import '../../../../widgets/welcome_card.dart';
 import '../controllers/admin_home_controller.dart';
@@ -212,6 +213,9 @@ class AdminHomeView extends GetView<AdminHomeController> {
                   icon: Icons.school_rounded,
                   color: Colors.blueAccent,
                   isLoading: controller.isLoadingStats.value,
+                  onTap: () {
+                    Get.toNamed(Routes.DAFTAR_USTADZ);
+                  },
                 ),
               ),
               const SizedBox(width: 10),
@@ -222,6 +226,9 @@ class AdminHomeView extends GetView<AdminHomeController> {
                   icon: Icons.family_restroom_rounded,
                   color: Colors.green,
                   isLoading: controller.isLoadingStats.value,
+                  onTap: () {
+                    Get.toNamed(Routes.DAFTAR_ORTU);
+                  },
                 ),
               ),
               const SizedBox(width: 10),
@@ -232,6 +239,9 @@ class AdminHomeView extends GetView<AdminHomeController> {
                   icon: Icons.group_rounded,
                   color: Colors.orangeAccent,
                   isLoading: controller.isLoadingStats.value,
+                  onTap: () {
+                    Get.toNamed(Routes.DAFTAR_SANTRI);
+                  },
                 ),
               ),
             ],
@@ -247,54 +257,59 @@ class AdminHomeView extends GetView<AdminHomeController> {
     required IconData icon,
     required Color color,
     required bool isLoading,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Ink(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(height: 12),
-          Skeletonizer(
-            enabled: isLoading,
-            child: Text(
-              '$count',
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: Colors.black87,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(height: 12),
+            Skeletonizer(
+              enabled: isLoading,
+              child: Text(
+                '$count',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -330,13 +345,13 @@ class AdminHomeView extends GetView<AdminHomeController> {
                 subtitle: 'Kelola data ustadz/ah',
                 icon: Icons.school_rounded,
                 iconColor: Colors.blueAccent,
-                onTap: () => Get.toNamed('/daftar-ustadz'),
+                onTap: () => Get.toNamed(Routes.DAFTAR_USTADZ),
               ),
               Divider(
                 height: 1,
                 thickness: 1,
                 color: Colors.grey[100],
-                indent: 64,
+                indent: 20,
                 endIndent: 20,
               ),
               _buildModernListTile(
@@ -345,13 +360,13 @@ class AdminHomeView extends GetView<AdminHomeController> {
                 subtitle: 'Kelola data Orang Tua',
                 icon: Icons.family_restroom_rounded,
                 iconColor: Colors.green,
-                onTap: () => Get.toNamed('/daftar-ortu'),
+                onTap: () => Get.toNamed(Routes.DAFTAR_ORTU),
               ),
               Divider(
                 height: 1,
                 thickness: 1,
                 color: Colors.grey[100],
-                indent: 64,
+                indent: 20,
                 endIndent: 20,
               ),
               _buildModernListTile(
@@ -360,7 +375,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
                 subtitle: 'Kelola data Santri',
                 icon: Icons.group_rounded,
                 iconColor: Colors.orangeAccent,
-                onTap: () => Get.toNamed('/daftar-santri'),
+                onTap: () => Get.toNamed(Routes.DAFTAR_SANTRI),
               ),
             ],
           ),
