@@ -37,6 +37,7 @@ class DetailHafalanJuzController extends GetxController {
   final RxList<dynamic> itemsTahsin = <dynamic>[].obs;
 
   RxBool isFabVisible = true.obs;
+  RxBool isActionBarVisible = true.obs;
 
   final listC = ListController();
   final scrollC = ScrollController();

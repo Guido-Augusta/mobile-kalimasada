@@ -279,13 +279,11 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
           child: NotificationListener<UserScrollNotification>(
             onNotification: (notification) {
               if (notification.direction == ScrollDirection.reverse) {
-                if (controller.isFabVisible.value) {
-                  controller.isFabVisible.value = false;
-                }
+                controller.isFabVisible.value = false;
+                controller.isActionBarVisible.value = false;
               } else if (notification.direction == ScrollDirection.forward) {
-                if (!controller.isFabVisible.value) {
-                  controller.isFabVisible.value = true;
-                }
+                controller.isFabVisible.value = true;
+                controller.isActionBarVisible.value = true;
               }
               return true;
             },
@@ -633,6 +631,7 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
         onTap: () {
           controller.changeTab(index);
           controller.isFabVisible.value = true;
+          controller.isActionBarVisible.value = true;
         },
         child: Obx(() {
           final isSelected = controller.selectedTab.value == index;
@@ -944,112 +943,127 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
       color = Colors.deepPurpleAccent;
     }
 
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        16,
-        12,
-        16,
-        MediaQuery.of(context).padding.bottom + 12,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, -3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Tombol Play/Pause
-          Container(
-            height: 48,
-            width: 48,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      height: controller.isActionBarVisible.value
+          ? (MediaQuery.of(context).padding.bottom +
+                72) // 12 (top) + 48 (child) + 12 (bottom) = 72
+          : 0,
+      child: ClipRect(
+        child: SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          child: Container(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              12,
+              16,
+              MediaQuery.of(context).padding.bottom + 12,
+            ),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 10,
+                  offset: const Offset(0, -3),
+                ),
+              ],
             ),
-            child: Material(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(12),
-              child: StreamBuilder<PlayerState>(
-                stream: controller.audioPlayer.playerStateStream,
-                builder: (context, snapshot) {
-                  final playerState = snapshot.data;
-                  final processingState = playerState?.processingState;
-                  final playing = playerState?.playing;
-
-                  if (processingState == ProcessingState.loading ||
-                      processingState == ProcessingState.buffering) {
-                    return Center(
-                      child: SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          color: color,
-                          strokeWidth: 2.5,
-                        ),
-                      ),
-                    );
-                  }
-
-                  IconData iconData;
-                  VoidCallback? onTap;
-
-                  if (!(playing ?? false)) {
-                    iconData = Icons.play_arrow_rounded;
-                    onTap = controller.audioPlayer.play;
-                  } else if (processingState != ProcessingState.completed) {
-                    iconData = Icons.pause_rounded;
-                    onTap = controller.audioPlayer.pause;
-                  } else {
-                    iconData = Icons.replay_rounded;
-                    onTap = () {
-                      controller.audioPlayer.seek(Duration.zero);
-                      controller.audioPlayer.play();
-                    };
-                  }
-
-                  return InkWell(
-                    onTap: onTap,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Center(
-                      child: Icon(iconData, color: color, size: 28),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Tombol Tambah Progres
-          Expanded(
-            child: Material(
-              color: color,
-              borderRadius: BorderRadius.circular(12),
-              child: InkWell(
-                onTap: () => _showAddProgressBottomSheet(context, tabIndex),
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
+            child: Row(
+              children: [
+                // Tombol Play/Pause
+                Container(
                   height: 48,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Center(
-                    child: Text(
-                      label,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                  width: 48,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                    child: StreamBuilder<PlayerState>(
+                      stream: controller.audioPlayer.playerStateStream,
+                      builder: (context, snapshot) {
+                        final playerState = snapshot.data;
+                        final processingState = playerState?.processingState;
+                        final playing = playerState?.playing;
+
+                        if (processingState == ProcessingState.loading ||
+                            processingState == ProcessingState.buffering) {
+                          return Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: color,
+                                strokeWidth: 2.5,
+                              ),
+                            ),
+                          );
+                        }
+
+                        IconData iconData;
+                        VoidCallback? onTap;
+
+                        if (!(playing ?? false)) {
+                          iconData = Icons.play_arrow_rounded;
+                          onTap = controller.audioPlayer.play;
+                        } else if (processingState !=
+                            ProcessingState.completed) {
+                          iconData = Icons.pause_rounded;
+                          onTap = controller.audioPlayer.pause;
+                        } else {
+                          iconData = Icons.replay_rounded;
+                          onTap = () {
+                            controller.audioPlayer.seek(Duration.zero);
+                            controller.audioPlayer.play();
+                          };
+                        }
+
+                        return InkWell(
+                          onTap: onTap,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Center(
+                            child: Icon(iconData, color: color, size: 28),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Tombol Tambah Progres
+                Expanded(
+                  child: Material(
+                    color: color,
+                    borderRadius: BorderRadius.circular(12),
+                    child: InkWell(
+                      onTap: () =>
+                          _showAddProgressBottomSheet(context, tabIndex),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        height: 48,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Center(
+                          child: Text(
+                            label,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

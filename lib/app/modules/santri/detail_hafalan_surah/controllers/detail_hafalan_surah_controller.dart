@@ -39,6 +39,7 @@ class DetailHafalanSurahController extends GetxController {
   AudioPlayer audioPlayer = AudioPlayer();
 
   RxBool isFabVisible = true.obs;
+  RxBool isActionBarVisible = true.obs;
 
   final listC = ListController();
   final scrollC = ScrollController();

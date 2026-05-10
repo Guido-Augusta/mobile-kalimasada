@@ -209,13 +209,11 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
           child: NotificationListener<UserScrollNotification>(
             onNotification: (notification) {
               if (notification.direction == ScrollDirection.reverse) {
-                if (controller.isFabVisible.value) {
-                  controller.isFabVisible.value = false;
-                }
+                controller.isFabVisible.value = false;
+                controller.isActionBarVisible.value = false;
               } else if (notification.direction == ScrollDirection.forward) {
-                if (!controller.isFabVisible.value) {
-                  controller.isFabVisible.value = true;
-                }
+                controller.isFabVisible.value = true;
+                controller.isActionBarVisible.value = true;
               }
               return true;
             },
@@ -467,6 +465,7 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
         onTap: () {
           controller.changeTab(index);
           controller.isFabVisible.value = true;
+          controller.isActionBarVisible.value = true;
         },
         child: Obx(() {
           final isSelected = controller.selectedTab.value == index;
@@ -833,50 +832,63 @@ class DetailHafalanJuzView extends GetView<DetailHafalanJuzController> {
       color = Colors.deepPurpleAccent;
     }
 
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        16,
-        12,
-        16,
-        MediaQuery.of(context).padding.bottom + 12,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, -3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Material(
-              color: color,
-              borderRadius: BorderRadius.circular(12),
-              child: InkWell(
-                onTap: () => _showAddProgressBottomSheet(context, tabIndex),
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  height: 48,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Center(
-                    child: Text(
-                      label,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      height: controller.isActionBarVisible.value
+          ? (MediaQuery.of(context).padding.bottom + 72)
+          : 0,
+      child: ClipRect(
+        child: SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          child: Container(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              12,
+              16,
+              MediaQuery.of(context).padding.bottom + 12,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 10,
+                  offset: const Offset(0, -3),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Material(
+                    color: color,
+                    borderRadius: BorderRadius.circular(12),
+                    child: InkWell(
+                      onTap: () =>
+                          _showAddProgressBottomSheet(context, tabIndex),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        height: 48,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Center(
+                          child: Text(
+                            label,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
