@@ -124,6 +124,8 @@ class DetailHafalanJuzController extends GetxController {
     } else if (index == 2 && detailTahsin.value == null) {
       getDetailTahsin();
     }
+    isFabVisible.value = true;
+    isActionBarVisible.value = true;
   }
 
   int _getLastCheckedIndex(List<dynamic> flatItems) {

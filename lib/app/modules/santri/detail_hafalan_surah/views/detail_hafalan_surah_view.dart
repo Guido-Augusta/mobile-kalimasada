@@ -630,8 +630,6 @@ class DetailHafalanSurahView extends GetView<DetailHafalanSurahController> {
       child: GestureDetector(
         onTap: () {
           controller.changeTab(index);
-          controller.isFabVisible.value = true;
-          controller.isActionBarVisible.value = true;
         },
         child: Obx(() {
           final isSelected = controller.selectedTab.value == index;
