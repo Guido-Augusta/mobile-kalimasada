@@ -1,6 +1,6 @@
 workflows:
   ios-test-build:
-    name: iOS Test Build (No Signing)
+    name: iOS Test Build (Simulator Mode)
     instance_type: mac_mini_m1
     max_build_duration: 30
     environment:
@@ -9,9 +9,9 @@ workflows:
     scripts:
       - name: Get Flutter dependencies
         script: flutter pub get
-      - name: Build iOS (Check for errors)
+      - name: Build iOS for Simulator (No Signing Required)
         script: |
-          # Build without signing to check for code compatibility
-          flutter build ios --debug --no-codesign
+          # Build untuk simulator untuk mengecek kompatibilitas kode tanpa perlu sertifikat
+          flutter build ios --simulator --debug
     artifacts:
-      - build/ios/iphoneos/*.app
+      - build/ios/iphonesimulator/*.app
