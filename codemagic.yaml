@@ -6,9 +6,16 @@ workflows:
     environment:
       flutter: stable
       xcode: latest
+      groups:
+        - api_config
     scripts:
       - name: Get Flutter dependencies
         script: flutter pub get
+      - name: Create .env File from Environment Variables
+        script: |
+          # Membuat file .env menggunakan variable dari dashboard Codemagic
+          echo "BASE_URL=$BASE_URL" > .env
+          echo "APP_DEBUG=$APP_DEBUG" >> .env
       - name: Build iOS for Simulator (No Signing Required)
         script: |
           # Build untuk simulator untuk mengecek kompatibilitas kode tanpa perlu sertifikat
