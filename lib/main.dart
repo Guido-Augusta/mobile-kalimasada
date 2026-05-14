@@ -36,7 +36,8 @@ Future<void> main() async {
   ]);
   runApp(
     DevicePreview(
-      enabled: !kReleaseMode,
+      enabled: !kReleaseMode && 
+               const bool.fromEnvironment('HIDE_DEVICE_PREVIEW', defaultValue: false) == false,
       builder: (context) => ToastificationWrapper(
         child: GetMaterialApp(
           useInheritedMediaQuery: true,

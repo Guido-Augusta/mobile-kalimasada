@@ -16,9 +16,10 @@ workflows:
           # Membuat file .env menggunakan variable dari dashboard Codemagic
           echo "BASE_URL=$BASE_URL" > .env
           echo "APP_DEBUG=$APP_DEBUG" >> .env
+          cat .env
       - name: Build iOS for Simulator (No Signing Required)
         script: |
-          # Build untuk simulator untuk mengecek kompatibilitas kode tanpa perlu sertifikat
-          flutter build ios --simulator --debug
+          # Build untuk simulator dengan flag untuk mematikan Device Preview
+          flutter build ios --simulator --debug --dart-define=HIDE_DEVICE_PREVIEW=true
     artifacts:
       - build/ios/iphonesimulator/*.app
