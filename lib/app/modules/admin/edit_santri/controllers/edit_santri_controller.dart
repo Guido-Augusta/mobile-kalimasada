@@ -1,52 +1,38 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_ortu.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz/daftar_santri/controllers/daftar_santri_controller.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../data/models/santri.dart';
 import '../../../../data/models/santri.dart' as s;
+import '../../../ustadz/detail_santri/controllers/detail_santri_controller.dart';
 
 class EditSantriController extends GetxController {
   final String santriId = Get.arguments['santriId'];
 
   final RxBool isLoading = false.obs;
-  final RxBool isUploadingImage = false.obs;
   final RxBool isSearching = false.obs;
   final RxBool isSaveProfileLoading = false.obs;
-  final RxBool isSaveEmailPasswordLoading = false.obs;
+  final RxBool isSavePasswordLoading = false.obs;
+
+  final RxBool isPasswordVisible = false.obs;
 
   var santriDetail = Rxn<Santri>();
 
-  final ImagePicker imagePicker = ImagePicker();
-  var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
-          .obs;
-
   final profileFormKey = GlobalKey<FormState>();
-  final emailPasswordFormKey = GlobalKey<FormState>();
+  final passwordFormKey = GlobalKey<FormState>();
 
   var namaC = TextEditingController();
-  var noIndukC = TextEditingController();
-  var noHpC = TextEditingController();
-  var tanggalLahirC = TextEditingController();
-  var jenisKelaminC = TextEditingController(text: 'L');
-  var alamatC = TextEditingController();
   var tahapHafalanC = TextEditingController(text: 'Level1');
-
-  var emailC = TextEditingController();
   var passwordC = TextEditingController();
 
   var selectedAyah = Rxn<Datum>();
@@ -57,13 +43,7 @@ class EditSantriController extends GetxController {
     id: 0,
     userId: 0,
     nama: 'Loading...',
-    noInduk: 'Loading...',
-    nomorHp: 'Loading...',
-    alamat: 'Loading...',
-    jenisKelamin: 'L',
-    tanggalLahir: DateTime.now(),
     tahapHafalan: '',
-    fotoProfil: '',
     orangTua: [],
     totalPoin: 0,
     peringkat: 0,
@@ -85,12 +65,7 @@ class EditSantriController extends GetxController {
   @override
   void onClose() {
     namaC.dispose();
-    noIndukC.dispose();
-    noHpC.dispose();
-    alamatC.dispose();
-    jenisKelaminC.dispose();
-    tanggalLahirC.dispose();
-    emailC.dispose();
+    tahapHafalanC.dispose();
     passwordC.dispose();
     super.onClose();
   }
@@ -114,20 +89,10 @@ class EditSantriController extends GetxController {
         final data = jsonDecode(response.body);
         final santri = Santri.fromJson(data['data']);
         santriDetail.value = santri;
-        fotoProfil.value = getImageUrl(santri.fotoProfil!);
 
         // Initialize text controllers with current values
-        namaC.text = santriDetail.value!.nama!;
-        noIndukC.text = santriDetail.value!.noInduk!;
-        noHpC.text = santriDetail.value!.nomorHp!;
-        alamatC.text = santriDetail.value!.alamat!;
-        jenisKelaminC.text = santriDetail.value!.jenisKelamin!;
-        tanggalLahirC = TextEditingController(
-          text: formatDateToDisplay(santriDetail.value!.tanggalLahir!),
-        );
-        tahapHafalanC.text = santriDetail.value!.tahapHafalan!;
-
-        emailC.text = santriDetail.value!.user!.email!;
+        namaC.text = santriDetail.value!.nama ?? '';
+        tahapHafalanC.text = santriDetail.value!.tahapHafalan ?? 'Level1';
 
         // Set selected items
         selectedAyah.value = convertOrangTuaToDatum(
@@ -174,7 +139,6 @@ class EditSantriController extends GetxController {
     }
   }
 
-  // Method untuk mendapatkan selected item berdasarkan tipe
   Datum? getSelectedOrtuByTipe(String tipe) {
     switch (tipe.toLowerCase()) {
       case 'ayah':
@@ -188,7 +152,6 @@ class EditSantriController extends GetxController {
     }
   }
 
-  // Method untuk mengkonversi OrangTua ke Datum
   Datum? convertOrangTuaToDatum(s.OrangTua? orangTua) {
     if (orangTua == null) return null;
 
@@ -205,7 +168,6 @@ class EditSantriController extends GetxController {
     );
   }
 
-  // Method untuk search orang tua
   Future<List<Datum>> loadOrtuByTipe(String tipe, String? query) async {
     try {
       isSearching.value = true;
@@ -256,136 +218,8 @@ class EditSantriController extends GetxController {
     }
   }
 
-  Future<void> pickImage(ImageSource source) async {
-    try {
-      final XFile? pickedImage = await imagePicker.pickImage(
-        source: source,
-        imageQuality: 70,
-        maxWidth: 800,
-        maxHeight: 800,
-      );
-
-      if (pickedImage != null) {
-        isUploadingImage.value = true;
-        await uploadImage(pickedImage.path);
-        if (kDebugMode) {
-          print(pickedImage.path);
-        }
-      }
-    } catch (e) {
-      ToastUtils.showErrorToast('Gagal memilih gambar');
-    }
-  }
-
-  Future<void> uploadImage(String imagePath) async {
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      final request = http.MultipartRequest(
-        'PUT',
-        Uri.parse(ApiUrl.santriDetail(santriId)),
-      );
-
-      request.headers['Authorization'] = 'Bearer $token';
-      request.headers['x-platform'] = 'mobile';
-
-      // Read file and create multipart with proper content type
-      final file = File(imagePath);
-      final bytes = await file.readAsBytes();
-      final fileName = path.basename(imagePath);
-      final extension = path.extension(imagePath).toLowerCase();
-
-      // Ensure proper file extension
-      String finalFileName = fileName;
-      if (extension != '.jpg' && extension != '.jpeg' && extension != '.png') {
-        finalFileName = '${path.basenameWithoutExtension(imagePath)}.jpg';
-      }
-      if (kDebugMode) {
-        print('final file name: $finalFileName');
-      }
-
-      // Determine content type
-      String contentType;
-      if (extension == '.png') {
-        contentType = 'image/png';
-      } else {
-        contentType = 'image/jpeg';
-      }
-
-      final multipartFile = http.MultipartFile.fromBytes(
-        'fotoProfil',
-        bytes,
-        filename: finalFileName,
-        contentType: MediaType.parse(contentType),
-      );
-
-      request.files.add(multipartFile);
-
-      final response = await request.send();
-      final responseBody = await response.stream.bytesToString();
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(responseBody);
-        if (data['data']['fotoProfil'] != null) {
-          fotoProfil.value = getImageUrl(data['data']['fotoProfil']);
-        }
-        if (Get.isRegistered<DaftarSantriController>()) {
-          await Get.find<DaftarSantriController>().fetchData();
-        }
-
-        ToastUtils.showSuccessToast('Foto profil berhasil diperbarui');
-      } else {
-        ToastUtils.showErrorToast('Gagal mengupload foto profil');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
-    } finally {
-      isUploadingImage.value = false;
-    }
-  }
-
-  // Function to show date picker
-  Future<void> selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: tanggalLahirC.text.isNotEmpty
-          ? DateTime.parse(convertDisplayToApiFormat(tanggalLahirC.text))
-          : santriDetail.value!.tanggalLahir!,
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.deepPurple,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null && picked != santriDetail.value!.tanggalLahir) {
-      tanggalLahirC.text = formatDateToDisplay(picked);
-    }
-  }
-
   Future<void> updateProfileSantri(
     String? nama,
-    String? noInduk,
-    String? noHp,
-    String? alamat,
-    String? jenisKelamin,
-    String? tanggalLahir,
     String? tahapHafalan,
     Datum? selectedAyah,
     Datum? selectedIbu,
@@ -394,12 +228,6 @@ class EditSantriController extends GetxController {
     try {
       bool hasNoChange =
           (nama == santriDetail.value?.nama &&
-          noInduk == santriDetail.value?.noInduk &&
-          noHp == santriDetail.value?.nomorHp &&
-          alamat == santriDetail.value?.alamat &&
-          jenisKelamin == santriDetail.value?.jenisKelamin &&
-          tanggalLahir ==
-              formatDateToDisplay(santriDetail.value!.tanggalLahir!) &&
           tahapHafalan == santriDetail.value?.tahapHafalan &&
           selectedAyah?.id ==
               getOrangTuaIdByTipe(santriDetail.value!.orangTua, 'Ayah') &&
@@ -420,20 +248,20 @@ class EditSantriController extends GetxController {
       isSaveProfileLoading.value = true;
 
       List<int> listIdOrtu = [];
-      if (selectedAyah != null) {
-        listIdOrtu.add(selectedAyah.id!);
-      }
-      if (selectedIbu != null) {
-        listIdOrtu.add(selectedIbu.id!);
-      }
-      if (selectedWali != null) {
-        listIdOrtu.add(selectedWali.id!);
-      }
+      if (selectedAyah != null) listIdOrtu.add(selectedAyah.id!);
+      if (selectedIbu != null) listIdOrtu.add(selectedIbu.id!);
+      if (selectedWali != null) listIdOrtu.add(selectedWali.id!);
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      final response = await http
+      Map<String, dynamic> requestBody = {
+        'nama': nama ?? santriDetail.value?.nama,
+        'tahapHafalan': tahapHafalan ?? santriDetail.value?.tahapHafalan,
+        'ortuId': listIdOrtu,
+      };
+
+      final responseProfile = await http
           .put(
             Uri.parse(ApiUrl.santriDetail(santriId)),
             headers: {
@@ -441,23 +269,18 @@ class EditSantriController extends GetxController {
               'Authorization': 'Bearer $token',
               'x-platform': 'mobile',
             },
-            body: jsonEncode({
-              'nama': nama ?? santriDetail.value?.nama,
-              'noInduk': noInduk ?? santriDetail.value?.noInduk,
-              'nomorHp': noHp ?? santriDetail.value?.nomorHp,
-              'alamat': alamat ?? santriDetail.value?.alamat,
-              'jenisKelamin': jenisKelamin ?? santriDetail.value?.jenisKelamin,
-              'tanggalLahir': convertDisplayToApiFormat(
-                tanggalLahir ??
-                    formatDateToDisplay(santriDetail.value!.tanggalLahir!),
-              ),
-              'tahapHafalan': tahapHafalan ?? santriDetail.value?.tahapHafalan,
-              'ortuId': listIdOrtu,
-            }),
+            body: jsonEncode(requestBody),
           )
           .timeout(const Duration(seconds: 30));
-      if (response.statusCode == 200) {
+
+      if (responseProfile.statusCode == 200) {
         await getSantriDetail(isReload: false);
+        if (Get.isRegistered<DetailSantriController>()) {
+          await Get.find<DetailSantriController>().getSantriDetail(
+            santriId,
+            isRefresh: false,
+          );
+        }
         if (Get.isRegistered<DaftarSantriController>()) {
           await Get.find<DaftarSantriController>().fetchData();
         }
@@ -479,17 +302,19 @@ class EditSantriController extends GetxController {
     }
   }
 
-  Future<void> updateEmailPasswordSantri(
-    String? email,
-    String? password,
-  ) async {
+  Future<void> updatePasswordSantri(String? passwordBaru) async {
     try {
-      isSaveEmailPasswordLoading.value = true;
+      if (passwordBaru == null || passwordBaru.isEmpty) {
+        ToastUtils.showErrorToast('Password baru tidak boleh kosong');
+        return;
+      }
+
+      isSavePasswordLoading.value = true;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      final response = await http
+      final responsePassword = await http
           .put(
             Uri.parse(ApiUrl.santriDetail(santriId)),
             headers: {
@@ -497,20 +322,28 @@ class EditSantriController extends GetxController {
               'Authorization': 'Bearer $token',
               'x-platform': 'mobile',
             },
-            body: jsonEncode({'email': email, 'password': password}),
+            body: jsonEncode({'password': passwordBaru}),
           )
           .timeout(const Duration(seconds: 30));
-      if (response.statusCode == 200) {
+
+      if (responsePassword.statusCode == 200) {
         await getSantriDetail(isReload: false);
-        Get.back();
-        ToastUtils.showSuccessToast('Email dan password berhasil diperbarui');
-      } else {
-        final now = DateTime.now();
-        if (lastErrorShown == null ||
-            now.difference(lastErrorShown!) > Duration(seconds: 3)) {
-          lastErrorShown = now;
-          ToastUtils.showErrorToast('Gagal memperbarui email dan password');
+        if (Get.isRegistered<DetailSantriController>()) {
+          await Get.find<DetailSantriController>().getSantriDetail(
+            santriId,
+            isRefresh: false,
+          );
         }
+        if (Get.isRegistered<DaftarSantriController>()) {
+          await Get.find<DaftarSantriController>().fetchData();
+        }
+        Get.back();
+        Future.delayed(const Duration(seconds: 1), () {
+          passwordC.clear();
+        });
+        ToastUtils.showSuccessToast('Password berhasil diperbarui');
+      } else {
+        ToastUtils.showErrorToast('Gagal memperbarui password');
       }
     } catch (e) {
       final now = DateTime.now();
@@ -522,29 +355,7 @@ class EditSantriController extends GetxController {
         );
       }
     } finally {
-      isSaveEmailPasswordLoading.value = false;
-    }
-  }
-
-  String getImageUrl(String imageUrl) {
-    String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
-    return newImageUrl;
-  }
-
-  // Format the date to display in the text field
-  String formatDateToDisplay(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
-
-  String convertDisplayToApiFormat(String displayDate) {
-    try {
-      final parts = displayDate.split('/');
-      if (parts.length == 3) {
-        return '${parts[2]}-${parts[1]}-${parts[0]}'; // DD/MM/YYYY -> YYYY-MM-DD
-      }
-      return displayDate;
-    } catch (e) {
-      return displayDate;
+      isSavePasswordLoading.value = false;
     }
   }
 
@@ -560,33 +371,14 @@ class EditSantriController extends GetxController {
     }
   }
 
-  String? validateEmail(String? email) {
-    RegExp emailRegex = RegExp(
-      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-    );
-    if (email == null || email.isEmpty) {
-      return 'Email tidak boleh kosong';
-    } else if (!emailRegex.hasMatch(email)) {
-      return 'Masukkan email yang valid';
-    }
-    return null;
-  }
-
   String generatePassword({int length = 8}) {
-    // 1. Tentukan karakter apa saja yang boleh dipakai
     const lowerCase = "abcdefghijklmnopqrstuvwxyz";
     const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const numbers = "0123456789";
-
-    // Gabungkan semua jadi satu string panjang
     const allowedChars = lowerCase + upperCase + numbers;
 
-    // 2. Gunakan Random.secure() untuk keamanan tinggi
     final random = Random.secure();
-
-    // 3. Generate password
     final charCodes = List.generate(length, (index) {
-      // Ambil posisi random dari allowedChars
       return allowedChars.codeUnitAt(random.nextInt(allowedChars.length));
     });
 

@@ -9,30 +9,35 @@ class DoaKhatamView extends GetView<DoaKhatamController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
-      appBar: AppBar(
+    return SafeArea(
+      top: false,
+      child: Scaffold(
         backgroundColor: const Color(0xFFF1F5F9),
-        surfaceTintColor: Colors.transparent,
-        title: Text(
-          'Detail Progres',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFFF1F5F9),
+          surfaceTintColor: Colors.transparent,
+          title: Text(
+            'Detail Progres',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Card
-            _buildHeaderCard(),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Card
+              _buildHeaderCard(),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            // Arabic Text Card
-            _buildTextCard(),
-          ],
+              // Arabic Text Card
+              _buildTextCard(),
+
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );
@@ -66,6 +71,7 @@ class DoaKhatamView extends GetView<DoaKhatamController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
@@ -94,7 +100,7 @@ class DoaKhatamView extends GetView<DoaKhatamController> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Doa setelah menyelesaikan pembacaan Al-Qur\'an',
+                      'Doa setelah selesai membaca Al-Qur\'an',
                       style: GoogleFonts.poppins(
                         color: Colors.white.withValues(alpha: 0.8),
                         fontSize: 12,
@@ -131,12 +137,9 @@ class DoaKhatamView extends GetView<DoaKhatamController> {
         children: [
           SelectableText(
             controller.doaArab.trim(),
-            style: GoogleFonts.amiri(
-              fontSize: 24,
-              height: 2.5,
-              color: Colors.black87,
-            ),
+            style: GoogleFonts.amiri(fontSize: 24, height: 2.5),
             textAlign: TextAlign.right,
+            textDirection: TextDirection.rtl,
           ),
 
           SizedBox(height: 12),
@@ -146,7 +149,7 @@ class DoaKhatamView extends GetView<DoaKhatamController> {
               controller.doaLatin,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[700],
+                color: Colors.green,
                 fontStyle: FontStyle.italic,
                 height: 1.4,
               ),

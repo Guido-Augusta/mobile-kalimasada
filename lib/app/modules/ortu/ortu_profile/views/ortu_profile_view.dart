@@ -1,10 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-
+import 'package:fullscreen_image_viewer/fullscreen_image_viewer.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../controllers/ortu_profile_controller.dart';
 
@@ -18,7 +19,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
         appBar: controller.ortuDetail.value == null
             ? AppBar(
                 title: const Text(
-                  'Profil',
+                  'Profil Orang Tua',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -28,21 +29,20 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                 centerTitle: true,
                 backgroundColor: Colors.deepPurpleAccent,
                 elevation: 0,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Get.back(),
-                ),
               )
             : null,
         body: Obx(() {
-          final ortu = controller.ortuDetail.value;
+          final ortuData = controller.ortuDetail.value;
+          final isLoading = controller.isLoading.value;
 
-          // Data kosong
-          if (ortu == null) {
+          // Data kosong dan tidak sedang loading
+          if (ortuData == null && !isLoading) {
             return RefreshIndicator(
               onRefresh: () async {
                 controller.getOrtuDetail();
               },
+              color: Colors.deepPurpleAccent,
+              backgroundColor: Colors.white,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: SizedBox(
@@ -69,7 +69,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Data orang tua/wali tidak ditemukan',
+                        'Data orang tua tidak ditemukan',
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -90,292 +90,320 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
             );
           }
 
+          // Gunakan dummy data untuk skeleton jika ortuData masih null
+          final ortu =
+              ortuData ??
+              Ortu(
+                id: 0,
+                userId: 0,
+                nama: 'Nama Orang Tua',
+                nomorHp: '081234567890',
+                alamat: 'Alamat lengkap orang tua disini...',
+                jenisKelamin: 'L',
+                fotoProfil: '',
+                tipe: 'ayah',
+                user: User(
+                  id: 0,
+                  email: 'ortu@kalimasada.com',
+                  password: '',
+                  role: 'ortu',
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                ),
+                santri: [],
+              );
+
           return RefreshIndicator(
             onRefresh: () async {
               controller.getOrtuDetail();
             },
-            child: CustomScrollView(
-              slivers: [
-                // Custom App Bar with Gradient Background
-                SliverAppBar(
-                  centerTitle: true,
-                  title: Text(
-                    controller.ortuDetail.value?.tipe?.toLowerCase() ==
-                                'ayah' ||
-                            controller.ortuDetail.value?.tipe?.toLowerCase() ==
-                                'ibu'
-                        ? 'Profil Orang Tua'
-                        : 'Profil Wali',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.logout_rounded,
-                        color: Colors.redAccent,
+            color: Colors.deepPurpleAccent,
+            backgroundColor: Colors.white,
+            child: Skeletonizer(
+              enabled: isLoading,
+              child: CustomScrollView(
+                slivers: [
+                  // Custom App Bar with Gradient Background
+                  SliverAppBar(
+                    centerTitle: true,
+                    title: Skeletonizer(
+                      enabled: isLoading,
+                      effect: ShimmerEffect(
+                        baseColor: Colors.white.withValues(alpha: 0.2),
+                        highlightColor: Colors.white.withValues(alpha: 0.4),
                       ),
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            title: Text(
-                              'Logout',
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            content: Text(
-                              'Apakah anda yakin ingin logout?',
-                              style: GoogleFonts.poppins(),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Get.back();
-                                },
-                                child: Text(
-                                  'Tidak',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ),
-                              Obx(
-                                () => ElevatedButton(
-                                  onPressed: controller.isLoadingLogout.value
-                                      ? null
-                                      : () {
-                                          controller.logout();
-                                        },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 8,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: controller.isLoadingLogout.value
-                                      ? const SizedBox(
-                                          width: 16,
-                                          height: 16,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 1,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : Text(
-                                          'Ya',
-                                          style: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                  expandedHeight: 280,
-                  pinned: false,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.deepPurpleAccent,
-                            Colors.deepPurple[700]!,
-                          ],
+                      child: const Text(
+                        'Profil Orang Tua',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                      child: SafeArea(
-                        child: Column(
-                          children: [
-                            // Profile Section
-                            const SizedBox(height: 40),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Profile Picture with Border and Shadow
-                                  Stack(
-                                    children: [
-                                      Container(
-                                        width: 120,
-                                        height: 120,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 4,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(
-                                                alpha: 0.2,
-                                              ),
-                                              blurRadius: 20,
-                                              offset: const Offset(0, 8),
-                                            ),
-                                          ],
+                    ),
+                    actions: [
+                      Skeletonizer(
+                        enabled: isLoading,
+                        effect: ShimmerEffect(
+                          baseColor: Colors.white.withValues(alpha: 0.2),
+                          highlightColor: Colors.white.withValues(alpha: 0.4),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.logout_rounded,
+                            color: Colors.redAccent,
+                          ),
+                          onPressed: () => showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                title: Text(
+                                  'Logout',
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                content: Text(
+                                  'Apakah anda yakin ingin logout?',
+                                  style: GoogleFonts.poppins(),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Get.back();
+                                    },
+                                    child: Text(
+                                      'Tidak',
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ),
+                                  Obx(
+                                    () => ElevatedButton(
+                                      onPressed:
+                                          controller.isLoadingLogout.value
+                                          ? null
+                                          : () {
+                                              controller.logout();
+                                            },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                          vertical: 8,
                                         ),
-                                        child: ClipOval(
-                                          child: CachedNetworkImage(
-                                            imageUrl: controller.getImageUrl(
-                                              controller.fotoProfil.value,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                      ),
+                                      child: controller.isLoadingLogout.value
+                                          ? const SizedBox(
+                                              width: 16,
+                                              height: 16,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 1,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : Text(
+                                              'Ya',
+                                              style: GoogleFonts.poppins(
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                             ),
-                                            fit: BoxFit.cover,
-                                            placeholder: (context, url) =>
-                                                Container(
-                                                  color: Colors.grey[300],
-                                                  child: const Icon(
-                                                    Icons.person,
-                                                    size: 40,
-                                                    color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                    expandedHeight: 230,
+                    pinned: false,
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.deepPurpleAccent,
+                              Colors.deepPurple[700]!,
+                            ],
+                          ),
+                        ),
+                        child: SafeArea(
+                          child: Column(
+                            children: [
+                              // Profile Section
+                              const SizedBox(height: 40),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // Profile Picture with Border and Shadow
+                                    Stack(
+                                      children: [
+                                        Container(
+                                          width: 110,
+                                          height: 110,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.white,
+                                              width: 4,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(
+                                                  alpha: 0.2,
+                                                ),
+                                                blurRadius: 20,
+                                                offset: const Offset(0, 8),
+                                              ),
+                                            ],
+                                          ),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              FullscreenImageViewer.open(
+                                                context: Get.context!,
+                                                child: Hero(
+                                                  tag: 'foto-profil-ortu',
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: controller
+                                                        .getImageUrl(
+                                                          controller
+                                                              .fotoProfil
+                                                              .value,
+                                                        ),
+                                                    fit: BoxFit.contain,
+                                                    placeholder: (c, u) =>
+                                                        _buildProfilePlaceholder(),
+                                                    errorWidget: (c, u, e) =>
+                                                        _buildProfilePlaceholder(),
                                                   ),
                                                 ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    Container(
-                                                      color: Colors.grey[300],
-                                                      child: const Icon(
-                                                        Icons.person,
-                                                        size: 40,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        bottom: 0,
-                                        right: 0,
-                                        child: Material(
-                                          shape: const CircleBorder(),
-                                          child: InkWell(
-                                            onTap: () {
-                                              _showEditPhotoProfileBottomSheet();
+                                              );
                                             },
-                                            customBorder: const CircleBorder(),
-                                            child: Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: const BoxDecoration(
-                                                color: Colors.white,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                Icons.camera_alt,
-                                                color: Colors.deepPurpleAccent,
-                                                size: 20,
+                                            child: Hero(
+                                              tag: 'foto-profil-ortu',
+                                              child: ClipOval(
+                                                child: CachedNetworkImage(
+                                                  imageUrl: controller
+                                                      .getImageUrl(
+                                                        controller
+                                                            .fotoProfil
+                                                            .value,
+                                                      ),
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (c, u) =>
+                                                      _buildProfilePlaceholder(),
+                                                  errorWidget: (c, u, e) =>
+                                                      _buildProfilePlaceholder(),
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  const SizedBox(height: 16),
-
-                                  // Name
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    child: Text(
-                                      ortu.nama ?? 'Nama tidak tersedia',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 8),
-
-                                  // Badges Row
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
-                                    ),
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.3,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            ortu.user?.email ??
-                                                'Email tidak tersedia',
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white,
+                                        Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: Material(
+                                            shape: const CircleBorder(),
+                                            child: InkWell(
+                                              onTap: () {
+                                                _showEditPhotoProfileBottomSheet();
+                                              },
+                                              customBorder:
+                                                  const CircleBorder(),
+                                              child: Container(
+                                                padding: const EdgeInsets.all(
+                                                  6,
+                                                ),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.camera_alt,
+                                                  color:
+                                                      Colors.deepPurpleAccent,
+                                                  size: 20,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                ],
+
+                                    const SizedBox(height: 16),
+
+                                    // Name
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
+                                      child: Skeletonizer(
+                                        enabled: isLoading,
+                                        effect: ShimmerEffect(
+                                          baseColor: Colors.white.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          highlightColor: Colors.white
+                                              .withValues(alpha: 0.4),
+                                        ),
+                                        child: Text(
+                                          ortu.nama ?? 'Nama tidak tersedia',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
 
-                // Main Content
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      // Action Cards
-                      _buildActionSection(ortu),
-                      const SizedBox(height: 16),
-                      // Personal Information
-                      _buildPersonalInfoSection(ortu),
-                      const SizedBox(height: 50), // Space for bottom buttons
-                    ]),
+                  // Main Content
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        // Personal Information
+                        _buildPersonalInfoSection(ortu),
+                        const SizedBox(height: 16),
+                        // Action Cards
+                        _buildActionSection(ortu),
+                        const SizedBox(height: 50), // Space for bottom buttons
+                      ]),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         }),
@@ -385,54 +413,56 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
 
   void _showEditPhotoProfileBottomSheet() {
     Get.bottomSheet(
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
+      SafeArea(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Foto Profil',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+              const SizedBox(height: 16),
+              Text(
+                'Foto Profil',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-            ListTile(
-              minTileHeight: 40,
-              leading: Icon(Icons.camera_alt_outlined),
-              title: Text('Kamera'),
-              onTap: () {
-                controller.pickImage(ImageSource.camera);
-                Get.back();
-              },
-            ),
-            ListTile(
-              minTileHeight: 40,
-              leading: Icon(Icons.photo_outlined),
-              title: Text('Galeri'),
-              onTap: () {
-                controller.pickImage(ImageSource.gallery);
-                Get.back();
-              },
-            ),
-          ],
+              ListTile(
+                minTileHeight: 40,
+                leading: Icon(Icons.camera_alt_outlined),
+                title: Text('Kamera'),
+                onTap: () {
+                  controller.pickImage(ImageSource.camera);
+                  Get.back();
+                },
+              ),
+              ListTile(
+                minTileHeight: 40,
+                leading: Icon(Icons.photo_outlined),
+                title: Text('Galeri'),
+                onTap: () {
+                  controller.pickImage(ImageSource.gallery);
+                  Get.back();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -447,7 +477,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(Get.context!).size.height * 0.65,
+            maxHeight: MediaQuery.of(Get.context!).size.height * 0.6,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -456,8 +486,8 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 20,
+                  horizontal: 16,
+                  vertical: 16,
                 ),
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
@@ -478,14 +508,13 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                         fontSize: 18,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Text(
                       'Pastikan data Anda benar',
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -752,149 +781,70 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
   }
 
   Widget _buildActionSection(Ortu ortu) {
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+        Row(
+          children: [
+            // Ubah Password
+            Expanded(
+              child: _buildActionButton(
+                label: 'Ubah Password',
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.deepPurple,
+                borderColor: Colors.deepPurple,
+                onTap: () => Get.toNamed('/change-password'),
+              ),
             ),
-            child: Column(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.people_alt_rounded,
-                    color: Colors.deepPurpleAccent,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  '${ortu.santri.length}',
-                  style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurpleAccent,
-                  ),
-                ),
-                Text(
-                  'Total Santri',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+            const SizedBox(width: 12),
+            // Edit Profil
+            Expanded(
+              child: _buildActionButton(
+                label: 'Edit Profil',
+                backgroundColor: Colors.orangeAccent,
+                foregroundColor: Colors.white,
+                onTap: () {
+                  controller.namaC.text = ortu.nama!;
+                  controller.noHpC.text = ortu.nomorHp!;
+                  controller.alamatC.text = ortu.alamat!;
+                  _showEditProfileDialog();
+                },
+              ),
             ),
-          ),
-        ),
-
-        const SizedBox(width: 16),
-
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Edit Profile Button
-                const SizedBox(height: 2),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      controller.namaC.text =
-                          controller.ortuDetail.value!.nama!;
-                      controller.noHpC.text =
-                          controller.ortuDetail.value!.nomorHp!;
-                      controller.alamatC.text =
-                          controller.ortuDetail.value!.alamat!;
-                      _showEditProfileDialog();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orangeAccent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 0,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'Edit Profil',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Change Password Button
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Get.toNamed('/change-password');
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF6B46C1),
-                      side: const BorderSide(color: Color(0xFF6B46C1)),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 0,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      'Ubah Password',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 2),
-              ],
-            ),
-          ),
+          ],
         ),
       ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required String label,
+    required Color backgroundColor,
+    required Color foregroundColor,
+    Color? borderColor,
+    required VoidCallback onTap,
+  }) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        minimumSize: Size(double.infinity, 44),
+        shadowColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: borderColor != null
+              ? BorderSide(color: borderColor, width: 1.5)
+              : BorderSide.none,
+        ),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.poppins(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: foregroundColor,
+        ),
+      ),
     );
   }
 
@@ -918,7 +868,7 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
           Text(
             'Informasi Pribadi',
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -926,21 +876,28 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
           const SizedBox(height: 16),
 
           _buildInfoTile(
-            icon: Icons.phone,
-            label: 'No. Telepon',
-            value: ortu.nomorHp ?? 'Tidak ada data',
-            telepon: ortu.nomorHp,
+            icon: Icons.email,
+            label: 'Email',
+            value: ortu.user?.email ?? '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
+
+          _buildInfoTile(
+            icon: Icons.phone,
+            label: 'No. Telepon',
+            value: ortu.nomorHp ?? '-',
+          ),
+
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.person,
             label: 'Peran',
-            value: ortu.tipe ?? 'Tidak ada data',
+            value: ortu.tipe ?? '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: ortu.jenisKelamin?.toLowerCase() == 'l'
@@ -952,12 +909,12 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                 : 'Perempuan',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.location_on,
             label: 'Alamat',
-            value: ortu.alamat ?? 'Tidak ada data',
+            value: ortu.alamat ?? '-',
           ),
         ],
       ),
@@ -968,53 +925,69 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
     required IconData icon,
     required String label,
     required String value,
-    String? telepon,
+    bool? isOverflow,
+    Color? iconColor,
+    VoidCallback? onTap,
   }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        color: Colors.transparent,
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: (iconColor ?? Colors.deepPurpleAccent).withValues(
+                  alpha: 0.1,
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: iconColor ?? Colors.deepPurpleAccent,
+                size: 20,
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: isOverflow == true ? TextOverflow.ellipsis : null,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfilePlaceholder() {
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
-          ),
-
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      color: Colors.grey[300],
+      child: const Icon(Icons.person, size: 40, color: Colors.grey),
     );
   }
 }

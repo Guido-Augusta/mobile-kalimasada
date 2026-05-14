@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../data/constants/api_url.dart';
 import '../../../../data/models/ustadz.dart';
+import '../../../../services/auth_service.dart';
 import '../../../../utils/toast_utils.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class DetailUstadzController extends GetxController {
   final ustadzId = Get.arguments['ustadzId'];
@@ -17,7 +18,7 @@ class DetailUstadzController extends GetxController {
   final isUploadingImage = false.obs;
   var ustadzData = Rxn<Ustadz>();
   var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   var namaC = TextEditingController();
@@ -36,8 +37,7 @@ class DetailUstadzController extends GetxController {
   Future<void> fetchUstadzData({bool isRefresh = true}) async {
     try {
       isLoading.value = isRefresh;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      final token = AuthService.to.token;
 
       final response = await http.get(
         Uri.parse(ApiUrl.ustadzDetail(ustadzId)),
@@ -51,7 +51,9 @@ class DetailUstadzController extends GetxController {
         final data = jsonDecode(response.body);
         final ustadz = Ustadz.fromJson(data['data']);
         ustadzData.value = ustadz;
-        fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+        if (ustadz.fotoProfil?.isNotEmpty == true) {
+          fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+        }
         namaC.text = ustadz.nama!;
         noHpC.text = ustadz.nomorHp!;
         alamatC.text = ustadz.alamat!;

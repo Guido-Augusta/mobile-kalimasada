@@ -12,7 +12,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/controllers/ortu_home_controller.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:path/path.dart' as path;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class OrtuProfileController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -25,7 +26,7 @@ class OrtuProfileController extends GetxController {
   final imagePicker = ImagePicker();
   var isUploadingImage = false.obs;
   var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   var namaC = TextEditingController();
@@ -49,12 +50,11 @@ class OrtuProfileController extends GetxController {
   Future<void> getOrtuDetail() async {
     try {
       isLoading.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final ortuId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final ortuId = AuthService.to.roleId.value;
 
       final response = await http.get(
-        Uri.parse(ApiUrl.ortuDetail(ortuId!)),
+        Uri.parse(ApiUrl.ortuDetail(ortuId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -66,9 +66,8 @@ class OrtuProfileController extends GetxController {
         final data = jsonDecode(response.body);
         final ortu = Ortu.fromJson(data['data']);
         ortuDetail.value = ortu;
-        fotoProfil.value = getImageUrl(ortu.fotoProfil!);
-        if (kDebugMode) {
-          print('Ortu detail loaded: ${ortu.nama}');
+        if (ortu.fotoProfil?.isNotEmpty == true) {
+          fotoProfil.value = getImageUrl(ortu.fotoProfil!);
         }
       } else {
         ToastUtils.showErrorToast('Gagal memuat data profil');
@@ -110,13 +109,12 @@ class OrtuProfileController extends GetxController {
 
   Future<void> uploadImage(String imagePath) async {
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final ortuId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final ortuId = AuthService.to.roleId.value;
 
       final request = http.MultipartRequest(
         'PUT',
-        Uri.parse(ApiUrl.ortuDetail(ortuId!)),
+        Uri.parse(ApiUrl.ortuDetail(ortuId)),
       );
 
       request.headers['Authorization'] = 'Bearer $token';
@@ -201,13 +199,12 @@ class OrtuProfileController extends GetxController {
         return;
       }
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final ortuId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final ortuId = AuthService.to.roleId.value;
 
       final response = await http
           .put(
-            Uri.parse(ApiUrl.ortuDetail(ortuId!)),
+            Uri.parse(ApiUrl.ortuDetail(ortuId)),
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',
@@ -247,11 +244,10 @@ class OrtuProfileController extends GetxController {
   void logout() async {
     try {
       isLoadingLogout.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('userId');
+      final userId = AuthService.to.userId.value;
       final response = await http
           .post(
-            Uri.parse(ApiUrl.logout(userId!)),
+            Uri.parse(ApiUrl.logout(userId)),
             headers: {'Content-Type': 'application/json'},
           )
           .timeout(const Duration(seconds: 30));
@@ -260,10 +256,7 @@ class OrtuProfileController extends GetxController {
         print(data);
       }
       if (response.statusCode == 200) {
-        await prefs.remove('token');
-        await prefs.remove('role');
-        await prefs.remove('userId');
-        await prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {

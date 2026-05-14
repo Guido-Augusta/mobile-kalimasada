@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mobile_kalimasada/app/data/models/peringkat.dart';
+import 'package:mobile_kalimasada/app/widgets/level_info_dialog.dart';
 
 import '../controllers/peringkat_controller.dart';
 
@@ -20,114 +20,124 @@ class PeringkatView extends GetView<PeringkatController> {
         centerTitle: true,
         title: Text(
           'Peringkat Santri',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline_rounded),
             onPressed: () {
-              // dialog informasi level
-              showLevelInfoDialog(context);
+              FocusManager.instance.primaryFocus?.unfocus();
+              LevelInfoDialog.show(context);
             },
           ),
         ],
       ),
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: () async {
-            controller.getPeringkat();
-          },
-          child: SingleChildScrollView(
+          onRefresh: () async => controller.getPeringkat(),
+          color: Colors.deepPurpleAccent,
+          backgroundColor: Colors.white,
+          child: CustomScrollView(
             controller: controller.scrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  const SizedBox(height: 24),
-                  // Search Bar
-                  _buildSearchBar(),
-                  const SizedBox(height: 24),
-                  _buildFilter(),
-                  const SizedBox(height: 20),
-                  Obx(
-                    () => controller.isLoading.value
-                        ? Container(
-                            height: 200,
-                            alignment: Alignment.center,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Color(0xFF6B46C1),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'Memuat peringkat...',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    color: const Color(0xFF6B7280),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : controller.peringkat.isEmpty
-                        ? _buildEmptyState()
-                        : ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount:
-                                controller.peringkat.length +
-                                (controller.hasMore ? 1 : 0),
-                            itemBuilder: (context, index) {
-                              if (index >= controller.peringkat.length) {
-                                return _buildLoadMoreIndicator();
-                              }
-                              final santri = controller.peringkat[index];
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
-                                child: _buildRankingCard(santri, index),
-                              );
-                            },
-                          ),
-                  ),
-                ],
-              ),
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
             ),
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    _buildHeader(context),
+                    const SizedBox(height: 24),
+                    _buildSearchBar(),
+                    const SizedBox(height: 20),
+                    _buildFilter(),
+                    const SizedBox(height: 24),
+                    _buildContentSection(),
+                  ]),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Container _buildSearchBar() {
+  Widget _buildContentSection() {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return _buildLoadingState();
+      }
+
+      if (controller.peringkat.isEmpty) {
+        return _buildEmptyState();
+      }
+
+      return ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: controller.peringkat.length + (controller.hasMore ? 1 : 0),
+        separatorBuilder: (context, index) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          if (index >= controller.peringkat.length) {
+            return _buildLoadMoreIndicator();
+          }
+          final santri = controller.peringkat[index];
+          return _buildRankingCard(santri, index);
+        },
+      );
+    });
+  }
+
+  Widget _buildLoadingState() {
+    return Container(
+      height: 250,
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Memuat peringkat...',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: const Color(0xFF64748B),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey[200]!,
-            spreadRadius: 2,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Obx(
         () => TextField(
           controller: controller.searchController,
-          onChanged: (value) {
-            controller.searchQuery.value = value;
-          },
+          onChanged: (value) => controller.searchQuery.value = value,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            color: const Color(0xFF1E293B),
+          ),
           decoration: InputDecoration(
-            hintText: 'Cari santri...',
-            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+            hintText: 'Cari nama santri...',
+            hintStyle: GoogleFonts.poppins(color: Colors.grey),
+            prefixIcon: const Icon(Icons.search_rounded, color: Colors.grey),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(
               vertical: 16,
@@ -135,13 +145,17 @@ class PeringkatView extends GetView<PeringkatController> {
             ),
             suffixIcon: controller.searchQuery.value.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.clear, color: Colors.grey),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: Color(0xFF94A3B8),
+                      size: 20,
+                    ),
                     onPressed: () {
                       controller.searchQuery.value = '';
                       controller.searchController.clear();
                     },
                   )
-                : const SizedBox.shrink(),
+                : null,
           ),
         ),
       ),
@@ -149,11 +163,16 @@ class PeringkatView extends GetView<PeringkatController> {
   }
 
   Widget _buildLoadMoreIndicator() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    return const Padding(
+      padding: EdgeInsets.all(16.0),
       child: Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
+        child: SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
+          ),
         ),
       ),
     );
@@ -162,24 +181,24 @@ class PeringkatView extends GetView<PeringkatController> {
   Color _getTahapColor(String? tahap) {
     switch (tahap?.toLowerCase()) {
       case 'level1':
-        return const Color(0xFF10B981); // Hijau
+        return Colors.green;
       case 'level2':
-        return const Color(0xFFFB923C); // Orange
+        return Colors.orange;
       case 'level3':
-        return const Color(0xFFEF4444); // Merah
+        return Colors.red;
       default:
-        return const Color(0xFF6B7280); // Gray
+        return Colors.grey;
     }
   }
 
   String _getTahapLabel(String? tahap) {
     switch (tahap?.toLowerCase()) {
       case 'level1':
-        return 'Level 1';
+        return 'Level 1 - Juz 30';
       case 'level2':
-        return 'Level 2';
+        return 'Level 2 - Surah Pilihan';
       case 'level3':
-        return 'Level 3';
+        return 'Level 3 - Juz 1-29';
       default:
         return 'Unknown';
     }
@@ -188,60 +207,52 @@ class PeringkatView extends GetView<PeringkatController> {
   Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.deepPurpleAccent.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          Row(
+          Positioned(
+            right: -20,
+            top: -20,
+            child: Icon(
+              Icons.emoji_events_rounded,
+              size: 100,
+              color: Colors.white.withValues(alpha: 0.1),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.emoji_events,
+              Text(
+                'Peringkat Hafalan',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                   color: Colors.white,
-                  size: 28,
+                  height: 1.2,
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Peringkat Santri',
-                      style: GoogleFonts.poppins(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      'Lihat peringkat berdasarkan jumlah poin hafalan',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: Colors.white.withValues(alpha: 0.8),
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 6),
+              Text(
+                'Peringkat berdasarkan total poin hafalan.',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: Colors.white.withValues(alpha: 0.8),
                 ),
               ),
             ],
@@ -252,104 +263,108 @@ class PeringkatView extends GetView<PeringkatController> {
   }
 
   Widget _buildFilter() {
-    return Row(
-      children: [
-        _buildFilterButton('Level 1', 'level1'),
-        const SizedBox(width: 8),
-        _buildFilterButton('Level 2', 'level2'),
-        const SizedBox(width: 8),
-        _buildFilterButton('Level 3', 'level3'),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          _buildFilterButton('Level 1', 'level1'),
+          _buildFilterButton('Level 2', 'level2'),
+          _buildFilterButton('Level 3', 'level3'),
+        ],
+      ),
     );
   }
 
   Widget _buildFilterButton(String label, String value) {
-    return Obx(
-      () => Expanded(
+    return Obx(() {
+      final isSelected = controller.selectedTahap.value == value;
+      return Expanded(
         child: GestureDetector(
-          onTap: () {
-            controller.changeTahapFilter(value);
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+          onTap: () => controller.changeTahapFilter(value),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
-              color: controller.selectedTahap.value == value
-                  ? Colors.deepPurpleAccent.withValues(alpha: 0.2)
-                  : Colors.white,
+              color: isSelected ? Colors.deepPurpleAccent : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: controller.selectedTahap.value == value
-                    ? Colors.deepPurpleAccent.withValues(alpha: 0.3)
-                    : Colors.transparent,
-                width: controller.selectedTahap.value == value ? 2 : 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey[200]!,
-                  spreadRadius: 2,
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
             ),
             child: Center(
               child: Text(
                 label,
                 style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: controller.selectedTahap.value == value
-                      ? Colors.deepPurple
-                      : Colors.grey,
+                  fontSize: 13,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected ? Colors.white : Colors.grey,
                 ),
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildRankingCard(Datum item, int index) {
+    final int rank = item.peringkat ?? (index + 1);
+
+    List<Color> rankGradient;
+    if (rank == 1) {
+      rankGradient = [const Color(0xFFFFD700), const Color(0xFFF59E0B)];
+    } else if (rank == 2) {
+      rankGradient = [const Color(0xFFE2E8F0), const Color(0xFF94A3B8)];
+    } else if (rank == 3) {
+      rankGradient = [const Color(0xFFFDBA74), const Color(0xFFEA580C)];
+    } else {
+      rankGradient = [Colors.deepPurpleAccent, Colors.deepPurple.shade700];
+    }
+
     return InkWell(
-      onTap: () => Get.toNamed('/detail-santri', arguments: item.id.toString()),
-      borderRadius: BorderRadius.circular(16),
-      hoverColor: Colors.transparent,
-      splashColor: Colors.transparent,
-      highlightColor: Colors.transparent,
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        Get.toNamed('/detail-santri', arguments: item.id.toString());
+      },
+      borderRadius: BorderRadius.circular(20),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           children: [
-            // Rank Number
+            // Rank Badge
             Container(
-              constraints: BoxConstraints(minWidth: 40, minHeight: 40),
-              padding: EdgeInsets.symmetric(horizontal: 8),
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: index < 3
-                      ? [const Color(0xFFFFD700), const Color(0xFFFFA500)]
-                      : [Colors.deepPurpleAccent, Colors.deepPurple.shade500],
+                  colors: rankGradient,
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(8),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: rankGradient.last.withValues(alpha: 0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Center(
                 child: Text(
-                  '${item.peringkat}',
+                  '$rank',
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -358,93 +373,65 @@ class PeringkatView extends GetView<PeringkatController> {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-            // Profile Picture
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: item.fotoProfil != null && item.fotoProfil!.isNotEmpty
-                  ? CachedNetworkImage(
-                      imageUrl: controller.getImageUrl(item.fotoProfil!),
-                      width: 48,
-                      height: 48,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        width: 48,
-                        height: 48,
-                        color: const Color(0xFFF3F4F6),
-                        child: const Center(
-                          child: Icon(Icons.person, color: Color(0xFF9CA3AF)),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        width: 48,
-                        height: 48,
-                        color: const Color(0xFFF3F4F6),
-                        child: const Icon(
-                          Icons.person,
-                          color: Color(0xFF9CA3AF),
-                        ),
-                      ),
-                    )
-                  : Container(
-                      width: 48,
-                      height: 48,
-                      color: const Color(0xFFF3F4F6),
-                      child: const Icon(Icons.person, color: Color(0xFF9CA3AF)),
-                    ),
-            ),
-            const SizedBox(width: 12),
-            // Student Info
+            const SizedBox(width: 16),
+
+            // Profile Info
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Text(
-                    item.nama ?? '-',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF111827),
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _getTahapColor(
-                            item.tahapHafalan,
-                          ).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          _getTahapLabel(item.tahapHafalan),
+                  // Name and Level
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.nama ?? '-',
                           style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: _getTahapColor(item.tahapHafalan),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getTahapColor(
+                              item.tahapHafalan,
+                            ).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            _getTahapLabel(item.tahapHafalan),
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: _getTahapColor(item.tahapHafalan),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
+
+            const SizedBox(width: 12),
+
             // Points
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   '${item.totalPoin}',
                   style: GoogleFonts.poppins(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.deepPurpleAccent,
                   ),
@@ -452,8 +439,8 @@ class PeringkatView extends GetView<PeringkatController> {
                 Text(
                   'Poin',
                   style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.black54,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -464,156 +451,46 @@ class PeringkatView extends GetView<PeringkatController> {
     );
   }
 
-  Container _buildEmptyState() {
+  Widget _buildEmptyState() {
     return Container(
-      height: 200,
+      height: 300,
       alignment: Alignment.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(50),
+              color: Colors.deepPurpleAccent.withValues(alpha: 0.05),
+              shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.emoji_events_outlined,
-              size: 48,
+              Icons.search_off_rounded,
+              size: 64,
               color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Text(
-            controller.searchQuery.isEmpty
-                ? 'Tidak ada data peringkat'
-                : 'Data santri tidak ditemukan',
+            controller.appliedSearchQuery.value.isNotEmpty
+                ? 'Belum ada data peringkat'
+                : 'Santri tidak ditemukan',
             style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF1E293B),
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Tarik ke bawah untuk refresh',
-            style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void showLevelInfoDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Informasi Level Hafalan',
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF6B46C1),
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildLevelInfo(
-                context,
-                title: 'Level 1',
-                description: 'Juz 30',
-                color: const Color(0xFF10B981), // Green
-              ),
-              const SizedBox(height: 12),
-              _buildLevelInfo(
-                context,
-                title: 'Level 2',
-                description: 'Surah Pilihan',
-                color: const Color(0xFFF59E0B), // Amber
-              ),
-              const SizedBox(height: 12),
-              _buildLevelInfo(
-                context,
-                title: 'Level 3',
-                description: 'Juz 1-29',
-                color: const Color(0xFFEF4444), // Red
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6B46C1),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  child: Text(
-                    'Mengerti',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLevelInfo(
-    BuildContext context, {
-    required String title,
-    required String description,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            child: const Icon(Icons.check, color: Colors.white, size: 16),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              ],
+            controller.appliedSearchQuery.value.isNotEmpty
+                ? 'Tarik ke bawah untuk refresh'
+                : 'Coba gunakan kata kunci lain',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: const Color(0xFF64748B),
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

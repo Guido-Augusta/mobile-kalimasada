@@ -1,10 +1,14 @@
 class DaftarUstadz {
-  DaftarUstadz({required this.data});
+  DaftarUstadz({required this.pagination, required this.data});
 
+  final Pagination? pagination;
   final List<Datum> data;
 
   factory DaftarUstadz.fromJson(Map<String, dynamic> json) {
     return DaftarUstadz(
+      pagination: json["pagination"] == null
+          ? null
+          : Pagination.fromJson(json["pagination"]),
       data: json["data"] == null
           ? []
           : List<Datum>.from(json["data"]!.map((x) => Datum.fromJson(x))),
@@ -12,12 +16,13 @@ class DaftarUstadz {
   }
 
   Map<String, dynamic> toJson() => {
+    "pagination": pagination?.toJson(),
     "data": data.map((x) => x.toJson()).toList(),
   };
 
   @override
   String toString() {
-    return "$data, ";
+    return "$pagination, $data, ";
   }
 }
 
@@ -92,5 +97,40 @@ class User {
   @override
   String toString() {
     return "$id, $email, $role, ";
+  }
+}
+
+class Pagination {
+  Pagination({
+    required this.page,
+    required this.limit,
+    required this.totalData,
+    required this.totalPages,
+  });
+
+  final int? page;
+  final int? limit;
+  final int? totalData;
+  final int? totalPages;
+
+  factory Pagination.fromJson(Map<String, dynamic> json) {
+    return Pagination(
+      page: json["page"],
+      limit: json["limit"],
+      totalData: json["totalData"],
+      totalPages: json["totalPages"],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "page": page,
+    "limit": limit,
+    "totalData": totalData,
+    "totalPages": totalPages,
+  };
+
+  @override
+  String toString() {
+    return "$page, $limit, $totalData, $totalPages, ";
   }
 }

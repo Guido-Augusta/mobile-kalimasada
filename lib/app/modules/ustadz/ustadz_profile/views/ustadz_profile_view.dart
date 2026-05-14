@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fullscreen_image_viewer/fullscreen_image_viewer.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/data/models/ustadz.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../controllers/ustadz_profile_controller.dart';
 
 class UstadzProfileView extends GetView<UstadzProfileController> {
@@ -14,7 +16,8 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
     return Obx(
       () => Scaffold(
         backgroundColor: const Color(0xFFF1F5F9),
-        appBar: controller.ustadzData.value == null
+        appBar:
+            controller.ustadzData.value == null && !controller.isLoading.value
             ? AppBar(
                 title: const Text(
                   'Profil Ustadz',
@@ -27,20 +30,20 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                 centerTitle: true,
                 backgroundColor: Colors.deepPurpleAccent,
                 elevation: 0,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Get.back(),
-                ),
               )
             : null,
         body: Obx(() {
-          final ustadz = controller.ustadzData.value;
-          // Data kosong
-          if (ustadz == null) {
+          final ustadzData = controller.ustadzData.value;
+          final isLoading = controller.isLoading.value;
+
+          // Data kosong dan tidak sedang loading
+          if (ustadzData == null && !isLoading) {
             return RefreshIndicator(
               onRefresh: () async {
                 controller.fetchUstadzData();
               },
+              color: Colors.deepPurpleAccent,
+              backgroundColor: Colors.white,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: SizedBox(
@@ -88,221 +91,250 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
             );
           }
 
+          // Gunakan dummy data untuk skeleton jika ustadzData masih null
+          final ustadz =
+              ustadzData ??
+              Ustadz(
+                id: 0,
+                userId: 0,
+                nama: 'Nama Ustadz',
+                nomorHp: '081234567890',
+                alamat: 'Alamat lengkap ustadz disini...',
+                jenisKelamin: 'L',
+                fotoProfil: '',
+                waliKelasTahap: null,
+                user: User(
+                  id: 0,
+                  email: 'ustadz@kalimasada.com',
+                  password: '',
+                  role: 'ustadz',
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                ),
+              );
+
           return RefreshIndicator(
             onRefresh: () async {
               controller.fetchUstadzData();
             },
-            child: CustomScrollView(
-              slivers: [
-                // Custom App Bar with Gradient Background
-                SliverAppBar(
-                  centerTitle: true,
-                  title: Text(
-                    ustadz.jenisKelamin?.toLowerCase() == 'l'
-                        ? 'Profil Ustadz'
-                        : 'Profil Ustazah',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.logout_rounded,
-                        color: Colors.redAccent,
+            color: Colors.deepPurpleAccent,
+            backgroundColor: Colors.white,
+            child: Skeletonizer(
+              enabled: isLoading,
+              child: CustomScrollView(
+                slivers: [
+                  // Custom App Bar with Gradient Background
+                  SliverAppBar(
+                    centerTitle: true,
+                    title: Skeletonizer(
+                      enabled: isLoading,
+                      effect: ShimmerEffect(
+                        baseColor: Colors.white.withValues(alpha: 0.2),
+                        highlightColor: Colors.white.withValues(alpha: 0.4),
                       ),
-                      onPressed: () => showLogoutDialog(context),
-                    ),
-                  ],
-                  expandedHeight: 280,
-                  pinned: false,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.deepPurpleAccent,
-                            Colors.deepPurple[700]!,
-                          ],
+                      child: Text(
+                        ustadz.jenisKelamin?.toLowerCase() == 'l'
+                            ? 'Profil Ustadz'
+                            : 'Profil Ustazah',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
-                      child: SafeArea(
-                        child: Column(
-                          children: [
-                            // Profile Section
-                            const SizedBox(height: 40),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Profile Picture with Border and Shadow
-                                  Stack(
-                                    children: [
-                                      Container(
-                                        width: 120,
-                                        height: 120,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 4,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(
-                                                alpha: 0.2,
+                    ),
+                    actions: [
+                      Skeletonizer(
+                        enabled: isLoading,
+                        effect: ShimmerEffect(
+                          baseColor: Colors.white.withValues(alpha: 0.2),
+                          highlightColor: Colors.white.withValues(alpha: 0.4),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.logout_rounded,
+                            color: Colors.redAccent,
+                          ),
+                          onPressed: () => showLogoutDialog(context),
+                        ),
+                      ),
+                    ],
+                    expandedHeight: 230,
+                    pinned: false,
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.deepPurpleAccent,
+                              Colors.deepPurple[700]!,
+                            ],
+                          ),
+                        ),
+                        child: SafeArea(
+                          child: Column(
+                            children: [
+                              // Profile Section
+                              const SizedBox(height: 40),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // Profile Picture with Border and Shadow
+                                    Stack(
+                                      children: [
+                                        Container(
+                                          width: 110,
+                                          height: 110,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.white,
+                                              width: 4,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(
+                                                  alpha: 0.2,
+                                                ),
+                                                blurRadius: 20,
+                                                offset: const Offset(0, 8),
                                               ),
-                                              blurRadius: 20,
-                                              offset: const Offset(0, 8),
-                                            ),
-                                          ],
-                                        ),
-                                        child: ClipOval(
-                                          child: CachedNetworkImage(
-                                            imageUrl: controller.getImageUrl(
-                                              controller.fotoProfil.value,
-                                            ),
-                                            fit: BoxFit.cover,
-                                            placeholder: (context, url) =>
-                                                Container(
-                                                  color: Colors.grey[300],
-                                                  child: const Icon(
-                                                    Icons.person,
-                                                    size: 40,
-                                                    color: Colors.grey,
+                                            ],
+                                          ),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              FullscreenImageViewer.open(
+                                                context: Get.context!,
+                                                child: Hero(
+                                                  tag: 'foto-profil-ustadz',
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: controller
+                                                        .getImageUrl(
+                                                          controller
+                                                              .fotoProfil
+                                                              .value,
+                                                        ),
+                                                    fit: BoxFit.contain,
+                                                    placeholder: (c, u) =>
+                                                        _buildProfilePlaceholder(),
+                                                    errorWidget: (c, u, e) =>
+                                                        _buildProfilePlaceholder(),
                                                   ),
                                                 ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    Container(
-                                                      color: Colors.grey[300],
-                                                      child: const Icon(
-                                                        Icons.person,
-                                                        size: 40,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        bottom: 0,
-                                        right: 0,
-                                        child: Material(
-                                          shape: const CircleBorder(),
-                                          child: InkWell(
-                                            onTap: () {
-                                              _showEditPhotoProfileBottomSheet();
+                                              );
                                             },
-                                            customBorder: const CircleBorder(),
-                                            child: Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: const BoxDecoration(
-                                                color: Colors.white,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                Icons.camera_alt,
-                                                color: Colors.deepPurpleAccent,
-                                                size: 20,
+                                            child: Hero(
+                                              tag: 'foto-profil-ustadz',
+                                              child: ClipOval(
+                                                child: CachedNetworkImage(
+                                                  imageUrl: controller
+                                                      .getImageUrl(
+                                                        controller
+                                                            .fotoProfil
+                                                            .value,
+                                                      ),
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (c, u) =>
+                                                      _buildProfilePlaceholder(),
+                                                  errorWidget: (c, u, e) =>
+                                                      _buildProfilePlaceholder(),
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  const SizedBox(height: 16),
-
-                                  // Name
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    child: Text(
-                                      ustadz.nama ?? 'Nama tidak tersedia',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 8),
-
-                                  // Badges Row
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
-                                    ),
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.3,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Flexible(
-                                          child: Text(
-                                            ustadz.user?.email ??
-                                                'Email tidak tersedia',
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white,
+                                        Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: Material(
+                                            shape: const CircleBorder(),
+                                            child: InkWell(
+                                              onTap: () {
+                                                _showEditPhotoProfileBottomSheet();
+                                              },
+                                              customBorder:
+                                                  const CircleBorder(),
+                                              child: Container(
+                                                padding: const EdgeInsets.all(
+                                                  6,
+                                                ),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.camera_alt,
+                                                  color:
+                                                      Colors.deepPurpleAccent,
+                                                  size: 20,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                ],
+
+                                    const SizedBox(height: 16),
+
+                                    // Name
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
+                                      child: Skeletonizer(
+                                        enabled: isLoading,
+                                        effect: ShimmerEffect(
+                                          baseColor: Colors.white.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          highlightColor: Colors.white
+                                              .withValues(alpha: 0.4),
+                                        ),
+                                        child: Text(
+                                          ustadz.nama ?? 'Nama tidak tersedia',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
 
-                // Main Content
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      // Personal Information
-                      _buildPersonalInfoSection(ustadz),
-                      const SizedBox(height: 16),
-                      // Action Cards
-                      _buildActionSection(ustadz),
-                      const SizedBox(height: 50), // Space for bottom buttons
-                    ]),
+                  // Main Content
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        // Personal Information
+                        _buildPersonalInfoSection(ustadz),
+                        const SizedBox(height: 16),
+                        // Action Cards
+                        _buildActionSection(ustadz),
+                        const SizedBox(height: 50), // Space for bottom buttons
+                      ]),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         }),
@@ -377,76 +409,70 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
   }
 
   Widget _buildActionSection(Ustadz ustadz) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Change Password Button
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () {
-                Get.toNamed('/change-password');
-              },
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF6B46C1),
-                side: const BorderSide(color: Color(0xFF6B46C1)),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Ubah Password',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+    return Column(
+      children: [
+        Row(
+          children: [
+            // Ubah Password
+            Expanded(
+              child: _buildActionButton(
+                label: 'Ubah Password',
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.deepPurple,
+                borderColor: Colors.deepPurple,
+                onTap: () => Get.toNamed('/change-password'),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          // Edit Profile Button
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                controller.namaC.text = controller.ustadzData.value!.nama!;
-                controller.noHpC.text = controller.ustadzData.value!.nomorHp!;
-                controller.alamatC.text = controller.ustadzData.value!.alamat!;
-                controller.jenisKelaminC.text =
-                    controller.ustadzData.value!.jenisKelamin!;
-                _showEditProfileDialog();
-              },
-              style: ElevatedButton.styleFrom(
+            const SizedBox(width: 12),
+            // Edit Profil
+            Expanded(
+              child: _buildActionButton(
+                label: 'Edit Profil',
                 backgroundColor: Colors.orangeAccent,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Edit Profil',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+                onTap: () {
+                  controller.namaC.text = ustadz.nama!;
+                  controller.noHpC.text = ustadz.nomorHp!;
+                  controller.alamatC.text = ustadz.alamat!;
+                  controller.jenisKelaminC.text = ustadz.jenisKelamin!;
+                  _showEditProfileDialog();
+                },
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required String label,
+    required Color backgroundColor,
+    required Color foregroundColor,
+    Color? borderColor,
+    required VoidCallback onTap,
+  }) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        minimumSize: Size(double.infinity, 44),
+        shadowColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: borderColor != null
+              ? BorderSide(color: borderColor, width: 1.5)
+              : BorderSide.none,
+        ),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.poppins(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: foregroundColor,
+        ),
       ),
     );
   }
@@ -471,7 +497,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
           Text(
             'Informasi Pribadi',
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -479,13 +505,20 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
           const SizedBox(height: 16),
 
           _buildInfoTile(
-            icon: Icons.phone,
-            label: 'No. Telepon',
-            value: ustadz.nomorHp ?? 'Tidak ada data',
-            telepon: ustadz.nomorHp,
+            icon: Icons.email,
+            label: 'Email',
+            value: ustadz.user?.email ?? '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
+
+          _buildInfoTile(
+            icon: Icons.phone,
+            label: 'No. Telepon',
+            value: ustadz.nomorHp ?? '-',
+          ),
+
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: ustadz.jenisKelamin?.toLowerCase() == 'l'
@@ -497,21 +530,21 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                 : 'Perempuan',
           ),
 
-          if (ustadz.waliKelasTahap != null) const SizedBox(height: 12),
-
-          if (ustadz.waliKelasTahap != null)
+          if (ustadz.waliKelasTahap != null) ...[
+            Divider(color: Colors.grey[200], height: 16),
             _buildInfoTile(
-              icon: Icons.person,
-              label: 'Wali Kelas Tahap',
+              icon: Icons.school,
+              label: 'Penanggung Jawab Kelas',
               value: _getTahapLabel(ustadz.waliKelasTahap ?? ''),
             ),
+          ],
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.location_on,
             label: 'Alamat',
-            value: ustadz.alamat ?? 'Tidak ada data',
+            value: ustadz.alamat ?? '-',
           ),
         ],
       ),
@@ -522,52 +555,61 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
     required IconData icon,
     required String label,
     required String value,
-    String? telepon,
+    bool? isOverflow,
+    Color? iconColor,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: Colors.deepPurpleAccent, size: 20),
-          ),
-
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        color: Colors.transparent,
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: (iconColor ?? Colors.deepPurpleAccent).withValues(
+                  alpha: 0.1,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: iconColor ?? Colors.deepPurpleAccent,
+                size: 20,
+              ),
             ),
-          ),
-        ],
+
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: isOverflow == true ? TextOverflow.ellipsis : null,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -947,54 +989,56 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
 
   void _showEditPhotoProfileBottomSheet() {
     Get.bottomSheet(
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
+      SafeArea(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Foto Profil',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+              const SizedBox(height: 16),
+              Text(
+                'Foto Profil',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-            ListTile(
-              minTileHeight: 40,
-              leading: Icon(Icons.camera_alt_outlined),
-              title: Text('Kamera'),
-              onTap: () {
-                controller.pickImage(ImageSource.camera);
-                Get.back();
-              },
-            ),
-            ListTile(
-              minTileHeight: 40,
-              leading: Icon(Icons.photo_outlined),
-              title: Text('Galeri'),
-              onTap: () {
-                controller.pickImage(ImageSource.gallery);
-                Get.back();
-              },
-            ),
-          ],
+              ListTile(
+                minTileHeight: 40,
+                leading: Icon(Icons.camera_alt_outlined),
+                title: Text('Kamera'),
+                onTap: () {
+                  controller.pickImage(ImageSource.camera);
+                  Get.back();
+                },
+              ),
+              ListTile(
+                minTileHeight: 40,
+                leading: Icon(Icons.photo_outlined),
+                title: Text('Galeri'),
+                onTap: () {
+                  controller.pickImage(ImageSource.gallery);
+                  Get.back();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1003,13 +1047,20 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
   String _getTahapLabel(String tahap) {
     switch (tahap) {
       case 'Level1':
-        return 'Level 1';
+        return 'Level 1 - Juz 30';
       case 'Level2':
-        return 'Level 2';
+        return 'Level 2 - Surah Pilihan';
       case 'Level3':
-        return 'Level 3';
+        return 'Level 3 - Juz 1-29';
       default:
         return 'Tahap tidak ditemukan';
     }
+  }
+
+  Widget _buildProfilePlaceholder() {
+    return Container(
+      color: Colors.grey[300],
+      child: const Icon(Icons.person, size: 40, color: Colors.grey),
+    );
   }
 }

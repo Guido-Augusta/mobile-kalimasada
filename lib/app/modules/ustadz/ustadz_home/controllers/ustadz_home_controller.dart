@@ -6,14 +6,15 @@ import 'package:http/http.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/ustadz.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class UstadzHomeController extends GetxController {
   var isLoading = true.obs;
   var isLoadingLogout = false.obs;
   var ustadz = Rxn<Ustadz>();
   var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   DateTime? _lastErrorShown;
@@ -32,12 +33,11 @@ class UstadzHomeController extends GetxController {
   Future<void> getUstadz() async {
     try {
       isLoading.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final ustadzId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final ustadzId = AuthService.to.roleId.value;
 
       final response = await get(
-        Uri.parse(ApiUrl.ustadzDetail(ustadzId!)),
+        Uri.parse(ApiUrl.ustadzDetail(ustadzId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -51,7 +51,9 @@ class UstadzHomeController extends GetxController {
       }
       if (response.statusCode == 200) {
         ustadz.value = Ustadz.fromJson(data['data']);
-        fotoProfil.value = getImageUrl(ustadz.value!.fotoProfil!);
+        if (ustadz.value?.fotoProfil?.isNotEmpty == true) {
+          fotoProfil.value = getImageUrl(ustadz.value!.fotoProfil!);
+        }
       } else {
         ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
@@ -71,11 +73,10 @@ class UstadzHomeController extends GetxController {
 
   void logout() async {
     isLoadingLogout.value = true;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
+    final userId = AuthService.to.userId.value;
     try {
       final response = await post(
-        Uri.parse(ApiUrl.logout(userId!)),
+        Uri.parse(ApiUrl.logout(userId)),
         headers: {'Content-Type': 'application/json'},
       ).timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
@@ -84,10 +85,7 @@ class UstadzHomeController extends GetxController {
         print(data);
       }
       if (response.statusCode == 200) {
-        await prefs.remove('token');
-        await prefs.remove('role');
-        await prefs.remove('userId');
-        await prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_surah.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
@@ -22,6 +23,7 @@ class DetailSurahController extends GetxController {
 
   final listC = ListController();
   final scrollC = ScrollController();
+  final searchC = TextEditingController();
   RxInt lastCheckedAyat = 0.obs;
 
   @override
@@ -32,8 +34,11 @@ class DetailSurahController extends GetxController {
 
   @override
   void onClose() {
-    super.onClose();
+    searchC.dispose();
+    scrollC.dispose();
+    listC.dispose();
     audioPlayer.dispose();
+    super.onClose();
   }
 
   void getDetailSurah() async {
@@ -64,7 +69,15 @@ class DetailSurahController extends GetxController {
               .replaceAll('127.0.0.1', '10.0.2.2');
 
           try {
-            await audioPlayer.setUrl(audioUrl);
+            final mediaItem = MediaItem(
+              id: detailSurah.value?.nomor?.toString() ?? surahId,
+              title: detailSurah.value?.namaLatin ?? 'Surah $surahId',
+              album: 'Al-Quran',
+            );
+
+            await audioPlayer.setAudioSource(
+              AudioSource.uri(Uri.parse(audioUrl), tag: mediaItem),
+            );
             if (kDebugMode) {
               print('Audio loaded successfully');
             }
@@ -84,6 +97,25 @@ class DetailSurahController extends GetxController {
       );
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  void scrollToAyat(int nomor) {
+    final ayatList = detailSurah.value?.ayat ?? [];
+    final targetIndex = ayatList.indexWhere((a) => a.nomor == nomor);
+
+    if (targetIndex != -1) {
+      if (listC.isAttached) {
+        listC.animateToItem(
+          index: targetIndex,
+          scrollController: scrollC,
+          alignment: 0,
+          duration: (estimatedDistance) => const Duration(milliseconds: 800),
+          curve: (estimatedDistance) => Curves.easeInOutCubic,
+        );
+      }
+    } else {
+      ToastUtils.showErrorToast('Ayat $nomor tidak ditemukan');
     }
   }
 }

@@ -15,6 +15,7 @@ import '../../../../data/constants/api_url.dart';
 import '../../../../data/models/ustadz.dart';
 import '../../../../utils/toast_utils.dart';
 import '../../daftar_ustadz/controllers/daftar_ustadz_controller.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class EditUstadzController extends GetxController {
   final String ustadzId = Get.arguments['ustadzId'];
@@ -25,15 +26,17 @@ class EditUstadzController extends GetxController {
   final RxBool isSaveProfileLoading = false.obs;
   final RxBool isSaveEmailPasswordLoading = false.obs;
 
+  final RxBool isPasswordVisible = false.obs;
   var ustadzDetail = Rxn<Ustadz>();
 
   final ImagePicker imagePicker = ImagePicker();
   var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   final profileFormKey = GlobalKey<FormState>();
   final emailPasswordFormKey = GlobalKey<FormState>();
+  final passwordFieldKey = GlobalKey<FormFieldState>();
 
   var emailC = TextEditingController();
   var passwordC = TextEditingController();
@@ -72,7 +75,9 @@ class EditUstadzController extends GetxController {
         final data = jsonDecode(response.body);
         final ustadz = Ustadz.fromJson(data['data']);
         ustadzDetail.value = ustadz;
-        fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+        if (ustadz.fotoProfil != null && ustadz.fotoProfil!.isNotEmpty) {
+          fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+        }
 
         // Initialize text controllers with current values
         namaC.text = ustadzDetail.value!.nama!;
@@ -95,7 +100,7 @@ class EditUstadzController extends GetxController {
       }
       final now = DateTime.now();
       if (lastErrorShown == null ||
-          now.difference(lastErrorShown!) > Duration(seconds: 3)) {
+          now.difference(lastErrorShown!) > const Duration(seconds: 3)) {
         lastErrorShown = now;
         ToastUtils.showErrorToast(
           'Terjadi kesalahan\nPeriksa koneksi internet Anda',
@@ -124,73 +129,6 @@ class EditUstadzController extends GetxController {
       }
     } catch (e) {
       ToastUtils.showErrorToast('Gagal memilih gambar');
-    }
-  }
-
-  void deleteImage() async {
-    try {
-      bool? confirm = await Get.dialog<bool>(
-        AlertDialog(
-          title: const Text('Hapus Foto Profil'),
-          content: const Text('Apakah Anda yakin ingin menghapus foto profil?'),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(result: false),
-              child: const Text('Batal'),
-            ),
-            TextButton(
-              onPressed: () => Get.back(result: true),
-              child: const Text('Hapus', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        ),
-      );
-
-      if (confirm != true) return;
-
-      isUploadingImage.value = true;
-
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      final request = http.MultipartRequest(
-        'PUT',
-        Uri.parse(ApiUrl.ustadzDetail(ustadzId)),
-      );
-
-      request.headers['Authorization'] = 'Bearer $token';
-      request.headers['x-platform'] = 'mobile';
-
-      final emptyFile = http.MultipartFile.fromString(
-        'fotoProfil',
-        '',
-        filename: 'empty.jpg',
-        contentType: MediaType.parse('image/jpeg'),
-      );
-      request.files.add(emptyFile);
-
-      final response = await request.send();
-
-      if (response.statusCode == 200) {
-        // Reset ke foto default
-        fotoProfil.value = getImageUrl(
-          'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg',
-        );
-
-        await getUstadzDetail(isReload: false);
-        ToastUtils.showSuccessToast('Foto profil berhasil dihapus');
-      } else {
-        ToastUtils.showErrorToast('Gagal menghapus foto profil');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error deleting image: $e');
-      }
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
-    } finally {
-      isUploadingImage.value = false;
     }
   }
 
@@ -285,7 +223,7 @@ class EditUstadzController extends GetxController {
       if (hasNoChange) {
         final now = DateTime.now();
         if (_lastNoChangeShown == null ||
-            now.difference(_lastNoChangeShown!) > Duration(seconds: 3)) {
+            now.difference(_lastNoChangeShown!) > const Duration(seconds: 3)) {
           _lastNoChangeShown = now;
           ToastUtils.showErrorToast('Tidak ada perubahan data');
         }
@@ -326,7 +264,7 @@ class EditUstadzController extends GetxController {
     } catch (e) {
       final now = DateTime.now();
       if (lastErrorShown == null ||
-          now.difference(lastErrorShown!) > Duration(seconds: 3)) {
+          now.difference(lastErrorShown!) > const Duration(seconds: 3)) {
         lastErrorShown = now;
         ToastUtils.showErrorToast(
           'Terjadi kesalahan\nPeriksa koneksi internet Anda',
@@ -342,6 +280,20 @@ class EditUstadzController extends GetxController {
     String? password,
   ) async {
     try {
+      bool hasNoChange =
+          (email == ustadzDetail.value?.user?.email &&
+          (password == null || password.isEmpty));
+
+      if (hasNoChange) {
+        final now = DateTime.now();
+        if (_lastNoChangeShown == null ||
+            now.difference(_lastNoChangeShown!) > const Duration(seconds: 3)) {
+          _lastNoChangeShown = now;
+          ToastUtils.showErrorToast('Tidak ada perubahan data');
+        }
+        return;
+      }
+
       isSaveEmailPasswordLoading.value = true;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -359,13 +311,26 @@ class EditUstadzController extends GetxController {
           )
           .timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
+        String oldEmail = ustadzDetail.value?.user?.email ?? "";
+        bool emailChanged = email != oldEmail;
+        bool passwordChanged = password != null && password.isNotEmpty;
+
         await getUstadzDetail(isReload: false);
         Get.back();
-        ToastUtils.showSuccessToast('Email dan password berhasil diperbarui');
+
+        if (emailChanged && passwordChanged) {
+          ToastUtils.showSuccessToast('Email dan password berhasil diperbarui');
+        } else if (emailChanged) {
+          ToastUtils.showSuccessToast('Email berhasil diperbarui');
+        } else if (passwordChanged) {
+          ToastUtils.showSuccessToast('Password berhasil diperbarui');
+        } else {
+          ToastUtils.showSuccessToast('Data berhasil diperbarui');
+        }
       } else {
         final now = DateTime.now();
         if (lastErrorShown == null ||
-            now.difference(lastErrorShown!) > Duration(seconds: 3)) {
+            now.difference(lastErrorShown!) > const Duration(seconds: 3)) {
           lastErrorShown = now;
           ToastUtils.showErrorToast('Gagal memperbarui email dan password');
         }
@@ -373,7 +338,7 @@ class EditUstadzController extends GetxController {
     } catch (e) {
       final now = DateTime.now();
       if (lastErrorShown == null ||
-          now.difference(lastErrorShown!) > Duration(seconds: 3)) {
+          now.difference(lastErrorShown!) > const Duration(seconds: 3)) {
         lastErrorShown = now;
         ToastUtils.showErrorToast(
           'Terjadi kesalahan\nPeriksa koneksi internet Anda',

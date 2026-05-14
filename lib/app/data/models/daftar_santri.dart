@@ -1,11 +1,19 @@
 class DaftarSantri {
-  DaftarSantri({required this.data, required this.totalSantri});
+  DaftarSantri({
+    required this.pagination,
+    required this.data,
+    required this.totalSantri,
+  });
 
+  final Pagination? pagination;
   final List<Datum> data;
   final int? totalSantri;
 
   factory DaftarSantri.fromJson(Map<String, dynamic> json) {
     return DaftarSantri(
+      pagination: json["pagination"] == null
+          ? null
+          : Pagination.fromJson(json["pagination"]),
       data: json["data"] == null
           ? []
           : List<Datum>.from(json["data"]!.map((x) => Datum.fromJson(x))),
@@ -14,13 +22,14 @@ class DaftarSantri {
   }
 
   Map<String, dynamic> toJson() => {
+    "pagination": pagination?.toJson(),
     "data": data.map((x) => x.toJson()).toList(),
     "totalSantri": totalSantri,
   };
 
   @override
   String toString() {
-    return "$data, $totalSantri, ";
+    return "$pagination, $data, $totalSantri, ";
   }
 }
 
@@ -29,12 +38,6 @@ class Datum {
     required this.id,
     required this.userId,
     required this.nama,
-    required this.nomorHp,
-    required this.alamat,
-    required this.jenisKelamin,
-    required this.tanggalLahir,
-    required this.fotoProfil,
-    required this.noInduk,
     required this.tahapHafalan,
     required this.totalPoin,
     required this.peringkat,
@@ -47,12 +50,6 @@ class Datum {
   final int? id;
   final int? userId;
   final String? nama;
-  final String? nomorHp;
-  final String? alamat;
-  final String? jenisKelamin;
-  final DateTime? tanggalLahir;
-  final String? fotoProfil;
-  final String? noInduk;
   final String? tahapHafalan;
   final int? totalPoin;
   final int? peringkat;
@@ -66,12 +63,6 @@ class Datum {
       id: json["id"],
       userId: json["userId"],
       nama: json["nama"],
-      nomorHp: json["nomorHp"],
-      alamat: json["alamat"],
-      jenisKelamin: json["jenisKelamin"],
-      tanggalLahir: DateTime.tryParse(json["tanggalLahir"] ?? ""),
-      fotoProfil: json["fotoProfil"],
-      noInduk: json["noInduk"],
       tahapHafalan: json["tahapHafalan"],
       totalPoin: json["totalPoin"],
       peringkat: json["peringkat"],
@@ -90,12 +81,6 @@ class Datum {
     "id": id,
     "userId": userId,
     "nama": nama,
-    "nomorHp": nomorHp,
-    "alamat": alamat,
-    "jenisKelamin": jenisKelamin,
-    "tanggalLahir": tanggalLahir?.toIso8601String(),
-    "fotoProfil": fotoProfil,
-    "noInduk": noInduk,
     "tahapHafalan": tahapHafalan,
     "totalPoin": totalPoin,
     "peringkat": peringkat,
@@ -107,7 +92,7 @@ class Datum {
 
   @override
   String toString() {
-    return "$id, $userId, $nama, $nomorHp, $alamat, $jenisKelamin, $tanggalLahir, $fotoProfil, $noInduk, $tahapHafalan, $totalPoin, $peringkat, $createdAt, $poinUpdatedAt, $user, $orangTua, ";
+    return "$id, $userId, $nama, $tahapHafalan, $totalPoin, $peringkat, $createdAt, $poinUpdatedAt, $user, $orangTua, ";
   }
 }
 
@@ -131,20 +116,54 @@ class OrangTua {
 }
 
 class User {
-  User({required this.id, required this.email, required this.role});
+  User({required this.id, required this.role});
 
   final int? id;
-  final String? email;
   final String? role;
 
   factory User.fromJson(Map<String, dynamic> json) {
-    return User(id: json["id"], email: json["email"], role: json["role"]);
+    return User(id: json["id"], role: json["role"]);
   }
 
-  Map<String, dynamic> toJson() => {"id": id, "email": email, "role": role};
+  Map<String, dynamic> toJson() => {"id": id, "role": role};
 
   @override
   String toString() {
-    return "$id, $email, $role, ";
+    return "$id, $role, ";
+  }
+}
+
+class Pagination {
+  Pagination({
+    required this.page,
+    required this.limit,
+    required this.totalData,
+    required this.totalPages,
+  });
+
+  final int? page;
+  final int? limit;
+  final int? totalData;
+  final int? totalPages;
+
+  factory Pagination.fromJson(Map<String, dynamic> json) {
+    return Pagination(
+      page: json["page"],
+      limit: json["limit"],
+      totalData: json["totalData"],
+      totalPages: json["totalPages"],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "page": page,
+    "limit": limit,
+    "totalData": totalData,
+    "totalPages": totalPages,
+  };
+
+  @override
+  String toString() {
+    return "$page, $limit, $totalData, $totalPages, ";
   }
 }

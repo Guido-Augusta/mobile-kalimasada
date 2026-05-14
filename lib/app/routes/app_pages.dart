@@ -19,6 +19,8 @@ import '../modules/admin/tambah_santri/bindings/tambah_santri_binding.dart';
 import '../modules/admin/tambah_santri/views/tambah_santri_view.dart';
 import '../modules/admin/tambah_ustadz/bindings/tambah_ustadz_binding.dart';
 import '../modules/admin/tambah_ustadz/views/tambah_ustadz_view.dart';
+import '../modules/main/admin_main/bindings/admin_main_binding.dart';
+import '../modules/main/admin_main/views/admin_main_view.dart';
 import '../modules/auth/change_password/bindings/change_password_binding.dart';
 import '../modules/auth/change_password/views/change_password_view.dart';
 import '../modules/auth/forgot_password/bindings/forgot_password_binding.dart';
@@ -27,6 +29,8 @@ import '../modules/auth/login/bindings/login_binding.dart';
 import '../modules/auth/login/views/login_view.dart';
 import '../modules/auth/splash/bindings/splash_binding.dart';
 import '../modules/auth/splash/views/splash_view.dart';
+import '../modules/quran/detail_juz/bindings/detail_juz_binding.dart';
+import '../modules/quran/detail_juz/views/detail_juz_view.dart';
 import '../modules/main/ortu_main/bindings/ortu_main_binding.dart';
 import '../modules/main/ortu_main/views/ortu_main_view.dart';
 import '../modules/main/santri_main/bindings/santri_main_binding.dart';
@@ -43,8 +47,10 @@ import '../modules/quran/alquran/bindings/alquran_binding.dart';
 import '../modules/quran/alquran/views/alquran_view.dart';
 import '../modules/quran/detail_surah/bindings/detail_surah_binding.dart';
 import '../modules/quran/detail_surah/views/detail_surah_view.dart';
-import '../modules/santri/detail_progres/bindings/detail_progres_binding.dart';
-import '../modules/santri/detail_progres/views/detail_progres_view.dart';
+import '../modules/santri/detail_hafalan_juz/bindings/detail_hafalan_juz_binding.dart';
+import '../modules/santri/detail_hafalan_juz/views/detail_hafalan_juz_view.dart';
+import '../modules/santri/detail_hafalan_surah/bindings/detail_hafalan_surah_binding.dart';
+import '../modules/santri/detail_hafalan_surah/views/detail_hafalan_surah_view.dart';
 import '../modules/santri/doa_khatam/bindings/doa_khatam_binding.dart';
 import '../modules/santri/doa_khatam/views/doa_khatam_view.dart';
 import '../modules/santri/santri_home/bindings/santri_home_binding.dart';
@@ -84,6 +90,7 @@ class AppPages {
       name: _Paths.LOGIN,
       page: () => const LoginView(),
       binding: LoginBinding(),
+      middlewares: [GuestMiddleware()],
     ),
     GetPage(
       name: _Paths.SPLASH,
@@ -94,29 +101,31 @@ class AppPages {
       name: _Paths.SANTRI_HOME,
       page: () => const SantriHomeView(),
       binding: SantriHomeBinding(),
+      middlewares: [SantriMiddleware()],
     ),
     GetPage(
       name: _Paths.USTADZ_HOME,
       page: () => const UstadzHomeView(),
       binding: UstadzHomeBinding(),
-      middlewares: [AuthMiddleware()],
+      middlewares: [UstadzMiddleware()],
     ),
     GetPage(
       name: _Paths.ORTU_HOME,
       page: () => const OrtuHomeView(),
       binding: OrtuHomeBinding(),
+      middlewares: [OrtuMiddleware()],
     ),
     GetPage(
       name: _Paths.DAFTAR_SANTRI,
       page: () => const DaftarSantriView(),
       binding: DaftarSantriBinding(),
-      middlewares: [AuthMiddleware()],
+      middlewares: [UstadzMiddleware()],
     ),
     GetPage(
       name: _Paths.USTADZ_PROFILE,
       page: () => const UstadzProfileView(),
       binding: UstadzProfileBinding(),
-      middlewares: [AuthMiddleware()],
+      middlewares: [UstadzMiddleware()],
     ),
     GetPage(
       name: _Paths.ALQURAN,
@@ -128,7 +137,7 @@ class AppPages {
       name: _Paths.DETAIL_SANTRI,
       page: () => const DetailSantriView(),
       binding: DetailSantriBinding(),
-      middlewares: [AuthMiddleware()],
+      middlewares: [UstadzOrtuMiddleware()],
     ),
     GetPage(
       name: _Paths.PROGRES_HAFALAN,
@@ -140,29 +149,31 @@ class AppPages {
       name: _Paths.USTADZ_MAIN,
       page: () => UstadzMainView(),
       binding: UstadzMainBinding(),
-      middlewares: [AuthMiddleware()],
+      middlewares: [UstadzMiddleware()],
     ),
     GetPage(
       name: _Paths.SANTRI_MAIN,
       page: () => SantriMainView(),
       binding: SantriMainBinding(),
-      middlewares: [AuthMiddleware()],
+      middlewares: [SantriMiddleware()],
     ),
     GetPage(
       name: _Paths.ORTU_MAIN,
       page: () => OrtuMainView(),
       binding: OrtuMainBinding(),
-      middlewares: [AuthMiddleware()],
+      middlewares: [OrtuMiddleware()],
     ),
     GetPage(
       name: _Paths.RIWAYAT_HAFALAN,
       page: () => const RiwayatHafalanView(),
       binding: RiwayatHafalanBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: _Paths.DETAIL_RIWAYAT_HAFALAN,
       page: () => const DetailRiwayatHafalanView(),
       binding: DetailRiwayatHafalanBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: _Paths.PERINGKAT,
@@ -175,9 +186,9 @@ class AppPages {
       binding: SantriProfileBinding(),
     ),
     GetPage(
-      name: _Paths.DETAIL_PROGRES,
-      page: () => const DetailProgresView(),
-      binding: DetailProgresBinding(),
+      name: _Paths.DETAIL_HAFALAN_SURAH,
+      page: () => const DetailHafalanSurahView(),
+      binding: DetailHafalanSurahBinding(),
     ),
     GetPage(
       name: _Paths.DETAIL_SURAH,
@@ -218,51 +229,78 @@ class AppPages {
       name: _Paths.ADMIN_HOME,
       page: () => const AdminHomeView(),
       binding: AdminHomeBinding(),
+      middlewares: [AdminMiddleware()],
     ),
     GetPage(
       name: _Paths.EDIT_SANTRI,
       page: () => const EditSantriView(),
       binding: EditSantriBinding(),
+      middlewares: [AdminMiddleware()],
     ),
     GetPage(
       name: _Paths.TAMBAH_SANTRI,
       page: () => const TambahSantriView(),
       binding: TambahSantriBinding(),
+      middlewares: [AdminMiddleware()],
     ),
     GetPage(
       name: _Paths.DAFTAR_ORTU,
       page: () => const DaftarOrtuView(),
       binding: DaftarOrtuBinding(),
+      middlewares: [AdminMiddleware()],
     ),
     GetPage(
       name: _Paths.TAMBAH_ORTU,
       page: () => const TambahOrtuView(),
       binding: TambahOrtuBinding(),
+      middlewares: [AdminMiddleware()],
     ),
     GetPage(
       name: _Paths.EDIT_ORTU,
       page: () => const EditOrtuView(),
       binding: EditOrtuBinding(),
+      middlewares: [AdminMiddleware()],
     ),
     GetPage(
       name: _Paths.DAFTAR_USTADZ,
       page: () => const DaftarUstadzView(),
       binding: DaftarUstadzBinding(),
+      middlewares: [AdminMiddleware()],
     ),
     GetPage(
       name: _Paths.DETAIL_USTADZ,
       page: () => const DetailUstadzView(),
       binding: DetailUstadzBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: _Paths.TAMBAH_USTADZ,
       page: () => const TambahUstadzView(),
       binding: TambahUstadzBinding(),
+      middlewares: [AdminMiddleware()],
     ),
     GetPage(
       name: _Paths.EDIT_USTADZ,
       page: () => const EditUstadzView(),
       binding: EditUstadzBinding(),
+      middlewares: [AdminMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.DETAIL_HAFALAN_JUZ,
+      page: () => const DetailHafalanJuzView(),
+      binding: DetailHafalanJuzBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.DETAIL_JUZ,
+      page: () => const DetailJuzView(),
+      binding: DetailJuzBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_MAIN,
+      page: () => AdminMainView(),
+      binding: AdminMainBinding(),
+      middlewares: [AdminMiddleware()],
     ),
   ];
 }

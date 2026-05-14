@@ -60,12 +60,15 @@ class UstadzMainView extends GetView<UstadzMainController> {
               },
               items: [
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.home, color: Colors.grey),
-                  activeIcon: Icon(Icons.home, color: Colors.deepPurpleAccent),
+                  icon: Icon(Icons.home_outlined, color: Colors.grey),
+                  activeIcon: Icon(
+                    Icons.home_rounded,
+                    color: Colors.deepPurpleAccent,
+                  ),
                   label: 'Beranda',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.book, color: Colors.grey),
+                  icon: Icon(Icons.book_outlined, color: Colors.grey),
                   activeIcon: Icon(
                     Icons.menu_book_rounded,
                     color: Colors.deepPurpleAccent,
@@ -73,7 +76,7 @@ class UstadzMainView extends GetView<UstadzMainController> {
                   label: 'Al-Qur\'an',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.person, color: Colors.grey),
+                  icon: Icon(Icons.person_outline, color: Colors.grey),
                   activeIcon: Icon(
                     Icons.person,
                     color: Colors.deepPurpleAccent,

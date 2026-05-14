@@ -15,23 +15,24 @@ import '../../../../data/constants/api_url.dart';
 import '../../../../data/models/ustadz.dart';
 import '../../../../utils/toast_utils.dart';
 import '../../daftar_ustadz/controllers/daftar_ustadz_controller.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class TambahUstadzController extends GetxController {
   final RxBool isUploadingImage = false.obs;
   final RxBool isSaveProfileLoading = false.obs;
   final RxBool isSaveEmailPasswordLoading = false.obs;
+  final RxBool isPasswordVisible = false.obs;
 
   var ustadzDetail = Rxn<Ustadz>();
 
   final ImagePicker imagePicker = ImagePicker();
   var pickedImage = Rxn<XFile>();
   var defaultPhotoProfile =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   GlobalKey<FormState> profileFormKey = GlobalKey<FormState>();
-  final GlobalKey<FormFieldState> passwordFieldKey =
-      GlobalKey<FormFieldState>();
+  GlobalKey<FormFieldState> passwordFieldKey = GlobalKey<FormFieldState>();
 
   var emailC = TextEditingController();
   var passwordC = TextEditingController();
@@ -124,8 +125,10 @@ class TambahUstadzController extends GetxController {
 
   void resetForm() {
     profileFormKey.currentState?.reset();
+    passwordFieldKey.currentState?.reset();
     pickedImage.value = null;
     waliKelasTahapC.value = '';
+    isPasswordVisible.value = false;
     emailC.clear();
     passwordC.clear();
     namaC.clear();
@@ -134,6 +137,7 @@ class TambahUstadzController extends GetxController {
     jenisKelaminC.text = 'L';
 
     profileFormKey = GlobalKey<FormState>();
+    passwordFieldKey = GlobalKey<FormFieldState>();
     update();
   }
 

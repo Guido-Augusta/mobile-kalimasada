@@ -15,6 +15,7 @@ import '../../../../data/constants/api_url.dart';
 import '../../../../data/models/ortu.dart';
 import '../../../../utils/toast_utils.dart';
 import '../../daftar_ortu/controllers/daftar_ortu_controller.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class EditOrtuController extends GetxController {
   final String ortuId = Get.arguments['ortuId'];
@@ -24,13 +25,12 @@ class EditOrtuController extends GetxController {
   final RxBool isSearching = false.obs;
   final RxBool isSaveProfileLoading = false.obs;
   final RxBool isSaveEmailPasswordLoading = false.obs;
+  final RxBool isPasswordVisible = false.obs;
 
   var ortuDetail = Rxn<Ortu>();
 
   final ImagePicker imagePicker = ImagePicker();
-  var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
-          .obs;
+  var fotoProfil = AppConstants.defaultProfileImageUrl.obs;
 
   final profileFormKey = GlobalKey<FormState>();
   final emailPasswordFormKey = GlobalKey<FormState>();
@@ -80,7 +80,9 @@ class EditOrtuController extends GetxController {
         final data = jsonDecode(response.body);
         final ortu = Ortu.fromJson(data['data']);
         ortuDetail.value = ortu;
-        fotoProfil.value = getImageUrl(ortu.fotoProfil!);
+        if (ortu.fotoProfil != null && ortu.fotoProfil!.isNotEmpty) {
+          fotoProfil.value = getImageUrl(ortu.fotoProfil!);
+        }
 
         // Initialize text controllers with current values
         namaC.text = ortuDetail.value!.nama!;
@@ -132,73 +134,6 @@ class EditOrtuController extends GetxController {
       }
     } catch (e) {
       ToastUtils.showErrorToast('Gagal memilih gambar');
-    }
-  }
-
-  void deleteImage() async {
-    try {
-      bool? confirm = await Get.dialog<bool>(
-        AlertDialog(
-          title: const Text('Hapus Foto Profil'),
-          content: const Text('Apakah Anda yakin ingin menghapus foto profil?'),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(result: false),
-              child: const Text('Batal'),
-            ),
-            TextButton(
-              onPressed: () => Get.back(result: true),
-              child: const Text('Hapus', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        ),
-      );
-
-      if (confirm != true) return;
-
-      isUploadingImage.value = true;
-
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      final request = http.MultipartRequest(
-        'PUT',
-        Uri.parse(ApiUrl.ortuDetail(ortuId)),
-      );
-
-      request.headers['Authorization'] = 'Bearer $token';
-      request.headers['x-platform'] = 'mobile';
-
-      final emptyFile = http.MultipartFile.fromString(
-        'fotoProfil',
-        '',
-        filename: 'empty.jpg',
-        contentType: MediaType.parse('image/jpeg'),
-      );
-      request.files.add(emptyFile);
-
-      final response = await request.send();
-
-      if (response.statusCode == 200) {
-        // Reset ke foto default
-        fotoProfil.value = getImageUrl(
-          'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg',
-        );
-
-        await getOrtuDetail(isReload: false);
-        ToastUtils.showSuccessToast('Foto profil berhasil dihapus');
-      } else {
-        ToastUtils.showErrorToast('Gagal menghapus foto profil');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error deleting image: $e');
-      }
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
-    } finally {
-      isUploadingImage.value = false;
     }
   }
 
@@ -363,9 +298,22 @@ class EditOrtuController extends GetxController {
           )
           .timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
+        String oldEmail = ortuDetail.value?.user?.email ?? "";
+        bool emailChanged = email != oldEmail;
+        bool passwordChanged = password != null && password.isNotEmpty;
+
         await getOrtuDetail(isReload: false);
         Get.back();
-        ToastUtils.showSuccessToast('Email dan password berhasil diperbarui');
+
+        if (emailChanged && passwordChanged) {
+          ToastUtils.showSuccessToast('Email dan password berhasil diperbarui');
+        } else if (emailChanged) {
+          ToastUtils.showSuccessToast('Email berhasil diperbarui');
+        } else if (passwordChanged) {
+          ToastUtils.showSuccessToast('Password berhasil diperbarui');
+        } else {
+          ToastUtils.showSuccessToast('Data berhasil diperbarui');
+        }
       } else {
         final now = DateTime.now();
         if (lastErrorShown == null ||

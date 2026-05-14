@@ -11,8 +11,9 @@ import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/models/ustadz.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mobile_kalimasada/app/modules/ustadz/ustadz_home/controllers/ustadz_home_controller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class UstadzProfileController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -23,7 +24,7 @@ class UstadzProfileController extends GetxController {
   final isUploadingImage = false.obs;
   var ustadzData = Rxn<Ustadz>();
   var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   var namaC = TextEditingController();
@@ -44,12 +45,11 @@ class UstadzProfileController extends GetxController {
   Future<void> fetchUstadzData() async {
     try {
       isLoading.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final ustadzId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final ustadzId = AuthService.to.roleId.value;
 
       final response = await http.get(
-        Uri.parse(ApiUrl.ustadzDetail(ustadzId!)),
+        Uri.parse(ApiUrl.ustadzDetail(ustadzId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -60,7 +60,9 @@ class UstadzProfileController extends GetxController {
         final data = jsonDecode(response.body);
         final ustadz = Ustadz.fromJson(data['data']);
         ustadzData.value = ustadz;
-        fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+        if (ustadz.fotoProfil?.isNotEmpty == true) {
+          fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+        }
         namaC.text = ustadz.nama!;
         noHpC.text = ustadz.nomorHp!;
         alamatC.text = ustadz.alamat!;
@@ -105,13 +107,12 @@ class UstadzProfileController extends GetxController {
         return;
       }
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final ustadzId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final ustadzId = AuthService.to.roleId.value;
 
       final response = await http
           .put(
-            Uri.parse(ApiUrl.ustadzDetail(ustadzId!)),
+            Uri.parse(ApiUrl.ustadzDetail(ustadzId)),
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',
@@ -175,13 +176,12 @@ class UstadzProfileController extends GetxController {
 
   Future<void> uploadImage(String imagePath) async {
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final ustadzId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final ustadzId = AuthService.to.roleId.value;
 
       final request = http.MultipartRequest(
         'PUT',
-        Uri.parse(ApiUrl.ustadzDetail(ustadzId!)),
+        Uri.parse(ApiUrl.ustadzDetail(ustadzId)),
       );
 
       request.headers['Authorization'] = 'Bearer $token';
@@ -244,11 +244,10 @@ class UstadzProfileController extends GetxController {
   void logout() async {
     try {
       isLoadingLogout.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('userId');
+      final userId = AuthService.to.userId.value;
       final response = await http
           .post(
-            Uri.parse(ApiUrl.logout(userId!)),
+            Uri.parse(ApiUrl.logout(userId)),
             headers: {'Content-Type': 'application/json'},
           )
           .timeout(const Duration(seconds: 30));
@@ -257,10 +256,7 @@ class UstadzProfileController extends GetxController {
         print(data);
       }
       if (response.statusCode == 200) {
-        await prefs.remove('token');
-        await prefs.remove('role');
-        await prefs.remove('userId');
-        await prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {

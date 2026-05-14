@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
+import '../../../../routes/app_pages.dart';
+import '../../../../widgets/islamic_decoration.dart';
+import '../../../../widgets/welcome_card.dart';
 import '../controllers/admin_home_controller.dart';
 
 class AdminHomeView extends GetView<AdminHomeController> {
@@ -13,23 +17,34 @@ class AdminHomeView extends GetView<AdminHomeController> {
       backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(backgroundColor: Color(0xFFF1F5F9), toolbarHeight: 0),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.only(
-            top: 20,
-            left: 20,
-            right: 20,
-            bottom: 30,
+        child: RefreshIndicator(
+          onRefresh: () => controller.fetchTotals(),
+          color: Colors.deepPurpleAccent,
+          backgroundColor: Colors.white,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.only(
+              top: 20,
+              left: 20,
+              right: 20,
+              bottom: 30,
+            ),
+            children: [
+              _buildHeader(context),
+              const SizedBox(height: 30),
+              const WelcomeCard(
+                title: 'Dashboard Admin',
+                subtitle: 'Kelola Data dengan Mudah',
+              ),
+              const SizedBox(height: 25),
+              _buildStatsSection(context),
+              const SizedBox(height: 25),
+              _buildFeatureCards(context),
+              const SizedBox(height: 25),
+              const IslamicDecoration(),
+              const SizedBox(height: 25),
+            ],
           ),
-          children: [
-            _buildHeader(context),
-            const SizedBox(height: 30),
-            _buildWelcomeCard(context),
-            const SizedBox(height: 25),
-            _buildFeatureCards(context),
-            const SizedBox(height: 25),
-            _buildIslamicDecoration(context),
-            const SizedBox(height: 25),
-          ],
         ),
       ),
     );
@@ -42,8 +57,8 @@ class AdminHomeView extends GetView<AdminHomeController> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Colors.deepPurpleAccent.withValues(alpha: 0.3),
-              width: 3,
+              color: Colors.deepPurple.withValues(alpha: 0.3),
+              width: 2,
             ),
             boxShadow: [
               BoxShadow(
@@ -54,7 +69,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
             ],
           ),
           child: CircleAvatar(
-            radius: 28,
+            radius: 26,
             backgroundColor: Colors.grey[200],
             child: Text(
               'A',
@@ -87,9 +102,8 @@ class AdminHomeView extends GetView<AdminHomeController> {
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 style: GoogleFonts.poppins(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.deepPurple[800],
                 ),
               ),
             ],
@@ -180,100 +194,122 @@ class AdminHomeView extends GetView<AdminHomeController> {
     );
   }
 
-  Widget _buildWelcomeCard(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  Widget _buildStatsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Statistik Pengguna',
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
         ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.deepPurpleAccent.withValues(alpha: 0.3),
-            blurRadius: 25,
-            offset: const Offset(0, 15),
-          ),
-          BoxShadow(
-            color: Colors.deepPurple.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        const SizedBox(height: 15),
+        Obx(() {
+          return Row(
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Selamat Datang',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Dashboard Admin',
-                      style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        height: 1.2,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        'Kelola Data dengan Mudah',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                  ],
+                child: _buildStatCard(
+                  title: 'Ustadz/ah',
+                  count: controller.totalUstadz.value,
+                  icon: Icons.school_rounded,
+                  color: Colors.blueAccent,
+                  isLoading: controller.isLoadingStats.value,
+                  onTap: () {
+                    Get.toNamed(Routes.DAFTAR_USTADZ);
+                  },
                 ),
               ),
-              const SizedBox(width: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(16),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildStatCard(
+                  title: 'Orang Tua',
+                  count: controller.totalOrtu.value,
+                  icon: Icons.family_restroom_rounded,
+                  color: Colors.green,
+                  isLoading: controller.isLoadingStats.value,
+                  onTap: () {
+                    Get.toNamed(Routes.DAFTAR_ORTU);
+                  },
                 ),
-                child: const Icon(
-                  Icons.dashboard_rounded,
-                  color: Colors.white,
-                  size: 40,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildStatCard(
+                  title: 'Santri',
+                  count: controller.totalSantri.value,
+                  icon: Icons.group_rounded,
+                  color: Colors.orangeAccent,
+                  isLoading: controller.isLoadingStats.value,
+                  onTap: () {
+                    Get.toNamed(Routes.DAFTAR_SANTRI);
+                  },
                 ),
               ),
             ],
-          ),
-        ],
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildStatCard({
+    required String title,
+    required int count,
+    required IconData icon,
+    required Color color,
+    required bool isLoading,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Ink(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(height: 12),
+            Skeletonizer(
+              enabled: isLoading,
+              child: Text(
+                '$count',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -284,341 +320,127 @@ class AdminHomeView extends GetView<AdminHomeController> {
       children: [
         Text(
           'Kelola Data Pengguna',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.deepPurple[800],
-          ),
+          style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 15),
         // Daftar User (Ustadz/ah, Orang Tua, Santri)
-        _buildRegistrationCard(
-          context,
-          title: 'Daftar Ustadz/ah',
-          subtitle: 'Kelola data ustadz/ah',
-          icon: Icons.person_add_alt_1_rounded,
-          onTap: () => Get.toNamed('/daftar-ustadz'),
-        ),
-        const SizedBox(height: 15),
-        _buildRegistrationCard(
-          context,
-          title: 'Daftar Orang Tua',
-          subtitle: 'Kelola data Orang Tua',
-          icon: Icons.family_restroom_rounded,
-          onTap: () => Get.toNamed('/daftar-ortu'),
-        ),
-        const SizedBox(height: 15),
-        _buildRegistrationCard(
-          context,
-          title: 'Daftar Santri',
-          subtitle: 'Kelola data Santri',
-          icon: Icons.school_outlined,
-          onTap: () => Get.toNamed('/daftar-santri'),
-        ),
-
-        const SizedBox(height: 25),
-        Text(
-          'Fitur Lainnya',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.deepPurple[800],
+        Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ),
-        const SizedBox(height: 15),
-        // Al-Qur'an dan Peringkat
-        Row(
-          children: [
-            Expanded(
-              child: InkWell(
-                onTap: () {
-                  Get.toNamed('/alquran');
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurple.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Icon(
-                          Icons.menu_book_rounded,
-                          color: Colors.deepPurple,
-                          size: 32,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Al-Qur\'an',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          color: Colors.deepPurple[800],
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Daftar Surah',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+          child: Column(
+            children: [
+              _buildModernListTile(
+                context,
+                title: 'Daftar Ustadz/ah',
+                subtitle: 'Kelola data ustadz/ah',
+                icon: Icons.school_rounded,
+                iconColor: Colors.blueAccent,
+                onTap: () => Get.toNamed(Routes.DAFTAR_USTADZ),
               ),
-            ),
-            const SizedBox(width: 15),
-            Expanded(
-              child: InkWell(
-                onTap: () {
-                  Get.toNamed('/peringkat');
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Icon(
-                          Icons.leaderboard_outlined,
-                          color: Colors.orange,
-                          size: 32,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Peringkat',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          color: Colors.deepPurple[800],
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Santri',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: Colors.grey[100],
+                indent: 20,
+                endIndent: 20,
               ),
-            ),
-          ],
+              _buildModernListTile(
+                context,
+                title: 'Daftar Orang Tua',
+                subtitle: 'Kelola data Orang Tua',
+                icon: Icons.family_restroom_rounded,
+                iconColor: Colors.green,
+                onTap: () => Get.toNamed(Routes.DAFTAR_ORTU),
+              ),
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: Colors.grey[100],
+                indent: 20,
+                endIndent: 20,
+              ),
+              _buildModernListTile(
+                context,
+                title: 'Daftar Santri',
+                subtitle: 'Kelola data Santri',
+                icon: Icons.group_rounded,
+                iconColor: Colors.orangeAccent,
+                onTap: () => Get.toNamed(Routes.DAFTAR_SANTRI),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildRegistrationCard(
+  Widget _buildModernListTile(
     BuildContext context, {
     required String title,
     required String subtitle,
     required IconData icon,
+    required Color iconColor,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.deepPurple.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(icon, color: Colors.orangeAccent, size: 28),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black.withValues(alpha: 0.9),
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.deepPurple.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.arrow_forward_ios_rounded,
-                color: Colors.deepPurpleAccent,
-                size: 16,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIslamicDecoration(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.green.withValues(alpha: 0.1),
-            Colors.teal.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.green.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.2),
+                  color: iconColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.mosque, color: Colors.green, size: 28),
+                child: Icon(icon, color: iconColor, size: 24),
               ),
-              const SizedBox(width: 15),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Kalimasada: Tahfidz App',
+                      title,
                       style: GoogleFonts.poppins(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: Colors.green[800],
+                        color: Colors.black87,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
                     ),
+                    const SizedBox(height: 2),
                     Text(
-                      'Menuntut ilmu dengan penuh keikhlasan',
+                      subtitle,
                       style: GoogleFonts.poppins(
                         fontSize: 12,
-                        color: Colors.grey[600],
                         fontWeight: FontWeight.w400,
+                        color: Colors.grey[500],
                       ),
                     ),
                   ],
                 ),
               ),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Colors.grey[400],
+                size: 16,
+              ),
             ],
           ),
-          const SizedBox(height: 15),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.7),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              'طَلَبُ الْعِلْمِ فَرِيْضَةٌ عَلَى كُلِّ مُسْلِمٍ',
-              style: GoogleFonts.amiri(
-                fontSize: 20,
-                color: Colors.green[800],
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Menuntut ilmu itu wajib atas setiap Muslim',
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w400,
-              fontStyle: FontStyle.italic,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+        ),
       ),
     );
   }

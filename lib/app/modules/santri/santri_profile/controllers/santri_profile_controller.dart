@@ -12,7 +12,11 @@ import 'package:mobile_kalimasada/app/data/models/santri.dart';
 import 'package:mobile_kalimasada/app/modules/santri/santri_home/controllers/santri_home_controller.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:path/path.dart' as path;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
+
+enum ChartType { tambahHafalan, murajaah, tahsin }
 
 class SantriProfileController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -26,7 +30,7 @@ class SantriProfileController extends GetxController {
   final imagePicker = ImagePicker();
   var isUploadingImage = false.obs;
   var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+      AppConstants.defaultProfileImageUrl
           .obs;
 
   var namaC = TextEditingController();
@@ -34,6 +38,13 @@ class SantriProfileController extends GetxController {
   var alamatC = TextEditingController();
   var jenisKelaminC = TextEditingController();
   var tanggalLahirC = TextEditingController();
+
+  var isLoadingChart = false.obs;
+  var isChartError = false.obs;
+  var chart = Rxn<c.Chart>();
+  var range = '1w'.obs;
+  var selectedChartType = ChartType.tambahHafalan.obs;
+  var selectedChartMode = 'ayat'.obs;
 
   DateTime? _lastErrorShown;
   DateTime? _lastNoChangeShown;
@@ -84,12 +95,11 @@ class SantriProfileController extends GetxController {
   Future<void> getSantriDetail() async {
     try {
       isLoading.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final santriId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final santriId = AuthService.to.roleId.value;
 
       final response = await http.get(
-        Uri.parse(ApiUrl.santriDetail(santriId!)),
+        Uri.parse(ApiUrl.santriDetail(santriId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -98,10 +108,10 @@ class SantriProfileController extends GetxController {
       );
 
       if (response.statusCode == 200) {
+        getChart();
         final data = jsonDecode(response.body);
         final santri = Santri.fromJson(data['data']);
         santriDetail.value = santri;
-        fotoProfil.value = getImageUrl(santri.fotoProfil!);
         if (kDebugMode) {
           print('Santri detail loaded: ${santri.nama}');
         }
@@ -145,13 +155,12 @@ class SantriProfileController extends GetxController {
 
   Future<void> uploadImage(String imagePath) async {
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final santriId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final santriId = AuthService.to.roleId.value;
 
       final request = http.MultipartRequest(
         'PUT',
-        Uri.parse(ApiUrl.santriDetail(santriId!)),
+        Uri.parse(ApiUrl.santriDetail(santriId)),
       );
 
       request.headers['Authorization'] = 'Bearer $token';
@@ -222,12 +231,7 @@ class SantriProfileController extends GetxController {
   ) async {
     try {
       isSaveLoading.value = true;
-      bool hasNoChange =
-          (nama == santriDetail.value?.nama &&
-          noHp == santriDetail.value?.nomorHp &&
-          alamat == santriDetail.value?.alamat &&
-          jenisKelamin == santriDetail.value?.jenisKelamin &&
-          tanggalLahir == formatDate(santriDetail.value!.tanggalLahir!));
+      bool hasNoChange = (nama == santriDetail.value?.nama);
 
       if (hasNoChange) {
         final now = DateTime.now();
@@ -239,27 +243,18 @@ class SantriProfileController extends GetxController {
         return;
       }
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final santriId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final santriId = AuthService.to.roleId.value;
 
       final response = await http
           .put(
-            Uri.parse(ApiUrl.santriDetail(santriId!)),
+            Uri.parse(ApiUrl.santriDetail(santriId)),
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',
               'x-platform': 'mobile',
             },
-            body: jsonEncode({
-              'nama': nama ?? santriDetail.value?.nama,
-              'nomorHp': noHp ?? santriDetail.value?.nomorHp,
-              'alamat': alamat ?? santriDetail.value?.alamat,
-              'jenisKelamin': jenisKelamin ?? santriDetail.value?.jenisKelamin,
-              'tanggalLahir': convertDisplayToApiFormat(
-                tanggalLahir ?? formatDate(santriDetail.value!.tanggalLahir!),
-              ),
-            }),
+            body: jsonEncode({'nama': nama ?? santriDetail.value?.nama}),
           )
           .timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
@@ -289,11 +284,10 @@ class SantriProfileController extends GetxController {
   void logout() async {
     try {
       isLoadingLogout.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('userId');
+      final userId = AuthService.to.userId.value;
       final response = await http
           .post(
-            Uri.parse(ApiUrl.logout(userId!)),
+            Uri.parse(ApiUrl.logout(userId)),
             headers: {'Content-Type': 'application/json'},
           )
           .timeout(const Duration(seconds: 30));
@@ -302,10 +296,7 @@ class SantriProfileController extends GetxController {
         print(data);
       }
       if (response.statusCode == 200) {
-        await prefs.remove('token');
-        await prefs.remove('role');
-        await prefs.remove('userId');
-        await prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {
@@ -345,5 +336,50 @@ class SantriProfileController extends GetxController {
     } catch (e) {
       return displayDate;
     }
+  }
+
+  void getChart() async {
+    isLoadingChart.value = true;
+    isChartError.value = false;
+    final token = AuthService.to.token.value;
+    try {
+      final santriId = AuthService.to.roleId.value;
+      final queryParams = {
+        'range': range.value,
+        'santriId': santriId.toString(),
+        'mode': selectedChartMode.value,
+      };
+
+      final uri = Uri.parse(ApiUrl.chart).replace(queryParameters: queryParams);
+
+      final response = await http
+          .get(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+              'x-platform': 'mobile',
+            },
+          )
+          .timeout(const Duration(seconds: 30));
+      var data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        chart.value = c.Chart.fromJson(data);
+      } else {
+        isChartError.value = true;
+        ToastUtils.showErrorToast('Gagal mendapatkan data chart');
+      }
+    } catch (e) {
+      isChartError.value = true;
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(
+          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+        );
+      }
+    }
+    isLoadingChart.value = false;
   }
 }

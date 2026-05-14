@@ -1,88 +1,125 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fullscreen_image_viewer/fullscreen_image_viewer.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../data/models/daftar_santri.dart';
+import '../../../../data/models/daftar_santri.dart' as s;
 import '../../../ustadz/detail_santri/controllers/detail_santri_controller.dart';
 import '../controllers/detail_ortu_controller.dart';
 
 class DetailOrtuView extends GetView<DetailOrtuController> {
   const DetailOrtuView({super.key});
+
+  Ortu get _dummyOrtu => Ortu(
+    id: 0,
+    userId: 0,
+    nama: 'Name Placeholder',
+    nomorHp: '081234567890',
+    alamat: 'Jl. Contoh Alamat No. 123',
+    jenisKelamin: 'L',
+    fotoProfil: '',
+    tipe: 'Ayah',
+    user: User(
+      id: 0,
+      email: 'placeholder@email.com',
+      password: '',
+      role: '',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
+    santri: [],
+  );
+
   @override
   Widget build(BuildContext context) {
     return Obx(
       () => Scaffold(
         backgroundColor: const Color(0xFFF1F5F9),
         appBar:
-            controller.ortuDetail.value == null || controller.isLoading.value
+            (!controller.isLoading.value && controller.ortuDetail.value == null)
             ? AppBar(
                 title: const Text(
                   'Detail Orang Tua',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 centerTitle: true,
-                backgroundColor: Colors.deepPurpleAccent,
+                backgroundColor: const Color(0xFFF1F5F9),
                 elevation: 0,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Get.back(),
-                ),
               )
             : null,
-        body: Obx(() {
-          final ortu = controller.ortuDetail.value;
-          final santriList = controller.santriList;
+        body: SafeArea(
+          top: false,
+          child: Obx(() {
+            final ortu = controller.ortuDetail.value;
+            final santriList = controller.santriList;
 
-          // Loading
-          if (controller.isLoading.value) {
-            return _buildLoadingState();
-          }
-          // Empty Data
-          if (ortu == null) {
-            return _buildEmptyState(context);
-          }
+            // Loading
+            if (controller.isLoading.value) {
+              return Skeletonizer(
+                enabled: true,
+                child: _buildContent(_dummyOrtu, const []),
+              );
+            }
+            // Empty Data
+            if (ortu == null) {
+              return _buildEmptyState(context);
+            }
 
-          // Main Content
-          return _buildContent(ortu, santriList);
-        }),
+            // Main Content
+            return _buildContent(ortu, santriList);
+          }),
+        ),
       ),
     );
   }
 
-  RefreshIndicator _buildContent(Ortu ortu, List<Datum> santriList) {
+  RefreshIndicator _buildContent(Ortu ortu, List<s.Datum> santriList) {
     return RefreshIndicator(
       onRefresh: () async {
         controller.getOrtuDetail(controller.ortuId!);
-        controller.getSantriList(controller.ortuId!);
+        if (AuthService.to.isAdmin) {
+          controller.getSantriList(controller.ortuId!);
+        }
       },
+      color: Colors.deepPurpleAccent,
+      backgroundColor: Colors.white,
       child: CustomScrollView(
         slivers: [
           // Custom App Bar with Gradient Background
           SliverAppBar(
             centerTitle: true,
-            title: Text(
-              'Detail Orang Tua',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+            iconTheme: const IconThemeData(color: Colors.white),
+            title: Skeletonizer(
+              enabled: controller.isLoading.value,
+              effect: ShimmerEffect(
+                baseColor: Colors.white.withValues(alpha: 0.2),
+                highlightColor: Colors.white.withValues(alpha: 0.4),
+              ),
+              child: const Text(
+                'Detail Orang Tua',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Get.back(),
+            leading: Skeletonizer(
+              enabled: controller.isLoading.value,
+              effect: ShimmerEffect(
+                baseColor: Colors.white.withValues(alpha: 0.2),
+                highlightColor: Colors.white.withValues(alpha: 0.4),
+              ),
+              child: const BackButton(),
             ),
-
-            expandedHeight: 250,
+            expandedHeight: 230,
             pinned: false,
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -95,83 +132,102 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
                     colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
                   ),
                 ),
-                child: SafeArea(
-                  child: Column(
-                    children: [
-                      // Profile Section
-                      const SizedBox(height: 40),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Profile Picture
-                            Container(
-                              width: 120,
-                              height: 120,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 4,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.2),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 8),
+                child: Skeletonizer(
+                  enabled: controller.isLoading.value,
+                  effect: ShimmerEffect(
+                    baseColor: Colors.white.withValues(alpha: 0.2),
+                    highlightColor: Colors.white.withValues(alpha: 0.4),
+                  ),
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        // Profile Section
+                        const SizedBox(height: 40),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Profile Picture
+                              Container(
+                                width: 110,
+                                height: 110,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 4,
                                   ),
-                                ],
-                              ),
-                              child: ClipOval(
-                                child: CachedNetworkImage(
-                                  imageUrl: controller.getImageUrl(
-                                    controller.fotoProfil.value,
-                                  ),
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => Container(
-                                    color: Colors.grey[300],
-                                    child: const Icon(
-                                      Icons.person,
-                                      size: 40,
-                                      color: Colors.grey,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.2,
+                                      ),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 8),
                                     ),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      Container(
-                                        color: Colors.grey[300],
-                                        child: const Icon(
-                                          Icons.person,
-                                          size: 40,
-                                          color: Colors.grey,
+                                  ],
+                                ),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    FullscreenImageViewer.open(
+                                      context: Get.context!,
+                                      child: Hero(
+                                        tag: 'foto-profil-detail-ortu',
+                                        child: CachedNetworkImage(
+                                          imageUrl: controller.getImageUrl(
+                                            controller.fotoProfil.value,
+                                          ),
+                                          fit: BoxFit.contain,
+                                          placeholder: (context, url) =>
+                                              _buildProfilePlaceholder(),
+                                          errorWidget: (context, url, error) =>
+                                              _buildProfilePlaceholder(),
                                         ),
                                       ),
+                                    );
+                                  },
+                                  child: Hero(
+                                    tag: 'foto-profil-detail-ortu',
+                                    child: ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl: controller.getImageUrl(
+                                          controller.fotoProfil.value,
+                                        ),
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) =>
+                                            _buildProfilePlaceholder(),
+                                        errorWidget: (context, url, error) =>
+                                            _buildProfilePlaceholder(),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
 
-                            const SizedBox(height: 16),
+                              const SizedBox(height: 16),
 
-                            // Name
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: Text(
-                                ortu.nama ?? 'Nama tidak tersedia',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                              // Name
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
+                                child: Text(
+                                  ortu.nama ?? 'Nama tidak tersedia',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -187,7 +243,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
                 _buildPersonalInfoSection(ortu),
 
                 () {
-                  if (controller.isAdmin) {
+                  if (AuthService.to.isAdmin) {
                     return Column(
                       children: [
                         const SizedBox(height: 24),
@@ -208,31 +264,16 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
     );
   }
 
-  Center _buildLoadingState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(),
-          SizedBox(height: 16),
-          Text(
-            'Loading...',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   RefreshIndicator _buildEmptyState(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
         controller.getOrtuDetail(controller.ortuId!);
+        if (AuthService.to.isAdmin) {
+          controller.getSantriList(controller.ortuId!);
+        }
       },
+      color: Colors.deepPurpleAccent,
+      backgroundColor: Colors.white,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: SizedBox(
@@ -246,29 +287,32 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Icon(
-                  Icons.person,
+                  Icons.person_off_rounded,
                   size: 48,
                   color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                'Data tidak ditemukan',
+                'Data orang tua tidak ditemukan',
                 style: GoogleFonts.poppins(
                   fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[700],
+                  fontWeight: FontWeight.w600,
                 ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
                 'Tarik ke bawah untuk refresh',
                 style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -297,7 +341,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
           Text(
             'Informasi Pribadi',
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -306,28 +350,28 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
 
           _buildInfoTile(
             icon: Icons.email_rounded,
-            label: 'email',
+            label: 'Email',
             value: ortu.user?.email ?? '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.phone,
             label: 'No. Telepon',
-            value: ortu.nomorHp ?? 'Tidak ada data',
-            telepon: ortu.nomorHp,
+            value: ortu.nomorHp ?? '-',
+            telepon: controller.isLoading.value ? null : ortu.nomorHp,
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
-            icon: Icons.person,
+            icon: Icons.family_restroom_rounded,
             label: 'Peran',
-            value: ortu.tipe ?? 'Tidak ada data',
+            value: ortu.tipe ?? '-',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: ortu.jenisKelamin?.toLowerCase() == 'l'
@@ -339,19 +383,19 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
                 : 'Perempuan',
           ),
 
-          const SizedBox(height: 12),
+          Divider(color: Colors.grey[200], height: 16),
 
           _buildInfoTile(
             icon: Icons.location_on,
             label: 'Alamat',
-            value: ortu.alamat ?? 'Tidak ada data',
+            value: ortu.alamat ?? '-',
           ),
         ],
       ),
     );
   }
 
-  Widget _buildChildrenList(List<Datum> santriList) {
+  Widget _buildChildrenList(List<s.Datum> santriList) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -371,7 +415,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
           Text(
             'Daftar Anak',
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -429,9 +473,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
                 return _buildChildTile(
                   id: santri.id.toString(),
                   nama: santri.nama ?? '-',
-                  noInduk: santri.noInduk ?? '-',
                   tahap: santri.tahapHafalan ?? '-',
-                  jenisKelamin: santri.jenisKelamin ?? '-',
                 );
               },
             );
@@ -448,11 +490,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
     String? telepon,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       child: Row(
         children: [
           Container(
@@ -550,9 +588,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
   Widget _buildChildTile({
     required String id,
     required String nama,
-    required String noInduk,
     required String tahap,
-    required String jenisKelamin,
   }) {
     return GestureDetector(
       onTap: () {
@@ -573,16 +609,12 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: jenisKelamin.toLowerCase() == 'l'
-                    ? Colors.blue.withValues(alpha: 0.1)
-                    : Colors.pink.withValues(alpha: 0.1),
+                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.person,
-                color: jenisKelamin.toLowerCase() == 'l'
-                    ? Colors.blue
-                    : Colors.pink,
+                color: Colors.deepPurpleAccent,
                 size: 20,
               ),
             ),
@@ -602,23 +634,12 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    noInduk,
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
                   const SizedBox(height: 4),
                   // Badges Row
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
-                      vertical: 4,
+                      vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: _getTahapColor(tahap).withValues(alpha: 0.2),
@@ -640,7 +661,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
                 ],
               ),
             ),
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             const Icon(
               Icons.keyboard_arrow_right_rounded,
               color: Colors.deepPurpleAccent,
@@ -675,5 +696,12 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
       default:
         return 'Tahap ?';
     }
+  }
+
+  Widget _buildProfilePlaceholder() {
+    return Container(
+      color: Colors.grey[300],
+      child: const Icon(Icons.person, size: 40, color: Colors.grey),
+    );
   }
 }

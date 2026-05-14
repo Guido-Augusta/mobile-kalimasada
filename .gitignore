@@ -64,3 +64,5 @@ ios/Pods/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+flutter_analyze.txt

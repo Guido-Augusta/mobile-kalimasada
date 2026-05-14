@@ -14,6 +14,7 @@ class PeringkatController extends GetxController {
 
   var selectedTahap = 'level1'.obs;
   var searchQuery = ''.obs;
+  final appliedSearchQuery = ''.obs;
   var searchController = TextEditingController();
 
   final int _perPage = 20;
@@ -32,6 +33,7 @@ class PeringkatController extends GetxController {
     _setupScrollController();
 
     debounce(searchQuery, (callback) {
+      appliedSearchQuery.value = searchQuery.value;
       getPeringkat();
     }, time: const Duration(milliseconds: 700));
   }

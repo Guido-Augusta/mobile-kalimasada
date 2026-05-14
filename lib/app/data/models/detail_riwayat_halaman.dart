@@ -1,10 +1,10 @@
-class DetailRiwayatHafalan {
-  DetailRiwayatHafalan({required this.data});
+class DetailRiwayatHalaman {
+  DetailRiwayatHalaman({required this.data});
 
   final Data? data;
 
-  factory DetailRiwayatHafalan.fromJson(Map<String, dynamic> json) {
-    return DetailRiwayatHafalan(
+  factory DetailRiwayatHalaman.fromJson(Map<String, dynamic> json) {
+    return DetailRiwayatHalaman(
       data: json["data"] == null ? null : Data.fromJson(json["data"]),
     );
   }
@@ -22,8 +22,13 @@ class Data {
     required this.tanggal,
     required this.status,
     required this.ustadz,
+    required this.kualitas,
+    required this.keterangan,
     required this.catatan,
     required this.totalPoin,
+    required this.juz,
+    required this.rangeAyat,
+    required this.rangeHalaman,
     required this.surah,
     required this.daftarAyat,
   });
@@ -31,9 +36,14 @@ class Data {
   final DateTime? tanggal;
   final String? status;
   final Ustadz? ustadz;
+  final String? kualitas;
+  final String? keterangan;
   final String? catatan;
   final int? totalPoin;
-  final Surah? surah;
+  final int? juz;
+  final Range? rangeAyat;
+  final Range? rangeHalaman;
+  final List<Surah> surah;
   final List<DaftarAyat> daftarAyat;
 
   factory Data.fromJson(Map<String, dynamic> json) {
@@ -41,9 +51,20 @@ class Data {
       tanggal: DateTime.tryParse(json["tanggal"] ?? ""),
       status: json["status"],
       ustadz: json["ustadz"] == null ? null : Ustadz.fromJson(json["ustadz"]),
+      kualitas: json["kualitas"],
+      keterangan: json["keterangan"],
       catatan: json["catatan"],
       totalPoin: json["totalPoin"],
-      surah: json["surah"] == null ? null : Surah.fromJson(json["surah"]),
+      juz: json["juz"],
+      rangeAyat: json["rangeAyat"] == null
+          ? null
+          : Range.fromJson(json["rangeAyat"]),
+      rangeHalaman: json["rangeHalaman"] == null
+          ? null
+          : Range.fromJson(json["rangeHalaman"]),
+      surah: json["surah"] == null
+          ? []
+          : List<Surah>.from(json["surah"]!.map((x) => Surah.fromJson(x))),
       daftarAyat: json["daftarAyat"] == null
           ? []
           : List<DaftarAyat>.from(
@@ -57,15 +78,20 @@ class Data {
         "${tanggal?.year.toString().padLeft(4, '0')}-${tanggal?.month.toString().padLeft(2, '0')}-${tanggal?.day.toString().padLeft(2, '0')}",
     "status": status,
     "ustadz": ustadz?.toJson(),
+    "kualitas": kualitas,
+    "keterangan": keterangan,
     "catatan": catatan,
     "totalPoin": totalPoin,
-    "surah": surah?.toJson(),
+    "juz": juz,
+    "rangeAyat": rangeAyat?.toJson(),
+    "rangeHalaman": rangeHalaman?.toJson(),
+    "surah": surah.map((x) => x.toJson()).toList(),
     "daftarAyat": daftarAyat.map((x) => x.toJson()).toList(),
   };
 
   @override
   String toString() {
-    return "$tanggal, $status, $ustadz, $catatan, $totalPoin, $surah, $daftarAyat, ";
+    return "$tanggal, $status, $ustadz, $kualitas, $keterangan, $catatan, $totalPoin, $juz, $rangeAyat, $rangeHalaman, $surah, $daftarAyat, ";
   }
 }
 
@@ -76,9 +102,12 @@ class DaftarAyat {
     required this.arab,
     required this.latin,
     required this.terjemah,
+    required this.halaman,
     required this.juz,
     required this.surah,
     required this.poinDidapat,
+    required this.kualitas,
+    required this.keterangan,
   });
 
   final int? id;
@@ -86,9 +115,12 @@ class DaftarAyat {
   final String? arab;
   final String? latin;
   final String? terjemah;
+  final int? halaman;
   final int? juz;
   final Surah? surah;
   final int? poinDidapat;
+  final String? kualitas;
+  final String? keterangan;
 
   factory DaftarAyat.fromJson(Map<String, dynamic> json) {
     return DaftarAyat(
@@ -97,9 +129,12 @@ class DaftarAyat {
       arab: json["arab"],
       latin: json["latin"],
       terjemah: json["terjemah"],
+      halaman: json["halaman"],
       juz: json["juz"],
       surah: json["surah"] == null ? null : Surah.fromJson(json["surah"]),
       poinDidapat: json["poinDidapat"],
+      kualitas: json["kualitas"],
+      keterangan: json["keterangan"],
     );
   }
 
@@ -109,14 +144,17 @@ class DaftarAyat {
     "arab": arab,
     "latin": latin,
     "terjemah": terjemah,
+    "halaman": halaman,
     "juz": juz,
     "surah": surah?.toJson(),
     "poinDidapat": poinDidapat,
+    "kualitas": kualitas,
+    "keterangan": keterangan,
   };
 
   @override
   String toString() {
-    return "$id, $nomorAyat, $arab, $latin, $terjemah, $juz, $surah, $poinDidapat, ";
+    return "$id, $nomorAyat, $arab, $latin, $terjemah, $halaman, $juz, $surah, $poinDidapat, $kualitas, $keterangan, ";
   }
 }
 
@@ -144,6 +182,24 @@ class Surah {
   @override
   String toString() {
     return "$id, $nama, $namaLatin, ";
+  }
+}
+
+class Range {
+  Range({required this.awal, required this.akhir});
+
+  final int? awal;
+  final int? akhir;
+
+  factory Range.fromJson(Map<String, dynamic> json) {
+    return Range(awal: json["awal"], akhir: json["akhir"]);
+  }
+
+  Map<String, dynamic> toJson() => {"awal": awal, "akhir": akhir};
+
+  @override
+  String toString() {
+    return "$awal, $akhir, ";
   }
 }
 

@@ -1,11 +1,13 @@
 class Chart {
-  Chart({required this.santri, required this.data});
+  Chart({required this.mode, required this.santri, required this.data});
 
+  final String? mode;
   final Santri? santri;
   final List<Datum> data;
 
   factory Chart.fromJson(Map<String, dynamic> json) {
     return Chart(
+      mode: json["mode"],
       santri: json["santri"] == null ? null : Santri.fromJson(json["santri"]),
       data: json["data"] == null
           ? []
@@ -14,13 +16,14 @@ class Chart {
   }
 
   Map<String, dynamic> toJson() => {
+    "mode": mode,
     "santri": santri?.toJson(),
     "data": data.map((x) => x.toJson()).toList(),
   };
 
   @override
   String toString() {
-    return "$santri, $data, ";
+    return "$mode, $santri, $data, ";
   }
 }
 
@@ -29,17 +32,20 @@ class Datum {
     required this.tanggal,
     required this.tambahHafalan,
     required this.murajaah,
+    required this.tahsin,
   });
 
   final DateTime? tanggal;
   final int? tambahHafalan;
   final int? murajaah;
+  final int? tahsin;
 
   factory Datum.fromJson(Map<String, dynamic> json) {
     return Datum(
       tanggal: DateTime.tryParse(json["tanggal"] ?? ""),
       tambahHafalan: json["tambahHafalan"],
       murajaah: json["murajaah"],
+      tahsin: json["tahsin"],
     );
   }
 
@@ -48,11 +54,12 @@ class Datum {
         "${tanggal?.year.toString().padLeft(4, '0')}-${tanggal?.month.toString().padLeft(2, '0')}-${tanggal?.day.toString().padLeft(2, '0')}",
     "tambahHafalan": tambahHafalan,
     "murajaah": murajaah,
+    "tahsin": tahsin,
   };
 
   @override
   String toString() {
-    return "$tanggal, $tambahHafalan, $murajaah, ";
+    return "$tanggal, $tambahHafalan, $murajaah, $tahsin, ";
   }
 }
 

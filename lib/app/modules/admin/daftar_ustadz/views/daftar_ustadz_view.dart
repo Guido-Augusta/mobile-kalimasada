@@ -13,7 +13,7 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF1F5F9),
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         title: const Text(
           'Daftar Ustadz/ah',
@@ -43,77 +43,81 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
           ),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          controller.fetchData();
-        },
-        child: NotificationListener<UserScrollNotification>(
-          onNotification: (notification) {
-            if (notification.direction == ScrollDirection.reverse) {
-              if (controller.isFabVisible.value) {
-                controller.isFabVisible.value = false;
-              }
-            } else if (notification.direction == ScrollDirection.forward) {
-              if (!controller.isFabVisible.value) {
-                controller.isFabVisible.value = true;
-              }
-            }
-            return true;
+      body: SafeArea(
+        top: false,
+        child: RefreshIndicator(
+          onRefresh: () async {
+            controller.fetchData();
           },
-          child: ListView(
-            controller: controller.scrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: [
-              // Search Bar
-              _buildSearchBar(),
-
-              // Student List
-              Obx(() {
-                if (controller.isLoading.value &&
-                    controller.searchQuery.value.isEmpty) {
-                  return _buildLoadingIndicator();
-                } else if (controller.ustadzList.isEmpty) {
-                  return _buildEmptyState();
-                } else if (controller.searchQuery.value.isNotEmpty &&
-                    controller.ustadzList.isEmpty) {
-                  return _buildEmptyState();
+          color: Colors.deepPurpleAccent,
+          backgroundColor: Colors.white,
+          child: NotificationListener<UserScrollNotification>(
+            onNotification: (notification) {
+              if (notification.direction == ScrollDirection.reverse) {
+                if (controller.isFabVisible.value) {
+                  controller.isFabVisible.value = false;
                 }
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
-                  itemCount:
-                      controller.ustadzList.length +
-                      (controller.hasMore.value ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index >= controller.ustadzList.length) {
-                      return _buildLoadMoreIndicator();
-                    }
-                    final ustadz = controller.ustadzList[index];
-                    return _buildUstadzCard(ustadz);
-                  },
-                );
-              }),
-            ],
+              } else if (notification.direction == ScrollDirection.forward) {
+                if (!controller.isFabVisible.value) {
+                  controller.isFabVisible.value = true;
+                }
+              }
+              return true;
+            },
+            child: ListView(
+              controller: controller.scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                // Search Bar
+                _buildSearchBar(),
+
+                // Student List
+                Obx(() {
+                  if (controller.isLoading.value &&
+                      controller.searchQuery.value.isEmpty) {
+                    return _buildLoadingIndicator();
+                  } else if (controller.ustadzList.isEmpty) {
+                    return _buildEmptyState();
+                  } else if (controller.searchQuery.value.isNotEmpty &&
+                      controller.ustadzList.isEmpty) {
+                    return _buildEmptyState();
+                  }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
+                    itemCount:
+                        controller.ustadzList.length +
+                        (controller.hasMore.value ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= controller.ustadzList.length) {
+                        return _buildLoadMoreIndicator();
+                      }
+                      final ustadz = controller.ustadzList[index];
+                      return _buildUstadzCard(ustadz);
+                    },
+                  );
+                }),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Padding _buildSearchBar() {
+  Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey[200]!,
-              spreadRadius: 2,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -123,12 +127,18 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
             onChanged: (value) {
               controller.searchQuery.value = value;
             },
+            style: GoogleFonts.poppins(fontSize: 14),
             decoration: InputDecoration(
               hintText: 'Cari ustadz/ah...',
-              prefixIcon: const Icon(Icons.search, color: Colors.grey),
+              hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+              prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[400]),
               suffixIcon: controller.searchQuery.value.isNotEmpty
                   ? IconButton(
-                      icon: const Icon(Icons.clear_rounded, color: Colors.grey),
+                      icon: Icon(
+                        Icons.clear_rounded,
+                        color: Colors.grey[400],
+                        size: 20,
+                      ),
                       onPressed: () {
                         controller.searchQuery.value = '';
                         controller.searchController.clear();
@@ -137,7 +147,7 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
                   : null,
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
-                vertical: 16,
+                vertical: 14,
                 horizontal: 20,
               ),
             ),
@@ -156,7 +166,7 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
         const SizedBox(height: 16),
         Text(
           'Tidak ada data ustadz/ah',
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             color: Colors.grey[600],
             fontSize: 18,
             fontWeight: FontWeight.w500,
@@ -165,11 +175,11 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
         const SizedBox(height: 8),
         Obx(
           () => Text(
-            controller.searchQuery.value.isNotEmpty &&
-                    controller.ustadzList.isEmpty
+            (controller.appliedSearchQuery.value.isNotEmpty &&
+                    controller.ustadzList.isEmpty)
                 ? 'Ustadz/ah tidak ditemukan'
                 : 'Tarik ke bawah untuk refresh',
-            style: TextStyle(color: Colors.grey[500], fontSize: 14),
+            style: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 14),
           ),
         ),
       ],
@@ -193,13 +203,13 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: 100),
-          CircularProgressIndicator(
+          const CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Memuat data...',
-            style: TextStyle(color: Colors.grey, fontSize: 16),
+            style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
           ),
         ],
       ),
@@ -207,158 +217,193 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
   }
 
   Widget _buildUstadzCard(Datum ustadz) {
-    return Card(
-      color: Colors.white,
+    String getGenderLabel(String gender) {
+      if (gender.toLowerCase() == 'l') {
+        return 'Laki-laki';
+      } else if (gender.toLowerCase() == 'p') {
+        return 'Perempuan';
+      } else {
+        return '-';
+      }
+    }
+
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 3,
-      shadowColor: Colors.grey.withValues(alpha: 0.1),
-      child: InkWell(
-        onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-          Get.toNamed(
-            '/detail-ustadz',
-            arguments: {'ustadzId': ustadz.id.toString()},
-          );
-        },
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Profile Picture
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.grey[200],
-                      border: Border.all(color: Colors.grey[300]!, width: 2),
-                    ),
-                    child: ClipOval(
-                      child:
-                          ustadz.fotoProfil != null ||
-                              ustadz.fotoProfil!.isNotEmpty ||
-                              ustadz.fotoProfil! != ''
-                          ? CachedNetworkImage(
-                              imageUrl: controller.getImageUrl(
-                                ustadz.fotoProfil!,
-                              ),
-                              fit: BoxFit.cover,
-                              width: 60,
-                              height: 60,
-                              placeholder: (context, url) => Icon(
-                                Icons.person,
-                                size: 30,
-                                color: Colors.grey[400],
-                              ),
-                              errorWidget: (context, url, error) => Icon(
-                                Icons.person,
-                                size: 30,
-                                color: Colors.grey[400],
-                              ),
-                            )
-                          : Icon(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            Get.toNamed(
+              '/detail-ustadz',
+              arguments: {'ustadzId': ustadz.id.toString()},
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: [
+                // Profile Picture
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.grey[50],
+                    border: Border.all(color: Colors.grey[100]!, width: 2),
+                  ),
+                  child: ClipOval(
+                    child:
+                        ustadz.fotoProfil != null &&
+                            ustadz.fotoProfil!.isNotEmpty
+                        ? CachedNetworkImage(
+                            imageUrl: controller.getImageUrl(
+                              ustadz.fotoProfil!,
+                            ),
+                            fit: BoxFit.cover,
+                            width: 56,
+                            height: 56,
+                            placeholder: (context, url) => Icon(
                               Icons.person,
-                              size: 30,
+                              size: 28,
                               color: Colors.grey[400],
                             ),
-                    ),
+                            errorWidget: (context, url, error) => Icon(
+                              Icons.person,
+                              size: 28,
+                              color: Colors.grey[400],
+                            ),
+                          )
+                        : Icon(Icons.person, size: 28, color: Colors.grey[400]),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Nama, No HP, Email
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    ustadz.nama ?? 'Nama tidak tersedia',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    ustadz.user?.email ?? '-',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    ustadz.nomorHp ?? '-',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            PopupMenuButton(
-                              itemBuilder: (context) => [
-                                PopupMenuItem(
-                                  value: 'edit',
-                                  child: const Text('Edit'),
-                                  onTap: () {
-                                    Get.toNamed(
-                                      '/edit-ustadz',
-                                      arguments: {
-                                        'ustadzId': ustadz.id.toString(),
-                                      },
-                                    );
-                                  },
-                                ),
-                                PopupMenuItem(
-                                  value: 'delete',
-                                  child: const Text('Hapus'),
-                                  onTap: () {
-                                    _showDeleteAccountDialog(context, ustadz);
-                                  },
-                                ),
-                              ],
-                              onSelected: (value) {},
-                              color: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              popUpAnimationStyle: const AnimationStyle(
-                                curve: Curves.easeInOut,
-                                duration: Duration(milliseconds: 150),
-                              ),
-                              style: ButtonStyle(
-                                visualDensity: VisualDensity.compact,
-                              ),
-                            ),
-                          ],
+                ),
+                const SizedBox(width: 14),
+
+                // Info Section
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        ustadz.nama ?? 'Nama tidak tersedia',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
                         ),
-                      ],
-                    ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        ustadz.user?.email ?? '-',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        getGenderLabel(ustadz.jenisKelamin ?? '-'),
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: Colors.grey[500],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ],
+                ),
+
+                // Admin Menu Actions
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    Icons.more_vert_rounded,
+                    color: Colors.grey[400],
+                    size: 22,
+                  ),
+                  padding: EdgeInsets.zero,
+                  surfaceTintColor: Colors.transparent,
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  offset: const Offset(0, 40),
+                  elevation: 4,
+                  shadowColor: Colors.black.withValues(alpha: 0.2),
+                  onOpened: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.edit_outlined,
+                            size: 18,
+                            color: Colors.orange[600],
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Edit Profil',
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.delete_outline_rounded,
+                            size: 18,
+                            color: Colors.red[600],
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Hapus Akun',
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      Get.toNamed(
+                        '/edit-ustadz',
+                        arguments: {'ustadzId': ustadz.id.toString()},
+                      );
+                    } else if (value == 'delete') {
+                      _showDeleteAccountDialog(Get.context!, ustadz);
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -371,25 +416,62 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
-          title: Text(
-            'Hapus Akun',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          title: Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.red[600]),
+              const SizedBox(width: 10),
+              Text(
+                'Konfirmasi Hapus',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18,
+                ),
+              ),
+            ],
           ),
-          content: Text(
-            'Apakah anda yakin ingin menghapus akun ${ustadz.user?.email ?? 'ini'}?',
-            style: GoogleFonts.poppins(),
+          content: Text.rich(
+            TextSpan(
+              text: 'Apakah anda yakin ingin menghapus akun ',
+              children: [
+                TextSpan(
+                  text: (ustadz.jenisKelamin == 'L') ? 'ustadz ' : 'ustadzah ',
+                ),
+                TextSpan(
+                  text: (ustadz.nama?.isNotEmpty ?? false)
+                      ? ustadz.nama
+                      : 'ini',
+                  style: TextStyle(
+                    fontWeight: (ustadz.nama?.isNotEmpty ?? false)
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    color: (ustadz.nama?.isNotEmpty ?? false)
+                        ? Colors.black87
+                        : null,
+                  ),
+                ),
+                const TextSpan(text: '? Tindakan ini tidak dapat dibatalkan.'),
+              ],
+            ),
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: Colors.grey[700],
+              height: 1.5,
+            ),
           ),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           actions: [
             TextButton(
-              onPressed: () {
-                Get.back();
-              },
+              onPressed: () => Get.back(),
               child: Text(
-                'Tidak',
-                style: GoogleFonts.poppins(color: Colors.grey[600]),
+                'Batal',
+                style: GoogleFonts.poppins(
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             const SizedBox(width: 4),
@@ -401,28 +483,29 @@ class DaftarUstadzView extends GetView<DaftarUstadzController> {
                         controller.deleteUstadzAccount(ustadz.id!.toString());
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Colors.red[600],
                   foregroundColor: Colors.white,
+                  elevation: 0,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
-                    vertical: 8,
+                    vertical: 10,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
                 child: controller.isLoadingDeleteAccount.value
                     ? const SizedBox(
-                        width: 16,
-                        height: 16,
+                        width: 20,
+                        height: 20,
                         child: CircularProgressIndicator(
-                          strokeWidth: 1,
+                          strokeWidth: 2,
                           color: Colors.white,
                         ),
                       )
                     : Text(
-                        'Ya',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                        'Hapus Akun',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
                       ),
               ),
             ),

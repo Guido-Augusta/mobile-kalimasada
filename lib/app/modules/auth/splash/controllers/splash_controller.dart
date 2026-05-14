@@ -8,7 +8,7 @@ import 'package:http/http.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
 
 class SplashController extends GetxController {
   final isConnectedToInternet = false.obs;
@@ -55,18 +55,17 @@ class SplashController extends GetxController {
 
   void checkLoginStatus() async {
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final role = prefs.getString('role');
-      final userId = prefs.getString('userId');
-      final roleId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final role = AuthService.to.roleString;
+      final userId = AuthService.to.userId.value;
+      final roleId = AuthService.to.roleId.value;
       if (kDebugMode) {
         print(token);
         print(role);
         print('userId: $userId');
         print('roleId: $roleId');
       }
-      if (token != null) {
+      if (token.isNotEmpty) {
         if (role == 'santri') {
           getSantri();
         } else if (role == 'ustadz') {
@@ -74,7 +73,10 @@ class SplashController extends GetxController {
         } else if (role == 'ortu') {
           getOrtu();
         } else if (role == 'admin') {
-          Get.offAllNamed('/admin-home');
+          getPeringkat();
+        } else {
+          AuthService.to.logout();
+          Get.offAllNamed('/login');
         }
       } else {
         Get.offAllNamed('/login');
@@ -143,11 +145,10 @@ class SplashController extends GetxController {
 
   Future<void> getSantri() async {
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final santriId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final santriId = AuthService.to.roleId.value;
       final response = await get(
-        Uri.parse(ApiUrl.santriDetail(santriId!)),
+        Uri.parse(ApiUrl.santriDetail(santriId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -157,19 +158,13 @@ class SplashController extends GetxController {
       if (response.statusCode == 200) {
         Get.offAllNamed('/santri-main');
       } else if (response.statusCode == 401) {
-        prefs.remove('token');
-        prefs.remove('role');
-        prefs.remove('userId');
-        prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showErrorToast(
           'Token tidak ditemukan\nSilakan login kembali',
         );
       } else {
-        prefs.remove('token');
-        prefs.remove('role');
-        prefs.remove('userId');
-        prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showErrorToast('Gagal memuat data\nSilakan login kembali');
       }
@@ -182,11 +177,10 @@ class SplashController extends GetxController {
 
   Future<void> getUstadz() async {
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final ustadzId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final ustadzId = AuthService.to.roleId.value;
       final response = await get(
-        Uri.parse(ApiUrl.ustadzDetail(ustadzId!)),
+        Uri.parse(ApiUrl.ustadzDetail(ustadzId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -196,19 +190,13 @@ class SplashController extends GetxController {
       if (response.statusCode == 200) {
         Get.offAllNamed('/ustadz-main');
       } else if (response.statusCode == 401) {
-        prefs.remove('token');
-        prefs.remove('role');
-        prefs.remove('userId');
-        prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showErrorToast(
           'Token tidak ditemukan\nSilakan login kembali',
         );
       } else {
-        prefs.remove('token');
-        prefs.remove('role');
-        prefs.remove('userId');
-        prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showErrorToast('Gagal memuat data\nSilakan login kembali');
       }
@@ -221,11 +209,10 @@ class SplashController extends GetxController {
 
   void getOrtu() async {
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final ortuId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final ortuId = AuthService.to.roleId.value;
       final response = await get(
-        Uri.parse(ApiUrl.ortuDetail(ortuId!)),
+        Uri.parse(ApiUrl.ortuDetail(ortuId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -235,19 +222,52 @@ class SplashController extends GetxController {
       if (response.statusCode == 200) {
         Get.offAllNamed('/ortu-main');
       } else if (response.statusCode == 401) {
-        prefs.remove('token');
-        prefs.remove('role');
-        prefs.remove('userId');
-        prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showErrorToast(
           'Token tidak ditemukan\nSilakan login kembali',
         );
       } else {
-        prefs.remove('token');
-        prefs.remove('role');
-        prefs.remove('userId');
-        prefs.remove('roleId');
+        await AuthService.to.logout();
+        Get.offAllNamed('/login');
+        ToastUtils.showErrorToast('Gagal memuat data\nSilakan login kembali');
+      }
+    } catch (e) {
+      ToastUtils.showErrorToast(
+        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      );
+    }
+  }
+
+  void getPeringkat() async {
+    try {
+      final token = AuthService.to.token.value;
+
+      final queryParams = {'page': '1', 'limit': '1', 'tahapHafalan': 'level1'};
+
+      final uri = Uri.parse(
+        ApiUrl.santriRank,
+      ).replace(queryParameters: queryParams);
+
+      final response = await get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'x-platform': 'mobile',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Get.offAllNamed('/admin-main');
+      } else if (response.statusCode == 401) {
+        await AuthService.to.logout();
+        Get.offAllNamed('/login');
+        ToastUtils.showErrorToast(
+          'Token tidak ditemukan\nSilakan login kembali',
+        );
+      } else {
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showErrorToast('Gagal memuat data\nSilakan login kembali');
       }

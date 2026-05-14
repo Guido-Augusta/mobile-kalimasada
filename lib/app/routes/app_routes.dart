@@ -20,7 +20,7 @@ abstract class Routes {
   static const DETAIL_RIWAYAT_HAFALAN = _Paths.DETAIL_RIWAYAT_HAFALAN;
   static const PERINGKAT = _Paths.PERINGKAT;
   static const SANTRI_PROFILE = _Paths.SANTRI_PROFILE;
-  static const DETAIL_PROGRES = _Paths.DETAIL_PROGRES;
+  static const DETAIL_HAFALAN_SURAH = _Paths.DETAIL_HAFALAN_SURAH;
   static const DETAIL_SURAH = _Paths.DETAIL_SURAH;
   static const ORTU_PROFILE = _Paths.ORTU_PROFILE;
   static const CHANGE_PASSWORD = _Paths.CHANGE_PASSWORD;
@@ -38,6 +38,9 @@ abstract class Routes {
   static const DETAIL_USTADZ = _Paths.DETAIL_USTADZ;
   static const TAMBAH_USTADZ = _Paths.TAMBAH_USTADZ;
   static const EDIT_USTADZ = _Paths.EDIT_USTADZ;
+  static const DETAIL_HAFALAN_JUZ = _Paths.DETAIL_HAFALAN_JUZ;
+  static const DETAIL_JUZ = _Paths.DETAIL_JUZ;
+  static const ADMIN_MAIN = _Paths.ADMIN_MAIN;
 }
 
 abstract class _Paths {
@@ -59,7 +62,7 @@ abstract class _Paths {
   static const DETAIL_RIWAYAT_HAFALAN = '/detail-riwayat-hafalan';
   static const PERINGKAT = '/peringkat';
   static const SANTRI_PROFILE = '/santri-profile';
-  static const DETAIL_PROGRES = '/detail-progres';
+  static const DETAIL_HAFALAN_SURAH = '/detail-hafalan-surah';
   static const DETAIL_SURAH = '/detail-surah';
   static const ORTU_PROFILE = '/ortu-profile';
   static const CHANGE_PASSWORD = '/change-password';
@@ -77,4 +80,7 @@ abstract class _Paths {
   static const DETAIL_USTADZ = '/detail-ustadz';
   static const TAMBAH_USTADZ = '/tambah-ustadz';
   static const EDIT_USTADZ = '/edit-ustadz';
+  static const DETAIL_HAFALAN_JUZ = '/detail-hafalan-juz';
+  static const DETAIL_JUZ = '/detail-juz';
+  static const ADMIN_MAIN = '/admin-main';
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
@@ -8,20 +9,32 @@ import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart' as o;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class OrtuHomeController extends GetxController {
-  var isLoading = true.obs;
-  var isLoadingChildren = true.obs;
-  var isLoadingLogout = false.obs;
-  var fotoProfil =
-      'https://res.cloudinary.com/dqrppoiza/image/upload/v1754292060/placeholder_profile_ff5xwy.jpg'
+  // ── State Variables ────────────────────────────────────────────────────────
+  final isLoading = true.obs;
+  final isLoadingChildren = true.obs;
+  final isLoadingLogout = false.obs;
+  final isLoadingMore = false.obs;
+
+  final fotoProfil =
+      AppConstants.defaultProfileImageUrl
           .obs;
 
-  var ortu = Rxn<o.Ortu>();
-  var childrenList = RxList<s.Santri>();
+  final ortu = Rxn<o.Ortu>();
+  final childrenList = RxList<s.Santri>();
 
-  var currentIndex = 0.obs;
+  // ── Pagination & Search ───────────────────────────────────────────────────
+  final int _perPage = 10;
+  int currentPage = 1;
+  final hasMore = true.obs;
+
+  final searchQuery = ''.obs;
+  final appliedSearchQuery = ''.obs;
+  final searchController = TextEditingController();
+  final scrollController = ScrollController();
 
   DateTime? _lastErrorShown;
 
@@ -29,6 +42,31 @@ class OrtuHomeController extends GetxController {
   void onInit() {
     super.onInit();
     getOrtu();
+    _setupScrollController();
+    _setupSearchDebounce();
+  }
+
+  void _setupScrollController() {
+    scrollController.addListener(() {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
+        if (hasMore.value && !isLoadingMore.value) {
+          loadMoreChildrenData();
+        }
+      }
+    });
+  }
+
+  void _setupSearchDebounce() {
+    debounce(searchQuery, (callback) {
+      appliedSearchQuery.value = searchQuery.value;
+      fetchChildrenData();
+    }, time: const Duration(milliseconds: 700));
+  }
+
+  void resetPagination() {
+    currentPage = 1;
+    hasMore.value = true;
   }
 
   String getImageUrl(String imageUrl) {
@@ -39,12 +77,11 @@ class OrtuHomeController extends GetxController {
   Future<void> getOrtu() async {
     try {
       isLoading.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final ortuId = prefs.getString('roleId');
+      final token = AuthService.to.token.value;
+      final ortuId = AuthService.to.roleId.value;
 
       final response = await get(
-        Uri.parse(ApiUrl.ortuDetail(ortuId!)),
+        Uri.parse(ApiUrl.ortuDetail(ortuId)),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -52,18 +89,14 @@ class OrtuHomeController extends GetxController {
         },
       ).timeout(const Duration(seconds: 30));
       var data = jsonDecode(response.body);
-      if (kDebugMode) {
-        print(response.statusCode);
-        print(data);
-      }
+
       if (response.statusCode == 200) {
         ortu.value = o.Ortu.fromJson(data['data']);
-        fotoProfil.value = getImageUrl(ortu.value!.fotoProfil!);
-
-        if (ortu.value?.santri != null && ortu.value!.santri.isNotEmpty) {
-          isLoadingChildren.value = true;
-          await getChildrenList();
+        if (ortu.value?.fotoProfil?.isNotEmpty == true) {
+          fotoProfil.value = getImageUrl(ortu.value!.fotoProfil!);
         }
+
+        fetchChildrenData();
       } else {
         ToastUtils.showErrorToast('Gagal mendapatkan data');
       }
@@ -78,59 +111,119 @@ class OrtuHomeController extends GetxController {
       }
     } finally {
       isLoading.value = false;
-      isLoadingChildren.value = false;
     }
   }
 
-  Future<void> getChildrenList() async {
+  Future<void> fetchChildrenData() async {
     try {
-      childrenList.clear();
+      isLoadingChildren.value = true;
+      resetPagination();
 
-      if (ortu.value?.santri != null) {
-        final futures = ortu.value!.santri
-            .map((santri) => getChildren(santri.id.toString()))
-            .toList();
-        await Future.wait(futures, eagerError: false);
-      }
-    } catch (e) {
-      ToastUtils.showErrorToast('Gagal memuat data anak');
-    }
-  }
+      final token = AuthService.to.token.value;
+      final ortuId = AuthService.to.roleId.value;
 
-  Future<void> getChildren(String santriId) async {
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      final queryParams = {
+        'page': currentPage.toString(),
+        'limit': _perPage.toString(),
+        'ortuId': ortuId,
+        'search': searchQuery.value,
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.santri,
+      ).replace(queryParameters: queryParams);
+
       final response = await get(
-        Uri.parse(ApiUrl.santriDetail(santriId)),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'x-platform': 'mobile',
         },
-      ).timeout(const Duration(seconds: 30));
-      var data = jsonDecode(response.body);
+      );
+
       if (response.statusCode == 200) {
-        childrenList.addIf(
-          !childrenList.any((child) => child.id.toString() == santriId),
-          s.Santri.fromJson(data['data']),
+        childrenList.clear();
+        final data = jsonDecode(response.body);
+        final items = List<s.Santri>.from(
+          data['data'].map((x) => s.Santri.fromJson(x)),
         );
+
+        if (items.length < _perPage) {
+          hasMore.value = false;
+        }
+
+        childrenList.assignAll(items);
       } else {
-        ToastUtils.showErrorToast('Gagal mendapatkan data anak');
+        ToastUtils.showErrorToast('Gagal memuat data anak');
       }
     } catch (e) {
-      ToastUtils.showErrorToast('Terjadi kesalahan\nCoba refresh');
+      ToastUtils.showErrorToast('Terjadi kesalahan memuat data anak');
+    } finally {
+      isLoadingChildren.value = false;
+    }
+  }
+
+  void loadMoreChildrenData() async {
+    if (isLoadingMore.value || !hasMore.value) return;
+
+    try {
+      isLoadingMore.value = true;
+      currentPage++;
+
+      final token = AuthService.to.token.value;
+      final ortuId = AuthService.to.roleId.value;
+
+      final queryParams = {
+        'page': currentPage.toString(),
+        'limit': _perPage.toString(),
+        'ortuId': ortuId,
+        'search': searchQuery.value,
+      };
+
+      final uri = Uri.parse(
+        ApiUrl.santri,
+      ).replace(queryParameters: queryParams);
+
+      final response = await get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'x-platform': 'mobile',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final newItems = List<s.Santri>.from(
+          data['data'].map((x) => s.Santri.fromJson(x)),
+        );
+
+        if (newItems.length < _perPage) {
+          hasMore.value = false;
+        }
+
+        childrenList.addAll(newItems);
+      } else {
+        currentPage--;
+        ToastUtils.showErrorToast('Gagal memuat data tambahan');
+      }
+    } catch (e) {
+      currentPage--;
+      ToastUtils.showErrorToast('Terjadi kesalahan memuat data tambahan');
+    } finally {
+      isLoadingMore.value = false;
     }
   }
 
   void logout() async {
     try {
       isLoadingLogout.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('userId');
+      final userId = AuthService.to.userId.value;
       final response = await http
           .post(
-            Uri.parse(ApiUrl.logout(userId!)),
+            Uri.parse(ApiUrl.logout(userId)),
             headers: {'Content-Type': 'application/json'},
           )
           .timeout(const Duration(seconds: 30));
@@ -139,10 +232,7 @@ class OrtuHomeController extends GetxController {
         print(data);
       }
       if (response.statusCode == 200) {
-        await prefs.remove('token');
-        await prefs.remove('role');
-        await prefs.remove('userId');
-        await prefs.remove('roleId');
+        await AuthService.to.logout();
         Get.offAllNamed('/login');
         ToastUtils.showSuccessToast('Logout berhasil');
       } else {
