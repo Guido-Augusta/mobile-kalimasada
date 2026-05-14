@@ -1,3 +1,5 @@
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -33,26 +35,31 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
   ]);
   runApp(
-    ToastificationWrapper(
-      child: GetMaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: "Application",
-        theme: ThemeData(
-          useMaterial3: true,
-          actionIconTheme: ActionIconThemeData(
-            backButtonIconBuilder: (BuildContext context) =>
-                const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) => ToastificationWrapper(
+        child: GetMaterialApp(
+          useInheritedMediaQuery: true,
+          builder: DevicePreview.appBuilder,
+          debugShowCheckedModeBanner: false,
+          title: "Application",
+          theme: ThemeData(
+            useMaterial3: true,
+            actionIconTheme: ActionIconThemeData(
+              backButtonIconBuilder: (BuildContext context) =>
+                  const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+            ),
           ),
+          initialRoute: AppPages.INITIAL,
+          getPages: AppPages.routes,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('id', 'ID')],
+          locale: const Locale('id', 'ID'),
         ),
-        initialRoute: AppPages.INITIAL,
-        getPages: AppPages.routes,
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [Locale('id', 'ID')],
-        locale: const Locale('id', 'ID'),
       ),
     ),
   );

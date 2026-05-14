@@ -1,0 +1,17 @@
+workflows:
+  ios-test-build:
+    name: iOS Test Build (No Signing)
+    instance_type: mac_mini_m1
+    max_build_duration: 30
+    environment:
+      flutter: stable
+      xcode: latest
+    scripts:
+      - name: Get Flutter dependencies
+        script: flutter pub get
+      - name: Build iOS (Check for errors)
+        script: |
+          # Build without signing to check for code compatibility
+          flutter build ios --debug --no-codesign
+    artifacts:
+      - build/ios/iphoneos/*.app
