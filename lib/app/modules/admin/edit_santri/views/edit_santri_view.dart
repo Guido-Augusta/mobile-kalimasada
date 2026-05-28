@@ -698,7 +698,7 @@ class EditSantriView extends GetView<EditSantriController> {
           items: (f, cs) => controller.loadOrtuByTipe(tipe, f),
           itemAsString: (Datum u) => u.nama ?? '',
           selectedItem: controller.getSelectedOrtuByTipe(tipe),
-          onChanged: (Datum? selectedItem) {
+          onSelected: (Datum? selectedItem) {
             if (tipe == 'ayah') {
               controller.selectedAyah.value = selectedItem;
             } else if (tipe == 'ibu') {

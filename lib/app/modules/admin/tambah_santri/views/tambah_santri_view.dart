@@ -331,7 +331,7 @@ class TambahSantriView extends GetView<TambahSantriController> {
           },
           itemAsString: (Datum u) => u.nama ?? '',
           autoValidateMode: AutovalidateMode.onUserInteraction,
-          onChanged: (Datum? selectedItem) {
+          onSelected: (Datum? selectedItem) {
             if (tipe == 'ayah') controller.selectedAyah.value = selectedItem;
             if (tipe == 'ibu') controller.selectedIbu.value = selectedItem;
             if (tipe == 'wali') controller.selectedWali.value = selectedItem;
