@@ -15,25 +15,24 @@ abstract class AppException implements Exception {
 
 class NetworkException extends AppException {
   NetworkException({
-    super.message = 'Koneksi internet bermasalah. Periksa koneksi Anda.',
-  }) : super(prefix: 'Koneksi Error: ');
+    super.message = 'Terjadi kesalahan.\nPeriksa koneksi internet Anda.',
+  });
 }
 
 class UnauthorizedException extends AppException {
   UnauthorizedException({
-    super.message = 'Sesi Anda telah berakhir. Silakan login kembali.',
-  }) : super(prefix: 'Autentikasi Gagal: ');
+    super.message = 'Sesi Anda telah berakhir.\nSilakan login kembali.',
+  });
 }
 
 class ForbiddenException extends AppException {
   ForbiddenException({
     super.message = 'Anda tidak memiliki hak akses untuk tindakan ini.',
-  }) : super(prefix: 'Akses Ditolak: ');
+  });
 }
 
 class NotFoundException extends AppException {
-  NotFoundException({super.message = 'Data atau layanan tidak ditemukan.'})
-    : super(prefix: 'Tidak Ditemukan: ');
+  NotFoundException({super.message = 'Data atau layanan tidak ditemukan.'});
 }
 
 class ValidationException extends AppException {
@@ -41,19 +40,18 @@ class ValidationException extends AppException {
   ValidationException({
     super.message = 'Data yang dikirim tidak valid.',
     this.errors,
-  }) : super(prefix: 'Validasi Gagal: ');
+  });
 }
 
 class ServerException extends AppException {
   ServerException({
     super.message =
-        'Terjadi kesalahan pada server. Silakan coba beberapa saat lagi.',
-  }) : super(prefix: 'Server Error: ');
+        'Terjadi kesalahan pada server.\nSilakan coba beberapa saat lagi.',
+  });
 }
 
 class UnexpectedException extends AppException {
-  UnexpectedException({super.message = 'Terjadi kesalahan tidak terduga.'})
-    : super(prefix: 'Error: ');
+  UnexpectedException({super.message = 'Terjadi kesalahan tidak terduga.'});
 }
 
 class AppExceptionMapper {

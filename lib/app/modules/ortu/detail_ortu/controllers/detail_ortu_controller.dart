@@ -1,19 +1,19 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
-import 'package:mobile_kalimasada/app/data/models/ortu.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile_kalimasada/app/data/models/ortu.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 
 import '../../../../data/models/daftar_santri.dart';
+import '../../../../data/repositories/ortu_repository.dart';
 import '../../../../services/auth_service.dart';
+import '../../../../utils/image_helper.dart';
 import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class DetailOrtuController extends GetxController {
+  final OrtuRepository _ortuRepository = OrtuRepository();
+
   var isLoading = false.obs;
   var isLoadingSantriList = false.obs;
   var isSaveLoading = false.obs;
@@ -24,122 +24,57 @@ class DetailOrtuController extends GetxController {
 
   final imagePicker = ImagePicker();
   var isUploadingImage = false.obs;
-  var fotoProfil =
-      AppConstants.defaultProfileImageUrl
-          .obs;
+  var fotoProfil = AppConstants.defaultProfileImageUrl.obs;
 
   var namaC = TextEditingController();
   var noHpC = TextEditingController();
   var alamatC = TextEditingController();
 
-  DateTime? _lastErrorShown;
-
   @override
-  void onInit() async {
+  void onInit() {
     super.onInit();
-    getOrtuDetail(ortuId!);
-    if (AuthService.to.isAdmin) {
-      getSantriList(ortuId!);
+    if (ortuId != null) {
+      loadData();
     }
   }
 
-  String getImageUrl(String imageUrl) {
-    String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
-    return newImageUrl;
+  String getImageUrl(String? imageUrl) {
+    return ImageHelper.getImageUrl(imageUrl);
   }
 
-  Future<void> getOrtuDetail(String ortuId) async {
+  Future<void> loadData({bool isRefresh = false}) async {
+    if (isLoading.value || isLoadingSantriList.value) {
+      return;
+    }
+
     try {
-      isLoading.value = true;
-      final token = AuthService.to.token;
+      isLoading.value = isRefresh;
+      isLoadingSantriList.value = true;
 
-      final response = await http.get(
-        Uri.parse(ApiUrl.ortuDetail(ortuId)),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-      );
+      final id = ortuId!.toString();
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final ortu = Ortu.fromJson(data['data']);
-        ortuDetail.value = ortu;
-        if (ortu.fotoProfil?.isNotEmpty == true) {
-          fotoProfil.value = getImageUrl(ortu.fotoProfil!);
-        }
-        if (kDebugMode) {
-          print('Ortu detail loaded: ${ortu.nama}');
-        }
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat data profil');
-      }
+      await Future.wait([
+        _ortuRepository.getOrtuDetail(id).then((ortu) {
+          ortuDetail.value = ortu;
+          if (ortu.fotoProfil?.isNotEmpty == true) {
+            fotoProfil.value = ImageHelper.getImageUrl(ortu.fotoProfil);
+          }
+          if (kDebugMode) {
+            print('Ortu detail loaded: ${ortu.nama}');
+          }
+        }),
+        if (AuthService.to.isAdmin)
+          _ortuRepository.getSantriList(id).then((items) {
+            santriList.assignAll(items);
+            if (kDebugMode) {
+              print('Santri list loaded: ${items.length} anak');
+            }
+          }),
+      ]);
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoading.value = false;
-    }
-  }
-
-  Future<void> getSantriList(String ortuId) async {
-    try {
-      isLoadingSantriList.value = true;
-      final token = AuthService.to.token;
-
-      if (token.isEmpty) {
-        ToastUtils.showErrorToast('Anda tidak terautentikasi');
-        Get.offAllNamed('/login');
-        return;
-      }
-
-      final queryParams = {
-        'page': '1',
-        'limit': '10',
-        'ortuId': ortuId.toString(),
-      };
-
-      final uri = Uri.parse(
-        ApiUrl.santri,
-      ).replace(queryParameters: queryParams);
-
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        santriList.clear();
-        final data = jsonDecode(response.body);
-        final items = List<Datum>.from(
-          data['data'].map((x) => Datum.fromJson(x)),
-        );
-
-        santriList.value = items;
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat data');
-      }
-    } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
-      }
-    } finally {
       isLoadingSantriList.value = false;
     }
   }

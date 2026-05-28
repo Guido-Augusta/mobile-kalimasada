@@ -82,12 +82,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
 
   RefreshIndicator _buildContent(Ortu ortu, List<s.Datum> santriList) {
     return RefreshIndicator(
-      onRefresh: () async {
-        controller.getOrtuDetail(controller.ortuId!);
-        if (AuthService.to.isAdmin) {
-          controller.getSantriList(controller.ortuId!);
-        }
-      },
+      onRefresh: () => controller.loadData(isRefresh: true),
       color: Colors.deepPurpleAccent,
       backgroundColor: Colors.white,
       child: CustomScrollView(
@@ -266,12 +261,7 @@ class DetailOrtuView extends GetView<DetailOrtuController> {
 
   RefreshIndicator _buildEmptyState(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: () async {
-        controller.getOrtuDetail(controller.ortuId!);
-        if (AuthService.to.isAdmin) {
-          controller.getSantriList(controller.ortuId!);
-        }
-      },
+      onRefresh: () => controller.loadData(isRefresh: false),
       color: Colors.deepPurpleAccent,
       backgroundColor: Colors.white,
       child: SingleChildScrollView(
