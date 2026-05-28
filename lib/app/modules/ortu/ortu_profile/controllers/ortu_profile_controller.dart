@@ -1,21 +1,23 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
-import 'package:mobile_kalimasada/app/data/models/ortu.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile_kalimasada/app/data/models/ortu.dart';
 import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/controllers/ortu_home_controller.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:path/path.dart' as path;
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
+import '../../../../data/repositories/auth_repository.dart';
+import '../../../../data/repositories/ortu_repository.dart';
+import '../../../../utils/image_helper.dart';
 
 class OrtuProfileController extends GetxController {
+  final OrtuRepository _ortuRepository = OrtuRepository();
+  final AuthRepository _authRepository = AuthRepository();
+
   final formKey = GlobalKey<FormState>();
 
   var isLoading = false.obs;
@@ -25,62 +27,35 @@ class OrtuProfileController extends GetxController {
 
   final imagePicker = ImagePicker();
   var isUploadingImage = false.obs;
-  var fotoProfil =
-      AppConstants.defaultProfileImageUrl
-          .obs;
+  var fotoProfil = AppConstants.defaultProfileImageUrl.obs;
 
   var namaC = TextEditingController();
   var noHpC = TextEditingController();
   var alamatC = TextEditingController();
 
-  DateTime? _lastErrorShown;
   DateTime? _lastNoChangeShown;
 
   @override
-  void onInit() async {
+  void onInit() {
     super.onInit();
     getOrtuDetail();
   }
 
-  String getImageUrl(String imageUrl) {
-    String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
-    return newImageUrl;
+  String getImageUrl(String? imageUrl) {
+    return ImageHelper.getImageUrl(imageUrl);
   }
 
   Future<void> getOrtuDetail() async {
     try {
       isLoading.value = true;
-      final token = AuthService.to.token.value;
       final ortuId = AuthService.to.roleId.value;
-
-      final response = await http.get(
-        Uri.parse(ApiUrl.ortuDetail(ortuId)),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final ortu = Ortu.fromJson(data['data']);
-        ortuDetail.value = ortu;
-        if (ortu.fotoProfil?.isNotEmpty == true) {
-          fotoProfil.value = getImageUrl(ortu.fotoProfil!);
-        }
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat data profil');
+      final ortu = await _ortuRepository.getOrtuDetail(ortuId);
+      ortuDetail.value = ortu;
+      if (ortu.fotoProfil?.isNotEmpty == true) {
+        fotoProfil.value = ImageHelper.getImageUrl(ortu.fotoProfil);
       }
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoading.value = false;
     }
@@ -109,68 +84,44 @@ class OrtuProfileController extends GetxController {
 
   Future<void> uploadImage(String imagePath) async {
     try {
-      final token = AuthService.to.token.value;
+      isUploadingImage.value = true;
       final ortuId = AuthService.to.roleId.value;
 
-      final request = http.MultipartRequest(
-        'PUT',
-        Uri.parse(ApiUrl.ortuDetail(ortuId)),
-      );
-
-      request.headers['Authorization'] = 'Bearer $token';
-      request.headers['x-platform'] = 'mobile';
-
-      // Read file and create multipart with proper content type
+      // Persiapkan parameter file
       final file = File(imagePath);
       final bytes = await file.readAsBytes();
       final fileName = path.basename(imagePath);
       final extension = path.extension(imagePath).toLowerCase();
 
-      // Ensure proper file extension
+      // Pastikan ekstensi gambar valid
       String finalFileName = fileName;
       if (extension != '.jpg' && extension != '.jpeg' && extension != '.png') {
         finalFileName = '${path.basenameWithoutExtension(imagePath)}.jpg';
       }
 
-      // Determine content type
-      String contentType;
-      if (extension == '.png') {
-        contentType = 'image/png';
-      } else {
-        contentType = 'image/jpeg';
-      }
+      // Tentukan tipe konten
+      String contentType = (extension == '.png') ? 'image/png' : 'image/jpeg';
 
-      final multipartFile = http.MultipartFile.fromBytes(
-        'fotoProfil',
-        bytes,
-        filename: finalFileName,
-        contentType: MediaType.parse(contentType),
+      final updatedOrtu = await _ortuRepository.uploadFotoProfil(
+        ortuId: ortuId,
+        bytes: bytes,
+        fileName: finalFileName,
+        contentType: contentType,
       );
 
-      request.files.add(multipartFile);
-
-      final response = await request.send();
-      final responseBody = await response.stream.bytesToString();
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(responseBody);
-        if (data['data']['fotoProfil'] != null) {
-          fotoProfil.value = getImageUrl(data['data']['fotoProfil']);
-        }
-
-        if (Get.isRegistered<OrtuHomeController>()) {
-          Get.find<OrtuHomeController>().getOrtu();
-        }
-
-        Get.back();
-        ToastUtils.showSuccessToast('Foto profil berhasil diperbarui');
-      } else {
-        ToastUtils.showErrorToast('Gagal mengupload foto profil');
+      if (updatedOrtu.fotoProfil?.isNotEmpty == true) {
+        fotoProfil.value = ImageHelper.getImageUrl(updatedOrtu.fotoProfil);
       }
+
+      // Refresh Home Screen jika terbuka
+      if (Get.isRegistered<OrtuHomeController>()) {
+        Get.find<OrtuHomeController>().loadHomeData(isRefresh: true);
+      }
+
+      Get.back();
+      ToastUtils.showSuccessToast('Foto profil berhasil diperbarui');
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isUploadingImage.value = false;
     }
@@ -183,6 +134,7 @@ class OrtuProfileController extends GetxController {
   ) async {
     try {
       isSaveLoading.value = true;
+
       // Cek apakah ada perubahan
       bool hasNoChange =
           (nama == ortuDetail.value?.nama &&
@@ -192,85 +144,50 @@ class OrtuProfileController extends GetxController {
       if (hasNoChange) {
         final now = DateTime.now();
         if (_lastNoChangeShown == null ||
-            now.difference(_lastNoChangeShown!) > Duration(seconds: 3)) {
+            now.difference(_lastNoChangeShown!) > const Duration(seconds: 3)) {
           _lastNoChangeShown = now;
           ToastUtils.showErrorToast('Tidak ada perubahan data');
         }
         return;
       }
 
-      final token = AuthService.to.token.value;
       final ortuId = AuthService.to.roleId.value;
+      final updatedOrtu = await _ortuRepository.updateProfile(
+        ortuId: ortuId,
+        nama: nama ?? ortuDetail.value?.nama ?? '',
+        noHp: noHp ?? ortuDetail.value?.nomorHp ?? '',
+        alamat: alamat ?? ortuDetail.value?.alamat ?? '',
+      );
 
-      final response = await http
-          .put(
-            Uri.parse(ApiUrl.ortuDetail(ortuId)),
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer $token',
-              'x-platform': 'mobile',
-            },
-            body: jsonEncode({
-              'nama': nama ?? ortuDetail.value?.nama,
-              'nomorHp': noHp ?? ortuDetail.value?.nomorHp,
-              'alamat': alamat ?? ortuDetail.value?.alamat,
-            }),
-          )
-          .timeout(const Duration(seconds: 30));
-      if (response.statusCode == 200) {
-        getOrtuDetail();
-        if (Get.isRegistered<OrtuHomeController>()) {
-          Get.find<OrtuHomeController>().getOrtu();
-        }
-        Get.back();
-        ToastUtils.showSuccessToast('Profil berhasil diperbarui');
-      } else {
-        ToastUtils.showErrorToast('Gagal memperbarui profil');
+      ortuDetail.value = updatedOrtu;
+      if (updatedOrtu.fotoProfil?.isNotEmpty == true) {
+        fotoProfil.value = ImageHelper.getImageUrl(updatedOrtu.fotoProfil);
       }
+
+      // Refresh Home Screen jika terbuka
+      if (Get.isRegistered<OrtuHomeController>()) {
+        Get.find<OrtuHomeController>().loadHomeData(isRefresh: true);
+      }
+
+      Get.back();
+      ToastUtils.showSuccessToast('Profil berhasil diperbarui');
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isSaveLoading.value = false;
     }
   }
 
-  void logout() async {
+  Future<void> logout() async {
     try {
       isLoadingLogout.value = true;
       final userId = AuthService.to.userId.value;
-      final response = await http
-          .post(
-            Uri.parse(ApiUrl.logout(userId)),
-            headers: {'Content-Type': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 30));
-      var data = jsonDecode(response.body);
-      if (kDebugMode) {
-        print(data);
-      }
-      if (response.statusCode == 200) {
-        await AuthService.to.logout();
-        Get.offAllNamed('/login');
-        ToastUtils.showSuccessToast('Logout berhasil');
-      } else {
-        ToastUtils.showErrorToast('Logout gagal');
-      }
+      await _authRepository.logout(userId);
+      await AuthService.to.logout();
+      Get.offAllNamed('/login');
+      ToastUtils.showSuccessToast('Logout berhasil');
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoadingLogout.value = false;
     }

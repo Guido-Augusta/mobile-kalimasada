@@ -23,10 +23,7 @@ class OrtuHomeView extends GetView<OrtuHomeController> {
       ),
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: () async {
-            controller.getOrtu();
-            controller.fetchChildrenData();
-          },
+          onRefresh: () => controller.loadHomeData(isRefresh: true),
           color: Colors.deepPurpleAccent,
           backgroundColor: Colors.white,
           child: ListView(
