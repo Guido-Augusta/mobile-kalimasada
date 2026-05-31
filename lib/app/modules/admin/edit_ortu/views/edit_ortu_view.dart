@@ -280,54 +280,55 @@ class EditOrtuView extends GetView<EditOrtuController> {
   void _showPhotoBottomSheet() {
     Get.bottomSheet(
       SafeArea(
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(16),
-              topRight: Radius.circular(16),
-            ),
+        child: Material(
+          color: Colors.white,
+          clipBehavior: Clip.antiAlias,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey,
-                  borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Foto Profil',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                const SizedBox(height: 16),
+                Text(
+                  'Foto Profil',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              ListTile(
-                minTileHeight: 40,
-                leading: Icon(Icons.camera_alt_outlined),
-                title: Text('Kamera'),
-                onTap: () async {
-                  Get.back();
-                  await controller.pickImage(ImageSource.camera);
-                },
-              ),
-              ListTile(
-                minTileHeight: 40,
-                leading: Icon(Icons.photo_outlined),
-                title: Text('Galeri'),
-                onTap: () async {
-                  Get.back();
-                  await controller.pickImage(ImageSource.gallery);
-                },
-              ),
-            ],
+                ListTile(
+                  minTileHeight: 40,
+                  leading: Icon(Icons.camera_alt_outlined),
+                  title: Text('Kamera'),
+                  onTap: () async {
+                    Get.back();
+                    await controller.pickImage(ImageSource.camera);
+                  },
+                ),
+                ListTile(
+                  minTileHeight: 40,
+                  leading: Icon(Icons.photo_outlined),
+                  title: Text('Galeri'),
+                  onTap: () async {
+                    Get.back();
+                    await controller.pickImage(ImageSource.gallery);
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
