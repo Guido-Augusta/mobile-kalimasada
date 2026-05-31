@@ -8,13 +8,13 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_ortu.dart';
-import 'package:mobile_kalimasada/app/modules/ustadz/daftar_santri/controllers/daftar_santri_controller.dart';
+import 'package:mobile_kalimasada/app/modules/santri/daftar_santri/controllers/daftar_santri_controller.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../data/models/santri.dart';
 import '../../../../data/models/santri.dart' as s;
-import '../../../ustadz/detail_santri/controllers/detail_santri_controller.dart';
+import '../../../santri/detail_santri/controllers/detail_santri_controller.dart';
 
 class EditSantriController extends GetxController {
   final String santriId = Get.arguments['santriId'];

@@ -6,8 +6,8 @@ import 'package:mobile_kalimasada/app/modules/admin/admin_home/controllers/admin
 import 'package:mobile_kalimasada/app/modules/admin/admin_home/views/admin_home_view.dart';
 import 'package:mobile_kalimasada/app/modules/quran/alquran/controllers/alquran_controller.dart';
 import 'package:mobile_kalimasada/app/modules/quran/alquran/views/alquran_view.dart';
-import 'package:mobile_kalimasada/app/modules/ustadz/peringkat/controllers/peringkat_controller.dart';
-import 'package:mobile_kalimasada/app/modules/ustadz/peringkat/views/peringkat_view.dart';
+import 'package:mobile_kalimasada/app/modules/santri/peringkat/controllers/peringkat_controller.dart';
+import 'package:mobile_kalimasada/app/modules/santri/peringkat/views/peringkat_view.dart';
 
 import '../controllers/admin_main_controller.dart';
 

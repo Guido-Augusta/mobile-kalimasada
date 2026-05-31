@@ -259,10 +259,9 @@ class AdminHomeView extends GetView<AdminHomeController> {
     required bool isLoading,
     required VoidCallback onTap,
   }) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Ink(
+      child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,

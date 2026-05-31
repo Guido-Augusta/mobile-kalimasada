@@ -34,7 +34,7 @@ class DetailOrtuController extends GetxController {
   void onInit() {
     super.onInit();
     if (ortuId != null) {
-      loadData();
+      loadData(isRefresh: true);
     }
   }
 

@@ -1387,41 +1387,54 @@ class DetailSantriView extends GetView<DetailSantriController> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+    return RefreshIndicator(
+      onRefresh: () async {
+        controller.getSantriDetail(controller.santriId, isRefresh: false);
+      },
+      color: Colors.deepPurpleAccent,
+      backgroundColor: Colors.white,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height:
+              MediaQuery.of(context).size.height -
+              kToolbarHeight -
+              MediaQuery.of(context).padding.top,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Icon(
+                  Icons.person_off_rounded,
+                  size: 48,
+                  color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+                ),
               ),
-              child: Icon(
-                Icons.person_off_rounded,
-                size: 48,
-                color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+              const SizedBox(height: 16),
+              Text(
+                'Data santri tidak ditemukan',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  color: Colors.grey[700],
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Data santri tidak ditemukan',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
+              const SizedBox(height: 8),
+              Text(
+                'Tarik ke bawah untuk refresh',
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Tarik ke bawah untuk refresh',
-              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

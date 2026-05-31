@@ -13,7 +13,7 @@ import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
-import '../../../ustadz/progres_hafalan/controllers/progres_hafalan_controller.dart';
+import '../../progres_hafalan/controllers/progres_hafalan_controller.dart';
 
 class DetailHafalanSurahController extends GetxController {
   RxBool isSurahInfoLoading = false.obs;

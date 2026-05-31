@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 import 'package:flutter/material.dart';
 
-import '../../../ustadz/progres_hafalan/controllers/progres_hafalan_controller.dart';
+import '../../progres_hafalan/controllers/progres_hafalan_controller.dart';
 
 class DetailHafalanJuzController extends GetxController {
   RxBool isJuzInfoLoading = false.obs;

@@ -65,7 +65,7 @@ class DetailUstadzView extends GetView<DetailUstadzController> {
             if (ustadz == null) {
               return RefreshIndicator(
                 onRefresh: () async {
-                  controller.getUstadzData();
+                  controller.getUstadzData(isRefresh: false);
                 },
                 color: Colors.deepPurpleAccent,
                 backgroundColor: Colors.white,

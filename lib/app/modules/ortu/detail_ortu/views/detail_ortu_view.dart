@@ -11,7 +11,7 @@ import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../data/models/daftar_santri.dart' as s;
-import '../../../ustadz/detail_santri/controllers/detail_santri_controller.dart';
+import '../../../santri/detail_santri/controllers/detail_santri_controller.dart';
 import '../controllers/detail_ortu_controller.dart';
 
 class DetailOrtuView extends GetView<DetailOrtuController> {

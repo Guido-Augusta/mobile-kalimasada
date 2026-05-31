@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../data/constants/api_url.dart';
 import '../../../../data/models/daftar_ortu.dart';
-import '../../../ustadz/daftar_santri/controllers/daftar_santri_controller.dart';
+import '../../../santri/daftar_santri/controllers/daftar_santri_controller.dart';
 
 class TambahSantriController extends GetxController {
   final RxBool isSearching = false.obs;
