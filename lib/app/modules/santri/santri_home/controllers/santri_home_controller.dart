@@ -1,15 +1,16 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
-import 'package:http/http.dart' as http;
-import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
+import 'package:mobile_kalimasada/app/data/repositories/auth_repository.dart';
+import 'package:mobile_kalimasada/app/routes/app_pages.dart';
+import 'package:mobile_kalimasada/app/utils/image_helper.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
+import 'package:mobile_kalimasada/app/data/repositories/santri_repository.dart';
 
 class SantriHomeController extends GetxController {
+  final SantriRepository _santriRepository = SantriRepository();
+  final AuthRepository _authRepository = AuthRepository();
+
   var isLoading = true.obs;
   var isLoadingLogout = false.obs;
 
@@ -23,83 +24,42 @@ class SantriHomeController extends GetxController {
     getSantri();
   }
 
-  String getImageUrl(String imageUrl) {
-    String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
-    return newImageUrl;
+  String getImageUrl(String? imageUrl) {
+    return ImageHelper.getImageUrl(imageUrl);
   }
 
   Future<void> getSantri() async {
     try {
       isLoading.value = true;
-      final token = AuthService.to.token.value;
       final santriId = AuthService.to.roleId.value;
-
-      final response = await get(
-        Uri.parse(ApiUrl.santriDetail(santriId)),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-      ).timeout(const Duration(seconds: 30));
-      var data = jsonDecode(response.body);
-      if (kDebugMode) {
-        print(response.statusCode);
-        print(data);
-      }
-      if (response.statusCode == 200) {
-        santri.value = s.Santri.fromJson(data['data']);
-      } else {
-        ToastUtils.showErrorToast('Gagal mendapatkan data');
-      }
+      final data = await _santriRepository.getSantri(santriId);
+      santri.value = data;
     } catch (e) {
       final now = DateTime.now();
       if (_lastErrorShown == null ||
           now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
         _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
+        ToastUtils.showErrorToast(e.toString());
       }
     } finally {
       isLoading.value = false;
     }
   }
 
-  void logout() async {
+  Future<void> logout() async {
     try {
       isLoadingLogout.value = true;
       final userId = AuthService.to.userId.value;
-      final response = await http
-          .post(
-            Uri.parse(ApiUrl.logout(userId)),
-            headers: {'Content-Type': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 30));
-      var data = jsonDecode(response.body);
-      if (kDebugMode) {
-        print(data);
-      }
-      if (response.statusCode == 200) {
-        await AuthService.to.logout();
-        Get.offAllNamed('/login');
-        ToastUtils.showSuccessToast('Logout berhasil');
-      } else {
-        final now = DateTime.now();
-        if (_lastErrorShown == null ||
-            now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-          _lastErrorShown = now;
-          ToastUtils.showErrorToast('Logout gagal');
-        }
-      }
+      await _authRepository.logout(userId);
+      await AuthService.to.logout();
+      Get.offAllNamed(Routes.LOGIN);
+      ToastUtils.showSuccessToast('Logout berhasil');
     } catch (e) {
       final now = DateTime.now();
       if (_lastErrorShown == null ||
           now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
         _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
+        ToastUtils.showErrorToast(e.toString());
       }
     } finally {
       isLoadingLogout.value = false;

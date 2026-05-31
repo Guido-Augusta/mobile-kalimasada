@@ -47,7 +47,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
       body: Obx(() {
-        final santri = controller.santriDetail.value;
+        final santri = controller.santriData.value;
 
         if (controller.isLoading.value) {
           return Skeletonizer(
@@ -67,7 +67,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
 
   RefreshIndicator _buildContent(BuildContext context, Santri santri) {
     return RefreshIndicator(
-      onRefresh: () async => controller.getSantriDetail(),
+      onRefresh: () async => controller.loadProfileData(refresh: true),
       color: Colors.deepPurpleAccent,
       backgroundColor: Colors.white,
       child: CustomScrollView(
@@ -1073,7 +1073,7 @@ class SantriProfileView extends GetView<SantriProfileController> {
                 isAccountAction: true,
                 onTap: () {
                   Get.back();
-                  controller.namaC.text = controller.santriDetail.value!.nama!;
+                  controller.namaC.text = controller.santriData.value!.nama!;
                   _showEditProfileDialog();
                 },
               ),
@@ -1342,10 +1342,6 @@ class SantriProfileView extends GetView<SantriProfileController> {
                                       .validate()) {
                                     controller.updateProfileData(
                                       controller.namaC.text,
-                                      controller.noHpC.text,
-                                      controller.alamatC.text,
-                                      controller.jenisKelaminC.text,
-                                      controller.tanggalLahirC.text,
                                     );
                                   }
                                 },
@@ -1453,41 +1449,49 @@ class SantriProfileView extends GetView<SantriProfileController> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+    return RefreshIndicator(
+      onRefresh: () => controller.loadProfileData(refresh: false),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height:
+              MediaQuery.of(context).size.height -
+              kToolbarHeight -
+              MediaQuery.of(context).padding.top,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.person_off_rounded,
+                  size: 48,
+                  color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+                ),
               ),
-              child: Icon(
-                Icons.person_off_rounded,
-                size: 48,
-                color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
+              const SizedBox(height: 24),
+              Text(
+                'Data santri tidak ditemukan',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[700],
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Data santri tidak ditemukan',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
+              const SizedBox(height: 8),
+              Text(
+                'Tarik ke bawah untuk refresh',
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Tarik ke bawah untuk refresh',
-              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

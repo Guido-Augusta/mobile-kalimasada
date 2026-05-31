@@ -12,11 +12,7 @@ class AuthRepository {
     try {
       final response = await _apiClient.dio.post(
         ApiUrl.login,
-        data: {
-          'email': email,
-          'password': password,
-          'platform': 'mobile',
-        },
+        data: {'email': email, 'password': password, 'platform': 'mobile'},
       );
 
       if (response.statusCode == 200) {
@@ -37,9 +33,7 @@ class AuthRepository {
   /// Melakukan logout dari server
   Future<void> logout(String userId) async {
     try {
-      final response = await _apiClient.dio.post(
-        ApiUrl.logout(userId),
-      );
+      final response = await _apiClient.dio.post(ApiUrl.logout(userId));
 
       if (response.statusCode != 200) {
         throw UnexpectedException(message: 'Logout gagal');

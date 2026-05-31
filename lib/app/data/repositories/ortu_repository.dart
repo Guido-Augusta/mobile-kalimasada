@@ -20,9 +20,7 @@ class OrtuRepository {
         final responseData = response.data;
         return Ortu.fromJson(responseData['data']);
       } else {
-        throw UnexpectedException(
-          message: 'Gagal memuat data profil orang tua',
-        );
+        throw UnexpectedException(message: 'Gagal memuat data orang tua');
       }
     } on DioException catch (e) {
       throw AppExceptionMapper.fromDioException(e);
@@ -101,11 +99,7 @@ class OrtuRepository {
     try {
       final response = await _apiClient.dio.put(
         ApiUrl.ortuDetail(ortuId),
-        data: {
-          'nama': nama,
-          'nomorHp': noHp,
-          'alamat': alamat,
-        },
+        data: {'nama': nama, 'nomorHp': noHp, 'alamat': alamat},
       );
 
       if (response.statusCode == 200) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_kalimasada/app/data/models/ortu.dart' as o;
 import 'package:mobile_kalimasada/app/data/models/santri.dart' as s;
+import 'package:mobile_kalimasada/app/routes/app_pages.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
@@ -33,6 +34,8 @@ class OrtuHomeController extends GetxController {
   final appliedSearchQuery = ''.obs;
   final searchController = TextEditingController();
   final scrollController = ScrollController();
+
+  DateTime? _lastErrorShown;
 
   @override
   void onInit() {
@@ -103,7 +106,12 @@ class OrtuHomeController extends GetxController {
             }),
       ]);
     } catch (e) {
-      ToastUtils.showErrorToast(e.toString());
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(e.toString());
+      }
     } finally {
       isLoading.value = false;
       isLoadingChildren.value = false;
@@ -167,10 +175,15 @@ class OrtuHomeController extends GetxController {
       final userId = AuthService.to.userId.value;
       await _authRepository.logout(userId);
       await AuthService.to.logout();
-      Get.offAllNamed('/login');
+      Get.offAllNamed(Routes.LOGIN);
       ToastUtils.showSuccessToast('Logout berhasil');
     } catch (e) {
-      ToastUtils.showErrorToast(e.toString());
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(e.toString());
+      }
     } finally {
       isLoadingLogout.value = false;
     }

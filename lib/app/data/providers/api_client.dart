@@ -1,7 +1,8 @@
 // lib/app/data/providers/api_client.dart
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart' as get_x;
+import 'package:get/get.dart';
+import 'package:mobile_kalimasada/app/routes/app_pages.dart';
 import '../../services/auth_service.dart';
 import '../constants/api_url.dart';
 
@@ -19,10 +20,7 @@ class ApiClient {
         baseUrl: ApiUrl.baseUrl,
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
-        headers: {
-          'Content-Type': 'application/json',
-          'x-platform': 'mobile',
-        },
+        headers: {'Content-Type': 'application/json', 'x-platform': 'mobile'},
       ),
     );
 
@@ -55,7 +53,9 @@ class ApiClient {
         },
         onError: (DioException error, handler) {
           if (kDebugMode) {
-            print('<-- ERROR ${error.response?.statusCode} ${error.requestOptions.path}');
+            print(
+              '<-- ERROR ${error.response?.statusCode} ${error.requestOptions.path}',
+            );
             print('Message: ${error.message}');
             if (error.response?.data != null) {
               print('Response Error: ${error.response?.data}');
@@ -65,8 +65,8 @@ class ApiClient {
           // Handle automatic session expiration
           if (error.response?.statusCode == 401) {
             AuthService.to.logout();
-            if (get_x.Get.currentRoute != '/login') {
-              get_x.Get.offAllNamed('/login');
+            if (Get.currentRoute != Routes.LOGIN) {
+              Get.offAllNamed(Routes.LOGIN);
             }
           }
           return handler.next(error);

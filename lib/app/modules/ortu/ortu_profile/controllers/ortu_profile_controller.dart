@@ -34,6 +34,7 @@ class OrtuProfileController extends GetxController {
   var alamatC = TextEditingController();
 
   DateTime? _lastNoChangeShown;
+  DateTime? _lastErrorShown;
 
   @override
   void onInit() {
@@ -55,7 +56,12 @@ class OrtuProfileController extends GetxController {
         fotoProfil.value = ImageHelper.getImageUrl(ortu.fotoProfil);
       }
     } catch (e) {
-      ToastUtils.showErrorToast(e.toString());
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(e.toString());
+      }
     } finally {
       isLoading.value = false;
     }
@@ -172,7 +178,12 @@ class OrtuProfileController extends GetxController {
       Get.back();
       ToastUtils.showSuccessToast('Profil berhasil diperbarui');
     } catch (e) {
-      ToastUtils.showErrorToast(e.toString());
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(e.toString());
+      }
     } finally {
       isSaveLoading.value = false;
     }
@@ -187,7 +198,12 @@ class OrtuProfileController extends GetxController {
       Get.offAllNamed('/login');
       ToastUtils.showSuccessToast('Logout berhasil');
     } catch (e) {
-      ToastUtils.showErrorToast(e.toString());
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(e.toString());
+      }
     } finally {
       isLoadingLogout.value = false;
     }

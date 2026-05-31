@@ -1,17 +1,12 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/santri.dart';
+import 'package:mobile_kalimasada/app/data/repositories/auth_repository.dart';
+import 'package:mobile_kalimasada/app/data/repositories/santri_repository.dart';
 import 'package:mobile_kalimasada/app/modules/santri/santri_home/controllers/santri_home_controller.dart';
+import 'package:mobile_kalimasada/app/utils/image_helper.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:path/path.dart' as path;
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import 'package:mobile_kalimasada/app/data/models/chart.dart' as c;
 import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
@@ -19,19 +14,21 @@ import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 enum ChartType { tambahHafalan, murajaah, tahsin }
 
 class SantriProfileController extends GetxController {
+  final _authRepository = AuthRepository();
+  final _santriRepository = SantriRepository();
+
+  final santriId = AuthService.to.roleId.value;
+
   final formKey = GlobalKey<FormState>();
 
   var isLoading = false.obs;
   var isSaveLoading = false.obs;
   var isLoadingLogout = false.obs;
-  var santriDetail = Rxn<Santri>();
-  String? santriId;
+  var santriData = Rxn<Santri>();
 
   final imagePicker = ImagePicker();
   var isUploadingImage = false.obs;
-  var fotoProfil =
-      AppConstants.defaultProfileImageUrl
-          .obs;
+  var fotoProfil = AppConstants.defaultProfileImageUrl.obs;
 
   var namaC = TextEditingController();
   var noHpC = TextEditingController();
@@ -52,7 +49,7 @@ class SantriProfileController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    getSantriDetail();
+    loadProfileData();
   }
 
   @override
@@ -65,173 +62,60 @@ class SantriProfileController extends GetxController {
     super.onClose();
   }
 
-  String getImageUrl(String imageUrl) {
-    String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
-    return newImageUrl;
+  String getImageUrl(String? imageUrl) {
+    return ImageHelper.getImageUrl(imageUrl);
   }
 
-  String getOrangTuaByTipe(List<OrangTua> orangTua, String tipe) {
+  Future<void> loadProfileData({bool refresh = false}) async {
     try {
-      final orangTuaByTipe = orangTua.firstWhere(
-        (element) => element.tipe?.toLowerCase() == tipe.toLowerCase(),
-      );
-      return orangTuaByTipe.nama ?? '-';
+      isLoading.value = refresh;
+      isLoadingChart.value = refresh;
+      await Future.wait([
+        _santriRepository.getSantri(santriId).then((data) {
+          santriData.value = data;
+        }),
+        _santriRepository
+            .getChart(range.value, santriId, selectedChartMode.value)
+            .then((data) {
+              chart.value = data;
+            }),
+      ]);
     } catch (e) {
-      return '-';
-    }
-  }
-
-  String getOrangTuaIdByTipe(List<OrangTua> orangTua, String tipe) {
-    try {
-      final orangTuaById = orangTua.firstWhere(
-        (element) => element.tipe?.toLowerCase() == tipe.toLowerCase(),
-      );
-      return orangTuaById.id.toString();
-    } catch (e) {
-      return '-';
+      final now = DateTime.now();
+      if (_lastErrorShown == null ||
+          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
+        _lastErrorShown = now;
+        ToastUtils.showErrorToast(e.toString());
+      }
+    } finally {
+      isLoading.value = false;
+      isLoadingChart.value = false;
     }
   }
 
   Future<void> getSantriDetail() async {
     try {
       isLoading.value = true;
-      final token = AuthService.to.token.value;
       final santriId = AuthService.to.roleId.value;
 
-      final response = await http.get(
-        Uri.parse(ApiUrl.santriDetail(santriId)),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        getChart();
-        final data = jsonDecode(response.body);
-        final santri = Santri.fromJson(data['data']);
-        santriDetail.value = santri;
-        if (kDebugMode) {
-          print('Santri detail loaded: ${santri.nama}');
-        }
-      } else {
-        ToastUtils.showErrorToast('Gagal mendapatkan data');
-      }
+      final data = await _santriRepository.getSantri(santriId);
+      santriData.value = data;
     } catch (e) {
       final now = DateTime.now();
       if (_lastErrorShown == null ||
           now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
         _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
+        ToastUtils.showErrorToast(e.toString());
       }
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<void> pickImage(ImageSource source) async {
-    try {
-      final XFile? pickedImage = await imagePicker.pickImage(
-        source: source,
-        imageQuality: 70,
-        maxWidth: 800,
-        maxHeight: 800,
-      );
-
-      if (pickedImage != null) {
-        isUploadingImage.value = true;
-        await uploadImage(pickedImage.path);
-        if (kDebugMode) {
-          print(pickedImage.path);
-        }
-      }
-    } catch (e) {
-      ToastUtils.showErrorToast('Gagal memilih gambar');
-    }
-  }
-
-  Future<void> uploadImage(String imagePath) async {
-    try {
-      final token = AuthService.to.token.value;
-      final santriId = AuthService.to.roleId.value;
-
-      final request = http.MultipartRequest(
-        'PUT',
-        Uri.parse(ApiUrl.santriDetail(santriId)),
-      );
-
-      request.headers['Authorization'] = 'Bearer $token';
-      request.headers['x-platform'] = 'mobile';
-
-      // Read file and create multipart with proper content type
-      final file = File(imagePath);
-      final bytes = await file.readAsBytes();
-      final fileName = path.basename(imagePath);
-      final extension = path.extension(imagePath).toLowerCase();
-
-      // Ensure proper file extension
-      String finalFileName = fileName;
-      if (extension != '.jpg' && extension != '.jpeg' && extension != '.png') {
-        finalFileName = '${path.basenameWithoutExtension(imagePath)}.jpg';
-      }
-
-      // Determine content type
-      String contentType;
-      if (extension == '.png') {
-        contentType = 'image/png';
-      } else {
-        contentType = 'image/jpeg';
-      }
-
-      final multipartFile = http.MultipartFile.fromBytes(
-        'fotoProfil',
-        bytes,
-        filename: finalFileName,
-        contentType: MediaType.parse(contentType),
-      );
-
-      request.files.add(multipartFile);
-
-      final response = await request.send();
-      final responseBody = await response.stream.bytesToString();
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(responseBody);
-        if (data['data']['fotoProfil'] != null) {
-          fotoProfil.value = getImageUrl(data['data']['fotoProfil']);
-        }
-
-        if (Get.isRegistered<SantriHomeController>()) {
-          Get.find<SantriHomeController>().getSantri();
-        }
-
-        Get.back();
-        ToastUtils.showSuccessToast('Foto profil berhasil diperbarui');
-      } else {
-        ToastUtils.showErrorToast('Gagal mengupload foto profil');
-      }
-    } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
-    } finally {
-      isUploadingImage.value = false;
-    }
-  }
-
-  Future<void> updateProfileData(
-    String? nama,
-    String? noHp,
-    String? alamat,
-    String? jenisKelamin,
-    String? tanggalLahir,
-  ) async {
+  Future<void> updateProfileData(String? nama) async {
     try {
       isSaveLoading.value = true;
-      bool hasNoChange = (nama == santriDetail.value?.nama);
+      bool hasNoChange = (nama == santriData.value?.nama);
 
       if (hasNoChange) {
         final now = DateTime.now();
@@ -243,82 +127,48 @@ class SantriProfileController extends GetxController {
         return;
       }
 
-      final token = AuthService.to.token.value;
       final santriId = AuthService.to.roleId.value;
 
-      final response = await http
-          .put(
-            Uri.parse(ApiUrl.santriDetail(santriId)),
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer $token',
-              'x-platform': 'mobile',
-            },
-            body: jsonEncode({'nama': nama ?? santriDetail.value?.nama}),
-          )
-          .timeout(const Duration(seconds: 30));
-      if (response.statusCode == 200) {
-        getSantriDetail();
-        if (Get.isRegistered<SantriHomeController>()) {
-          Get.find<SantriHomeController>().getSantri();
-        }
-        Get.back();
-        ToastUtils.showSuccessToast('Profil berhasil diperbarui');
-      } else {
-        ToastUtils.showErrorToast('Gagal memperbarui data profil');
+      await _santriRepository.updateProfileData(nama, santriId);
+
+      await getSantriDetail();
+      if (Get.isRegistered<SantriHomeController>()) {
+        Get.find<SantriHomeController>().getSantri();
       }
+      Get.back();
+      ToastUtils.showSuccessToast('Profil berhasil diperbarui');
     } catch (e) {
       final now = DateTime.now();
       if (_lastErrorShown == null ||
           now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
         _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
+        ToastUtils.showErrorToast(e.toString());
       }
     } finally {
       isSaveLoading.value = false;
     }
   }
 
-  void logout() async {
+  Future<void> getChart() async {
+    isLoadingChart.value = true;
+    isChartError.value = false;
     try {
-      isLoadingLogout.value = true;
-      final userId = AuthService.to.userId.value;
-      final response = await http
-          .post(
-            Uri.parse(ApiUrl.logout(userId)),
-            headers: {'Content-Type': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 30));
-      var data = jsonDecode(response.body);
-      if (kDebugMode) {
-        print(data);
-      }
-      if (response.statusCode == 200) {
-        await AuthService.to.logout();
-        Get.offAllNamed('/login');
-        ToastUtils.showSuccessToast('Logout berhasil');
-      } else {
-        final now = DateTime.now();
-        if (_lastErrorShown == null ||
-            now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-          _lastErrorShown = now;
-          ToastUtils.showErrorToast('Logout gagal');
-        }
-      }
+      final data = await _santriRepository.getChart(
+        range.value,
+        santriId,
+        selectedChartMode.value,
+      );
+      chart.value = data;
     } catch (e) {
+      isChartError.value = true;
       final now = DateTime.now();
       if (_lastErrorShown == null ||
           now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
         _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
+        ToastUtils.showErrorToast(e.toString());
       }
-    } finally {
-      isLoadingLogout.value = false;
     }
+    isLoadingChart.value = false;
   }
 
   // Format the date to display in the text field
@@ -338,48 +188,18 @@ class SantriProfileController extends GetxController {
     }
   }
 
-  void getChart() async {
-    isLoadingChart.value = true;
-    isChartError.value = false;
-    final token = AuthService.to.token.value;
+  void logout() async {
     try {
-      final santriId = AuthService.to.roleId.value;
-      final queryParams = {
-        'range': range.value,
-        'santriId': santriId.toString(),
-        'mode': selectedChartMode.value,
-      };
-
-      final uri = Uri.parse(ApiUrl.chart).replace(queryParameters: queryParams);
-
-      final response = await http
-          .get(
-            uri,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer $token',
-              'x-platform': 'mobile',
-            },
-          )
-          .timeout(const Duration(seconds: 30));
-      var data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        chart.value = c.Chart.fromJson(data);
-      } else {
-        isChartError.value = true;
-        ToastUtils.showErrorToast('Gagal mendapatkan data chart');
-      }
+      isLoadingLogout.value = true;
+      final userId = AuthService.to.userId.value;
+      await _authRepository.logout(userId);
+      await AuthService.to.logout();
+      Get.offAllNamed('/login');
+      ToastUtils.showSuccessToast('Logout berhasil');
     } catch (e) {
-      isChartError.value = true;
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
-      }
+      ToastUtils.showErrorToast(e.toString());
+    } finally {
+      isLoadingLogout.value = false;
     }
-    isLoadingChart.value = false;
   }
 }
