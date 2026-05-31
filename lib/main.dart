@@ -34,6 +34,7 @@ Future<void> main() async {
   ]);
   runApp(
     ToastificationWrapper(
+      config: ToastificationConfig(maxToastLimit: 1),
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: "Application",

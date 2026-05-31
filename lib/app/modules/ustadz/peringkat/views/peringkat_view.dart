@@ -473,8 +473,8 @@ class PeringkatView extends GetView<PeringkatController> {
           const SizedBox(height: 24),
           Text(
             controller.appliedSearchQuery.value.isNotEmpty
-                ? 'Belum ada data peringkat'
-                : 'Santri tidak ditemukan',
+                ? 'Santri tidak ditemukan'
+                : 'Tidak ada data peringkat',
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -484,8 +484,8 @@ class PeringkatView extends GetView<PeringkatController> {
           const SizedBox(height: 8),
           Text(
             controller.appliedSearchQuery.value.isNotEmpty
-                ? 'Tarik ke bawah untuk refresh'
-                : 'Coba gunakan kata kunci lain',
+                ? 'Coba gunakan kata kunci lain'
+                : 'Tarik ke bawah untuk refresh',
             style: GoogleFonts.poppins(
               fontSize: 14,
               color: const Color(0xFF64748B),

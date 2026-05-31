@@ -35,12 +35,10 @@ class OrtuHomeController extends GetxController {
   final searchController = TextEditingController();
   final scrollController = ScrollController();
 
-  DateTime? _lastErrorShown;
-
   @override
   void onInit() {
     super.onInit();
-    loadHomeData();
+    loadHomeData(isRefresh: true);
     _setupScrollController();
     _setupSearchDebounce();
   }
@@ -106,12 +104,7 @@ class OrtuHomeController extends GetxController {
             }),
       ]);
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(e.toString());
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoading.value = false;
       isLoadingChildren.value = false;
@@ -173,17 +166,14 @@ class OrtuHomeController extends GetxController {
     try {
       isLoadingLogout.value = true;
       final userId = AuthService.to.userId.value;
+
       await _authRepository.logout(userId);
       await AuthService.to.logout();
+
       Get.offAllNamed(Routes.LOGIN);
       ToastUtils.showSuccessToast('Logout berhasil');
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(e.toString());
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoadingLogout.value = false;
     }

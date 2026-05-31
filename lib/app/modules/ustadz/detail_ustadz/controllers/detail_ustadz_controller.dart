@@ -1,82 +1,55 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
+import 'package:mobile_kalimasada/app/utils/image_helper.dart';
 
-import '../../../../data/constants/api_url.dart';
 import '../../../../data/models/ustadz.dart';
-import '../../../../services/auth_service.dart';
+import '../../../../data/repositories/ustadz_repository.dart';
 import '../../../../utils/toast_utils.dart';
 import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class DetailUstadzController extends GetxController {
+  final UstadzRepository _ustadzRepository = UstadzRepository();
+
   final ustadzId = Get.arguments['ustadzId'];
   final isLoading = true.obs;
   final isSaveLoading = false.obs;
   final isLoadingLogout = false.obs;
   final isUploadingImage = false.obs;
   var ustadzData = Rxn<Ustadz>();
-  var fotoProfil =
-      AppConstants.defaultProfileImageUrl
-          .obs;
+  var fotoProfil = AppConstants.defaultProfileImageUrl.obs;
 
   var namaC = TextEditingController();
   var noHpC = TextEditingController();
   var alamatC = TextEditingController();
   var jenisKelaminC = TextEditingController();
 
-  DateTime? _lastErrorShown;
-
   @override
   void onInit() {
     super.onInit();
-    fetchUstadzData();
+    getUstadzData();
   }
 
-  Future<void> fetchUstadzData({bool isRefresh = true}) async {
+  Future<void> getUstadzData({bool isRefresh = true}) async {
     try {
       isLoading.value = isRefresh;
-      final token = AuthService.to.token;
+      final ustadz = await _ustadzRepository.getUstadz(ustadzId);
 
-      final response = await http.get(
-        Uri.parse(ApiUrl.ustadzDetail(ustadzId)),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-      );
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final ustadz = Ustadz.fromJson(data['data']);
-        ustadzData.value = ustadz;
-        if (ustadz.fotoProfil?.isNotEmpty == true) {
-          fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
-        }
-        namaC.text = ustadz.nama!;
-        noHpC.text = ustadz.nomorHp!;
-        alamatC.text = ustadz.alamat!;
-        jenisKelaminC.text = ustadz.jenisKelamin!;
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat data profil');
+      ustadzData.value = ustadz;
+      if (ustadz.fotoProfil?.isNotEmpty == true) {
+        fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
       }
+      namaC.text = ustadz.nama!;
+      noHpC.text = ustadz.nomorHp!;
+      alamatC.text = ustadz.alamat!;
+      jenisKelaminC.text = ustadz.jenisKelamin!;
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoading.value = false;
     }
   }
 
   String getImageUrl(String imageUrl) {
-    String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
-    return newImageUrl;
+    return ImageHelper.getImageUrl(imageUrl);
   }
 }

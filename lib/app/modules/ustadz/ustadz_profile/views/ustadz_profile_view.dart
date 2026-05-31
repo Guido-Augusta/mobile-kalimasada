@@ -40,7 +40,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
           if (ustadzData == null && !isLoading) {
             return RefreshIndicator(
               onRefresh: () async {
-                controller.fetchUstadzData();
+                controller.getUstadzData();
               },
               color: Colors.deepPurpleAccent,
               backgroundColor: Colors.white,
@@ -115,7 +115,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
 
           return RefreshIndicator(
             onRefresh: () async {
-              controller.fetchUstadzData();
+              controller.getUstadzData();
             },
             color: Colors.deepPurpleAccent,
             backgroundColor: Colors.white,
