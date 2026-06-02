@@ -43,9 +43,6 @@ class SantriProfileController extends GetxController {
   var selectedChartType = ChartType.tambahHafalan.obs;
   var selectedChartMode = 'ayat'.obs;
 
-  DateTime? _lastErrorShown;
-  DateTime? _lastNoChangeShown;
-
   @override
   void onInit() async {
     super.onInit();
@@ -81,12 +78,7 @@ class SantriProfileController extends GetxController {
             }),
       ]);
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(e.toString());
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoading.value = false;
       isLoadingChart.value = false;
@@ -101,12 +93,7 @@ class SantriProfileController extends GetxController {
       final data = await _santriRepository.getSantri(santriId);
       santriData.value = data;
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(e.toString());
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoading.value = false;
     }
@@ -118,18 +105,13 @@ class SantriProfileController extends GetxController {
       bool hasNoChange = (nama == santriData.value?.nama);
 
       if (hasNoChange) {
-        final now = DateTime.now();
-        if (_lastNoChangeShown == null ||
-            now.difference(_lastNoChangeShown!) > Duration(seconds: 3)) {
-          _lastNoChangeShown = now;
-          ToastUtils.showErrorToast('Tidak ada perubahan data');
-        }
+        ToastUtils.showErrorToast('Tidak ada perubahan data');
         return;
       }
 
       final santriId = AuthService.to.roleId.value;
 
-      await _santriRepository.updateProfileData(nama, santriId);
+      await _santriRepository.updateNamaSantri(nama, santriId);
 
       await getSantriDetail();
       if (Get.isRegistered<SantriHomeController>()) {
@@ -138,12 +120,7 @@ class SantriProfileController extends GetxController {
       Get.back();
       ToastUtils.showSuccessToast('Profil berhasil diperbarui');
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(e.toString());
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isSaveLoading.value = false;
     }
@@ -161,12 +138,7 @@ class SantriProfileController extends GetxController {
       chart.value = data;
     } catch (e) {
       isChartError.value = true;
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(e.toString());
-      }
+      ToastUtils.showErrorToast(e.toString());
     }
     isLoadingChart.value = false;
   }

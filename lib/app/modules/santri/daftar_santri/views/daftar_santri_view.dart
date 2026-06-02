@@ -60,7 +60,7 @@ class DaftarSantriView extends GetView<DaftarSantriController> {
         top: false,
         child: RefreshIndicator(
           onRefresh: () async {
-            controller.fetchData();
+            controller.getSantriList();
           },
           color: Colors.deepPurpleAccent,
           backgroundColor: Colors.white,

@@ -16,8 +16,6 @@ class SantriHomeController extends GetxController {
 
   var santri = Rxn<s.Santri>();
 
-  DateTime? _lastErrorShown;
-
   @override
   void onInit() {
     super.onInit();
@@ -35,12 +33,7 @@ class SantriHomeController extends GetxController {
       final data = await _santriRepository.getSantri(santriId);
       santri.value = data;
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(e.toString());
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoading.value = false;
     }
@@ -55,12 +48,7 @@ class SantriHomeController extends GetxController {
       Get.offAllNamed(Routes.LOGIN);
       ToastUtils.showSuccessToast('Logout berhasil');
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(e.toString());
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoadingLogout.value = false;
     }

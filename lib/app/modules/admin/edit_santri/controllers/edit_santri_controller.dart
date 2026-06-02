@@ -282,7 +282,7 @@ class EditSantriController extends GetxController {
           );
         }
         if (Get.isRegistered<DaftarSantriController>()) {
-          await Get.find<DaftarSantriController>().fetchData();
+          await Get.find<DaftarSantriController>().getSantriList();
         }
         ToastUtils.showSuccessToast('Profil berhasil diperbarui');
       } else {
@@ -335,7 +335,7 @@ class EditSantriController extends GetxController {
           );
         }
         if (Get.isRegistered<DaftarSantriController>()) {
-          await Get.find<DaftarSantriController>().fetchData();
+          await Get.find<DaftarSantriController>().getSantriList();
         }
         Get.back();
         Future.delayed(const Duration(seconds: 1), () {

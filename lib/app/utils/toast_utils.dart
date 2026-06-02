@@ -25,6 +25,7 @@ class ToastUtils {
       borderSide: BorderSide.none,
       alignment: alignment,
       autoCloseDuration: duration,
+      dragToClose: false,
       closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
       animationBuilder: (context, animation, alignment, child) {
         return FadeTransition(opacity: animation, child: child);
@@ -57,6 +58,7 @@ class ToastUtils {
       borderSide: BorderSide.none,
       alignment: alignment,
       autoCloseDuration: duration,
+      dragToClose: false,
       closeButton: ToastCloseButton(showType: CloseButtonShowType.none),
       animationBuilder: (context, animation, alignment, child) {
         return FadeTransition(opacity: animation, child: child);

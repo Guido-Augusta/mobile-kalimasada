@@ -1,14 +1,13 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/peringkat.dart';
+import 'package:mobile_kalimasada/app/data/repositories/santri_repository.dart';
+import 'package:mobile_kalimasada/app/utils/image_helper.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PeringkatController extends GetxController {
+  final _santriRepository = SantriRepository();
+
   var isLoading = false.obs;
   var peringkat = <Datum>[].obs;
 
@@ -24,8 +23,6 @@ class PeringkatController extends GetxController {
 
   final scrollController = ScrollController();
 
-  DateTime? _lastErrorShown;
-
   @override
   void onInit() {
     super.onInit();
@@ -36,6 +33,13 @@ class PeringkatController extends GetxController {
       appliedSearchQuery.value = searchQuery.value;
       getPeringkat();
     }, time: const Duration(milliseconds: 700));
+  }
+
+  @override
+  void onClose() {
+    searchController.dispose();
+    scrollController.dispose();
+    super.onClose();
   }
 
   void _setupScrollController() {
@@ -55,8 +59,7 @@ class PeringkatController extends GetxController {
   }
 
   String getImageUrl(String imageUrl) {
-    String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
-    return newImageUrl;
+    return ImageHelper.getImageUrl(imageUrl);
   }
 
   Future<void> getPeringkat() async {
@@ -64,51 +67,22 @@ class PeringkatController extends GetxController {
       _resetPagination();
 
       isLoading.value = true;
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
 
-      final queryParams = {
-        'page': currentPage.toString(),
-        'limit': _perPage.toString(),
-        'search': searchQuery.value,
-        'tahapHafalan': selectedTahap.value,
-      };
-
-      final uri = Uri.parse(
-        ApiUrl.santriRank,
-      ).replace(queryParameters: queryParams);
-
-      final response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
+      final data = await _santriRepository.getPeringkatList(
+        currentPage: currentPage,
+        limit: _perPage,
+        search: searchQuery.value,
+        tahapHafalan: selectedTahap.value,
       );
 
-      if (response.statusCode == 200) {
-        peringkat.clear();
-        final data = jsonDecode(response.body);
-        peringkat.value = List<Datum>.from(
-          data['data'].map((x) => Datum.fromJson(x)),
-        );
+      peringkat.clear();
+      peringkat.assignAll(data);
 
-        if (peringkat.length < _perPage) {
-          hasMore = false;
-        }
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat data peringkat');
+      if (peringkat.length < _perPage) {
+        hasMore = false;
       }
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoading.value = false;
     }
@@ -131,56 +105,21 @@ class PeringkatController extends GetxController {
     currentPage++;
 
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      if (token != null) {
-        final queryParams = {
-          'page': currentPage.toString(),
-          'limit': _perPage.toString(),
-          'search': searchQuery.value,
-          'tahapHafalan': selectedTahap.value,
-        };
+      final data = await _santriRepository.getPeringkatList(
+        currentPage: currentPage,
+        limit: _perPage,
+        search: searchQuery.value,
+        tahapHafalan: selectedTahap.value,
+      );
 
-        final uri = Uri.parse(
-          ApiUrl.santriRank,
-        ).replace(queryParameters: queryParams);
+      peringkat.addAll(data);
 
-        final response = await http.get(
-          uri,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-            'x-platform': 'mobile',
-          },
-        );
-
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final newItems = List<Datum>.from(
-            data['data'].map((x) => Datum.fromJson(x)),
-          );
-          peringkat.addAll(newItems);
-
-          if (newItems.length < _perPage) {
-            hasMore = false;
-          }
-        } else {
-          currentPage = originalPage;
-          ToastUtils.showErrorToast('Gagal memuat data tambahan');
-        }
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat data tambahan');
+      if (data.length < _perPage) {
+        hasMore = false;
       }
     } catch (e) {
       currentPage = originalPage;
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
-      }
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoadingMore.value = false;
     }

@@ -47,8 +47,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
       () => Scaffold(
         backgroundColor: const Color(0xFFF1F5F9), // Modern soft background
         appBar:
-            (!controller.isLoading.value &&
-                controller.santriDetail.value == null)
+            (!controller.isLoading.value && controller.santriData.value == null)
             ? AppBar(
                 title: Text(
                   'Profil Santri',
@@ -62,7 +61,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
         body: SafeArea(
           top: false,
           child: Obx(() {
-            final santri = controller.santriDetail.value;
+            final santri = controller.santriData.value;
 
             if (controller.isLoading.value) {
               return Skeletonizer(
@@ -79,7 +78,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
           }),
         ),
         bottomNavigationBar:
-            (controller.santriDetail.value != null &&
+            (controller.santriData.value != null &&
                 !controller.isLoading.value &&
                 !controller.isAdmin)
             ? _buildBottomButtons()
@@ -1166,7 +1165,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
 
   void _showEditTahapDialog() {
     controller.selectedTahap.value =
-        controller.santriDetail.value?.tahapHafalan ?? 'Level1';
+        controller.santriData.value?.tahapHafalan ?? 'Level1';
     Get.dialog(
       Dialog(
         backgroundColor: Colors.white,
@@ -1207,7 +1206,7 @@ class DetailSantriView extends GetView<DetailSantriController> {
                   () => DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: controller.selectedTahap.value.isEmpty
-                          ? controller.santriDetail.value?.tahapHafalan
+                          ? controller.santriData.value?.tahapHafalan
                           : controller.selectedTahap.value,
                       isExpanded: true,
                       icon: Icon(

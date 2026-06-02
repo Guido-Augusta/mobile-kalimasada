@@ -157,7 +157,7 @@ class TambahSantriController extends GetxController {
           print(data);
         }
         if (Get.isRegistered<DaftarSantriController>()) {
-          await Get.find<DaftarSantriController>().fetchData();
+          await Get.find<DaftarSantriController>().getSantriList();
         }
         resetForm();
         ToastUtils.showSuccessToast('Santri berhasil ditambahkan');
