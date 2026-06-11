@@ -12,7 +12,7 @@ import '../../../../utils/image_helper.dart';
 import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class DetailOrtuController extends GetxController {
-  final OrtuRepository _ortuRepository = OrtuRepository();
+  final OrtuRepository _ortuRepository = Get.find<OrtuRepository>();
 
   var isLoading = false.obs;
   var isLoadingSantriList = false.obs;

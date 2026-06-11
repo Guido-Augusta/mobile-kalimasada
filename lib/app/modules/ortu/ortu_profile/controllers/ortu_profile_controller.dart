@@ -15,8 +15,8 @@ import '../../../../data/repositories/ortu_repository.dart';
 import '../../../../utils/image_helper.dart';
 
 class OrtuProfileController extends GetxController {
-  final OrtuRepository _ortuRepository = OrtuRepository();
-  final AuthRepository _authRepository = AuthRepository();
+  final OrtuRepository _ortuRepository = Get.find<OrtuRepository>();
+  final AuthRepository _authRepository = Get.find<AuthRepository>();
 
   final formKey = GlobalKey<FormState>();
 

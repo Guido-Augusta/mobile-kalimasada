@@ -6,7 +6,7 @@ import 'package:mobile_kalimasada/app/utils/image_helper.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 
 class PeringkatController extends GetxController {
-  final _santriRepository = SantriRepository();
+  final _santriRepository = Get.find<SantriRepository>();
 
   var isLoading = false.obs;
   var peringkat = <Datum>[].obs;

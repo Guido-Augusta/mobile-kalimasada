@@ -8,7 +8,7 @@ import '../../../../utils/toast_utils.dart';
 import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class DetailUstadzController extends GetxController {
-  final UstadzRepository _ustadzRepository = UstadzRepository();
+  final UstadzRepository _ustadzRepository = Get.find<UstadzRepository>();
 
   final ustadzId = Get.arguments['ustadzId'];
   final isLoading = true.obs;

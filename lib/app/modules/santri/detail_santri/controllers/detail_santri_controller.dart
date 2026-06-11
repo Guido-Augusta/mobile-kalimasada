@@ -11,7 +11,7 @@ import '../../../../utils/image_helper.dart';
 enum ChartType { tambahHafalan, murajaah, tahsin }
 
 class DetailSantriController extends GetxController {
-  final _santriRepository = SantriRepository();
+  final _santriRepository = Get.find<SantriRepository>();
 
   String token = AuthService.to.token.value;
   Rx<UserRole> userRole = AuthService.to.currentRole;

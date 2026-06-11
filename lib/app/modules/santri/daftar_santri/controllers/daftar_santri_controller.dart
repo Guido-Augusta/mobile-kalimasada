@@ -8,7 +8,7 @@ import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import '../../../../services/auth_service.dart';
 
 class DaftarSantriController extends GetxController {
-  final _santriRepository = SantriRepository();
+  final _santriRepository = Get.find<SantriRepository>();
 
   final token = AuthService.to.token.value;
 

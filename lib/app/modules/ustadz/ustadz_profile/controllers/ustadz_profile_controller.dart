@@ -17,8 +17,8 @@ import '../../../../data/repositories/ustadz_repository.dart';
 import '../../../../routes/app_pages.dart';
 
 class UstadzProfileController extends GetxController {
-  final UstadzRepository _ustadzRepository = UstadzRepository();
-  final AuthRepository _authRepository = AuthRepository();
+  final UstadzRepository _ustadzRepository = Get.find<UstadzRepository>();
+  final AuthRepository _authRepository = Get.find<AuthRepository>();
 
   final formKey = GlobalKey<FormState>();
 

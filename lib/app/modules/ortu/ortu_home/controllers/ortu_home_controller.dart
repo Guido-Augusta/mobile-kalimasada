@@ -11,8 +11,8 @@ import '../../../../data/repositories/ortu_repository.dart';
 import '../../../../utils/image_helper.dart';
 
 class OrtuHomeController extends GetxController {
-  final OrtuRepository _ortuRepository = OrtuRepository();
-  final AuthRepository _authRepository = AuthRepository();
+  final OrtuRepository _ortuRepository = Get.find<OrtuRepository>();
+  final AuthRepository _authRepository = Get.find<AuthRepository>();
 
   // ── State Variables ────────────────────────────────────────────────────────
   final isLoading = true.obs;

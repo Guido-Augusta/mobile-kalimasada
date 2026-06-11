@@ -8,8 +8,8 @@ import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import 'package:mobile_kalimasada/app/data/repositories/santri_repository.dart';
 
 class SantriHomeController extends GetxController {
-  final SantriRepository _santriRepository = SantriRepository();
-  final AuthRepository _authRepository = AuthRepository();
+  final SantriRepository _santriRepository = Get.find<SantriRepository>();
+  final AuthRepository _authRepository = Get.find<AuthRepository>();
 
   var isLoading = true.obs;
   var isLoadingLogout = false.obs;

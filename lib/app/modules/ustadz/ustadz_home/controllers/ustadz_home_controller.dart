@@ -10,8 +10,8 @@ import '../../../../data/repositories/auth_repository.dart';
 import '../../../../routes/app_pages.dart';
 
 class UstadzHomeController extends GetxController {
-  final UstadzRepository _ustadzRepository = UstadzRepository();
-  final AuthRepository _authRepository = AuthRepository();
+  final UstadzRepository _ustadzRepository = Get.find<UstadzRepository>();
+  final AuthRepository _authRepository = Get.find<AuthRepository>();
 
   var isLoading = true.obs;
   var isLoadingLogout = false.obs;

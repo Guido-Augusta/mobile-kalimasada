@@ -14,8 +14,8 @@ import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 enum ChartType { tambahHafalan, murajaah, tahsin }
 
 class SantriProfileController extends GetxController {
-  final _authRepository = AuthRepository();
-  final _santriRepository = SantriRepository();
+  final _authRepository = Get.find<AuthRepository>();
+  final _santriRepository = Get.find<SantriRepository>();
 
   final santriId = AuthService.to.roleId.value;
 
