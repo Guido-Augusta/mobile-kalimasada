@@ -1,7 +1,7 @@
 // GET http://10.0.2.2:5000/api/hafalan/:santriId/surah/:surahId?mode=tambah
 
-class DetailHafalan {
-  DetailHafalan({
+class DetailHafalanSurah {
+  DetailHafalanSurah({
     required this.surah,
     required this.santriId,
     required this.mode,
@@ -13,8 +13,8 @@ class DetailHafalan {
   final String? mode;
   final List<Ayat> ayat;
 
-  factory DetailHafalan.fromJson(Map<String, dynamic> json) {
-    return DetailHafalan(
+  factory DetailHafalanSurah.fromJson(Map<String, dynamic> json) {
+    return DetailHafalanSurah(
       surah: json["surah"] == null ? null : Surah.fromJson(json["surah"]),
       santriId: json["santriId"],
       mode: json["mode"],

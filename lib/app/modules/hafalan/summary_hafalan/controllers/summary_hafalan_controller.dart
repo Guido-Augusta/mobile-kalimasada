@@ -1,17 +1,14 @@
-import 'dart:convert';
-
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/summary_hafalan_juz.dart'
     as juz_model;
 import 'package:mobile_kalimasada/app/data/models/summary_hafalan_surah.dart'
     as surah_model;
+import 'package:mobile_kalimasada/app/data/repositories/hafalan_repository.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SummaryHafalanController extends GetxController {
+  final HafalanRepository _hafalanRepository = Get.find<HafalanRepository>();
   var isLoading = false.obs;
 
   var searchQuery = ''.obs;
@@ -82,29 +79,6 @@ class SummaryHafalanController extends GetxController {
     });
   }
 
-  Map<String, String> _buildQueryParams() {
-    return {
-      'page': currentPage.toString(),
-      'limit': _perPage.toString(),
-      'status': status.value,
-      'tahapHafalan': level.value,
-      if (mode.value == 'surah') 'sortByAyat': filterBy.value,
-      if (mode.value == 'juz') 'sortByHalaman': filterBy.value,
-      'name': searchQuery.value,
-      'mode': mode.value,
-    };
-  }
-
-  Future<Map<String, String>> _getHeaders() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-      'x-platform': 'mobile',
-    };
-  }
-
   void _showError(String msg) {
     final now = DateTime.now();
     if (_lastErrorShown == null ||
@@ -119,35 +93,33 @@ class SummaryHafalanController extends GetxController {
       isLoading.value = true;
       _resetPagination();
 
-      final headers = await _getHeaders();
-      final uri = Uri.parse(
-        ApiUrl.summaryHafalan,
-      ).replace(queryParameters: _buildQueryParams());
-
-      final response = await http.get(uri, headers: headers);
-
-      if (response.statusCode == 200) {
+      if (mode.value == 'surah') {
+        final items = await _hafalanRepository.fetchSummaryHafalanSurah(
+          page: currentPage,
+          limit: _perPage,
+          status: status.value,
+          tahapHafalan: level.value,
+          sortByAyat: filterBy.value,
+          name: searchQuery.value,
+        );
         clearList();
-        final data = jsonDecode(response.body);
-
-        if (mode.value == 'surah') {
-          final items = List<surah_model.Datum>.from(
-            data['data'].map((x) => surah_model.Datum.fromJson(x)),
-          );
-          if (items.length < _perPage) hasMore.value = false;
-          summaryHafalanSurahList.value = items;
-        } else {
-          final items = List<juz_model.Datum>.from(
-            data['data'].map((x) => juz_model.Datum.fromJson(x)),
-          );
-          if (items.length < _perPage) hasMore.value = false;
-          summaryHafalanJuzList.value = items;
-        }
+        if (items.length < _perPage) hasMore.value = false;
+        summaryHafalanSurahList.value = items;
       } else {
-        _showError('Gagal memuat data');
+        final items = await _hafalanRepository.fetchSummaryHafalanJuz(
+          page: currentPage,
+          limit: _perPage,
+          status: status.value,
+          tahapHafalan: level.value,
+          sortByHalaman: filterBy.value,
+          name: searchQuery.value,
+        );
+        clearList();
+        if (items.length < _perPage) hasMore.value = false;
+        summaryHafalanJuzList.value = items;
       }
     } catch (e) {
-      _showError('Terjadi kesalahan\nPeriksa koneksi internet Anda');
+      _showError(e.toString());
     } finally {
       isLoading.value = false;
     }
@@ -160,36 +132,32 @@ class SummaryHafalanController extends GetxController {
       isLoadingMore.value = true;
       currentPage++;
 
-      final headers = await _getHeaders();
-      final uri = Uri.parse(
-        ApiUrl.summaryHafalan,
-      ).replace(queryParameters: _buildQueryParams());
-
-      final response = await http.get(uri, headers: headers);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        if (mode.value == 'surah') {
-          final items = List<surah_model.Datum>.from(
-            data['data'].map((x) => surah_model.Datum.fromJson(x)),
-          );
-          if (items.length < _perPage) hasMore.value = false;
-          summaryHafalanSurahList.addAll(items);
-        } else {
-          final items = List<juz_model.Datum>.from(
-            data['data'].map((x) => juz_model.Datum.fromJson(x)),
-          );
-          if (items.length < _perPage) hasMore.value = false;
-          summaryHafalanJuzList.addAll(items);
-        }
+      if (mode.value == 'surah') {
+        final items = await _hafalanRepository.fetchSummaryHafalanSurah(
+          page: currentPage,
+          limit: _perPage,
+          status: status.value,
+          tahapHafalan: level.value,
+          sortByAyat: filterBy.value,
+          name: searchQuery.value,
+        );
+        if (items.length < _perPage) hasMore.value = false;
+        summaryHafalanSurahList.addAll(items);
       } else {
-        currentPage--;
-        _showError('Gagal memuat data');
+        final items = await _hafalanRepository.fetchSummaryHafalanJuz(
+          page: currentPage,
+          limit: _perPage,
+          status: status.value,
+          tahapHafalan: level.value,
+          sortByHalaman: filterBy.value,
+          name: searchQuery.value,
+        );
+        if (items.length < _perPage) hasMore.value = false;
+        summaryHafalanJuzList.addAll(items);
       }
     } catch (e) {
       currentPage--;
-      _showError('Terjadi kesalahan\nPeriksa koneksi internet Anda');
+      _showError(e.toString());
     } finally {
       isLoadingMore.value = false;
     }
@@ -206,5 +174,12 @@ class SummaryHafalanController extends GetxController {
       default:
         return 'Tidak ada tahapan';
     }
+  }
+
+  @override
+  void onClose() {
+    searchController.dispose();
+    scrollController.dispose();
+    super.onClose();
   }
 }

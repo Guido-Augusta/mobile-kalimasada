@@ -1,16 +1,15 @@
-import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_hafalan_juz.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../data/repositories/hafalan_repository.dart';
 import '../../progres_hafalan/controllers/progres_hafalan_controller.dart';
 
 class DetailHafalanJuzController extends GetxController {
+  final HafalanRepository _hafalanRepository = Get.find<HafalanRepository>();
+
   RxBool isJuzInfoLoading = false.obs;
 
   // Loading states per mode
@@ -20,11 +19,9 @@ class DetailHafalanJuzController extends GetxController {
 
   RxBool isSaveLoading = false.obs;
 
-  late String santriId;
-  late String juzId;
-  // We don't have santriName from arguments possibly if it only passed juzId and santriId,
-  // let's grab it or default to something
-  String santriName = 'Santri';
+  final juzId = Get.arguments['juzId'].toString();
+  final santriId = Get.arguments['santriId'].toString();
+  final santriName = Get.arguments['santriName'].toString();
 
   // Data per mode (Original)
   var detailTambah = Rxn<DetailHafalanJuz>();
@@ -87,20 +84,9 @@ class DetailHafalanJuzController extends GetxController {
     return detail.surah.last.ayat.last.halaman ?? 0;
   }
 
-  DateTime? _lastErrorShown;
-
   @override
   void onInit() {
     super.onInit();
-    final args = Get.arguments;
-    if (args != null) {
-      santriId = args['santriId'].toString();
-      juzId = args['juzId'].toString();
-      if (args.containsKey('santriName')) {
-        santriName = args['santriName'].toString();
-      }
-    }
-
     getDetailTambah();
   }
 
@@ -158,29 +144,17 @@ class DetailHafalanJuzController extends GetxController {
   Future<void> getDetailTambah() async {
     try {
       isLoadingTambah.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
 
-      final response = await http.get(
-        Uri.parse(ApiUrl.detailHafalanPerJuzTambah(santriId, juzId)),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-          'x-platform': 'mobile',
-        },
+      final data = await _hafalanRepository.fetchDetailHafalanJuz(
+        santriId,
+        juzId,
       );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final detail = DetailHafalanJuz.fromJson(data);
-        detailTambah.value = detail;
-        itemsTambah.assignAll(detail.surah.expand((s) => [s, ...s.ayat]));
-        lastCheckedTambah.value = _getLastCheckedIndex(itemsTambah);
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat hafalan juz');
-      }
+      detailTambah.value = data;
+      itemsTambah.assignAll(data.surah.expand((s) => [s, ...s.ayat]));
+      lastCheckedTambah.value = _getLastCheckedIndex(itemsTambah);
     } catch (e) {
-      ToastUtils.showErrorToast('Periksa koneksi internet Anda');
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoadingTambah.value = false;
     }
@@ -189,29 +163,17 @@ class DetailHafalanJuzController extends GetxController {
   Future<void> getDetailMurajaah() async {
     try {
       isLoadingMurajaah.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
 
-      final response = await http.get(
-        Uri.parse(ApiUrl.detailHafalanPerJuzMurajaah(santriId, juzId)),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-          'x-platform': 'mobile',
-        },
+      final data = await _hafalanRepository.fetchDetailMurajaahJuz(
+        santriId,
+        juzId,
       );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final detail = DetailHafalanJuz.fromJson(data);
-        detailMurajaah.value = detail;
-        itemsMurajaah.assignAll(detail.surah.expand((s) => [s, ...s.ayat]));
-        lastCheckedMurajaah.value = _getLastCheckedIndex(itemsMurajaah);
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat murajaah juz');
-      }
+      detailMurajaah.value = data;
+      itemsMurajaah.assignAll(data.surah.expand((s) => [s, ...s.ayat]));
+      lastCheckedMurajaah.value = _getLastCheckedIndex(itemsMurajaah);
     } catch (e) {
-      ToastUtils.showErrorToast('Periksa koneksi internet Anda');
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoadingMurajaah.value = false;
     }
@@ -220,27 +182,15 @@ class DetailHafalanJuzController extends GetxController {
   Future<void> getDetailTahsin() async {
     try {
       isLoadingTahsin.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
 
-      final response = await http.get(
-        Uri.parse(ApiUrl.detailHafalanPerJuzTahsin(santriId, juzId)),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-          'x-platform': 'mobile',
-        },
+      final data = await _hafalanRepository.fetchDetailTahsinJuz(
+        santriId,
+        juzId,
       );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final detail = DetailHafalanJuz.fromJson(data);
-        detailTahsin.value = detail;
-        itemsTahsin.assignAll(detail.surah.expand((s) => [s, ...s.ayat]));
-        lastCheckedTahsin.value = _getLastCheckedIndex(itemsTahsin);
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat tahsin juz');
-      }
+      detailTahsin.value = data;
+      itemsTahsin.assignAll(data.surah.expand((s) => [s, ...s.ayat]));
+      lastCheckedTahsin.value = _getLastCheckedIndex(itemsTahsin);
     } catch (e) {
       ToastUtils.showErrorToast('Periksa koneksi internet Anda');
     } finally {
@@ -268,7 +218,7 @@ class DetailHafalanJuzController extends GetxController {
     }
   }
 
-  Future<bool> saveSetoranByHalaman(
+  Future<void> saveSetoranByHalaman(
     int santriId,
     int juzId,
     int halamanMulai,
@@ -279,13 +229,10 @@ class DetailHafalanJuzController extends GetxController {
   ) async {
     try {
       isSaveLoading.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
 
       final detail = currentDetail;
       if (detail == null) {
         ToastUtils.showErrorToast('Data ayat belum tersedia');
-        return false;
       }
 
       String status = selectedTab.value == 0
@@ -298,64 +245,34 @@ class DetailHafalanJuzController extends GetxController {
         kualitas = 'SangatBaik';
       }
 
-      final response = await http.post(
-        Uri.parse(ApiUrl.saveSetoranByHalaman),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-        body: jsonEncode({
-          'santriId': santriId,
-          'juzId': juzId,
-          'halamanAwal': halamanMulai,
-          'halamanAkhir': halamanSelesai,
-          'status': status,
-          'kualitas': kualitas ?? 'Baik',
-          'keterangan': keterangan,
-          'catatan': catatan ?? '',
-        }),
+      await _hafalanRepository.saveSetoranByHalaman(
+        santriId,
+        juzId,
+        halamanMulai,
+        halamanSelesai,
+        status,
+        kualitas,
+        keterangan,
+        catatan,
       );
 
-      if (response.statusCode == 200) {
-        ToastUtils.showSuccessToast('Setoran berhasil disimpan');
-        if (selectedTab.value == 0) {
-          getDetailTambah();
-        } else if (selectedTab.value == 1) {
-          getDetailMurajaah();
-        } else if (selectedTab.value == 2) {
-          getDetailTahsin();
-        }
+      if (selectedTab.value == 0) {
+        await getDetailTambah();
+      } else if (selectedTab.value == 1) {
+        await getDetailMurajaah();
+      } else if (selectedTab.value == 2) {
+        await getDetailTahsin();
+      }
 
-        if (Get.isRegistered<ProgresHafalanController>()) {
-          await Future.wait([
-            Get.find<ProgresHafalanController>().getProgresHafalanSurah(
-              santriId.toString(),
-            ),
-            Get.find<ProgresHafalanController>().getProgresHafalanJuz(
-              santriId.toString(),
-            ),
-          ]);
-        }
-        return true;
-      } else {
-        ToastUtils.showErrorToast('Gagal menyimpan setoran');
-        return false;
+      if (Get.isRegistered<ProgresHafalanController>()) {
+        await Get.find<ProgresHafalanController>().loadData();
       }
+      ToastUtils.showSuccessToast('Setoran berhasil disimpan');
+      Get.back();
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
-      }
-      return false;
+      ToastUtils.showErrorToast(e.toString());
     } finally {
-      Future.delayed(const Duration(milliseconds: 300), () {
-        isSaveLoading.value = false;
-      });
+      isSaveLoading.value = false;
     }
   }
 }
