@@ -8,9 +8,9 @@ import 'package:mobile_kalimasada/app/data/providers/api_client.dart';
 class UstadzRepository {
   final ApiClient _apiClient = ApiClient();
 
-  Future<Ustadz> getUstadz(String santriId) async {
+  Future<Ustadz> getUstadz(String ustadzId) async {
     try {
-      final response = await _apiClient.dio.get(ApiUrl.ustadzDetail(santriId));
+      final response = await _apiClient.dio.get(ApiUrl.ustadzDetail(ustadzId));
 
       if (response.statusCode == 200) {
         return Ustadz.fromJson(response.data['data']);

@@ -1,24 +1,22 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/data/models/riwayat_hafalan_ayat.dart'
     as model_ayat;
 import 'package:mobile_kalimasada/app/data/models/riwayat_hafalan_halaman.dart'
     as model_halaman;
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../../data/repositories/riwayat_repository.dart';
 
 class RiwayatHafalanController extends GetxController {
-  final santriId = Get.arguments['santriId'];
+  final RiwayatRepository _riwayatRepository = Get.find<RiwayatRepository>();
+
+  final int santriId = int.parse(Get.arguments['santriId'].toString());
 
   var filterStatus = 'TambahHafalan'.obs; // TambahHafalan, Murajaah, Tahsin
   var filterMode = 'ayat'.obs; // ayat, halaman
 
   var profilSantri = Rxn<model_ayat.Santri>();
-  var totalSetoran = 0.obs;
 
   var riwayatAyatData = <model_ayat.Datum>[].obs;
   var riwayatHalamanData = <model_halaman.Datum>[].obs;
@@ -28,23 +26,17 @@ class RiwayatHafalanController extends GetxController {
   var hasMore = true.obs;
 
   var isLoading = false.obs;
-  var isInitialLoading = true.obs;
   var isLoadingMore = false.obs;
 
-  DateTime? _lastErrorShown;
+  static const Duration _kMinSkeletonDuration = Duration(milliseconds: 400);
 
   final ScrollController scrollController = ScrollController();
 
   @override
   void onInit() async {
     super.onInit();
-    _loadInitialData();
+    getRiwayatData();
     _setupScrollController();
-  }
-
-  Future<void> _loadInitialData() async {
-    await getRiwayatData();
-    isInitialLoading.value = false;
   }
 
   void _setupScrollController() {
@@ -62,58 +54,54 @@ class RiwayatHafalanController extends GetxController {
     super.onClose();
   }
 
-  Future<void> getRiwayatData() async {
-    if (isLoading.value) return;
-
+  Future<void> getRiwayatData({bool isSilent = false}) async {
     try {
-      isLoading.value = true;
+      if (!isSilent) {
+        isLoading.value = true;
+        riwayatAyatData.clear();
+        riwayatHalamanData.clear();
+      }
       currentPage = 1;
       hasMore.value = true;
 
-      if (filterMode.value == 'ayat') {
-        riwayatAyatData.clear();
-      } else {
-        riwayatHalamanData.clear();
-      }
-
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
-        ToastUtils.showErrorToast('Anda tidak terautentikasi');
-        Get.offAllNamed('/login');
-        return;
-      }
-
-      final response = await _fetchRiwayatFromApi(token, currentPage);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        if (filterMode.value == 'ayat') {
-          final riwayat = model_ayat.RiwayatHafalanAyat.fromJson(data);
-          profilSantri.value = riwayat.santri;
-          totalSetoran.value = riwayat.pagination?.totalData ?? 0;
-          riwayatAyatData.addAll(riwayat.data);
-          hasMore.value = riwayat.data.length >= _perPage;
-        } else {
-          final riwayat = model_halaman.RiwayatHafalanHalaman.fromJson(data);
-          if (data['santri'] != null) {
-            profilSantri.value = model_ayat.Santri.fromJson(data['santri']);
-          }
-          totalSetoran.value = riwayat.pagination?.totalData ?? 0;
-          riwayatHalamanData.addAll(riwayat.data);
-          hasMore.value = riwayat.data.length >= _perPage;
-        }
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat data riwayat');
-      }
+      await Future.wait([
+        _fetchRiwayat(),
+        if (!isSilent) Future.delayed(_kMinSkeletonDuration),
+      ]);
     } catch (e) {
-      _showErrorThrottled();
+      ToastUtils.showErrorToast(e.toString());
     } finally {
-      Future.delayed(const Duration(milliseconds: 300), () {
-        isLoading.value = false;
-      });
+      if (!isSilent) isLoading.value = false;
+    }
+  }
+
+  Future<void> _fetchRiwayat() async {
+    if (filterMode.value == 'ayat') {
+      final riwayat = await _riwayatRepository.getRiwayatAyat(
+        santriId: santriId,
+        page: currentPage,
+        limit: _perPage,
+        status: filterStatus.value,
+      );
+      profilSantri.value = riwayat.santri;
+      riwayatAyatData.clear();
+      riwayatAyatData.addAll(riwayat.data);
+      hasMore.value = riwayat.data.length >= _perPage;
+    } else {
+      final riwayat = await _riwayatRepository.getRiwayatHalaman(
+        santriId: santriId,
+        page: currentPage,
+        limit: _perPage,
+        status: filterStatus.value,
+      );
+      if (riwayat.santri != null) {
+        profilSantri.value = model_ayat.Santri.fromJson(
+          riwayat.santri!.toJson(),
+        );
+      }
+      riwayatHalamanData.clear();
+      riwayatHalamanData.addAll(riwayat.data);
+      hasMore.value = riwayat.data.length >= _perPage;
     }
   }
 
@@ -125,65 +113,35 @@ class RiwayatHafalanController extends GetxController {
       isLoadingMore.value = true;
       currentPage++;
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
-        ToastUtils.showErrorToast('Anda tidak terautentikasi');
-        Get.offAllNamed('/login');
-        return;
-      }
-
-      final response = await _fetchRiwayatFromApi(token, currentPage);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        if (filterMode.value == 'ayat') {
-          final riwayat = model_ayat.RiwayatHafalanAyat.fromJson(data);
-          riwayatAyatData.addAll(riwayat.data);
-          hasMore.value = riwayat.data.length >= _perPage;
-        } else {
-          final riwayat = model_halaman.RiwayatHafalanHalaman.fromJson(data);
-          riwayatHalamanData.addAll(riwayat.data);
-          hasMore.value = riwayat.data.length >= _perPage;
-        }
+      if (filterMode.value == 'ayat') {
+        final riwayat = await _riwayatRepository.getRiwayatAyat(
+          santriId: santriId,
+          page: currentPage,
+          limit: _perPage,
+          status: filterStatus.value,
+        );
+        riwayatAyatData.addAll(riwayat.data);
+        hasMore.value = riwayat.data.length >= _perPage;
       } else {
-        currentPage--;
-        ToastUtils.showErrorToast('Gagal memuat data');
+        final riwayat = await _riwayatRepository.getRiwayatHalaman(
+          santriId: santriId,
+          page: currentPage,
+          limit: _perPage,
+          status: filterStatus.value,
+        );
+        riwayatHalamanData.addAll(riwayat.data);
+        hasMore.value = riwayat.data.length >= _perPage;
       }
     } catch (e) {
       currentPage--;
-      _showErrorThrottled();
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isLoadingMore.value = false;
     }
   }
 
-  Future<http.Response> _fetchRiwayatFromApi(String token, int page) async {
-    final queryParams = {
-      'page': page.toString(),
-      'limit': _perPage.toString(),
-      'status': filterStatus.value,
-      'mode': filterMode.value,
-    };
-
-    final uri = Uri.parse(
-      ApiUrl.riwayatHafalan(santriId),
-    ).replace(queryParameters: queryParams);
-
-    return await http.get(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-        'x-platform': 'mobile',
-      },
-    );
-  }
-
-  void refreshRiwayatHafalan() {
-    getRiwayatData();
+  Future<void> refreshRiwayatHafalan() async {
+    await getRiwayatData(isSilent: true);
   }
 
   void updateFilterStatus(String status) {
@@ -210,49 +168,21 @@ class RiwayatHafalanController extends GetxController {
     int? juzId,
   }) async {
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
-        ToastUtils.showErrorToast('Anda tidak terautentikasi');
-        Get.offAllNamed('/login');
-        return;
-      }
-
-      final body = <String, dynamic>{
-        'santriId': santriId,
-        'tanggal': tanggal,
-        'status': status,
-      };
-
-      if (filterMode.value == 'ayat' && surahId != null) {
-        body['surahId'] = surahId;
-      } else if (filterMode.value == 'halaman' && juzId != null) {
-        body['juzId'] = juzId;
-      }
-
-      final response = await http.delete(
-        Uri.parse(ApiUrl.deleteRiwayatHafalan),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-        body: jsonEncode(body),
+      await _riwayatRepository.deleteRiwayatHafalan(
+        santriId: santriId,
+        tanggal: tanggal,
+        status: status,
+        mode: filterMode.value,
+        surahId: surahId,
+        juzId: juzId,
       );
 
-      if (response.statusCode == 200) {
-        ToastUtils.showSuccessToast(
-          'Riwayat ${getStatusText(status)} berhasil dihapus',
-        );
-        refreshRiwayatHafalan();
-      } else {
-        ToastUtils.showErrorToast(
-          'Gagal menghapus riwayat ${getStatusText(status)}',
-        );
-      }
+      ToastUtils.showSuccessToast(
+        'Riwayat ${getStatusText(status)} berhasil dihapus',
+      );
+      refreshRiwayatHafalan();
     } catch (e) {
-      _showErrorThrottled();
+      ToastUtils.showErrorToast(e.toString());
     }
   }
 
@@ -266,17 +196,6 @@ class RiwayatHafalanController extends GetxController {
         return 'Tahsin';
       default:
         return status ?? '-';
-    }
-  }
-
-  void _showErrorThrottled() {
-    final now = DateTime.now();
-    if (_lastErrorShown == null ||
-        now.difference(_lastErrorShown!) > const Duration(seconds: 3)) {
-      _lastErrorShown = now;
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
     }
   }
 }

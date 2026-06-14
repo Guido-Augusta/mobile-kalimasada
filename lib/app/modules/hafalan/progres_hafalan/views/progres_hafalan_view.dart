@@ -203,7 +203,7 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(32),
+                              padding: const EdgeInsets.all(24),
                               decoration: BoxDecoration(
                                 color: Colors.deepPurpleAccent.withValues(
                                   alpha: 0.05,
@@ -212,18 +212,19 @@ class ProgresHafalanView extends GetView<ProgresHafalanController> {
                               ),
                               child: Icon(
                                 Icons.book_outlined,
-                                size: 64,
+                                size: 48,
                                 color: Colors.deepPurpleAccent.withValues(
                                   alpha: 0.3,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 16),
                             Text(
                               'Tidak Ada Data',
                               style: GoogleFonts.poppins(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
+                                color: Colors.grey[700],
                               ),
                             ),
                             const SizedBox(height: 8),

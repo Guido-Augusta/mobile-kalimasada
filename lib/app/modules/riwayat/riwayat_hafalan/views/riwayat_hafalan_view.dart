@@ -3,8 +3,17 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import '../../../../services/auth_service.dart';
+import 'package:mobile_kalimasada/app/data/models/riwayat_hafalan_ayat.dart'
+    as model_ayat;
+import 'package:mobile_kalimasada/app/data/models/riwayat_hafalan_halaman.dart'
+    as model_halaman;
+
 import '../controllers/riwayat_hafalan_controller.dart';
+import '../widgets/riwayat_ayat_card.dart';
+import '../widgets/riwayat_halaman_card.dart';
+import '../widgets/riwayat_empty_state.dart';
+import '../widgets/riwayat_filter.dart';
+import '../widgets/riwayat_header.dart';
 
 class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
   const RiwayatHafalanView({super.key});
@@ -14,7 +23,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Riwayat Hafalan',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
         ),
@@ -27,9 +36,7 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
         return SafeArea(
           top: false,
           child: RefreshIndicator(
-            onRefresh: () async {
-              controller.refreshRiwayatHafalan();
-            },
+            onRefresh: () => controller.refreshRiwayatHafalan(),
             color: Colors.deepPurpleAccent,
             backgroundColor: Colors.white,
             child: CustomScrollView(
@@ -46,22 +53,209 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
   }
 
   Widget _buildRiwayatList() {
-    if (controller.isLoading.value) {
-      return _loadingState();
-    }
     final isAyatMode = controller.filterMode.value == 'ayat';
     final items = isAyatMode
         ? controller.riwayatAyatData
         : controller.riwayatHalamanData;
 
-    if (items.isEmpty) {
-      return _buildEmptyState();
-    } else {
+    final isLoading = controller.isLoading.value;
+
+    if (isLoading && items.isEmpty) {
       return SliverPadding(
         padding: const EdgeInsets.only(bottom: 40),
-        sliver: _buildRiwayatListData(),
+        sliver: Skeletonizer.sliver(
+          enabled: true,
+          child: SliverList.separated(
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildDummyCard(),
+              );
+            },
+            itemCount: 4,
+          ),
+        ),
       );
     }
+
+    if (items.isEmpty) {
+      return const SliverFillRemaining(child: RiwayatEmptyState());
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.only(bottom: 40),
+      sliver: Skeletonizer.sliver(
+        enabled: isLoading,
+        child: _buildRiwayatListData(),
+      ),
+    );
+  }
+
+  Widget _buildDummyCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            spreadRadius: 0,
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(11),
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(
+                    Icons.auto_stories_rounded,
+                    color: Colors.deepPurpleAccent,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Nama Surah Placeholder',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          'Ayat 1 - 10',
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: Colors.grey[500],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Colors.grey.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Text(
+                    'Hafalan',
+                    style: GoogleFonts.poppins(
+                      color: Colors.grey,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Divider(height: 1, color: Colors.grey[200]),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[600]!.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.calendar_month_rounded,
+                              size: 14,
+                              color: Colors.grey[600],
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '12 Jun 2026',
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.amber[600]!.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.auto_awesome_rounded,
+                              size: 14,
+                              color: Colors.amber[600],
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '10 poin',
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   SliverList _buildRiwayatListData() {
@@ -86,9 +280,30 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
           );
         }
 
+        final santri = controller.profilSantri.value;
+        if (santri == null) return const SizedBox.shrink();
+
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: _buildRiwayatCard(items[index], controller.profilSantri.value),
+          child: isAyatMode
+              ? RiwayatAyatCard(
+                  datum: items[index] as model_ayat.Datum,
+                  santri: santri,
+                  filterStatus: controller.filterStatus.value,
+                  getStatusText: controller.getStatusText,
+                  onDelete: (datum, santri, subtitle) {
+                    _showDeleteConfirmation(datum, santri, true, subtitle);
+                  },
+                )
+              : RiwayatHalamanCard(
+                  datum: items[index] as model_halaman.Datum,
+                  santri: santri,
+                  filterStatus: controller.filterStatus.value,
+                  getStatusText: controller.getStatusText,
+                  onDelete: (datum, santri, subtitle) {
+                    _showDeleteConfirmation(datum, santri, false, subtitle);
+                  },
+                ),
         );
       },
       itemCount: () {
@@ -97,614 +312,35 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
             ? controller.riwayatAyatData
             : controller.riwayatHalamanData;
         final hasMore = controller.hasMore.value;
+        final isLoadingMore = controller.isLoadingMore.value;
 
-        return items.length + (hasMore ? 1 : 0);
+        return items.length + (hasMore && isLoadingMore ? 1 : 0);
       }(),
-    );
-  }
-
-  SliverFillRemaining _buildEmptyState() {
-    return SliverFillRemaining(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.book_outlined,
-                size: 48,
-                color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Tidak ada riwayat hafalan',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Tarik ke bawah untuk refresh',
-              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[500]),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  SliverFillRemaining _loadingState() {
-    return SliverFillRemaining(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(
-                Colors.deepPurpleAccent,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Memuat data...',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
   SliverToBoxAdapter _buildFilter() {
     return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-        child: Row(
-          children: [
-            Expanded(
-              child: _buildDropdown(
-                value: controller.filterMode.value,
-                items: const [
-                  DropdownMenuItem(value: 'ayat', child: Text('Ayat')),
-                  DropdownMenuItem(value: 'halaman', child: Text('Halaman')),
-                ],
-                onChanged: (val) => controller.updateFilterMode(val!),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildDropdown(
-                value: controller.filterStatus.value,
-                items: const [
-                  DropdownMenuItem(
-                    value: 'TambahHafalan',
-                    child: Text('Tambah Hafalan'),
-                  ),
-                  DropdownMenuItem(value: 'Murajaah', child: Text('Murajaah')),
-                  DropdownMenuItem(value: 'Tahsin', child: Text('Tahsin')),
-                ],
-                onChanged: (val) => controller.updateFilterStatus(val!),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDropdown({
-    required String value,
-    required List<DropdownMenuItem<String>> items,
-    required Function(String?) onChanged,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          dropdownColor: Colors.white,
-          value: value,
-          isExpanded: true,
-          icon: const Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: Colors.deepPurple,
-            size: 20,
-          ),
-          style: GoogleFonts.poppins(
-            color: Colors.black87,
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-          ),
-          items: items,
-          onChanged: onChanged,
-        ),
+      child: RiwayatFilter(
+        filterMode: controller.filterMode.value,
+        filterStatus: controller.filterStatus.value,
+        onModeChanged: controller.updateFilterMode,
+        onStatusChanged: controller.updateFilterStatus,
       ),
     );
   }
 
   SliverToBoxAdapter _buildHeader() {
     final santri = controller.profilSantri.value;
-    final bool isLoading = controller.isInitialLoading.value || santri == null;
-
-    // Initials from name
-    String initials = '?';
-    if (santri?.nama != null && santri!.nama!.isNotEmpty) {
-      final parts = santri.nama!.trim().split(' ');
-      if (parts.length >= 2) {
-        initials = '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-      } else {
-        initials = parts[0]
-            .substring(0, parts[0].length > 1 ? 2 : 1)
-            .toUpperCase();
-      }
-    }
+    final bool isLoading = controller.isLoading.value && santri == null;
 
     return SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            colors: [Colors.deepPurpleAccent, Colors.deepPurple[700]!],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF6B46C1).withValues(alpha: 0.4),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            // Decorative circles
-            Positioned(
-              top: -20,
-              right: -20,
-              child: Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.05),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -30,
-              right: 60,
-              child: Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.04),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Avatar with initials
-                      Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.18),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.35),
-                            width: 2,
-                          ),
-                        ),
-                        child: Center(
-                          child: Skeletonizer(
-                            enabled: isLoading,
-                            effect: ShimmerEffect(
-                              baseColor: Colors.white.withValues(alpha: 0.2),
-                              highlightColor: Colors.white.withValues(
-                                alpha: 0.4,
-                              ),
-                            ),
-                            child: Text(
-                              isLoading ? 'SA' : initials,
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Informasi Santri',
-                              style: GoogleFonts.poppins(
-                                color: Colors.white.withValues(alpha: 0.65),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Skeletonizer(
-                              enabled: isLoading,
-                              effect: ShimmerEffect(
-                                baseColor: Colors.white.withValues(alpha: 0.2),
-                                highlightColor: Colors.white.withValues(
-                                  alpha: 0.4,
-                                ),
-                              ),
-                              child: Text(
-                                controller.profilSantri.value?.nama ??
-                                    'Nama Santri',
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.2,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.2),
-                      ),
-                    ),
-                    child: IntrinsicHeight(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildHeaderStat(
-                            title: 'Total Poin',
-                            value:
-                                '${controller.profilSantri.value?.totalPoin ?? 0}',
-                            flex: 4,
-                            isLoading: isLoading,
-                          ),
-                          VerticalDivider(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            thickness: 1,
-                          ),
-                          _buildHeaderStat(
-                            title: 'Tahap Hafalan',
-                            value: getTahapanLabel(
-                              controller.profilSantri.value?.tahapHafalan ??
-                                  '-',
-                            ),
-                            flex: 7,
-                            isLoading: isLoading,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      child: RiwayatHeader(
+        santri: santri,
+        isLoading: isLoading,
+        tahapanLabel: getTahapanLabel(santri?.tahapHafalan ?? '-'),
       ),
     );
-  }
-
-  Widget _buildHeaderStat({
-    required String title,
-    required String value,
-    required bool isLoading,
-    int? flex,
-  }) {
-    return Expanded(
-      flex: flex ?? 1,
-      child: Column(
-        children: [
-          Text(
-            title,
-            style: GoogleFonts.poppins(
-              color: Colors.white.withValues(alpha: 0.8),
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Skeletonizer(
-            enabled: isLoading,
-            effect: ShimmerEffect(
-              baseColor: Colors.white.withValues(alpha: 0.2),
-              highlightColor: Colors.white.withValues(alpha: 0.4),
-            ),
-            child: Text(
-              value,
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRiwayatCard(dynamic datum, dynamic santri) {
-    if (santri == null || datum == null) return const SizedBox.shrink();
-    final isAyatMode = controller.filterMode.value == 'ayat';
-
-    final String title = isAyatMode
-        ? (datum.namaSurahLatin ?? '-')
-        : 'Juz ${datum.juz}';
-    final String subtitle = isAyatMode
-        ? (datum.namaSurahLatin ?? '')
-        : (datum.surah as List).map((e) => e.namaLatin).join(', ');
-    final String rangeLabel = isAyatMode
-        ? 'Ayat ${datum.rangeAyat?.awal} - ${datum.rangeAyat?.akhir}'
-        : 'Hal ${datum.rangeHalaman?.awal} - ${datum.rangeHalaman?.akhir}';
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            spreadRadius: 0,
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            final args = {
-              'santriId': santri.id,
-              'tanggalRiwayat': datum.tanggal,
-              'status': datum.status,
-            };
-            if (isAyatMode) {
-              args['surahId'] = datum.surahId;
-            } else {
-              args['juzId'] = datum.juz;
-            }
-            Get.toNamed('/detail-riwayat-hafalan', arguments: args);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(11),
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Icon(
-                        isAyatMode
-                            ? Icons.auto_stories_rounded
-                            : Icons.menu_book_rounded,
-                        color: Colors.deepPurpleAccent,
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          if (subtitle.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: Text(
-                                rangeLabel,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  color: Colors.grey[500],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(
-                          datum.status,
-                        ).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: _getStatusColor(
-                            datum.status,
-                          ).withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Text(
-                        controller.getStatusText(datum.status),
-                        style: GoogleFonts.poppins(
-                          color: _getStatusColor(datum.status),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  child: Divider(height: 1, color: Colors.grey[200]),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          _buildBadge(
-                            Icons.calendar_month_rounded,
-                            datum.tanggal != null
-                                ? DateFormat(
-                                    'dd MMM yyyy',
-                                    'id_ID',
-                                  ).format(datum.tanggal!)
-                                : '-',
-                          ),
-                          if (controller.filterStatus.value == 'TambahHafalan')
-                            _buildBadge(
-                              Icons.auto_awesome_rounded,
-                              '${datum.totalPoin ?? 0} poin',
-                              color: Colors.amber[600],
-                            ),
-                        ],
-                      ),
-                    ),
-                    if (AuthService.to.isUstadz)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(8),
-                          onTap: () => _showDeleteConfirmation(
-                            datum,
-                            santri,
-                            isAyatMode,
-                            subtitle,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.red[50],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Icon(
-                              Icons.delete_outline_rounded,
-                              size: 20,
-                              color: Colors.red[400],
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBadge(IconData icon, String text, {Color? color}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: (color ?? Colors.grey[600]!).withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: color ?? Colors.grey[600]),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: GoogleFonts.poppins(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: color ?? Colors.grey[700],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Color _getStatusColor(String? status) {
-    switch (status?.toLowerCase()) {
-      case 'murajaah':
-        return Colors.orangeAccent[700]!;
-      case 'tambahhafalan':
-        return const Color(0xFF10B981);
-      case 'tahsin':
-        return Colors.blueAccent[700]!;
-      default:
-        return Colors.grey[600]!;
-    }
   }
 
   String getTahapanLabel(String tahapan) {
@@ -800,13 +436,13 @@ class RiwayatHafalanView extends GetView<RiwayatHafalanController> {
               Get.back();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red[500],
+              backgroundColor: Colors.red[600],
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             ),
             child: Text(
               'Hapus',
