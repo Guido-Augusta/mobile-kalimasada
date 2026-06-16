@@ -112,6 +112,8 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                                   ChangePasswordStep.oldPassword)
                                 TextFormField(
                                   controller: controller.oldPasswordC,
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Password lama tidak boleh kosong';

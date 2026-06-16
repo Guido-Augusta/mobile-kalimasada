@@ -1,17 +1,17 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
-import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
+
+import '../../../../data/repositories/auth_repository.dart';
 
 enum ForgotPasswordStep { inputEmail, tokenVerification, newPassword }
 
 class ForgotPasswordController extends GetxController {
+  final AuthRepository _authRepository = Get.find<AuthRepository>();
+
   final formKey = GlobalKey<FormState>();
 
   var isLoading = false.obs;
@@ -35,6 +35,9 @@ class ForgotPasswordController extends GetxController {
   @override
   void onClose() {
     _timer?.cancel();
+    emailC.dispose();
+    tokenC.dispose();
+    newPasswordC.dispose();
     super.onClose();
   }
 
@@ -77,34 +80,17 @@ class ForgotPasswordController extends GetxController {
     try {
       isValidating.value = true;
 
-      final response = await http.post(
-        Uri.parse(ApiUrl.forgotPassword),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': emailC.text}),
-      );
+      await _authRepository.forgotPassword(emailC.text);
 
-      var data = jsonDecode(response.body);
-      if (kDebugMode) {
-        print(data);
-      }
-      if (response.statusCode == 200) {
-        step.value = ForgotPasswordStep.tokenVerification;
-        formKey.currentState!.reset();
-        startCountdown();
-        ToastUtils.showSuccessToast(
-          'Token berhasil dikirim',
-          alignment: Alignment.topCenter,
-        );
-      } else {
-        ToastUtils.showErrorToast(
-          'Gagal mengirim token',
-          alignment: Alignment.topCenter,
-        );
-      }
-    } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      step.value = ForgotPasswordStep.tokenVerification;
+      formKey.currentState!.reset();
+      startCountdown();
+      ToastUtils.showSuccessToast(
+        'Token berhasil dikirim',
+        alignment: Alignment.topCenter,
       );
+    } catch (e) {
+      ToastUtils.showErrorToast(e.toString(), alignment: Alignment.topCenter);
     } finally {
       isValidating.value = false;
     }
@@ -114,34 +100,17 @@ class ForgotPasswordController extends GetxController {
     try {
       isValidating.value = true;
 
-      final response = await http.post(
-        Uri.parse(ApiUrl.verifyToken),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'token': tokenC.text}),
-      );
+      await _authRepository.verifyToken(tokenC.text);
 
-      var data = jsonDecode(response.body);
-      if (kDebugMode) {
-        print(data);
-      }
-      if (response.statusCode == 200) {
-        tokenVar.value = tokenC.text;
-        step.value = ForgotPasswordStep.newPassword;
-        formKey.currentState!.reset();
-        ToastUtils.showSuccessToast(
-          'Token berhasil diverifikasi',
-          alignment: Alignment.topCenter,
-        );
-      } else {
-        ToastUtils.showErrorToast(
-          'Gagal diverifikasi',
-          alignment: Alignment.topCenter,
-        );
-      }
-    } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      tokenVar.value = tokenC.text;
+      step.value = ForgotPasswordStep.newPassword;
+      formKey.currentState!.reset();
+      ToastUtils.showSuccessToast(
+        'Token berhasil diverifikasi',
+        alignment: Alignment.topCenter,
       );
+    } catch (e) {
+      ToastUtils.showErrorToast(e.toString(), alignment: Alignment.topCenter);
     } finally {
       isValidating.value = false;
     }
@@ -151,35 +120,15 @@ class ForgotPasswordController extends GetxController {
     try {
       isValidating.value = true;
 
-      final response = await http.post(
-        Uri.parse(ApiUrl.resetPassword),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'token': tokenVar.value,
-          'newPassword': newPasswordC.text,
-        }),
-      );
+      await _authRepository.resetPassword(tokenVar.value, newPasswordC.text);
 
-      var data = jsonDecode(response.body);
-      if (kDebugMode) {
-        print(data);
-      }
-      if (response.statusCode == 200) {
-        ToastUtils.showSuccessToast(
-          'Password berhasil diubah',
-          alignment: Alignment.topCenter,
-        );
-        showSuccessDialog();
-      } else {
-        ToastUtils.showErrorToast(
-          'Gagal mengubah password',
-          alignment: Alignment.topCenter,
-        );
-      }
-    } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
+      ToastUtils.showSuccessToast(
+        'Password berhasil diubah',
+        alignment: Alignment.topCenter,
       );
+      showSuccessDialog();
+    } catch (e) {
+      ToastUtils.showErrorToast(e.toString(), alignment: Alignment.topCenter);
     } finally {
       isValidating.value = false;
     }

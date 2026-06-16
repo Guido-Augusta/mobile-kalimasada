@@ -1,17 +1,16 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
-import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:mobile_kalimasada/app/services/auth_service.dart';
+
+import '../../../../data/repositories/auth_repository.dart';
 
 enum ChangePasswordStep { oldPassword, newPassword }
 
 class ChangePasswordController extends GetxController {
+  final AuthRepository _authRepository = Get.find<AuthRepository>();
+
   final formKey = GlobalKey<FormState>();
 
   var isLoading = false.obs;
@@ -46,34 +45,17 @@ class ChangePasswordController extends GetxController {
         ToastUtils.showErrorToast(
           'Token tidak ditemukan\nSilakan login kembali',
         );
+        return;
       }
 
-      final response = await http.post(
-        Uri.parse(ApiUrl.verifyOldPassword),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-        body: jsonEncode({'oldPassword': oldPassword}),
-      );
+      await _authRepository.verifyOldPassword(oldPassword);
 
-      var data = jsonDecode(response.body);
-      if (kDebugMode) {
-        print(data);
-      }
-      if (response.statusCode == 200) {
-        step.value = ChangePasswordStep.newPassword;
-        oldPasswordVar.value = oldPassword;
-        formKey.currentState!.reset();
-        ToastUtils.showSuccessToast('Password lama berhasil diverifikasi');
-      } else {
-        ToastUtils.showErrorToast('Verifikasi gagal');
-      }
+      step.value = ChangePasswordStep.newPassword;
+      oldPasswordVar.value = oldPassword;
+      formKey.currentState!.reset();
+      ToastUtils.showSuccessToast('Password lama berhasil diverifikasi');
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isValidating.value = false;
     }
@@ -90,36 +72,19 @@ class ChangePasswordController extends GetxController {
         ToastUtils.showErrorToast(
           'Token tidak ditemukan\nSilakan login kembali',
         );
+        return;
       }
 
-      final response = await http.post(
-        Uri.parse(ApiUrl.changePassword),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-platform': 'mobile',
-        },
-        body: jsonEncode({
-          'oldPassword': oldPasswordVar.value,
-          'newPassword': newPassword,
-        }),
+      await _authRepository.changePassword(
+        oldPasswordVar.value,
+        newPassword,
       );
 
-      var data = jsonDecode(response.body);
-      if (kDebugMode) {
-        print(data);
-      }
-      if (response.statusCode == 200) {
-        await logout();
-        ToastUtils.showSuccessToast('Password berhasil diubah');
-        showSuccessDialog();
-      } else {
-        ToastUtils.showErrorToast('Gagal mengubah password');
-      }
+      await logout();
+      ToastUtils.showSuccessToast('Password berhasil diubah');
+      showSuccessDialog();
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      ToastUtils.showErrorToast(e.toString());
     } finally {
       isValidating.value = false;
     }
@@ -128,23 +93,10 @@ class ChangePasswordController extends GetxController {
   Future<void> logout() async {
     final userId = AuthService.to.userId.value;
     try {
-      final response = await http.post(
-        Uri.parse(ApiUrl.logout(userId)),
-        headers: {'Content-Type': 'application/json'},
-      );
-      var data = jsonDecode(response.body);
-      if (kDebugMode) {
-        print(data);
-      }
-      if (response.statusCode == 200) {
-        await AuthService.to.logout();
-      } else {
-        ToastUtils.showErrorToast('Gagal logout');
-      }
+      await _authRepository.logout(userId);
+      await AuthService.to.logout();
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      ToastUtils.showErrorToast(e.toString());
     }
   }
 
