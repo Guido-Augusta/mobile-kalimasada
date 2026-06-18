@@ -1,18 +1,19 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
+import 'package:mobile_kalimasada/app/data/exceptions/app_exception.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_surah.dart';
+import 'package:mobile_kalimasada/app/data/repositories/quran_repository.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
+import '../../../../utils/audio_helper.dart';
+
 class DetailSurahController extends GetxController {
+  final QuranRepository _quranRepository = Get.find();
+
   RxBool isLoading = false.obs;
   final surahId = Get.arguments.toString();
   var detailSurah = Rxn<DetailSurah>();
@@ -41,60 +42,42 @@ class DetailSurahController extends GetxController {
     super.onClose();
   }
 
-  void getDetailSurah() async {
+  Future<void> getDetailSurah() async {
     try {
       isLoading.value = true;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      detailSurah.value = await _quranRepository.fetchSurahDetail(surahId);
 
-      final response = await http
-          .get(
-            Uri.parse(ApiUrl.surahDetail(surahId)),
-            headers: {
-              'Authorization': 'Bearer $token',
-              'Content-Type': 'application/json',
-            },
-          )
-          .timeout(Duration(seconds: 15));
+      // Set audio source when surah info is loaded
+      if (detailSurah.value?.audio != null &&
+          detailSurah.value!.audio!.isNotEmpty) {
+        final String audioUrl = AudioHelper.getAudioUrl(
+          detailSurah.value!.audio!,
+        );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        detailSurah.value = DetailSurah.fromJson(data);
+        try {
+          final mediaItem = MediaItem(
+            id: detailSurah.value?.nomor?.toString() ?? surahId,
+            title: detailSurah.value?.namaLatin ?? 'Surah $surahId',
+            album: 'Al-Quran',
+          );
 
-        // Set audio source when surah info is loaded
-        if (detailSurah.value?.audio != null &&
-            detailSurah.value!.audio!.isNotEmpty) {
-          String audioUrl = detailSurah.value!.audio!
-              .replaceAll('localhost', '10.0.2.2')
-              .replaceAll('127.0.0.1', '10.0.2.2');
-
-          try {
-            final mediaItem = MediaItem(
-              id: detailSurah.value?.nomor?.toString() ?? surahId,
-              title: detailSurah.value?.namaLatin ?? 'Surah $surahId',
-              album: 'Al-Quran',
-            );
-
-            await audioPlayer.setAudioSource(
-              AudioSource.uri(Uri.parse(audioUrl), tag: mediaItem),
-            );
-            if (kDebugMode) {
-              print('Audio loaded successfully');
-            }
-          } catch (e) {
-            if (kDebugMode) {
-              print('Audio loading error: $e');
-            }
-            ToastUtils.showErrorToast('Gagal memuat audio');
+          await audioPlayer.setAudioSource(
+            AudioSource.uri(Uri.parse(audioUrl), tag: mediaItem),
+          );
+          if (kDebugMode) {
+            print('Audio loaded successfully');
           }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Audio loading error: $e');
+          }
+          ToastUtils.showErrorToast('Gagal memuat audio');
         }
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat data');
       }
+    } on AppException catch (e) {
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isLoading.value = false;
     }

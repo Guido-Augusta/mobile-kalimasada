@@ -1,16 +1,14 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:mobile_kalimasada/app/data/constants/api_url.dart';
+import 'package:mobile_kalimasada/app/data/exceptions/app_exception.dart';
 import 'package:mobile_kalimasada/app/data/models/detail_juz.dart';
+import 'package:mobile_kalimasada/app/data/repositories/quran_repository.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
-import '../../../../services/auth_service.dart';
-
 class DetailJuzController extends GetxController {
+  final QuranRepository _quranRepository = Get.find();
+
   RxBool isLoading = false.obs;
   final juzId = Get.arguments.toString();
   var detailJuz = Rxn<DetailJuz>();
@@ -37,46 +35,29 @@ class DetailJuzController extends GetxController {
     super.onClose();
   }
 
-  void getDetailJuz() async {
+  Future<void> getDetailJuz() async {
     try {
       isLoading.value = true;
-      final token = AuthService.to.token;
+      final detail = await _quranRepository.fetchJuzDetail(juzId);
+      detailJuz.value = detail;
 
-      final response = await http
-          .get(
-            Uri.parse(ApiUrl.juzDetail(juzId)),
-            headers: {
-              'Authorization': 'Bearer $token',
-              'Content-Type': 'application/json',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final detail = DetailJuz.fromJson(data);
-        detailJuz.value = detail;
-
-        // Flattening logic: Pisahkan Header Surah menjadi item tersendiri
-        final List<dynamic> flat = [];
-        final ayatList = detail.data?.ayat ?? [];
-        for (int i = 0; i < ayatList.length; i++) {
-          final ayat = ayatList[i];
-          final bool isNewSurah =
-              i == 0 || ayat.surah?.nomor != ayatList[i - 1].surah?.nomor;
-          if (isNewSurah && ayat.surah != null) {
-            flat.add(ayat.surah); // Tambahkan header surah
-          }
-          flat.add(ayat); // Tambahkan ayat
+      // Flattening logic: Pisahkan Header Surah menjadi item tersendiri
+      final List<dynamic> flat = [];
+      final ayatList = detail.data?.ayat ?? [];
+      for (int i = 0; i < ayatList.length; i++) {
+        final ayat = ayatList[i];
+        final bool isNewSurah =
+            i == 0 || ayat.surah?.nomor != ayatList[i - 1].surah?.nomor;
+        if (isNewSurah && ayat.surah != null) {
+          flat.add(ayat.surah); // Tambahkan header surah
         }
-        items.assignAll(flat);
-      } else {
-        ToastUtils.showErrorToast('Gagal memuat data');
+        flat.add(ayat); // Tambahkan ayat
       }
+      items.assignAll(flat);
+    } on AppException catch (e) {
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
-      ToastUtils.showErrorToast(
-        'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-      );
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isLoading.value = false;
     }

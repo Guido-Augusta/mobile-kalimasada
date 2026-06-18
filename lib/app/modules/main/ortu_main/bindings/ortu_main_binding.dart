@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '../../../../data/repositories/auth_repository.dart';
 import '../../../../data/repositories/ortu_repository.dart';
+import '../../../../data/repositories/quran_repository.dart';
 import '../controllers/ortu_main_controller.dart';
 
 class OrtuMainBinding extends Bindings {
@@ -9,8 +10,7 @@ class OrtuMainBinding extends Bindings {
   void dependencies() {
     Get.lazyPut<AuthRepository>(() => AuthRepository());
     Get.lazyPut<OrtuRepository>(() => OrtuRepository());
-    Get.lazyPut<OrtuMainController>(
-      () => OrtuMainController(),
-    );
+    Get.lazyPut<QuranRepository>(() => QuranRepository());
+    Get.lazyPut<OrtuMainController>(() => OrtuMainController());
   }
 }
