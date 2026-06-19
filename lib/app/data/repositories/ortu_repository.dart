@@ -17,11 +17,21 @@ class OrtuRepository {
     required int page,
     required int limit,
     String search = '',
+    String? tipe,
   }) async {
     try {
+      final queryParams = <String, dynamic>{
+        'page': page,
+        'limit': limit,
+        'search': search,
+      };
+      if (tipe != null && tipe.trim().isNotEmpty) {
+        queryParams['tipe'] = tipe;
+      }
+
       final response = await _apiClient.dio.get(
         ApiUrl.ortu,
-        queryParameters: {'page': page, 'limit': limit, 'search': search},
+        queryParameters: queryParams,
       );
 
       if (response.statusCode == 200) {

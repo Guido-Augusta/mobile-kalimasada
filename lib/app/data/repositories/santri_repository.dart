@@ -154,4 +154,79 @@ class SantriRepository {
       throw UnexpectedException(message: e.toString());
     }
   }
+
+  Future<void> updateProfile({
+    required String santriId,
+    required String nama,
+    required String tahapHafalan,
+    required List<int> ortuId,
+  }) async {
+    try {
+      final response = await _apiClient.dio.put(
+        ApiUrl.santriDetail(santriId),
+        data: {
+          'nama': nama,
+          'tahapHafalan': tahapHafalan,
+          'ortuId': ortuId,
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw UnexpectedException(message: 'Gagal memperbarui profil santri');
+      }
+    } on DioException catch (e) {
+      throw AppExceptionMapper.fromDioException(e);
+    } catch (e) {
+      throw UnexpectedException(message: e.toString());
+    }
+  }
+
+  Future<void> updatePassword({
+    required String santriId,
+    required String password,
+  }) async {
+    try {
+      final response = await _apiClient.dio.put(
+        ApiUrl.santriDetail(santriId),
+        data: {
+          'password': password,
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw UnexpectedException(message: 'Gagal memperbarui password santri');
+      }
+    } on DioException catch (e) {
+      throw AppExceptionMapper.fromDioException(e);
+    } catch (e) {
+      throw UnexpectedException(message: e.toString());
+    }
+  }
+
+  Future<void> addSantri({
+    required String nama,
+    required String password,
+    required String tahapHafalan,
+    required List<int> ortuId,
+  }) async {
+    try {
+      final response = await _apiClient.dio.post(
+        ApiUrl.santri,
+        data: {
+          'nama': nama,
+          'password': password,
+          'tahapHafalan': tahapHafalan,
+          'ortuId': ortuId,
+        },
+      );
+
+      if (response.statusCode != 201) {
+        throw UnexpectedException(message: 'Gagal menambahkan santri');
+      }
+    } on DioException catch (e) {
+      throw AppExceptionMapper.fromDioException(e);
+    } catch (e) {
+      throw UnexpectedException(message: e.toString());
+    }
+  }
 }

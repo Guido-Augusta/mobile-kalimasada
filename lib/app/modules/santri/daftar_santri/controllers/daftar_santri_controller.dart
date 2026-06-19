@@ -6,6 +6,7 @@ import 'package:mobile_kalimasada/app/utils/image_helper.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 
 import '../../../../services/auth_service.dart';
+import '../../../admin/admin_home/controllers/admin_home_controller.dart';
 
 class DaftarSantriController extends GetxController {
   final _santriRepository = Get.find<SantriRepository>();
@@ -133,6 +134,9 @@ class DaftarSantriController extends GetxController {
     try {
       await _santriRepository.deleteSantri(santriId);
       getSantriList();
+      if (Get.isRegistered<AdminHomeController>()) {
+        await Get.find<AdminHomeController>().fetchTotals();
+      }
       Get.back();
       ToastUtils.showSuccessToast('Santri berhasil dihapus');
     } catch (e) {
