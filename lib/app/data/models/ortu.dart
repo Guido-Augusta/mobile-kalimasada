@@ -28,7 +28,7 @@ class Ortu {
       id: json["id"],
       userId: json["userId"],
       nama: json["nama"],
-      nomorHp: json["nomorHp"],
+      nomorHp: json["nomorHp"]?.toString(),
       alamat: json["alamat"],
       jenisKelamin: json["jenisKelamin"],
       fotoProfil: json["fotoProfil"],
@@ -41,17 +41,43 @@ class Ortu {
   }
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "userId": userId,
-    "nama": nama,
-    "nomorHp": nomorHp,
-    "alamat": alamat,
-    "jenisKelamin": jenisKelamin,
-    "fotoProfil": fotoProfil,
-    "tipe": tipe,
-    "user": user?.toJson(),
-    "santri": santri.map((x) => x.toJson()).toList(),
-  };
+        "id": id,
+        "userId": userId,
+        "nama": nama,
+        "nomorHp": nomorHp,
+        "alamat": alamat,
+        "jenisKelamin": jenisKelamin,
+        "fotoProfil": fotoProfil,
+        "tipe": tipe,
+        "user": user?.toJson(),
+        "santri": santri.map((x) => x.toJson()).toList(),
+      };
+
+  Ortu copyWith({
+    int? id,
+    int? userId,
+    String? nama,
+    String? nomorHp,
+    String? alamat,
+    String? jenisKelamin,
+    String? fotoProfil,
+    String? tipe,
+    User? user,
+    List<Santri>? santri,
+  }) {
+    return Ortu(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      nama: nama ?? this.nama,
+      nomorHp: nomorHp ?? this.nomorHp,
+      alamat: alamat ?? this.alamat,
+      jenisKelamin: jenisKelamin ?? this.jenisKelamin,
+      fotoProfil: fotoProfil ?? this.fotoProfil,
+      tipe: tipe ?? this.tipe,
+      user: user ?? this.user,
+      santri: santri ?? this.santri,
+    );
+  }
 
   @override
   String toString() {

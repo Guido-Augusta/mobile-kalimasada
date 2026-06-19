@@ -564,6 +564,9 @@ class TambahOrtuView extends GetView<TambahOrtuController> {
             if (value.isNotEmpty && !value.isNumericOnly) {
               return 'Nomor telepon harus berupa angka';
             }
+            if (value.length < 10) {
+              return 'Nomor HP minimal 10 digit';
+            }
             return null;
           },
         ),
@@ -806,13 +809,7 @@ class SaveProfileButton extends StatelessWidget {
                     controller.alamatC.text,
                   );
                 } else {
-                  final now = DateTime.now();
-                  if (controller.lastErrorShown == null ||
-                      now.difference(controller.lastErrorShown!) >
-                          const Duration(seconds: 3)) {
-                    controller.lastErrorShown = now;
-                    ToastUtils.showErrorToast('Pastikan data yang diisi valid');
-                  }
+                  ToastUtils.showErrorToast('Pastikan data yang diisi valid');
                 }
               }
             : null,

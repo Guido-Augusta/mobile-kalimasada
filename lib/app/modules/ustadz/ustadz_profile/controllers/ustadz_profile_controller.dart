@@ -12,6 +12,7 @@ import 'package:mobile_kalimasada/app/services/auth_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
+import '../../../../data/exceptions/app_exception.dart';
 import '../../../../data/repositories/auth_repository.dart';
 import '../../../../data/repositories/ustadz_repository.dart';
 import '../../../../routes/app_pages.dart';
@@ -38,26 +39,27 @@ class UstadzProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getUstadzData();
+    getUstadzDetail();
   }
 
-  Future<void> getUstadzData() async {
+  Future<void> getUstadzDetail() async {
     try {
       isLoading.value = true;
       final ustadzId = AuthService.to.roleId.value;
-
       final ustadz = await _ustadzRepository.getUstadz(ustadzId);
-
       ustadzData.value = ustadz;
       if (ustadz.fotoProfil?.isNotEmpty == true) {
-        fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+        fotoProfil.value = ImageHelper.getImageUrl(ustadz.fotoProfil!);
       }
-      namaC.text = ustadz.nama!;
-      noHpC.text = ustadz.nomorHp!;
-      alamatC.text = ustadz.alamat!;
-      jenisKelaminC.text = ustadz.jenisKelamin!;
+      if (ustadz.nama != null) namaC.text = ustadz.nama!;
+      if (ustadz.nomorHp != null) noHpC.text = ustadz.nomorHp!;
+      if (ustadz.alamat != null) alamatC.text = ustadz.alamat!;
+      if (ustadz.jenisKelamin != null)
+        jenisKelaminC.text = ustadz.jenisKelamin!;
+    } on AppException catch (e) {
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
-      ToastUtils.showErrorToast(e.toString());
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isLoading.value = false;
     }
@@ -83,18 +85,22 @@ class UstadzProfileController extends GetxController {
 
       final ustadzId = AuthService.to.roleId.value;
 
+      final currentUser = ustadzData.value?.user;
+
       final ustadz = await _ustadzRepository.updateProfile(
-        ustadzId,
-        nama ?? ustadzData.value?.nama ?? '',
-        noHp ?? ustadzData.value?.nomorHp ?? '',
-        alamat ?? ustadzData.value?.alamat ?? '',
-        jenisKelamin ?? ustadzData.value?.jenisKelamin ?? '',
-        null,
+        ustadzId: ustadzId,
+        nama: nama ?? ustadzData.value?.nama ?? '',
+        noHp: noHp ?? ustadzData.value?.nomorHp ?? '',
+        alamat: alamat ?? ustadzData.value?.alamat ?? '',
+        jenisKelamin: jenisKelamin ?? ustadzData.value?.jenisKelamin ?? '',
+        waliKelasTahap: ustadzData.value?.waliKelasTahap,
       );
 
-      ustadzData.value = ustadz.user == null && ustadzData.value?.user != null
-          ? ustadz.copyWith(user: ustadzData.value?.user)
-          : ustadz;
+      if (ustadz.user == null && currentUser != null) {
+        ustadzData.value = ustadz.copyWith(user: currentUser);
+      } else {
+        ustadzData.value = ustadz;
+      }
 
       if (ustadzData.value?.fotoProfil?.isNotEmpty == true) {
         fotoProfil.value = getImageUrl(ustadzData.value!.fotoProfil!);
@@ -109,8 +115,10 @@ class UstadzProfileController extends GetxController {
       }
       Get.back();
       ToastUtils.showSuccessToast('Profil berhasil diperbarui');
+    } on AppException catch (e) {
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
-      ToastUtils.showErrorToast(e.toString());
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isSaveLoading.value = false;
     }

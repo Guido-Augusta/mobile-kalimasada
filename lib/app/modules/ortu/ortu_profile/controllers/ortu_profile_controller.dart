@@ -4,15 +4,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mobile_kalimasada/app/data/models/ortu.dart';
-import 'package:mobile_kalimasada/app/modules/ortu/ortu_home/controllers/ortu_home_controller.dart';
-import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 import 'package:path/path.dart' as path;
-import 'package:mobile_kalimasada/app/services/auth_service.dart';
-import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
+
+import '../../../../data/constants/app_constants.dart';
+import '../../../../data/exceptions/app_exception.dart';
+import '../../../../data/models/ortu.dart';
 import '../../../../data/repositories/auth_repository.dart';
 import '../../../../data/repositories/ortu_repository.dart';
+import '../../../../services/auth_service.dart';
 import '../../../../utils/image_helper.dart';
+import '../../../../utils/toast_utils.dart';
+import '../../ortu_home/controllers/ortu_home_controller.dart';
 
 class OrtuProfileController extends GetxController {
   final OrtuRepository _ortuRepository = Get.find<OrtuRepository>();
@@ -33,35 +35,43 @@ class OrtuProfileController extends GetxController {
   var noHpC = TextEditingController();
   var alamatC = TextEditingController();
 
-  DateTime? _lastNoChangeShown;
-  DateTime? _lastErrorShown;
-
   @override
   void onInit() {
     super.onInit();
     getOrtuDetail();
   }
 
+  @override
+  void onClose() {
+    namaC.dispose();
+    noHpC.dispose();
+    alamatC.dispose();
+    super.onClose();
+  }
+
   String getImageUrl(String? imageUrl) {
     return ImageHelper.getImageUrl(imageUrl);
   }
 
-  Future<void> getOrtuDetail() async {
+  Future<void> getOrtuDetail({bool isReload = true}) async {
     try {
-      isLoading.value = true;
+      isLoading.value = isReload;
       final ortuId = AuthService.to.roleId.value;
       final ortu = await _ortuRepository.getOrtuDetail(ortuId);
       ortuDetail.value = ortu;
+
       if (ortu.fotoProfil?.isNotEmpty == true) {
         fotoProfil.value = ImageHelper.getImageUrl(ortu.fotoProfil);
       }
+
+      // Initialize controllers with current values
+      if (isReload && ortu.nama != null) namaC.text = ortu.nama!;
+      if (isReload && ortu.nomorHp != null) noHpC.text = ortu.nomorHp!;
+      if (isReload && ortu.alamat != null) alamatC.text = ortu.alamat!;
+    } on AppException catch (e) {
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(e.toString());
-      }
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isLoading.value = false;
     }
@@ -93,20 +103,20 @@ class OrtuProfileController extends GetxController {
       isUploadingImage.value = true;
       final ortuId = AuthService.to.roleId.value;
 
-      // Persiapkan parameter file
       final file = File(imagePath);
       final bytes = await file.readAsBytes();
       final fileName = path.basename(imagePath);
       final extension = path.extension(imagePath).toLowerCase();
 
-      // Pastikan ekstensi gambar valid
       String finalFileName = fileName;
       if (extension != '.jpg' && extension != '.jpeg' && extension != '.png') {
         finalFileName = '${path.basenameWithoutExtension(imagePath)}.jpg';
       }
 
-      // Tentukan tipe konten
       String contentType = (extension == '.png') ? 'image/png' : 'image/jpeg';
+
+      // Cache user object for defensive merge
+      final currentUser = ortuDetail.value?.user;
 
       final updatedOrtu = await _ortuRepository.uploadFotoProfil(
         ortuId: ortuId,
@@ -115,19 +125,26 @@ class OrtuProfileController extends GetxController {
         contentType: contentType,
       );
 
+      // Preserve user relation
+      if (updatedOrtu.user == null && currentUser != null) {
+        ortuDetail.value = updatedOrtu.copyWith(user: currentUser);
+      } else {
+        ortuDetail.value = updatedOrtu;
+      }
+
       if (updatedOrtu.fotoProfil?.isNotEmpty == true) {
         fotoProfil.value = ImageHelper.getImageUrl(updatedOrtu.fotoProfil);
       }
 
-      // Refresh Home Screen jika terbuka
       if (Get.isRegistered<OrtuHomeController>()) {
         Get.find<OrtuHomeController>().loadHomeData(isRefresh: true);
       }
 
-      Get.back();
       ToastUtils.showSuccessToast('Foto profil berhasil diperbarui');
+    } on AppException catch (e) {
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
-      ToastUtils.showErrorToast(e.toString());
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isUploadingImage.value = false;
     }
@@ -139,51 +156,53 @@ class OrtuProfileController extends GetxController {
     String? alamat,
   ) async {
     try {
-      isSaveLoading.value = true;
-
-      // Cek apakah ada perubahan
       bool hasNoChange =
           (nama == ortuDetail.value?.nama &&
           noHp == ortuDetail.value?.nomorHp &&
           alamat == ortuDetail.value?.alamat);
 
       if (hasNoChange) {
-        final now = DateTime.now();
-        if (_lastNoChangeShown == null ||
-            now.difference(_lastNoChangeShown!) > const Duration(seconds: 3)) {
-          _lastNoChangeShown = now;
-          ToastUtils.showErrorToast('Tidak ada perubahan data');
-        }
+        ToastUtils.showErrorToast('Tidak ada perubahan data');
         return;
       }
 
+      isSaveLoading.value = true;
       final ortuId = AuthService.to.roleId.value;
+
+      final existingJenisKelamin = ortuDetail.value?.jenisKelamin ?? 'L';
+      final existingTipe = ortuDetail.value?.tipe ?? 'Ayah';
+
+      final currentUser = ortuDetail.value?.user;
+
       final updatedOrtu = await _ortuRepository.updateProfile(
         ortuId: ortuId,
         nama: nama ?? ortuDetail.value?.nama ?? '',
         noHp: noHp ?? ortuDetail.value?.nomorHp ?? '',
         alamat: alamat ?? ortuDetail.value?.alamat ?? '',
+        jenisKelamin: existingJenisKelamin,
+        tipe: existingTipe,
       );
 
-      ortuDetail.value = updatedOrtu;
+      if (updatedOrtu.user == null && currentUser != null) {
+        ortuDetail.value = updatedOrtu.copyWith(user: currentUser);
+      } else {
+        ortuDetail.value = updatedOrtu;
+      }
+
       if (updatedOrtu.fotoProfil?.isNotEmpty == true) {
         fotoProfil.value = ImageHelper.getImageUrl(updatedOrtu.fotoProfil);
       }
 
-      // Refresh Home Screen jika terbuka
       if (Get.isRegistered<OrtuHomeController>()) {
         Get.find<OrtuHomeController>().loadHomeData(isRefresh: true);
       }
 
       Get.back();
       ToastUtils.showSuccessToast('Profil berhasil diperbarui');
+    } on AppException catch (e) {
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(e.toString());
-      }
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isSaveLoading.value = false;
     }
@@ -197,13 +216,10 @@ class OrtuProfileController extends GetxController {
       await AuthService.to.logout();
       Get.offAllNamed('/login');
       ToastUtils.showSuccessToast('Logout berhasil');
+    } on AppException catch (e) {
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
-      final now = DateTime.now();
-      if (_lastErrorShown == null ||
-          now.difference(_lastErrorShown!) > Duration(seconds: 3)) {
-        _lastErrorShown = now;
-        ToastUtils.showErrorToast(e.toString());
-      }
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem saat logout');
     } finally {
       isLoadingLogout.value = false;
     }

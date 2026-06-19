@@ -51,14 +51,14 @@ class UstadzRepository {
   }
 
   /// Update ustadz profile
-  Future<Ustadz> updateProfile(
-    String ustadzId,
-    String nama,
-    String noHp,
-    String alamat,
-    String jenisKelamin,
+  Future<Ustadz> updateProfile({
+    required String ustadzId,
+    required String nama,
+    required String noHp,
+    required String alamat,
+    required String jenisKelamin,
     String? waliKelasTahap,
-  ) async {
+  }) async {
     try {
       final response = await _apiClient.dio.put(
         ApiUrl.ustadzDetail(ustadzId),
@@ -67,7 +67,7 @@ class UstadzRepository {
           'nomorHp': noHp,
           'alamat': alamat,
           'jenisKelamin': jenisKelamin,
-          'waliKelasTahap': ?waliKelasTahap,
+          'waliKelasTahap': waliKelasTahap,
         },
       );
 
@@ -84,11 +84,11 @@ class UstadzRepository {
   }
 
   /// Update ustadz email and/or password
-  Future<Ustadz> updateEmailPassword(
-    String ustadzId,
+  Future<Ustadz> updateEmailPassword({
+    required String ustadzId,
     String? email,
     String? password,
-  ) async {
+  }) async {
     try {
       final response = await _apiClient.dio.put(
         ApiUrl.ustadzDetail(ustadzId),

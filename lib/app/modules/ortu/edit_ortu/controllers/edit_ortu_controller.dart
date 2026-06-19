@@ -9,25 +9,25 @@ import 'package:path/path.dart' as path;
 
 import '../../../../data/constants/app_constants.dart';
 import '../../../../data/exceptions/app_exception.dart';
-import '../../../../data/models/ustadz.dart';
-import '../../../../data/repositories/ustadz_repository.dart';
+import '../../../../data/models/ortu.dart';
+import '../../../../data/repositories/ortu_repository.dart';
 import '../../../../utils/image_helper.dart';
 import '../../../../utils/toast_utils.dart';
-import '../../daftar_ustadz/controllers/daftar_ustadz_controller.dart';
+import '../../daftar_ortu/controllers/daftar_ortu_controller.dart';
 
-class EditUstadzController extends GetxController {
-  final UstadzRepository _ustadzRepository = Get.find();
+class EditOrtuController extends GetxController {
+  final OrtuRepository _ortuRepository = Get.find();
 
-  final String ustadzId = Get.arguments['ustadzId'];
+  final String ortuId = Get.arguments['ortuId'];
 
   final RxBool isLoading = false.obs;
   final RxBool isUploadingImage = false.obs;
   final RxBool isSearching = false.obs;
   final RxBool isSaveProfileLoading = false.obs;
   final RxBool isSaveEmailPasswordLoading = false.obs;
-
   final RxBool isPasswordVisible = false.obs;
-  var ustadzDetail = Rxn<Ustadz>();
+
+  var ortuDetail = Rxn<Ortu>();
 
   final ImagePicker imagePicker = ImagePicker();
   var fotoProfil = AppConstants.defaultProfileImageUrl.obs;
@@ -36,53 +36,57 @@ class EditUstadzController extends GetxController {
   final emailPasswordFormKey = GlobalKey<FormState>();
   final passwordFieldKey = GlobalKey<FormFieldState>();
 
-  var emailC = TextEditingController();
-  var passwordC = TextEditingController();
-
   var namaC = TextEditingController();
   var noHpC = TextEditingController();
   var alamatC = TextEditingController();
   var jenisKelaminC = TextEditingController(text: 'L');
-  var waliKelasTahapC = ''.obs;
+  var tipeC = TextEditingController(text: 'Ayah');
+
+  final alamatFocusNode = FocusNode();
+
+  var emailC = TextEditingController();
+  var passwordC = TextEditingController();
 
   @override
   void onInit() {
     super.onInit();
-    getUstadzDetail();
+    getOrtuDetail();
   }
 
   @override
   void onClose() {
-    emailC.dispose();
-    passwordC.dispose();
     namaC.dispose();
     noHpC.dispose();
     alamatC.dispose();
     jenisKelaminC.dispose();
+    tipeC.dispose();
+    alamatFocusNode.dispose();
+    emailC.dispose();
+    passwordC.dispose();
     super.onClose();
   }
 
-  Future<void> getUstadzDetail({bool isReload = true}) async {
+  Future<void> getOrtuDetail({bool isReload = true}) async {
     try {
       isLoading.value = isReload;
-      final ustadz = await _ustadzRepository.getUstadz(ustadzId);
-      ustadzDetail.value = ustadz;
+      final ortu = await _ortuRepository.getOrtuDetail(ortuId);
+      ortuDetail.value = ortu;
 
-      if (ustadz.fotoProfil != null && ustadz.fotoProfil!.isNotEmpty) {
-        fotoProfil.value = ImageHelper.getImageUrl(ustadz.fotoProfil!);
+      if (ortu.fotoProfil != null && ortu.fotoProfil!.isNotEmpty) {
+        fotoProfil.value = ImageHelper.getImageUrl(ortu.fotoProfil!);
       }
 
       // Initialize text controllers with current values
-      namaC.text = ustadzDetail.value!.nama!;
-      noHpC.text = ustadzDetail.value!.nomorHp!;
-      alamatC.text = ustadzDetail.value!.alamat!;
-      jenisKelaminC.text = ustadzDetail.value!.jenisKelamin!;
-      waliKelasTahapC.value = ustadzDetail.value?.waliKelasTahap ?? '';
+      namaC.text = ortuDetail.value!.nama!;
+      noHpC.text = ortuDetail.value!.nomorHp!;
+      alamatC.text = ortuDetail.value!.alamat!;
+      jenisKelaminC.text = ortuDetail.value!.jenisKelamin!;
+      tipeC.text = ortuDetail.value!.tipe!;
 
-      emailC.text = ustadzDetail.value!.user!.email!;
+      emailC.text = ortuDetail.value!.user!.email!;
 
       if (kDebugMode) {
-        print('Ustadz detail loaded: ${ustadz.nama}');
+        print('Ortu detail loaded: ${ortu.nama}');
       }
     } on AppException catch (e) {
       ToastUtils.showErrorToast(e.message);
@@ -130,19 +134,19 @@ class EditUstadzController extends GetxController {
       // Determine content type
       String contentType = extension == '.png' ? 'image/png' : 'image/jpeg';
 
-      final ustadz = await _ustadzRepository.uploadFotoProfil(
-        ustadzId: ustadzId,
+      final ortu = await _ortuRepository.uploadFotoProfil(
+        ortuId: ortuId,
         bytes: bytes,
         fileName: finalFileName,
         contentType: contentType,
       );
 
-      if (ustadz.fotoProfil != null) {
-        fotoProfil.value = ImageHelper.getImageUrl(ustadz.fotoProfil!);
+      if (ortu.fotoProfil != null) {
+        fotoProfil.value = ImageHelper.getImageUrl(ortu.fotoProfil!);
       }
 
-      if (Get.isRegistered<DaftarUstadzController>()) {
-        await Get.find<DaftarUstadzController>().fetchData();
+      if (Get.isRegistered<DaftarOrtuController>()) {
+        await Get.find<DaftarOrtuController>().fetchData();
       }
 
       ToastUtils.showSuccessToast('Foto profil berhasil diperbarui');
@@ -155,20 +159,20 @@ class EditUstadzController extends GetxController {
     }
   }
 
-  Future<void> updateProfileUstadz(
+  Future<void> updateProfileOrtu(
     String? nama,
     String? noHp,
     String? alamat,
     String? jenisKelamin,
-    String? waliKelasTahap,
+    String? tipe,
   ) async {
     try {
       bool hasNoChange =
-          (nama == ustadzDetail.value?.nama &&
-          noHp == ustadzDetail.value?.nomorHp &&
-          alamat == ustadzDetail.value?.alamat &&
-          jenisKelamin == ustadzDetail.value?.jenisKelamin &&
-          waliKelasTahap == ustadzDetail.value?.waliKelasTahap);
+          (nama == ortuDetail.value?.nama &&
+          noHp == ortuDetail.value?.nomorHp &&
+          alamat == ortuDetail.value?.alamat &&
+          jenisKelamin == ortuDetail.value?.jenisKelamin &&
+          tipe == ortuDetail.value?.tipe);
 
       if (hasNoChange) {
         ToastUtils.showErrorToast('Tidak ada perubahan data');
@@ -177,20 +181,19 @@ class EditUstadzController extends GetxController {
 
       isSaveProfileLoading.value = true;
 
-      await _ustadzRepository.updateProfile(
-        ustadzId: ustadzId,
-        nama: nama ?? ustadzDetail.value!.nama!,
-        noHp: noHp ?? ustadzDetail.value!.nomorHp!,
-        alamat: alamat ?? ustadzDetail.value!.alamat!,
-        jenisKelamin: jenisKelamin ?? ustadzDetail.value!.jenisKelamin!,
-        waliKelasTahap:
-            waliKelasTahap ?? ustadzDetail.value?.waliKelasTahap ?? '',
+      await _ortuRepository.updateProfile(
+        ortuId: ortuId,
+        nama: nama ?? ortuDetail.value!.nama!,
+        noHp: noHp ?? ortuDetail.value!.nomorHp!,
+        alamat: alamat ?? ortuDetail.value!.alamat!,
+        jenisKelamin: jenisKelamin ?? ortuDetail.value!.jenisKelamin!,
+        tipe: tipe ?? ortuDetail.value!.tipe!,
       );
 
-      await getUstadzDetail(isReload: false);
+      await getOrtuDetail(isReload: false);
 
-      if (Get.isRegistered<DaftarUstadzController>()) {
-        await Get.find<DaftarUstadzController>().fetchData();
+      if (Get.isRegistered<DaftarOrtuController>()) {
+        await Get.find<DaftarOrtuController>().fetchData();
       }
       ToastUtils.showSuccessToast('Profil berhasil diperbarui');
     } on AppException catch (e) {
@@ -202,13 +205,10 @@ class EditUstadzController extends GetxController {
     }
   }
 
-  Future<void> updateEmailPasswordUstadz(
-    String? email,
-    String? password,
-  ) async {
+  Future<void> updateEmailPasswordOrtu(String? email, String? password) async {
     try {
       bool hasNoChange =
-          (email == ustadzDetail.value?.user?.email &&
+          (email == ortuDetail.value?.user?.email &&
           (password == null || password.isEmpty));
 
       if (hasNoChange) {
@@ -218,17 +218,17 @@ class EditUstadzController extends GetxController {
 
       isSaveEmailPasswordLoading.value = true;
 
-      String oldEmail = ustadzDetail.value?.user?.email ?? "";
+      String oldEmail = ortuDetail.value?.user?.email ?? "";
       bool emailChanged = email != oldEmail;
       bool passwordChanged = password != null && password.isNotEmpty;
 
-      await _ustadzRepository.updateEmailPassword(
-        ustadzId: ustadzId,
+      await _ortuRepository.updateEmailPassword(
+        ortuId: ortuId,
         email: email,
         password: password,
       );
 
-      await getUstadzDetail(isReload: false);
+      await getOrtuDetail(isReload: false);
       Get.back();
 
       if (emailChanged && passwordChanged) {

@@ -398,6 +398,7 @@ class EditOrtuView extends GetView<EditOrtuController> {
           validator: (v) {
             if (v!.isEmpty) return 'Nomor telepon tidak boleh kosong';
             if (!v.isNumericOnly) return 'Nomor telepon harus berupa angka';
+            if (v.length < 10) return 'Nomor HP minimal 10 digit';
             return null;
           },
           decoration: _inputDecor('08xxxxxxxxxx'),
@@ -863,13 +864,7 @@ class SaveProfileButton extends StatelessWidget {
                     controller.tipeC.text,
                   );
                 } else {
-                  final now = DateTime.now();
-                  if (controller.lastErrorShown == null ||
-                      now.difference(controller.lastErrorShown!) >
-                          Duration(seconds: 3)) {
-                    controller.lastErrorShown = now;
-                    ToastUtils.showErrorToast('Pastikan data yang diisi valid');
-                  }
+                  ToastUtils.showErrorToast('Pastikan data yang diisi valid');
                 }
               }
             : null,

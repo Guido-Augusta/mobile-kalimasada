@@ -412,6 +412,7 @@ class EditUstadzView extends GetView<EditUstadzController> {
           validator: (v) {
             if (v!.isEmpty) return 'Nomor telepon tidak boleh kosong';
             if (!v.isNumericOnly) return 'Nomor telepon harus berupa angka';
+            if (v.length < 10) return 'Nomor HP minimal 10 digit';
             return null;
           },
           decoration: _inputDecor('08xxxxxxxxxx'),
@@ -962,9 +963,7 @@ class SaveProfileButton extends StatelessWidget {
                       controller.waliKelasTahapC.value,
                     );
                   } else {
-                    ToastUtils.showErrorToast(
-                      'Pastikan data yang diisi valid',
-                    );
+                    ToastUtils.showErrorToast('Pastikan data yang diisi valid');
                   }
                 }
               : null,

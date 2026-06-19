@@ -514,6 +514,9 @@ class TambahUstadzView extends GetView<TambahUstadzController> {
             if (value.isNotEmpty && !value.isNumericOnly) {
               return 'Nomor telepon harus berupa angka';
             }
+            if (value.length < 10) {
+              return 'Nomor HP minimal 10 digit';
+            }
             return null;
           },
         ),

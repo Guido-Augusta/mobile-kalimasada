@@ -603,6 +603,9 @@ class OrtuProfileView extends GetView<OrtuProfileController> {
                             if (value.isNotEmpty && !value.isNumericOnly) {
                               return 'Nomor HP harus berupa angka';
                             }
+                            if (value.length < 10) {
+                              return 'Nomor HP minimal 10 digit';
+                            }
                             return null;
                           },
                           decoration: InputDecoration(

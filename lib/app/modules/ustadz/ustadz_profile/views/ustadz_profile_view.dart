@@ -40,7 +40,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
           if (ustadzData == null && !isLoading) {
             return RefreshIndicator(
               onRefresh: () async {
-                controller.getUstadzData();
+                controller.getUstadzDetail();
               },
               color: Colors.deepPurpleAccent,
               backgroundColor: Colors.white,
@@ -115,7 +115,7 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
 
           return RefreshIndicator(
             onRefresh: () async {
-              controller.getUstadzData();
+              controller.getUstadzDetail();
             },
             color: Colors.deepPurpleAccent,
             backgroundColor: Colors.white,
@@ -748,6 +748,9 @@ class UstadzProfileView extends GetView<UstadzProfileController> {
                             }
                             if (value.isNotEmpty && !value.isNumericOnly) {
                               return 'Nomor HP harus berupa angka';
+                            }
+                            if (value.length < 10) {
+                              return 'Nomor HP minimal 10 digit';
                             }
                             return null;
                           },
