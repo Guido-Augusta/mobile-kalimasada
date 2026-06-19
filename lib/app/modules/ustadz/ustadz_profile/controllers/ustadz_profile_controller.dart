@@ -89,16 +89,20 @@ class UstadzProfileController extends GetxController {
         noHp ?? ustadzData.value?.nomorHp ?? '',
         alamat ?? ustadzData.value?.alamat ?? '',
         jenisKelamin ?? ustadzData.value?.jenisKelamin ?? '',
+        null,
       );
-      ustadzData.value = ustadz;
 
-      if (ustadz.fotoProfil?.isNotEmpty == true) {
-        fotoProfil.value = getImageUrl(ustadz.fotoProfil!);
+      ustadzData.value = ustadz.user == null && ustadzData.value?.user != null
+          ? ustadz.copyWith(user: ustadzData.value?.user)
+          : ustadz;
+
+      if (ustadzData.value?.fotoProfil?.isNotEmpty == true) {
+        fotoProfil.value = getImageUrl(ustadzData.value!.fotoProfil!);
       }
-      namaC.text = ustadz.nama!;
-      noHpC.text = ustadz.nomorHp!;
-      alamatC.text = ustadz.alamat!;
-      jenisKelaminC.text = ustadz.jenisKelamin!;
+      namaC.text = ustadzData.value?.nama ?? '';
+      noHpC.text = ustadzData.value?.nomorHp ?? '';
+      alamatC.text = ustadzData.value?.alamat ?? '';
+      jenisKelaminC.text = ustadzData.value?.jenisKelamin ?? '';
 
       if (Get.isRegistered<UstadzHomeController>()) {
         Get.find<UstadzHomeController>().getUstadz();
@@ -158,9 +162,14 @@ class UstadzProfileController extends GetxController {
         fileName: finalFileName,
         contentType: contentType,
       );
-      ustadzData.value = updatedUstadz;
-      if (updatedUstadz.fotoProfil?.isNotEmpty == true) {
-        fotoProfil.value = getImageUrl(updatedUstadz.fotoProfil!);
+
+      ustadzData.value =
+          updatedUstadz.user == null && ustadzData.value?.user != null
+          ? updatedUstadz.copyWith(user: ustadzData.value?.user)
+          : updatedUstadz;
+
+      if (ustadzData.value?.fotoProfil?.isNotEmpty == true) {
+        fotoProfil.value = getImageUrl(ustadzData.value!.fotoProfil!);
       }
 
       if (Get.isRegistered<UstadzHomeController>()) {

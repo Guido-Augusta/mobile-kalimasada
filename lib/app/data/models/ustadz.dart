@@ -28,7 +28,7 @@ class Ustadz {
       id: json["id"],
       userId: json["userId"],
       nama: json["nama"],
-      nomorHp: json["nomorHp"],
+      nomorHp: json["nomorHp"]?.toString(),
       alamat: json["alamat"],
       jenisKelamin: json["jenisKelamin"],
       fotoProfil: json["fotoProfil"],
@@ -48,6 +48,30 @@ class Ustadz {
     "waliKelasTahap": waliKelasTahap,
     "user": user?.toJson(),
   };
+
+  Ustadz copyWith({
+    int? id,
+    int? userId,
+    String? nama,
+    String? nomorHp,
+    String? alamat,
+    String? jenisKelamin,
+    String? fotoProfil,
+    String? waliKelasTahap,
+    User? user,
+  }) {
+    return Ustadz(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      nama: nama ?? this.nama,
+      nomorHp: nomorHp ?? this.nomorHp,
+      alamat: alamat ?? this.alamat,
+      jenisKelamin: jenisKelamin ?? this.jenisKelamin,
+      fotoProfil: fotoProfil ?? this.fotoProfil,
+      waliKelasTahap: waliKelasTahap ?? this.waliKelasTahap,
+      user: user ?? this.user,
+    );
+  }
 
   @override
   String toString() {

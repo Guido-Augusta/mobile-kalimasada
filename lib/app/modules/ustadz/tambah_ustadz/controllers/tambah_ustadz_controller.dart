@@ -1,23 +1,24 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile_kalimasada/app/modules/admin/admin_home/controllers/admin_home_controller.dart';
 import 'package:path/path.dart' as path;
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../data/constants/api_url.dart';
+import '../../../../data/constants/app_constants.dart';
+import '../../../../data/exceptions/app_exception.dart';
 import '../../../../data/models/ustadz.dart';
+import '../../../../data/repositories/ustadz_repository.dart';
+import '../../../../utils/image_helper.dart';
 import '../../../../utils/toast_utils.dart';
 import '../../daftar_ustadz/controllers/daftar_ustadz_controller.dart';
-import 'package:mobile_kalimasada/app/data/constants/app_constants.dart';
 
 class TambahUstadzController extends GetxController {
+  final UstadzRepository _ustadzRepository = Get.find();
+
   final RxBool isUploadingImage = false.obs;
   final RxBool isSaveProfileLoading = false.obs;
   final RxBool isSaveEmailPasswordLoading = false.obs;
@@ -27,9 +28,7 @@ class TambahUstadzController extends GetxController {
 
   final ImagePicker imagePicker = ImagePicker();
   var pickedImage = Rxn<XFile>();
-  var defaultPhotoProfile =
-      AppConstants.defaultProfileImageUrl
-          .obs;
+  var defaultPhotoProfile = AppConstants.defaultProfileImageUrl.obs;
 
   GlobalKey<FormState> profileFormKey = GlobalKey<FormState>();
   GlobalKey<FormFieldState> passwordFieldKey = GlobalKey<FormFieldState>();
@@ -42,8 +41,6 @@ class TambahUstadzController extends GetxController {
   var alamatC = TextEditingController();
   var jenisKelaminC = TextEditingController(text: 'L');
   var waliKelasTahapC = ''.obs;
-
-  DateTime? lastErrorShown;
 
   @override
   void onClose() {
@@ -98,20 +95,13 @@ class TambahUstadzController extends GetxController {
   }
 
   String generatePassword({int length = 8}) {
-    // 1. Tentukan karakter apa saja yang boleh dipakai
     const lowerCase = "abcdefghijklmnopqrstuvwxyz";
     const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const numbers = "0123456789";
-
-    // Gabungkan semua jadi satu string panjang
     const allowedChars = lowerCase + upperCase + numbers;
 
-    // 2. Gunakan Random.secure() untuk keamanan tinggi
     final random = Random.secure();
-
-    // 3. Generate password
     final charCodes = List.generate(length, (index) {
-      // Ambil posisi random dari allowedChars
       return allowedChars.codeUnitAt(random.nextInt(allowedChars.length));
     });
 
@@ -119,8 +109,7 @@ class TambahUstadzController extends GetxController {
   }
 
   String getImageUrl(String imageUrl) {
-    String newImageUrl = imageUrl.replaceFirst('localhost', '10.0.2.2');
-    return newImageUrl;
+    return ImageHelper.getImageUrl(imageUrl);
   }
 
   void resetForm() {
@@ -161,101 +150,63 @@ class TambahUstadzController extends GetxController {
       print(alamatC.text);
       print(waliKelasTahapC.value);
     }
+
     try {
       isSaveProfileLoading.value = true;
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      final request = http.MultipartRequest('POST', Uri.parse(ApiUrl.ustadz));
-      request.headers['Authorization'] = 'Bearer $token';
-      request.headers['x-platform'] = 'mobile';
-
-      request.fields['email'] = email!;
-      request.fields['password'] = password!;
-      request.fields['nama'] = nama!;
-      request.fields['nomorHp'] = noHp!;
-      request.fields['jenisKelamin'] = jenisKelamin!;
-      request.fields['alamat'] = alamat!;
-      request.fields['waliKelasTahap'] = waliKelasTahap!;
+      // Prepare photo bytes if provided
+      List<int>? fotoBytes;
+      String? fotoFileName;
+      String? fotoContentType;
 
       if (fotoProfil != null) {
-        // Read file and create multipart with proper content type
         final file = File(fotoProfil.path);
-        final bytes = await file.readAsBytes();
+        fotoBytes = await file.readAsBytes();
         final fileName = path.basename(fotoProfil.path);
         final extension = path.extension(fotoProfil.path).toLowerCase();
 
         // Ensure proper file extension
-        String finalFileName = fileName;
+        fotoFileName = fileName;
         if (extension != '.jpg' &&
             extension != '.jpeg' &&
             extension != '.png') {
-          finalFileName =
+          fotoFileName =
               '${path.basenameWithoutExtension(fotoProfil.path)}.jpg';
         }
-        if (kDebugMode) {
-          print('final file name: $finalFileName');
-        }
 
-        // Determine content type
-        String contentType;
-        if (extension == '.png') {
-          contentType = 'image/png';
-        } else {
-          contentType = 'image/jpeg';
-        }
-
-        final multipartFile = http.MultipartFile.fromBytes(
-          'fotoProfil',
-          bytes,
-          filename: finalFileName,
-          contentType: MediaType.parse(contentType),
-        );
-
-        request.files.add(multipartFile);
+        fotoContentType = extension == '.png' ? 'image/png' : 'image/jpeg';
       }
 
-      final response = await request.send();
-      final responseBody = await response.stream.bytesToString();
+      await _ustadzRepository.addUstadz(
+        email: email!,
+        password: password!,
+        nama: nama!,
+        noHp: noHp!,
+        jenisKelamin: jenisKelamin!,
+        alamat: alamat!,
+        waliKelasTahap: waliKelasTahap!,
+        fotoBytes: fotoBytes,
+        fotoFileName: fotoFileName,
+        fotoContentType: fotoContentType,
+      );
 
-      if (response.statusCode == 201) {
-        final data = jsonDecode(responseBody);
-        if (kDebugMode) {
-          print(data);
-        }
-        resetForm();
-        if (Get.isRegistered<DaftarUstadzController>()) {
-          await Get.find<DaftarUstadzController>().fetchData();
-        }
-        ToastUtils.showSuccessToast(
-          '${jenisKelamin.toLowerCase() == 'l' ? 'Ustadz' : 'Ustadzah'} berhasil ditambahkan',
-        );
-      } else if (response.statusCode == 400) {
-        final parsed = jsonDecode(responseBody);
-        final message = parsed['message'];
-        ToastUtils.showErrorToast(message);
-      } else {
-        if (kDebugMode) {
-          print(response.statusCode);
-          print(responseBody);
-        }
-        ToastUtils.showErrorToast(
-          'Gagal menambahkan ${jenisKelamin.toLowerCase() == 'l' ? 'ustadz' : 'ustadzah'}',
-        );
+      if (Get.isRegistered<DaftarUstadzController>()) {
+        await Get.find<DaftarUstadzController>().fetchData();
       }
+      if (Get.isRegistered<AdminHomeController>()) {
+        await Get.find<AdminHomeController>().fetchTotals();
+      }
+      resetForm();
+      ToastUtils.showSuccessToast(
+        '${jenisKelamin.toLowerCase() == 'l' ? 'Ustadz' : 'Ustadzah'} berhasil ditambahkan',
+      );
+    } on AppException catch (e) {
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
       if (kDebugMode) {
         print('error: $e');
       }
-      final now = DateTime.now();
-      if (lastErrorShown == null ||
-          now.difference(lastErrorShown!) > Duration(seconds: 3)) {
-        lastErrorShown = now;
-        ToastUtils.showErrorToast(
-          'Terjadi kesalahan\nPeriksa koneksi internet Anda',
-        );
-      }
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isSaveProfileLoading.value = false;
     }

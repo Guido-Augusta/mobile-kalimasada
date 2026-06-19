@@ -902,13 +902,7 @@ class SaveProfileButton extends StatelessWidget {
                     controller.waliKelasTahapC.value,
                   );
                 } else {
-                  final now = DateTime.now();
-                  if (controller.lastErrorShown == null ||
-                      now.difference(controller.lastErrorShown!) >
-                          const Duration(seconds: 3)) {
-                    controller.lastErrorShown = now;
-                    ToastUtils.showErrorToast('Pastikan data yang diisi valid');
-                  }
+                  ToastUtils.showErrorToast('Pastikan data yang diisi valid');
                 }
               }
             : null,
