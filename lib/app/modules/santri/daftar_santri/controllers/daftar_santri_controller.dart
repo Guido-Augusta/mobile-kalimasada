@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobile_kalimasada/app/data/exceptions/app_exception.dart';
 import 'package:mobile_kalimasada/app/data/models/daftar_santri.dart' as ds;
 import 'package:mobile_kalimasada/app/data/repositories/santri_repository.dart';
 import 'package:mobile_kalimasada/app/utils/image_helper.dart';
@@ -72,8 +73,8 @@ class DaftarSantriController extends GetxController {
       isLoading.value = true;
       resetPagination();
 
-      final data = await _santriRepository.getSantriList(
-        currentPage: currentPage,
+      final res = await _santriRepository.fetchSantriList(
+        page: currentPage,
         limit: _perPage,
         tahapHafalan: tahapHafalan.value,
         search: searchQuery.value,
@@ -81,13 +82,15 @@ class DaftarSantriController extends GetxController {
 
       santriList.clear();
 
-      if (data.length < _perPage) {
+      if (res.data.length < _perPage) {
         hasMore.value = false;
       }
 
-      santriList.assignAll(data);
+      santriList.assignAll(res.data);
+    } on AppException catch (e) {
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
-      ToastUtils.showErrorToast(e.toString());
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isLoading.value = false;
     }
@@ -109,21 +112,24 @@ class DaftarSantriController extends GetxController {
       isLoadingMore.value = true;
       currentPage++;
 
-      final data = await _santriRepository.getSantriList(
-        currentPage: currentPage,
+      final res = await _santriRepository.fetchSantriList(
+        page: currentPage,
         limit: _perPage,
         tahapHafalan: tahapHafalan.value,
         search: searchQuery.value,
       );
 
-      if (data.length < _perPage) {
+      if (res.data.length < _perPage) {
         hasMore.value = false;
       }
 
-      santriList.addAll(data);
+      santriList.addAll(res.data);
+    } on AppException catch (e) {
+      currentPage--;
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
-      currentPage--; // Revert page on error
-      ToastUtils.showErrorToast(e.toString());
+      currentPage--;
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isLoadingMore.value = false;
     }
@@ -139,8 +145,10 @@ class DaftarSantriController extends GetxController {
       }
       Get.back();
       ToastUtils.showSuccessToast('Santri berhasil dihapus');
+    } on AppException catch (e) {
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
-      ToastUtils.showErrorToast(e.toString());
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isLoadingDeleteAccount.value = false;
     }

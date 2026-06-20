@@ -27,31 +27,27 @@ class SantriRepository {
     }
   }
 
-  Future<List<Datum>> getSantriList({
-    required int currentPage,
+  Future<DaftarSantri> fetchSantriList({
+    required int page,
     required int limit,
-    required String tahapHafalan,
-    required String search,
+    String tahapHafalan = '',
+    String search = '',
   }) async {
     try {
-      final queryParams = {
-        'page': currentPage.toString(),
-        'limit': limit.toString(),
-        'tahapHafalan': tahapHafalan,
-        'search': search,
-      };
-
       final response = await _apiClient.dio.get(
         ApiUrl.santri,
-        queryParameters: queryParams,
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          'tahapHafalan': tahapHafalan,
+          'search': search,
+        },
       );
 
       if (response.statusCode == 200) {
-        final data = response.data['data'];
-        final santriList = List<Datum>.from(data.map((x) => Datum.fromJson(x)));
-        return santriList;
+        return DaftarSantri.fromJson(response.data);
       } else {
-        throw UnexpectedException(message: 'Gagal memuat data santri');
+        throw UnexpectedException(message: 'Gagal memuat daftar santri');
       }
     } on DioException catch (e) {
       throw AppExceptionMapper.fromDioException(e);
@@ -164,11 +160,7 @@ class SantriRepository {
     try {
       final response = await _apiClient.dio.put(
         ApiUrl.santriDetail(santriId),
-        data: {
-          'nama': nama,
-          'tahapHafalan': tahapHafalan,
-          'ortuId': ortuId,
-        },
+        data: {'nama': nama, 'tahapHafalan': tahapHafalan, 'ortuId': ortuId},
       );
 
       if (response.statusCode != 200) {
@@ -188,9 +180,7 @@ class SantriRepository {
     try {
       final response = await _apiClient.dio.put(
         ApiUrl.santriDetail(santriId),
-        data: {
-          'password': password,
-        },
+        data: {'password': password},
       );
 
       if (response.statusCode != 200) {

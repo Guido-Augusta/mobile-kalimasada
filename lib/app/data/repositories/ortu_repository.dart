@@ -67,7 +67,7 @@ class OrtuRepository {
   /// Mengambil daftar santri (anak) berdasarkan ortuId
   Future<List<Datum>> getSantriList(String ortuId) async {
     try {
-      final queryParams = {'page': '1', 'limit': '10', 'ortuId': ortuId};
+      final queryParams = {'page': '1', 'limit': '20', 'ortuId': ortuId};
 
       final response = await _apiClient.dio.get(
         ApiUrl.santri,
@@ -221,9 +221,7 @@ class OrtuRepository {
   /// Delete ortu account
   Future<void> deleteOrtu(String ortuId) async {
     try {
-      final response = await _apiClient.dio.delete(
-        ApiUrl.deleteOrtu(ortuId),
-      );
+      final response = await _apiClient.dio.delete(ApiUrl.deleteOrtu(ortuId));
 
       if (response.statusCode != 200) {
         throw UnexpectedException(message: 'Gagal menghapus orang tua');

@@ -7,6 +7,8 @@ import 'package:mobile_kalimasada/app/data/models/summary_hafalan_surah.dart'
 import 'package:mobile_kalimasada/app/data/repositories/hafalan_repository.dart';
 import 'package:mobile_kalimasada/app/utils/toast_utils.dart';
 
+import '../../../../data/exceptions/app_exception.dart';
+
 class SummaryHafalanController extends GetxController {
   final HafalanRepository _hafalanRepository = Get.find<HafalanRepository>();
   var isLoading = false.obs;
@@ -31,8 +33,6 @@ class SummaryHafalanController extends GetxController {
   var summaryHafalanJuzList = <juz_model.Datum>[].obs;
 
   final scrollController = ScrollController();
-
-  DateTime? _lastErrorShown;
 
   @override
   void onInit() {
@@ -79,15 +79,6 @@ class SummaryHafalanController extends GetxController {
     });
   }
 
-  void _showError(String msg) {
-    final now = DateTime.now();
-    if (_lastErrorShown == null ||
-        now.difference(_lastErrorShown!) > const Duration(seconds: 3)) {
-      _lastErrorShown = now;
-      ToastUtils.showErrorToast(msg);
-    }
-  }
-
   void getSummaryHafalan() async {
     try {
       isLoading.value = true;
@@ -118,8 +109,10 @@ class SummaryHafalanController extends GetxController {
         if (items.length < _perPage) hasMore.value = false;
         summaryHafalanJuzList.value = items;
       }
+    } on AppException catch (e) {
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
-      _showError(e.toString());
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isLoading.value = false;
     }
@@ -155,9 +148,12 @@ class SummaryHafalanController extends GetxController {
         if (items.length < _perPage) hasMore.value = false;
         summaryHafalanJuzList.addAll(items);
       }
+    } on AppException catch (e) {
+      currentPage--;
+      ToastUtils.showErrorToast(e.message);
     } catch (e) {
       currentPage--;
-      _showError(e.toString());
+      ToastUtils.showErrorToast('Terjadi kesalahan sistem');
     } finally {
       isLoadingMore.value = false;
     }
